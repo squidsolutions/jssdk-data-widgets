@@ -1,0 +1,24 @@
+{
+  "name": "squid_api_data_widgets",
+  "version": "1.0.0",
+  "homepage": "https://github.com/squidsolutions/jssdk-data-widgets",
+  "authors": [
+    "obalbous <oba@squid>"
+  ],
+  "main": "dist/squid_api_data-widgets.js",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "src",
+    "build",
+    "Gruntfile.js"
+  ],
+  "dependencies": {
+    "squid_api": "https://github.com/squidsolutions/jssdk2.git",
+    "handlebars": "~1.3.0"
+  }
+}
