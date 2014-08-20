@@ -1,0 +1,11 @@
+.sq-table {
+	border-spacing: 3px; border-collapse: separate; border: 1px solid #DDD;
+}
+
+.sq-table TH {
+	border: 1px solid #DDD; padding: 3px;
+}
+
+.sq-table TD {
+	border: 1px solid #DDD; padding: 3px;
+}
