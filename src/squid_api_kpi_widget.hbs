@@ -1,0 +1,14 @@
+{{#if this}}
+	<div class='sq-kpi'>
+		<span class="value" style="font-size: large;">{{value}}</span><span class="unit">{{unit}}</span>
+	    <span class="name">
+	        {{name}}
+	    </span>
+	</div>
+{{else}}
+	{{#if done}}
+  		No Data
+  	{{else}}
+  		Computing
+  	{{/if}}
+{{/if}}

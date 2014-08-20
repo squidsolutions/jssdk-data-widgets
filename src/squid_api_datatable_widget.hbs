@@ -1,16 +1,16 @@
 {{#if results}}
 	{{#with results}}
-	<table class='sq-table'>
+	<table class='sq-table' style="border-spacing: 3px; border-collapse: separate; border: 1px solid #DDD;">
 	    <thead>
 	        <tr>
-	            {{#cols}}<th>{{lname}}</th>{{/cols}}
+	            {{#cols}}<th style="border: 1px solid #DDD; padding: 3px;">{{lname}}</th>{{/cols}}
 	        </tr>
 	    </thead>
 	    <tbody>
 	        {{#rows}}
 	           <tr>
 	               {{#v}}
-	                  <td>{{this}}</td> 
+	                  <td style="border: 1px solid #DDD; padding: 3px;">{{this}}</td> 
 	               {{/v}}
 	           </tr>
 	        {{/rows}}
