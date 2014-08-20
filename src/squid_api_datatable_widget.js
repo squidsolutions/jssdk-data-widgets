@@ -5,6 +5,8 @@
     View = Backbone.View.extend( {
 
         template : null,
+        
+        maxRowsPerPage : 10000,
 
         initialize : function(options) {
             if (this.model) {
@@ -16,6 +18,9 @@
             } else {
                 this.template = squid_api.template.squid_api_datatable_widget;
             }
+            if (options.maxRowsPerPage) {
+                this.maxRowsPerPage = options.maxRowsPerPage;
+            }
         },
 
         setModel : function(model) {
@@ -24,11 +29,20 @@
         },
 
         render : function() {
-            var jsonData = this.model.toJSON();
-            jsonData.done = this.model.isDone();
-            var tableContent = this.$el;
-            var tableHTML = this.template(jsonData);
-            tableContent.html(tableHTML);
+            var jsonData, data;
+            jsonData = this.model.toJSON();
+            data = {};
+            data.done = this.model.isDone();
+            if (jsonData.results) {
+                data.results = {};
+                data.results.cols = jsonData.results.cols;
+                if (jsonData.results.rows.length> this.maxRowsPerPage) {
+                    data.results.rows = jsonData.results.rows.slice(0,this.maxRowsPerPage);
+                } else {
+                    data.results.rows = jsonData.results.rows;
+                }
+            }
+            this.$el.html(this.template(data));
             return this;
         }
     });
