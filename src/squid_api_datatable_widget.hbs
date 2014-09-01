@@ -1,0 +1,26 @@
+{{#if results}}
+	{{#with results}}
+	<table class='sq-table'>
+	    <thead>
+	        <tr>
+	            {{#cols}}<th>{{lname}}</th>{{/cols}}
+	        </tr>
+	    </thead>
+	    <tbody>
+	        {{#rows}}
+	           <tr>
+	               {{#v}}
+	                  <td>{{this}}</td> 
+	               {{/v}}
+	           </tr>
+	        {{/rows}}
+	    </tbody>
+	</table>
+	{{/with}}
+{{else}}
+	{{#if done}}
+  		No Data
+  	{{else}}
+  		Computing
+  	{{/if}}
+{{/if}}
