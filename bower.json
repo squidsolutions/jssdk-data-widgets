@@ -19,6 +19,7 @@
   ],
   "dependencies": {
     "squid_api": "https://github.com/squidsolutions/jssdk2.git",
-    "handlebars": "~1.3.0"
+    "handlebars": "~1.3.0",
+    "d3" : "3"
   }
 }
