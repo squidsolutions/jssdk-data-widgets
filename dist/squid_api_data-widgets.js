@@ -149,6 +149,8 @@ function program6(depth0,data) {
         template : null,
         
         maxRowsPerPage : 10000,
+        
+        format : null,
 
         initialize : function(options) {
             if (this.model) {
@@ -163,6 +165,18 @@ function program6(depth0,data) {
             if (options.maxRowsPerPage) {
                 this.maxRowsPerPage = options.maxRowsPerPage;
             }
+            if (options.format) {
+                this.format = options.format;
+            } else {
+                // default number formatter
+                if (d3) {
+                    this.format = d3.format(",.f");
+                } else {
+                    this.format = function(f){
+                        return f;
+                    };
+                }
+            }
         },
 
         setModel : function(model) {
@@ -171,18 +185,24 @@ function program6(depth0,data) {
         },
 
         render : function() {
-            var jsonData, data;
+            var jsonData, data, rowIdx, colIdx, row, rows, v;
             jsonData = this.model.toJSON();
             data = {};
             data.done = this.model.isDone();
             if (jsonData.results) {
-                data.results = {};
-                data.results.cols = jsonData.results.cols;
-                if (jsonData.results.rows.length> this.maxRowsPerPage) {
-                    data.results.rows = jsonData.results.rows.slice(0,this.maxRowsPerPage);
-                } else {
-                    data.results.rows = jsonData.results.rows;
-                }
+                data.results = {"cols" : jsonData.results.cols, "rows" : []};
+                rows = jsonData.results.rows;
+                for (rowIdx = 0; (rowIdx<rows.length && rowIdx<this.maxRowsPerPage); rowIdx++)
+                    row = rows[rowIdx];
+                    newRow = {v:[]};
+                    for (colIdx = 0; colIdx<jsonData.results.cols.length; colIdx++) {
+                        v = row.v[colIdx];
+                        if (jsonData.results.cols[colIdx].dataType == "NUMBER") {
+                            v = this.format(v);
+                        }
+                        newRow.v.push(v);
+                    }
+                    data.results.rows.push(newRow);
             }
             this.$el.html(this.template(data));
             return this;

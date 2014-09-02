@@ -21,7 +21,14 @@
             if (options.format) {
                 this.format = options.format;
             } else {
-                this.format = function(f){return f;};
+                // default number formatter
+                if (d3) {
+                    this.format = d3.format(",.1f");
+                } else {
+                    this.format = function(f){
+                        return f;
+                    };
+                }
             }
         },
 
