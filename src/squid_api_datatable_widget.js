@@ -50,7 +50,7 @@
             if (jsonData.results) {
                 data.results = {"cols" : jsonData.results.cols, "rows" : []};
                 rows = jsonData.results.rows;
-                for (rowIdx = 0; (rowIdx<rows.length && rowIdx<this.maxRowsPerPage); rowIdx++)
+                for (rowIdx = 0; (rowIdx<rows.length && rowIdx<this.maxRowsPerPage); rowIdx++) {
                     row = rows[rowIdx];
                     newRow = {v:[]};
                     for (colIdx = 0; colIdx<jsonData.results.cols.length; colIdx++) {
@@ -61,6 +61,7 @@
                         newRow.v.push(v);
                     }
                     data.results.rows.push(newRow);
+                }
             }
             this.$el.html(this.template(data));
             return this;
