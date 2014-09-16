@@ -91,6 +91,59 @@ function program11(depth0,data) {
   else { return ''; }
   });
 
+this["squid_api"]["template"]["squid_api_dimension_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\r\n    <select class=\"sq-select form-control\">\r\n        ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n    </select>\r\n";
+  return buffer;
+  }
+function program2(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\r\n            <option value=\"";
+  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += ">\r\n                ";
+  if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\r\n            </option>\r\n        ";
+  return buffer;
+  }
+function program3(depth0,data) {
+  
+  
+  return "selected";
+  }
+
+function program5(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\r\n    <!-- just display filter name -->\r\n    <label>";
+  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</label>\r\n    <span>-</span>\r\n";
+  return buffer;
+  }
+
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(5, program5, data),fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { return stack1; }
+  else { return ''; }
+  });
+
 this["squid_api"]["template"]["squid_api_kpi_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -208,6 +261,73 @@ function program6(depth0,data) {
             this.$el.html(this.template(data));
             return this;
         }
+    });
+
+    return View;
+}));
+
+(function (root, factory) {
+    root.squid_api.view.DimensionSelector = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_dimension_selector_widget);
+}(this, function (Backbone, squid_api, template) {
+
+    var View = Backbone.View.extend({
+        template : null,
+        dimensions : [],
+
+        initialize: function(options) {
+            // setup options
+            if (options.template) {
+                this.template = options.template;
+            } else {
+                this.template = template;
+            }
+            var me = this;
+            squid_api.model.project.on('change', function(model) {
+                // get the dimensions from the api
+                var domain = squid_api.utils.find(model.get("domains"), "oid", me.model.get("domains")[0].domainId);
+                var dims = domain.dimensions;
+                
+                // filter categorical dimensions
+                for (var i=0; i<dims.length; i++){
+                    var dim = dims[i];
+                    if (dim.type == "CATEGORICAL") {
+                        me.dimensions.push(dim);
+                    }
+                }
+                me.render();
+            });
+        },
+
+        setModel: function(model) {
+            this.model = model;
+            this.initialize();
+        },
+        
+        events: {
+            "change": function(event) {
+                var oid = this.$el.find("select").val();
+                this.model.setDimensionId(oid);
+            }
+        },
+
+        render: function() {
+            // display
+            var jsonData = {"selAvailable" : true, "options" : []};
+            for (var i=0; i<this.dimensions.length; i++) {
+                var dim = this.dimensions[i];
+                var selected = false;
+                if (dim.oid == this.model.get("dimensions")[0].dimensionId) {
+                    selected = true;
+                }
+                var option = {"label" : dim.name, "value" : dim.oid, "selected" : selected};
+                jsonData.options.push(option);
+            }
+            var html = this.template(jsonData);
+            this.$el.html(html);
+            this.$el.show();
+            return this;
+        }
+
     });
 
     return View;
