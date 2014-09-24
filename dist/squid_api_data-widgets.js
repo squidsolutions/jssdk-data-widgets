@@ -200,9 +200,9 @@ function program6(depth0,data) {
     View = Backbone.View.extend( {
 
         template : null,
-        
+
         maxRowsPerPage : 10000,
-        
+
         format : null,
 
         initialize : function(options) {
@@ -239,7 +239,17 @@ function program6(depth0,data) {
 
         render : function() {
             var jsonData, data, rowIdx, colIdx, row, rows, v;
+
             jsonData = this.model.toJSON();
+
+            // Use only the first array if multiple happen to exist
+
+            if (jsonData.analyses instanceof Array && jsonData.analyses !== null) {
+              jsonData = jsonData.analyses[0].attributes;
+            } else {
+              jsonData = jsonData.attributes;
+            }
+            
             data = {};
             data.done = this.model.isDone();
             if (jsonData.results) {
