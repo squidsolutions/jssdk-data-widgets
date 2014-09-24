@@ -7,7 +7,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var stack1, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\r\n	";
   stack1 = helpers['with'].call(depth0, (depth0 && depth0.results), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
@@ -16,7 +16,7 @@ function program1(depth0,data) {
   return buffer;
   }
 function program2(depth0,data) {
-  
+
   var buffer = "", stack1, helper, options;
   buffer += "\r\n	<table class='sq-table'>\r\n	    <thead>\r\n	        <tr>\r\n	            ";
   options={hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data}
@@ -34,7 +34,7 @@ function program2(depth0,data) {
   return buffer;
   }
 function program3(depth0,data) {
-  
+
   var buffer = "", stack1, helper;
   buffer += "<th>";
   if (helper = helpers.lname) { stack1 = helper.call(depth0, {hash:{},data:data}); }
@@ -45,7 +45,7 @@ function program3(depth0,data) {
   }
 
 function program5(depth0,data) {
-  
+
   var buffer = "", stack1, helper, options;
   buffer += "\r\n	           <tr>\r\n	               ";
   options={hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data}
@@ -57,7 +57,7 @@ function program5(depth0,data) {
   return buffer;
   }
 function program6(depth0,data) {
-  
+
   var buffer = "";
   buffer += "\r\n	                  <td>"
     + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
@@ -66,7 +66,7 @@ function program6(depth0,data) {
   }
 
 function program8(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\r\n	";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.done), {hash:{},inverse:self.program(11, program11, data),fn:self.program(9, program9, data),data:data});
@@ -75,14 +75,14 @@ function program8(depth0,data) {
   return buffer;
   }
 function program9(depth0,data) {
-  
-  
+
+
   return "\r\n  		No Data\r\n  	";
   }
 
 function program11(depth0,data) {
-  
-  
+
+
   return "\r\n  		Computing\r\n  	";
   }
 
@@ -97,7 +97,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\r\n    <select class=\"sq-select form-control\">\r\n        ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
@@ -106,7 +106,7 @@ function program1(depth0,data) {
   return buffer;
   }
 function program2(depth0,data) {
-  
+
   var buffer = "", stack1, helper;
   buffer += "\r\n            <option value=\"";
   if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
@@ -123,13 +123,13 @@ function program2(depth0,data) {
   return buffer;
   }
 function program3(depth0,data) {
-  
-  
+
+
   return "selected";
   }
 
 function program5(depth0,data) {
-  
+
   var buffer = "", stack1, helper;
   buffer += "\r\n    <!-- just display filter name -->\r\n    <label>";
   if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
@@ -150,7 +150,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1, helper;
   buffer += "\r\n	<div class='sq-kpi'>\r\n		<span class=\"value\" style=\"font-size: large;\">";
   if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
@@ -169,7 +169,7 @@ function program1(depth0,data) {
   }
 
 function program3(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\r\n	";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.done), {hash:{},inverse:self.program(6, program6, data),fn:self.program(4, program4, data),data:data});
@@ -178,14 +178,14 @@ function program3(depth0,data) {
   return buffer;
   }
 function program4(depth0,data) {
-  
-  
+
+
   return "\r\n  		No Data\r\n  	";
   }
 
 function program6(depth0,data) {
-  
-  
+
+
   return "\r\n  		Computing\r\n  	";
   }
 
@@ -200,9 +200,9 @@ function program6(depth0,data) {
     View = Backbone.View.extend( {
 
         template : null,
-        
+
         maxRowsPerPage : 10000,
-        
+
         format : null,
 
         initialize : function(options) {
@@ -239,7 +239,17 @@ function program6(depth0,data) {
 
         render : function() {
             var jsonData, data, rowIdx, colIdx, row, rows, v;
+
             jsonData = this.model.toJSON();
+
+            // Use only the first array if multiple happen to exist
+
+            if (jsonData.analyses instanceof Array && jsonData.analyses !== null) {
+              jsonData = jsonData.analyses[0].attributes;
+            } else {
+              jsonData = jsonData.attributes;
+            }
+            
             data = {};
             data.done = this.model.isDone();
             if (jsonData.results) {
@@ -286,7 +296,7 @@ function program6(depth0,data) {
                 // get the dimensions from the api
                 var domain = squid_api.utils.find(model.get("domains"), "oid", me.model.get("domains")[0].domainId);
                 var dims = domain.dimensions;
-                
+
                 // filter categorical dimensions
                 for (var i=0; i<dims.length; i++){
                     var dim = dims[i];
@@ -302,7 +312,7 @@ function program6(depth0,data) {
             this.model = model;
             this.initialize();
         },
-        
+
         events: {
             "change": function(event) {
                 var oid = this.$el.find("select").val();
@@ -340,7 +350,7 @@ function program6(depth0,data) {
     View = Backbone.View.extend( {
 
         template : null,
-        
+
         format : null,
 
         initialize : function(options) {
@@ -386,7 +396,7 @@ function program6(depth0,data) {
                             jsonData.unit = "%";
                             jsonData.name = results.cols[1].lname;
                         }
-                    } 
+                    }
                 }
             }
             var tableContent = this.$el;
