@@ -243,13 +243,13 @@ function program6(depth0,data) {
             jsonData = this.model.toJSON();
 
             // Use only the first array if multiple happen to exist
-
+            console.log('here')
             if (jsonData.analyses instanceof Array && jsonData.analyses !== null) {
               jsonData = jsonData.analyses[0].attributes;
             } else {
               jsonData = jsonData.attributes;
             }
-            
+
             data = {};
             data.done = this.model.isDone();
             if (jsonData.results) {
