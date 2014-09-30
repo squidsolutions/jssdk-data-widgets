@@ -298,11 +298,15 @@ function program6(depth0,data) {
 
                 var domainId, domain;
 
-                try {
-                  domainId = me.model.get("domains")[0].domainId;
-                }
-                catch(err) {
+                /* See if we can obtain the domain's.
+                If not check for a multi analysis array */
+
+                domains = me.model.get("domains");
+
+                if (!domains) {
                   domainId = me.model.get("analyses")[0].get("domains")[0].domainId;
+                } else {
+                  domainId = me.model.get("domains")[0].domainId;
                 }
 
                 domain = squid_api.utils.find(model.get("domains"), "oid", domainId);
@@ -341,14 +345,15 @@ function program6(depth0,data) {
                 var dim = this.dimensions[i];
                 var selected = false;
 
-                var oid;
+                /* See if we can obtain the dimensions.
+                If not check for a multi analysis array */
 
-                try {
-                  oid = this.model.get("dimensions")[0].dimensionId;
-                }
+                var oid = this.model.get("dimensions");
 
-                catch(err) {
-                  oid = this.model.get("analyses")[0].get("dimensions")[0].dimensionId;
+                if (!oid) {
+                    oid = this.model.get("analyses")[0].get("dimensions")[0].dimensionId;
+                } else {
+                    oid = this.model.get("dimensions")[0].dimensionId;
                 }
 
                 if (dim.oid == oid) {
