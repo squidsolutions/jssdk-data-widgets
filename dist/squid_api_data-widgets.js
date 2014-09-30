@@ -249,7 +249,7 @@ function program6(depth0,data) {
             } else {
               jsonData = jsonData.attributes;
             }
-            
+
             data = {};
             data.done = this.model.isDone();
             if (jsonData.results) {
