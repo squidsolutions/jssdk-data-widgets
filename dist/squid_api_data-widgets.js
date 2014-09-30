@@ -284,6 +284,7 @@ function program6(depth0,data) {
     var View = Backbone.View.extend({
         template : null,
         dimensions : [],
+        dimensionIdList : null,
 
         initialize: function(options) {
             // setup options
@@ -292,6 +293,11 @@ function program6(depth0,data) {
             } else {
                 this.template = template;
             }
+            
+            if (options.dimensionIdList) {
+                this.dimensionIdList = options.dimensionIdList;
+            }
+            
             var me = this;
             squid_api.model.project.on('change', function(model) {
                 // get the dimensions from the api
@@ -304,12 +310,10 @@ function program6(depth0,data) {
                 domains = me.model.get("domains");
 
                 if (!domains) {
-                  domainId = me.model.get("analyses")[0].get("domains")[0].domainId;
-                } else {
-                  domainId = me.model.get("domains")[0].domainId;
+                    domains = me.model.get("analyses")[0].get("domains");
                 }
 
-                domain = squid_api.utils.find(model.get("domains"), "oid", domainId);
+                domain = squid_api.utils.find(model.get("domains"), "oid", domains[0].domainId);
 
                 var dims = domain.dimensions;
 
@@ -317,7 +321,16 @@ function program6(depth0,data) {
                 for (var i=0; i<dims.length; i++){
                     var dim = dims[i];
                     if (dim.type == "CATEGORICAL") {
-                        me.dimensions.push(dim);
+                        if (me.dimensionIdList) {
+                            // insert and sort
+                            var idx = me.dimensionIdList.indexOf(dim.oid);
+                            if (idx >= 0) {
+                                me.dimensions[idx] = dim;
+                            }
+                        } else {
+                            // default unordered behavior
+                            me.dimensions.push(dim);
+                        }
                     }
                 }
                 me.render();
@@ -343,25 +356,25 @@ function program6(depth0,data) {
 
             for (var i=0; i<this.dimensions.length; i++) {
                 var dim = this.dimensions[i];
-                var selected = false;
-
-                /* See if we can obtain the dimensions.
-                If not check for a multi analysis array */
-
-                var oid = this.model.get("dimensions");
-
-                if (!oid) {
-                    oid = this.model.get("analyses")[0].get("dimensions")[0].dimensionId;
-                } else {
-                    oid = this.model.get("dimensions")[0].dimensionId;
+                if (dim) {
+                    var selected = false;
+    
+                    /* See if we can obtain the dimensions.
+                    If not check for a multi analysis array */
+    
+                    var dimensions = this.model.get("dimensions");
+    
+                    if (!dimensions) {
+                        dimensions = this.model.get("analyses")[0].get("dimensions");
+                    }
+    
+                    if (dim.oid == dimensions[0].oid) {
+                        selected = true;
+                    }
+    
+                    var option = {"label" : dim.name, "value" : dim.oid, "selected" : selected};
+                    jsonData.options.push(option);
                 }
-
-                if (dim.oid == oid) {
-                    selected = true;
-                }
-
-                var option = {"label" : dim.name, "value" : dim.oid, "selected" : selected};
-                jsonData.options.push(option);
             }
             var html = this.template(jsonData);
             this.$el.html(html);
