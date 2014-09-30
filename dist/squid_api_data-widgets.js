@@ -278,6 +278,7 @@ function program6(depth0,data) {
 
 (function (root, factory) {
     root.squid_api.view.DimensionSelector = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_dimension_selector_widget);
+
 }(this, function (Backbone, squid_api, template) {
 
     var View = Backbone.View.extend({
@@ -294,9 +295,24 @@ function program6(depth0,data) {
             var me = this;
             squid_api.model.project.on('change', function(model) {
                 // get the dimensions from the api
-                var domain = squid_api.utils.find(model.get("domains"), "oid", me.model.get("domains")[0].domainId);
+
+                var domainId, domain;
+
+                /* See if we can obtain the domain's.
+                If not check for a multi analysis array */
+
+                domains = me.model.get("domains");
+
+                if (!domains) {
+                  domainId = me.model.get("analyses")[0].get("domains")[0].domainId;
+                } else {
+                  domainId = me.model.get("domains")[0].domainId;
+                }
+
+                domain = squid_api.utils.find(model.get("domains"), "oid", domainId);
+
                 var dims = domain.dimensions;
-                
+
                 // filter categorical dimensions
                 for (var i=0; i<dims.length; i++){
                     var dim = dims[i];
@@ -312,23 +328,38 @@ function program6(depth0,data) {
             this.model = model;
             this.initialize();
         },
-        
+
         events: {
             "change": function(event) {
                 var oid = this.$el.find("select").val();
-                this.model.setDimensionId(oid);
+                this.model.get("analyses")[0].setDimensionId(oid);
             }
         },
 
         render: function() {
             // display
+
             var jsonData = {"selAvailable" : true, "options" : []};
+
             for (var i=0; i<this.dimensions.length; i++) {
                 var dim = this.dimensions[i];
                 var selected = false;
-                if (dim.oid == this.model.get("dimensions")[0].dimensionId) {
+
+                /* See if we can obtain the dimensions.
+                If not check for a multi analysis array */
+
+                var oid = this.model.get("dimensions");
+
+                if (!oid) {
+                    oid = this.model.get("analyses")[0].get("dimensions")[0].dimensionId;
+                } else {
+                    oid = this.model.get("dimensions")[0].dimensionId;
+                }
+
+                if (dim.oid == oid) {
                     selected = true;
                 }
+
                 var option = {"label" : dim.name, "value" : dim.oid, "selected" : selected};
                 jsonData.options.push(option);
             }
