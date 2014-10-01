@@ -368,7 +368,7 @@ function program6(depth0,data) {
                         dimensions = this.model.get("analyses")[0].get("dimensions");
                     }
     
-                    if (dim.oid == dimensions[0].oid) {
+                    if (dim.oid == dimensions[0].dimensionId) {
                         selected = true;
                     }
     
