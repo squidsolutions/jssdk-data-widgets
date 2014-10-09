@@ -67,7 +67,17 @@
         events: {
             "change": function(event) {
                 var oid = this.$el.find("select").val();
-                this.model.get("analyses")[0].setDimensionId(oid);
+
+                if (this.model.get("analyses")) {
+                    // If instance of array
+                    if (this.model.get("analyses")[0]) {
+                        this.model.get("analyses")[0].setDimensionId(oid);
+                    } else {
+                        this.model.get("analyses").setDimensionId(oid);
+                    }
+                } else {
+                    this.model.setDimensionId(oid);
+                }
             }
         },
 
