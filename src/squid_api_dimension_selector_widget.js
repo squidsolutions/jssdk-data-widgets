@@ -7,6 +7,7 @@
         template : null,
         dimensions : [],
         dimensionIdList : null,
+        dimensionIndex : 0,
 
         initialize: function(options) {
             // setup options
@@ -14,6 +15,10 @@
                 this.template = options.template;
             } else {
                 this.template = template;
+            }
+            
+            if (options.dimensionIndex) {
+                this.dimensionIndex = options.dimensionIndex;
             }
             
             if (options.dimensionIdList) {
@@ -67,7 +72,11 @@
         events: {
             "change": function(event) {
                 var oid = this.$el.find("select").val();
-                this.model.get("analyses")[0].setDimensionId(oid);
+                var analysis = this.model;
+                if (this.model.get("analyses")) {
+                    analysis = this.model.get("analyses")[0];
+                }
+                analysis.setDimensionId(oid, this.dimensionIndex);
             }
         },
 
@@ -90,7 +99,7 @@
                         dimensions = this.model.get("analyses")[0].get("dimensions");
                     }
     
-                    if (dim.oid == dimensions[0].dimensionId) {
+                    if (dim.oid == dimensions[this.dimensionIndex].dimensionId) {
                         selected = true;
                     }
     
