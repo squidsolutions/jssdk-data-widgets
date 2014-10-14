@@ -283,6 +283,7 @@ function program6(depth0,data) {
         template : null,
         dimensions : [],
         dimensionIdList : null,
+        dimensionIndex : 0,
 
         initialize: function(options) {
             // setup options
@@ -290,6 +291,10 @@ function program6(depth0,data) {
                 this.template = options.template;
             } else {
                 this.template = template;
+            }
+            
+            if (options.dimensionIndex) {
+                this.dimensionIndex = options.dimensionIndex;
             }
             
             if (options.dimensionIdList) {
@@ -344,16 +349,12 @@ function program6(depth0,data) {
             "change": function(event) {
                 var oid = this.$el.find("select").val();
 
+                var analysis = this.model;
                 if (this.model.get("analyses")) {
-                    // If instance of array
-                    if (this.model.get("analyses")[0]) {
-                        this.model.get("analyses")[0].setDimensionId(oid);
-                    } else {
-                        this.model.get("analyses").setDimensionId(oid);
-                    }
-                } else {
-                    this.model.setDimensionId(oid);
+                    analysis = this.model.get("analyses")[0];
                 }
+                analysis.setDimensionId(oid, this.dimensionIndex);
+
             }
         },
 
@@ -376,7 +377,7 @@ function program6(depth0,data) {
                         dimensions = this.model.get("analyses")[0].get("dimensions");
                     }
     
-                    if (dim.oid == dimensions[0].dimensionId) {
+                    if (dim.oid == dimensions[this.dimensionIndex].dimensionId) {
                         selected = true;
                     }
     
