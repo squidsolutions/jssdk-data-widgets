@@ -49,10 +49,8 @@
 
             // Use only the first array if multiple happen to exist
 
-            if (jsonData.analyses instanceof Array && jsonData.analyses !== null) {
-              jsonData = jsonData.analyses[0].attributes;
-            } else {
-              jsonData = jsonData.attributes;
+            if (jsonData.analyses && jsonData.analyses instanceof Array) {
+              jsonData = jsonData.analyses[0];
             }
 
             data = {};
