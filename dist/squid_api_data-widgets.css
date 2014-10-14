@@ -9,8 +9,3 @@
 .sq-table TD {
 	border: 1px solid #DDD; padding: 3px;
 }
-#origin {
-  position: relative;
-  top: -22px;
-  left: -5px;
-}

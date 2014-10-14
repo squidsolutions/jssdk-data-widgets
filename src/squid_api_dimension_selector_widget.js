@@ -72,11 +72,13 @@
         events: {
             "change": function(event) {
                 var oid = this.$el.find("select").val();
+
                 var analysis = this.model;
                 if (this.model.get("analyses")) {
                     analysis = this.model.get("analyses")[0];
                 }
                 analysis.setDimensionId(oid, this.dimensionIndex);
+
             }
         },
 
