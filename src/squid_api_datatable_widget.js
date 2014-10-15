@@ -43,17 +43,17 @@
         },
 
         render : function() {
-            var jsonData, data, rowIdx, colIdx, row, rows, v;
+            var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
 
-            jsonData = this.model.toJSON();
+            analysis = this.model;
 
-            // Use only the first array if multiple happen to exist
+            // Use the first analyses array
 
-            if (jsonData.analyses instanceof Array && jsonData.analyses !== null) {
-              jsonData = jsonData.analyses[0].attributes;
-            } else {
-              jsonData = jsonData.attributes;
+            if (analysis.get("analyses")) {
+              analysis = analysis.get("analyses")[0];
             }
+
+            jsonData = analysis.toJSON();
 
             data = {};
             data.done = this.model.isDone();

@@ -239,17 +239,16 @@ function program6(depth0,data) {
         },
 
         render : function() {
-            var jsonData, data, rowIdx, colIdx, row, rows, v;
+            var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
 
-            jsonData = this.model.toJSON();
+            analysis = this.model;
 
             // Use only the first array if multiple happen to exist
 
-            if (jsonData.analyses instanceof Array && jsonData.analyses !== null) {
-              jsonData = jsonData.analyses[0].attributes;
-            } else {
-              jsonData = jsonData.attributes;
+            if (analysis.get("analyses")) {
+              analysis = analysis.get("analyses")[0];
             }
+            jsonData = analysis.toJSON();
 
             data = {};
             data.done = this.model.isDone();
@@ -290,20 +289,24 @@ function program6(depth0,data) {
         template : null,
         dimensions : [],
         dimensionIdList : null,
+        dimensionIndex : 0,
 
         initialize: function(options) {
-
             // setup options
             if (options.template) {
                 this.template = options.template;
             } else {
                 this.template = template;
             }
-
+            
+            if (options.dimensionIndex) {
+                this.dimensionIndex = options.dimensionIndex;
+            }
+            
             if (options.dimensionIdList) {
                 this.dimensionIdList = options.dimensionIdList;
             }
-
+            
             var me = this;
             squid_api.model.project.on('change', function(model) {
                 // get the dimensions from the api
@@ -352,16 +355,12 @@ function program6(depth0,data) {
             "change": function(event) {
                 var oid = this.$el.find("select").val();
 
+                var analysis = this.model;
                 if (this.model.get("analyses")) {
-                    // If instance of array
-                    if (this.model.get("analyses")[0]) {
-                        this.model.get("analyses")[0].setDimensionId(oid);
-                    } else {
-                        this.model.get("analyses").setDimensionId(oid);
-                    }
-                } else {
-                    this.model.setDimensionId(oid);
+                    analysis = this.model.get("analyses")[0];
                 }
+                analysis.setDimensionId(oid, this.dimensionIndex);
+
             }
         },
 
@@ -374,20 +373,20 @@ function program6(depth0,data) {
                 var dim = this.dimensions[i];
                 if (dim) {
                     var selected = false;
-
+    
                     /* See if we can obtain the dimensions.
                     If not check for a multi analysis array */
-
+    
                     var dimensions = this.model.get("dimensions");
-
+    
                     if (!dimensions) {
                         dimensions = this.model.get("analyses")[0].get("dimensions");
                     }
-
-                    if (dim.oid == dimensions[0].dimensionId) {
+    
+                    if (dim.oid == dimensions[this.dimensionIndex].dimensionId) {
                         selected = true;
                     }
-
+    
                     var option = {"label" : dim.name, "value" : dim.oid, "selected" : selected};
                     jsonData.options.push(option);
                 }
