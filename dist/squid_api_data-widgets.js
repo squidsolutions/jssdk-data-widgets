@@ -271,8 +271,8 @@ function program6(depth0,data) {
             }
             this.$el.html(this.template(data));
 
-            // After data has rendered to the DOM, initiate the Data Table
-            $(".sq-table").DataTable();
+            // Initiate the Data Table after render
+            this.$el.find(".sq-table").DataTable();
 
             return this;
         }
