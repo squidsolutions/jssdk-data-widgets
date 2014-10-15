@@ -74,6 +74,10 @@
                 }
             }
             this.$el.html(this.template(data));
+
+            // Initiate the Data Table after render
+            $(".sq-table").DataTable();
+
             return this;
         }
     });

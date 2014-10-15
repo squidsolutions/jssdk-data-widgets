@@ -10,7 +10,7 @@
 	        {{#rows}}
 	           <tr>
 	               {{#v}}
-	                  <td>{{this}}</td> 
+	                  <td>{{this}}</td>
 	               {{/v}}
 	           </tr>
 	        {{/rows}}
@@ -21,6 +21,18 @@
 	{{#if done}}
   		No Data
   	{{else}}
-  		Computing
+  	<div class="sq-loading" style="position:absolute; width:100%; top:40%;">
+		<div class="spinner">
+  			<div class="rect5"></div>
+  			<div class="rect4"></div>
+  			<div class="rect3"></div>
+  			<div class="rect2"></div>
+  			<div class="rect1"></div>
+  			<div class="rect2"></div>
+  			<div class="rect3"></div>
+  			<div class="rect4"></div>
+  			<div class="rect5"></div>
+		</div>
+	</div>
   	{{/if}}
 {{/if}}

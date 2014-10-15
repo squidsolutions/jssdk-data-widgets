@@ -1,11 +1,47 @@
-.sq-table {
-	border-spacing: 3px; border-collapse: separate; border: 1px solid #DDD;
+.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {
+	color: #767676;
 }
 
-.sq-table TH {
-	border: 1px solid #DDD; padding: 3px;
+.dataTables_wrapper {
+	padding: 10px;
+	background: #ffffff;
+	font-weight: 100;
 }
 
-.sq-table TD {
-	border: 1px solid #DDD; padding: 3px;
+.dataTables_wrapper input {
+	border-radius: 5px;
+	border: 1px solid #f1f2f7;
+	padding: 2px;
+}
+
+.dataTables_wrapper .dataTables_length {
+	padding-left: 17px;
+}
+
+.dataTables_wrapper .dataTables_length select {
+	padding:3px;
+    margin: 0;
+    border-radius:4px;
+    background: #f8f8f8;
+	border-color: #e7e7e7;
+    display: inline-block;
+    cursor:pointer;
+}
+
+.dataTables_wrapper table.dataTable thead th, table.dataTable thead td, table.dataTable.no-footer  {
+	border-bottom: 1px solid #e7e7e7;
+	padding-top: 10px;
+}
+
+.dataTables_wrapper table.dataTable thead th, table.dataTable tfoot th {
+	font-weight: 100;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover, .dataTables_wrapper .dataTables_paginate .paginate_button, .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+	background: none;
+	color: #767676 !important;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+	padding-top: 10px;
 }

@@ -4,7 +4,7 @@ this["squid_api"]["template"] = this["squid_api"]["template"] || {};
 this["squid_api"]["template"]["squid_api_datatable_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var stack1, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
 
 function program1(depth0,data) {
   
@@ -61,7 +61,7 @@ function program6(depth0,data) {
   var buffer = "";
   buffer += "\r\n	                  <td>"
     + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
-    + "</td> \r\n	               ";
+    + "</td>\r\n	               ";
   return buffer;
   }
 
@@ -83,12 +83,13 @@ function program9(depth0,data) {
 function program11(depth0,data) {
   
   
-  return "\r\n  		Computing\r\n  	";
+  return "\r\n  	<div class=\"sq-loading\" style=\"position:absolute; width:100%; top:40%;\">\r\n		<div class=\"spinner\">\r\n  			<div class=\"rect5\"></div>\r\n  			<div class=\"rect4\"></div>\r\n  			<div class=\"rect3\"></div>\r\n  			<div class=\"rect2\"></div>\r\n  			<div class=\"rect1\"></div>\r\n  			<div class=\"rect2\"></div>\r\n  			<div class=\"rect3\"></div>\r\n  			<div class=\"rect4\"></div>\r\n  			<div class=\"rect5\"></div>\r\n		</div>\r\n	</div>\r\n  	";
   }
 
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.results), {hash:{},inverse:self.program(8, program8, data),fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { return stack1; }
-  else { return ''; }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n";
+  return buffer;
   });
 
 this["squid_api"]["template"]["squid_api_dimension_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -269,6 +270,10 @@ function program6(depth0,data) {
                 }
             }
             this.$el.html(this.template(data));
+
+            // After data has rendered to the DOM, initiate the Data Table
+            $(".sq-table").DataTable();
+
             return this;
         }
     });
@@ -287,17 +292,18 @@ function program6(depth0,data) {
         dimensionIdList : null,
 
         initialize: function(options) {
+
             // setup options
             if (options.template) {
                 this.template = options.template;
             } else {
                 this.template = template;
             }
-            
+
             if (options.dimensionIdList) {
                 this.dimensionIdList = options.dimensionIdList;
             }
-            
+
             var me = this;
             squid_api.model.project.on('change', function(model) {
                 // get the dimensions from the api
@@ -368,20 +374,20 @@ function program6(depth0,data) {
                 var dim = this.dimensions[i];
                 if (dim) {
                     var selected = false;
-    
+
                     /* See if we can obtain the dimensions.
                     If not check for a multi analysis array */
-    
+
                     var dimensions = this.model.get("dimensions");
-    
+
                     if (!dimensions) {
                         dimensions = this.model.get("analyses")[0].get("dimensions");
                     }
-    
+
                     if (dim.oid == dimensions[0].dimensionId) {
                         selected = true;
                     }
-    
+
                     var option = {"label" : dim.name, "value" : dim.oid, "selected" : selected};
                     jsonData.options.push(option);
                 }
