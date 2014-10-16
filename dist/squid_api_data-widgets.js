@@ -243,11 +243,12 @@ function program6(depth0,data) {
 
             analysis = this.model;
 
-            // Use only the first array if multiple happen to exist
+            // Use the first analyses array
 
             if (analysis.get("analyses")) {
               analysis = analysis.get("analyses")[0];
             }
+
             jsonData = analysis.toJSON();
 
             data = {};
@@ -289,7 +290,6 @@ function program6(depth0,data) {
         template : null,
         dimensions : [],
         dimensionIdList : null,
-        dimensionIndex : 0,
 
         initialize: function(options) {
             // setup options
@@ -297,10 +297,6 @@ function program6(depth0,data) {
                 this.template = options.template;
             } else {
                 this.template = template;
-            }
-            
-            if (options.dimensionIndex) {
-                this.dimensionIndex = options.dimensionIndex;
             }
             
             if (options.dimensionIdList) {
@@ -355,12 +351,16 @@ function program6(depth0,data) {
             "change": function(event) {
                 var oid = this.$el.find("select").val();
 
-                var analysis = this.model;
                 if (this.model.get("analyses")) {
-                    analysis = this.model.get("analyses")[0];
+                    // If instance of array
+                    if (this.model.get("analyses")[0]) {
+                        this.model.get("analyses")[0].setDimensionId(oid);
+                    } else {
+                        this.model.get("analyses").setDimensionId(oid);
+                    }
+                } else {
+                    this.model.setDimensionId(oid);
                 }
-                analysis.setDimensionId(oid, this.dimensionIndex);
-
             }
         },
 
@@ -383,7 +383,7 @@ function program6(depth0,data) {
                         dimensions = this.model.get("analyses")[0].get("dimensions");
                     }
     
-                    if (dim.oid == dimensions[this.dimensionIndex].dimensionId) {
+                    if (dim.oid == dimensions[0].dimensionId) {
                         selected = true;
                     }
     
