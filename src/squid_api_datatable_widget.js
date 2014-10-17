@@ -75,6 +75,19 @@
             }
             this.$el.html(this.template(data));
 
+            if (!this.model.isDone()) {
+                // running
+                if (this.model.get("status") == "RUNNING") {
+                    $(".sq-loading").show();
+                }
+            } else if (this.model.get("error")) {
+                // error
+                $(".sq-loading").hide();
+            } else {
+                // display
+                $(".sq-loading").hide();
+            }
+
             // Initiate the Data Table after render
             this.$el.find(".sq-table").DataTable();
 
