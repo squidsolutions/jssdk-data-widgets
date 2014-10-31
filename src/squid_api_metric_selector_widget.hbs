@@ -1,0 +1,7 @@
+<select class="form-control metric-selector" multiple="multiple">
+    {{#each metricCollection}}
+        <option value="{{oid}}" {{#if selected}}selected{{/if}}>
+            {{name}}
+        </option>
+    {{/each}}
+</select>
