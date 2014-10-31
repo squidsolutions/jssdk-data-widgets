@@ -9,7 +9,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\r\n	";
+  buffer += "\r\n\r\n	";
   stack1 = helpers['with'].call(depth0, (depth0 && depth0.results), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n";
@@ -18,7 +18,7 @@ function program1(depth0,data) {
 function program2(depth0,data) {
   
   var buffer = "", stack1, helper, options;
-  buffer += "\r\n	<table class='sq-table'>\r\n	    <thead>\r\n	        <tr>\r\n	            ";
+  buffer += "\r\n\r\n	<table class='sq-table'>\r\n	    <thead>\r\n	        <tr>\r\n	            ";
   options={hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data}
   if (helper = helpers.cols) { stack1 = helper.call(depth0, options); }
   else { helper = (depth0 && depth0.cols); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
@@ -68,7 +68,7 @@ function program6(depth0,data) {
 function program8(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\r\n	";
+  buffer += "\r\n\r\n	";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.done), {hash:{},inverse:self.program(11, program11, data),fn:self.program(9, program9, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n";
@@ -83,9 +83,10 @@ function program9(depth0,data) {
 function program11(depth0,data) {
   
   
-  return "\r\n  	<div class=\"sq-loading\" style=\"position:absolute; width:100%; top:40%;\">\r\n		<div class=\"spinner\">\r\n  			<div class=\"rect5\"></div>\r\n  			<div class=\"rect4\"></div>\r\n  			<div class=\"rect3\"></div>\r\n  			<div class=\"rect2\"></div>\r\n  			<div class=\"rect1\"></div>\r\n  			<div class=\"rect2\"></div>\r\n  			<div class=\"rect3\"></div>\r\n  			<div class=\"rect4\"></div>\r\n  			<div class=\"rect5\"></div>\r\n		</div>\r\n	</div>\r\n  	";
+  return "\r\n\r\n  	";
   }
 
+  buffer += "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n\r\n";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.results), {hash:{},inverse:self.program(8, program8, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n";
@@ -194,6 +195,50 @@ function program6(depth0,data) {
   if(stack1 || stack1 === 0) { return stack1; }
   else { return ''; }
   });
+
+this["squid_api"]["template"]["squid_api_metric_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\n        <option value=\"";
+  if (helper = helpers.oid) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.oid); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += ">\n            ";
+  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\n        </option>\n    ";
+  return buffer;
+  }
+function program2(depth0,data) {
+  
+  
+  return "selected";
+  }
+
+  buffer += "<select class=\"form-control metric-selector\" multiple=\"multiple\">\n    ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.metricCollection), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n</select>\n";
+  return buffer;
+  });
+
+this["squid_api"]["template"]["squid_api_timeseries_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\">\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	 <form id=\"offset_form\" class=\"toggler\">\n                <input type=\"radio\" name=\"offset\" id=\"lines\" value=\"lines\" checked>\n                <label class=\"lines\" for=\"lines\">lines</label>\n                <input type=\"radio\" name=\"offset\" id=\"stack\" value=\"stack\">\n                <label class=\"stack\" for=\"stack\">stack</label>\n				<input type=\"radio\" name=\"offset\" id=\"bar\" value=\"bar\">\n				<label class=\"bar\" for=\"bar\">bar</label>\n        </form>\n	<div id=\"slider\"></div>\n</div>\n";
+  });
 (function (root, factory) {
     root.squid_api.view.DataTableView = factory(root.Backbone, root.squid_api);
 }(this, function (Backbone, squid_api) {
@@ -270,6 +315,19 @@ function program6(depth0,data) {
                 }
             }
             this.$el.html(this.template(data));
+
+            if (!this.model.isDone()) {
+                // running
+                if (this.model.get("status") == "RUNNING") {
+                    $(".sq-loading").show();
+                }
+            } else if (this.model.get("error")) {
+                // error
+                $(".sq-loading").hide();
+            } else {
+                // display
+                $(".sq-loading").hide();
+            }
 
             // Initiate the Data Table after render
             this.$el.find(".sq-table").DataTable();
@@ -463,6 +521,385 @@ function program6(depth0,data) {
             tableContent.html(tableHTML);
             return this;
         }
+    });
+
+    return View;
+}));
+
+(function (root, factory) {
+    root.squid_api.view.MetricSelectorView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_metric_selector_widget);
+
+}(this, function (Backbone, squid_api, template) {
+
+    var View = Backbone.View.extend({
+        template : null,
+        metrics : [],
+        metricCollection: [],
+
+        initialize: function(options) {
+
+            var me, domains;
+
+            me = this;
+
+            if (options.template) {
+                this.template = options.template;
+            } else {
+                this.template = template;
+            }
+
+            // Check for existing metrics
+            if (this.model.get('metrics')) {
+
+                var metricsBaseObject = this.model.get('metrics');
+                var metricsNames = [];
+
+                $.each(metricsBaseObject, function() {
+                    metricsNames.push(this.metricId);
+                });
+
+                me.metrics = metricsNames;
+            }
+
+            squid_api.model.project.on('change', function(model) {
+                // get the dimensions from the api
+
+                var domainId, domain;
+
+                /* See if we can obtain the domain's.
+                If not check for a multi analysis array */
+
+                domains = me.model.get("domains");
+
+                if (!domains) {
+                    domains = me.model.get("analyses")[0].get("domains");
+                }
+
+                domain = squid_api.utils.find(model.get("domains"), "oid", domains[0].domainId);
+
+                $.each(domain.metrics, function(index, value) {
+
+                    if ($.inArray(value.oid, me.metrics) !== -1) {
+                        value.selected = true;
+                    }
+
+                    me.metricCollection.push(value);
+
+                });
+
+                me.render();
+
+            });
+
+            // this.render(me);
+        },
+
+        setModel: function(model) {
+            this.model = model;
+            this.initialize();
+        },
+
+        events: {
+            "change": function(event) {
+                // Collect list of desired metrics and trigger a model change
+                var metrics = this.$el.find("select option:selected");
+                var selected = [];
+                $(metrics).each(function(index, metric){
+                    selected.push($(this).val());
+                });
+
+                this.model.setMetricIds(selected);
+
+            }
+        },
+
+        render: function() {
+            var me = this;
+
+            // Display template
+            var html = this.template({ metricCollection: me.metricCollection });
+            this.$el.html(html);
+
+            // Initialize plugin
+            this.$el.find("select").multiselect();
+
+            return this;
+        }
+
+    });
+
+    return View;
+
+}));
+
+(function (root, factory) {
+    root.squid_api.view.TimeSeriesView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_timeseries_widget);
+}(this, function (Backbone, squid_api) {
+
+    View = Backbone.View.extend({
+
+        template : null,
+        metrics : null,
+        statistics: null,
+        dataToDisplay : 10000,
+        format : null,
+
+        initialize : function(options) {
+            if (this.model) {
+                this.model.on('change:status', this.update, this);
+                this.model.on('change:error', this.render, this);
+            }
+            if (options.dataToDisplay) {
+                this.dataToDisplay = options.dataToDisplay;
+            }
+
+            // setup options
+            if (options.template) {
+                this.template = options.template;
+            } else {
+                this.template = squid_api.template.squid_api_timeseries_widget;
+            }
+
+            if (options.format) {
+                this.format = options.format;
+            } else {
+                // default number formatter
+                if (d3) {
+                    this.format = d3.format(",.f");
+                } else {
+                    this.format = function(f){
+                        return f;
+                    };
+                }
+            }
+
+            // Store the current metrics
+            this.metrics = this.model.get("metrics");
+
+            this.render();
+        },
+
+        setModel : function(model) {
+            this.model = model;
+            this.initialize();
+        },
+
+        update : function() {
+
+            if (!this.model.isDone()) {
+                // running
+                if (this.model.get("status") == "RUNNING") {
+                    $(".sq-loading").show();
+                }
+            } else if (this.model.get("error")) {
+                // error
+                $(".sq-loading").hide();
+            }
+
+            // Store the current metrics
+            this.metrics = this.model.get("metrics");
+
+            this.render();
+        },
+
+        seriesColorAssignment : function(serie) {
+            // Default
+            var color = "#666666";
+
+            // Specify a colour return value for each metric
+            switch (serie) {
+                case "count" :
+                    color = "#fe6e70";
+                break;
+                case "withFTA" :
+                    color = "#67e363";
+                break;
+                case "max_date" :
+                    color = "#b563e2";
+                break;
+                case "sum_fta" :
+                    color = "#ffc46f";
+                break;
+                case "unique_ftas" :
+                    color = "#67e363";
+                break;
+            }
+
+            return color;
+        },
+
+        seriesDataValues : function(serie, index, modelData) {
+            var currentIndex = index;
+
+            var seriesData = [];
+
+            $.each(modelData, function(index, value) {
+                var object = {};
+
+                // Convert date value into unix
+                object.x = moment(value[0]).unix();
+                object.y = parseFloat(value[currentIndex + 1]);
+
+                seriesData.push(object);
+            });
+
+            return seriesData;
+        },
+
+        getData: function() {
+
+                var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
+
+                analysis = this.model;
+
+                // Use the first analyses array
+
+                if (analysis.get("analyses")) {
+                  analysis = analysis.get("analyses")[0];
+                }
+
+                jsonData = analysis.toJSON();
+
+                data = {};
+                data.done = this.model.isDone();
+                if (jsonData.results) {
+                    data.results = {"cols" : jsonData.results.cols, "rows" : []};
+                    rows = jsonData.results.rows;
+                    for (rowIdx = 0; (rowIdx<rows.length && rowIdx<this.dataToDisplay); rowIdx++) {
+                        row = rows[rowIdx];
+                        newRow = {v:[]};
+                        for (colIdx = 0; colIdx<jsonData.results.cols.length; colIdx++) {
+                            v = row.v[colIdx];
+                            if (jsonData.results.cols[colIdx].dataType == "NUMBER") {
+                                v = v;
+                            }
+                            newRow.v.push(v);
+                        }
+                        data.results.rows.push(newRow);
+                    }
+                }
+
+                return data;
+        },
+
+        sortDateValues : function(dates) {
+            var data = [];
+
+            $.each(dates, function(index, value) {
+                var object = {};
+
+                $.each(value.v, function(index, value) {
+                    object[index] = value;
+                });
+
+                data.push(object);
+            });
+
+            // Make sure that dates are sorted from lowest to highest
+            var sortedDates = _.sortBy(data, function(o) { return o[0]; });
+
+            return sortedDates;
+        },
+
+        render : function() {
+
+            var me = this;
+
+            var data = this.getData();
+
+            // Metric Data Manipulation
+            var metricObject = this.metrics;
+            var metricNames = [];
+
+            $.each(metricObject, function(index, value) {
+                metricNames.push(value.metricId);
+            });
+
+            // Print Template
+            this.$el.html(this.template());
+
+            // Time Series [Series Data]
+            var series = [];
+
+            $.each(metricNames, function(index, value) {
+                // Array of objects
+                var object = {};
+
+                if (data.done) {
+                    $(".sq-loading").hide();
+                    object.color = me.seriesColorAssignment(value);
+                    object.name = value;
+                    object.data = me.seriesDataValues(value, index, me.sortDateValues(data.results.rows));
+                    series.push(object);
+                }
+            });
+
+            var tempWidth = $(window).width() - 50;
+
+            // Time Series Chart
+
+            var graph = new Rickshaw.Graph({
+	               element: document.getElementById("chart"),
+	               width: tempWidth,
+	               height: 400,
+	               renderer: 'line',
+	                  series: series
+                 });
+
+                 graph.render();
+
+
+
+                 var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+                     graph: graph,
+                     xFormatter: function(x) { return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD')},
+                     yFormatter: function(y) { return Math.floor(y) }
+                 });
+
+                 var legend = new Rickshaw.Graph.Legend( {
+	                graph: graph,
+	                element: document.getElementById('legend')
+                 });
+
+                 var xAxis = new Rickshaw.Graph.Axis.Time( {
+	                 graph: graph
+                 });
+
+                 var yAxis = new Rickshaw.Graph.Axis.Y( {
+                     graph: graph
+                 });
+
+                 var slider = new Rickshaw.Graph.RangeSlider({
+                     graph: graph,
+                     element: document.querySelector('#slider')
+                });
+
+                var offsetForm = document.getElementById('offset_form');
+
+                // Change chart type on button change
+                offsetForm.addEventListener('change', function(e) {
+                    var offsetMode = e.target.value;
+
+                    if (offsetMode == 'lines') {
+                        graph.setRenderer('line');
+                        graph.offset = 'zero';
+                    } else if (offsetMode == 'stack') {
+                        graph.setRenderer('stack');
+                        graph.offset = offsetMode;
+                    } else if (offsetMode == 'bar') {
+                        graph.setRenderer('bar');
+                        graph.offset = offsetMode;
+                    }
+
+                    graph.render();
+
+                }, false);
+
+                 yAxis.render();
+                 xAxis.render();
+
+                 return this;
+             }
     });
 
     return View;
