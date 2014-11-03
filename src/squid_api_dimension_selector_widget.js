@@ -15,11 +15,11 @@
             } else {
                 this.template = template;
             }
-            
+
             if (options.dimensionIdList) {
                 this.dimensionIdList = options.dimensionIdList;
             }
-            
+
             var me = this;
             squid_api.model.project.on('change', function(model) {
                 // get the dimensions from the api
@@ -66,17 +66,22 @@
 
         events: {
             "change": function(event) {
-                var oid = this.$el.find("select").val();
+                var oid = this.$el.find("select option:selected");
+                var selected = [];
+
+                $(oid).each(function(index, metric){
+                    selected.push($(this).val());
+                });
 
                 if (this.model.get("analyses")) {
                     // If instance of array
                     if (this.model.get("analyses")[0]) {
-                        this.model.get("analyses")[0].setDimensionId(oid);
+                        this.model.get("analyses")[0].setDimensionIds(selected);
                     } else {
-                        this.model.get("analyses").setDimensionId(oid);
+                        this.model.get("analyses").setDimensionIds(selected);
                     }
                 } else {
-                    this.model.setDimensionId(oid);
+                    this.model.setDimensionIds(selected);
                 }
             }
         },
@@ -90,27 +95,32 @@
                 var dim = this.dimensions[i];
                 if (dim) {
                     var selected = false;
-    
+
                     /* See if we can obtain the dimensions.
                     If not check for a multi analysis array */
-    
+
                     var dimensions = this.model.get("dimensions");
-    
+
                     if (!dimensions) {
                         dimensions = this.model.get("analyses")[0].get("dimensions");
                     }
-    
+
                     if (dim.oid == dimensions[0].dimensionId) {
                         selected = true;
                     }
-    
+
                     var option = {"label" : dim.name, "value" : dim.oid, "selected" : selected};
                     jsonData.options.push(option);
                 }
             }
+
             var html = this.template(jsonData);
             this.$el.html(html);
             this.$el.show();
+
+            // Initialize plugin
+            this.$el.find("select").multiselect();
+
             return this;
         }
 
