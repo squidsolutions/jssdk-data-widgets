@@ -11,9 +11,9 @@
         format : null,
 
         initialize : function(options) {
-            // if (this.model) {
-            //     this.model.on('change', this.render, this);
-            // }
+            if (this.model) {
+                this.model.on('change', this.render, this);
+            }
 
             // setup options
             if (options.template) {
