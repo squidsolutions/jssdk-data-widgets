@@ -11,9 +11,10 @@
         format : null,
 
         initialize : function(options) {
-            if (this.model) {
-                this.model.on('change', this.render, this);
-            }
+            // if (this.model) {
+            //     this.model.on('change', this.render, this);
+            // }
+
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -42,8 +43,46 @@
             this.initialize();
         },
 
+        dataTableInsert : function(data) {
+
+            var globalID;
+
+            if (this.$el.attr("id")) {
+                globalID = "#" + this.$el.attr('id');
+            } else {
+                console.log("No ID assigned to DOM element for Data Table");
+            }
+
+            d3.select(globalID + " tbody").selectAll("tr").remove();
+
+            // header
+            var th = d3.select(globalID + " thead tr").selectAll("th")
+                .data(data.results.cols)
+                .enter().append("th")
+                .text(function(d) {
+                    return d.name;
+                })
+
+            // Rows
+            var tr = d3.select(globalID + " tbody").selectAll("tr")
+                .data(data.results.rows)
+                .enter().append("tr")
+
+            // Cells
+            var td = tr.selectAll("td")
+                .data(function(d) {
+                    return d.v;
+                })
+                .enter().append("td")
+                .text(function(d) {
+                    return d;
+                });
+        },
+
         render : function() {
             var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
+
+            var me = this;
 
             analysis = this.model;
 
@@ -85,11 +124,14 @@
                 $(".sq-loading").hide();
             } else {
                 // display
-                $(".sq-loading").hide();
-            }
+                this.dataTableInsert(data);
 
-            // Initiate the Data Table after render
-            this.$el.find(".sq-table").DataTable();
+                $(".sq-loading").hide();
+                // Initiate the Data Table after render
+
+                this.$el.find(".sq-table").DataTable();
+
+            }
 
             return this;
         }
