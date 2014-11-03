@@ -11,33 +11,9 @@
 	<div class="rect5"></div>
 	</div>
 </div>
-
-{{#if results}}
-
-	{{#with results}}
-
-	<table class='sq-table'>
-	    <thead>
-	        <tr>
-	            {{#cols}}<th>{{lname}}</th>{{/cols}}
-	        </tr>
-	    </thead>
-	    <tbody>
-	        {{#rows}}
-	           <tr>
-	               {{#v}}
-	                  <td>{{this}}</td>
-	               {{/v}}
-	           </tr>
-	        {{/rows}}
-	    </tbody>
-	</table>
-	{{/with}}
-{{else}}
-
-	{{#if done}}
-  		No Data
-  	{{else}}
-
-  	{{/if}}
-{{/if}}
+<table class="sq-table">
+	<thead>
+		<tr></tr>
+	</thead>
+	<tbody></tbody>
+</table>
