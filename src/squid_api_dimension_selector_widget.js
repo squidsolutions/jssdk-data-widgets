@@ -105,9 +105,11 @@
                         dimensions = this.model.get("analyses")[0].get("dimensions");
                     }
 
-                    if (dim.oid == dimensions[0].dimensionId) {
-                        selected = true;
-                    }
+                    $.each(dimensions, function() {
+                        if (dim.oid == this.dimensionId) {
+                            selected = true;
+                        }
+                    });
 
                     var option = {"label" : dim.name, "value" : dim.oid, "selected" : selected};
                     jsonData.options.push(option);
