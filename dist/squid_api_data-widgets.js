@@ -428,11 +428,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     selected.push($(oid[i]).val());
                 }
 
-                if (selected.length === 1) {
-                    selected = selected[0];
-                }
-
                 if (this.dimensionIndex !== null) {
+
+                    if (selected.length === 1) {
+                        selected = selected[0];
+                    }
+
                     if (this.model.get("analyses")) {
                         // If instance of array
                         if (this.model.get("analyses")[0]) {
