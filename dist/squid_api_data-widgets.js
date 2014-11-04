@@ -18,13 +18,22 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\r\n    <select class=\"sq-select form-control\" multiple=\"multiple\">\r\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  buffer += "\r\n    <select class=\"sq-select form-control\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.multiple), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += ">\r\n        ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n    </select>\r\n";
   return buffer;
   }
 function program2(depth0,data) {
+  
+  
+  return "multiple";
+  }
+
+function program4(depth0,data) {
   
   var buffer = "", stack1, helper;
   buffer += "\r\n            <option value=\"";
@@ -32,7 +41,7 @@ function program2(depth0,data) {
   else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
     + "\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\r\n                ";
   if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
@@ -41,13 +50,13 @@ function program2(depth0,data) {
     + "\r\n            </option>\r\n        ";
   return buffer;
   }
-function program3(depth0,data) {
+function program5(depth0,data) {
   
   
   return "selected";
   }
 
-function program5(depth0,data) {
+function program7(depth0,data) {
   
   var buffer = "", stack1, helper;
   buffer += "\r\n    <!-- just display filter name -->\r\n    <label>";
@@ -58,7 +67,7 @@ function program5(depth0,data) {
   return buffer;
   }
 
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(5, program5, data),fn:self.program(1, program1, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(7, program7, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n";
   return buffer;
@@ -337,7 +346,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         template : null,
         dimensions : [],
         dimensionIdList : null,
-        
+        dimensionIndex: null,
+
         initializeDimensions : function(me) {
          // get the dimensions from the api
 
@@ -377,7 +387,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         initialize: function(options) {
             var me = this;
-            
+
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -387,6 +397,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             if (options.dimensionIdList) {
                 this.dimensionIdList = options.dimensionIdList;
+            }
+
+            if (options.dimensionIndex !== null) {
+                this.dimensionIndex = options.dimensionIndex;
             }
 
             // init the dimensions from the project
@@ -410,19 +424,36 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var oid = this.$el.find("select option:selected");
                 var selected = [];
 
-                $(oid).each(function(index, metric){
-                    selected.push($(this).val());
-                });
+                for (i = 0; i < oid.length; i++) {
+                    selected.push($(oid[i]).val());
+                }
 
-                if (this.model.get("analyses")) {
-                    // If instance of array
-                    if (this.model.get("analyses")[0]) {
-                        this.model.get("analyses")[0].setDimensionIds(selected);
+                if (selected.length === 1) {
+                    selected = selected[0];
+                }
+
+                if (this.dimensionIndex !== null) {
+                    if (this.model.get("analyses")) {
+                        // If instance of array
+                        if (this.model.get("analyses")[0]) {
+                            this.model.get("analyses")[0].setDimensionId(selected, this.dimensionIndex);
+                        } else {
+                            this.model.get("analyses").setDimensionId(selected, this.dimensionIndex);
+                        }
                     } else {
-                        this.model.get("analyses").setDimensionIds(selected);
+                        this.model.setDimensionId(selected, this.dimensionIndex);
                     }
                 } else {
-                    this.model.setDimensionIds(selected);
+                    if (this.model.get("analyses")) {
+                        // If instance of array
+                        if (this.model.get("analyses")[0]) {
+                            this.model.get("analyses")[0].setDimensionIds(selected);
+                        } else {
+                            this.model.get("analyses").setDimensionIds(selected);
+                        }
+                    } else {
+                        this.model.setDimensionIds(selected);
+                    }
                 }
             }
         },
@@ -430,7 +461,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         render: function() {
             // display
 
-            var jsonData = {"selAvailable" : true, "options" : []};
+            var isMultiple = true;
+
+            if (this.dimensionIndex !== null) {
+                isMultiple = false;
+            }
+
+            var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
 
             for (var i=0; i<this.dimensions.length; i++) {
                 var dim = this.dimensions[i];
@@ -445,7 +482,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     if (!dimensions) {
                         dimensions = this.model.get("analyses")[0].get("dimensions");
                     }
-                    
+
                     for (var j=0; j<dimensions.length; j++) {
                         if (dim.oid == dimensions[j].dimensionId) {
                             selected = true;

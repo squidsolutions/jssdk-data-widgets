@@ -7,7 +7,8 @@
         template : null,
         dimensions : [],
         dimensionIdList : null,
-        
+        dimensionIndex: null,
+
         initializeDimensions : function(me) {
          // get the dimensions from the api
 
@@ -47,7 +48,7 @@
 
         initialize: function(options) {
             var me = this;
-            
+
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -57,6 +58,10 @@
 
             if (options.dimensionIdList) {
                 this.dimensionIdList = options.dimensionIdList;
+            }
+
+            if (options.dimensionIndex !== null) {
+                this.dimensionIndex = options.dimensionIndex;
             }
 
             // init the dimensions from the project
@@ -80,19 +85,36 @@
                 var oid = this.$el.find("select option:selected");
                 var selected = [];
 
-                $(oid).each(function(index, metric){
-                    selected.push($(this).val());
-                });
+                for (i = 0; i < oid.length; i++) {
+                    selected.push($(oid[i]).val());
+                }
 
-                if (this.model.get("analyses")) {
-                    // If instance of array
-                    if (this.model.get("analyses")[0]) {
-                        this.model.get("analyses")[0].setDimensionIds(selected);
+                if (selected.length === 1) {
+                    selected = selected[0];
+                }
+
+                if (this.dimensionIndex !== null) {
+                    if (this.model.get("analyses")) {
+                        // If instance of array
+                        if (this.model.get("analyses")[0]) {
+                            this.model.get("analyses")[0].setDimensionId(selected, this.dimensionIndex);
+                        } else {
+                            this.model.get("analyses").setDimensionId(selected, this.dimensionIndex);
+                        }
                     } else {
-                        this.model.get("analyses").setDimensionIds(selected);
+                        this.model.setDimensionId(selected, this.dimensionIndex);
                     }
                 } else {
-                    this.model.setDimensionIds(selected);
+                    if (this.model.get("analyses")) {
+                        // If instance of array
+                        if (this.model.get("analyses")[0]) {
+                            this.model.get("analyses")[0].setDimensionIds(selected);
+                        } else {
+                            this.model.get("analyses").setDimensionIds(selected);
+                        }
+                    } else {
+                        this.model.setDimensionIds(selected);
+                    }
                 }
             }
         },
@@ -100,7 +122,13 @@
         render: function() {
             // display
 
-            var jsonData = {"selAvailable" : true, "options" : []};
+            var isMultiple = true;
+
+            if (this.dimensionIndex !== null) {
+                isMultiple = false;
+            }
+
+            var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
 
             for (var i=0; i<this.dimensions.length; i++) {
                 var dim = this.dimensions[i];
@@ -115,7 +143,7 @@
                     if (!dimensions) {
                         dimensions = this.model.get("analyses")[0].get("dimensions");
                     }
-                    
+
                     for (var j=0; j<dimensions.length; j++) {
                         if (dim.oid == dimensions[j].dimensionId) {
                             selected = true;
