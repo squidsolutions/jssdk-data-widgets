@@ -248,12 +248,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 .enter().append("th")
                 .text(function(d) {
                     return d.name;
-                })
+                });
 
             // Rows
             var tr = d3.select(globalID + " tbody").selectAll("tr")
                 .data(data.results.rows)
-                .enter().append("tr")
+                .enter().append("tr");
 
             // Cells
             var td = tr.selectAll("td")
@@ -337,8 +337,47 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         template : null,
         dimensions : [],
         dimensionIdList : null,
+        
+        initializeDimensions : function(me) {
+         // get the dimensions from the api
+
+            var domainId, domain;
+
+            /* See if we can obtain the domain's.
+            If not check for a multi analysis array */
+
+            domains = me.model.get("domains");
+
+            if (!domains) {
+                domains = me.model.get("analyses")[0].get("domains");
+            }
+
+            domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", domains[0].domainId);
+
+            var dims = domain.dimensions;
+
+            // filter categorical dimensions
+            for (var i=0; i<dims.length; i++){
+                var dim = dims[i];
+                if (dim.type == "CATEGORICAL") {
+                    if (me.dimensionIdList) {
+                        // insert and sort
+                        var idx = me.dimensionIdList.indexOf(dim.oid);
+                        if (idx >= 0) {
+                            me.dimensions[idx] = dim;
+                        }
+                    } else {
+                        // default unordered behavior
+                        me.dimensions.push(dim);
+                    }
+                }
+            }
+            me.render();
+        },
 
         initialize: function(options) {
+            var me = this;
+            
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -350,43 +389,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.dimensionIdList = options.dimensionIdList;
             }
 
-            var me = this;
-            squid_api.model.project.on('change', function(model) {
-                // get the dimensions from the api
-
-                var domainId, domain;
-
-                /* See if we can obtain the domain's.
-                If not check for a multi analysis array */
-
-                domains = me.model.get("domains");
-
-                if (!domains) {
-                    domains = me.model.get("analyses")[0].get("domains");
-                }
-
-                domain = squid_api.utils.find(model.get("domains"), "oid", domains[0].domainId);
-
-                var dims = domain.dimensions;
-
-                // filter categorical dimensions
-                for (var i=0; i<dims.length; i++){
-                    var dim = dims[i];
-                    if (dim.type == "CATEGORICAL") {
-                        if (me.dimensionIdList) {
-                            // insert and sort
-                            var idx = me.dimensionIdList.indexOf(dim.oid);
-                            if (idx >= 0) {
-                                me.dimensions[idx] = dim;
-                            }
-                        } else {
-                            // default unordered behavior
-                            me.dimensions.push(dim);
-                        }
-                    }
-                }
-                me.render();
-            });
+            // init the dimensions from the project
+            if (squid_api.model.project.get("domains")) {
+                me.initializeDimensions(me);
+            } else {
+                // project not loaded yet
+                squid_api.model.project.on('change', function(model) {
+                    me.initializeDimensions(me);
+                });
+            }
         },
 
         setModel: function(model) {
@@ -434,12 +445,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     if (!dimensions) {
                         dimensions = this.model.get("analyses")[0].get("dimensions");
                     }
-
-                    $.each(dimensions, function() {
-                        if (dim.oid == this.dimensionId) {
+                    
+                    for (var j=0; j<dimensions.length; j++) {
+                        if (dim.oid == dimensions[j].dimensionId) {
                             selected = true;
                         }
-                    });
+                    }
 
                     var option = {"label" : dim.name, "value" : dim.oid, "selected" : selected};
                     jsonData.options.push(option);
@@ -569,7 +580,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         });
 
         if (this.baseWidget) {
-            this.changeWidget(this.baseWidget)
+            this.changeWidget(this.baseWidget);
         }
 
         return this;
@@ -984,8 +995,8 @@ return View;
 
                          var hoverDetail = new Rickshaw.Graph.HoverDetail( {
                              graph: graph,
-                             xFormatter: function(x) { return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD')},
-                             yFormatter: function(y) { return Math.floor(y) }
+                             xFormatter: function(x) { return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD');},
+                             yFormatter: function(y) { return Math.floor(y); }
                          });
 
                          var legend = new Rickshaw.Graph.Legend( {

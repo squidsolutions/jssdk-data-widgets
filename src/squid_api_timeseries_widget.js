@@ -230,8 +230,8 @@
 
                          var hoverDetail = new Rickshaw.Graph.HoverDetail( {
                              graph: graph,
-                             xFormatter: function(x) { return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD')},
-                             yFormatter: function(y) { return Math.floor(y) }
+                             xFormatter: function(x) { return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD');},
+                             yFormatter: function(y) { return Math.floor(y); }
                          });
 
                          var legend = new Rickshaw.Graph.Legend( {

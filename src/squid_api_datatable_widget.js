@@ -62,12 +62,12 @@
                 .enter().append("th")
                 .text(function(d) {
                     return d.name;
-                })
+                });
 
             // Rows
             var tr = d3.select(globalID + " tbody").selectAll("tr")
                 .data(data.results.rows)
-                .enter().append("tr")
+                .enter().append("tr");
 
             // Cells
             var td = tr.selectAll("td")

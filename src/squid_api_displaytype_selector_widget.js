@@ -106,7 +106,7 @@
         });
 
         if (this.baseWidget) {
-            this.changeWidget(this.baseWidget)
+            this.changeWidget(this.baseWidget);
         }
 
         return this;
