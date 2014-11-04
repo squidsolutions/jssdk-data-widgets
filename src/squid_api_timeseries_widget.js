@@ -8,6 +8,7 @@
         metrics : null,
         statistics: null,
         dataToDisplay : 10000,
+        invalidData: false,
         format : null,
 
         initialize : function(options) {
@@ -15,6 +16,7 @@
                 this.model.on('change:status', this.update, this);
                 this.model.on('change:error', this.render, this);
             }
+
             if (options.dataToDisplay) {
                 this.dataToDisplay = options.dataToDisplay;
             }
@@ -74,6 +76,7 @@
 
             // Specify a colour return value for each metric
             switch (serie) {
+
                 case "count" :
                     color = "#fe6e70";
                 break;
@@ -187,89 +190,101 @@
             // Time Series [Series Data]
             var series = [];
 
-            $.each(metricNames, function(index, value) {
-                // Array of objects
-                var object = {};
+            if (data.done) {
 
-                if (data.done) {
+                $.each(metricNames, function(index, value) {
+                    var object = {};
+
                     $(".sq-loading").hide();
+
                     object.color = me.seriesColorAssignment(value);
                     object.name = value;
                     object.data = me.seriesDataValues(value, index, me.sortDateValues(data.results.rows));
-                    series.push(object);
-                }
-            });
 
-            var tempWidth = $(window).width() - 50;
+                    if (isNaN(object.data[0].x)) {
+                        me.invalidData = true;
+                        return false;
 
-            // Time Series Chart
-
-            var graph = new Rickshaw.Graph({
-	               element: document.getElementById("chart"),
-	               width: tempWidth,
-	               height: 400,
-	               renderer: 'line',
-	                  series: series
-                 });
-
-                 graph.render();
-
-
-
-                 var hoverDetail = new Rickshaw.Graph.HoverDetail( {
-                     graph: graph,
-                     xFormatter: function(x) { 
-                             return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD');
-                         },
-                     yFormatter: function(y) { 
-                             return Math.floor(y);
-                         }
-                 });
-
-                 var legend = new Rickshaw.Graph.Legend( {
-	                graph: graph,
-	                element: document.getElementById('legend')
-                 });
-
-                 var xAxis = new Rickshaw.Graph.Axis.Time( {
-	                 graph: graph
-                 });
-
-                 var yAxis = new Rickshaw.Graph.Axis.Y( {
-                     graph: graph
-                 });
-
-                 var slider = new Rickshaw.Graph.RangeSlider({
-                     graph: graph,
-                     element: document.querySelector('#slider')
-                });
-
-                var offsetForm = document.getElementById('offset_form');
-
-                // Change chart type on button change
-                offsetForm.addEventListener('change', function(e) {
-                    var offsetMode = e.target.value;
-
-                    if (offsetMode == 'lines') {
-                        graph.setRenderer('line');
-                        graph.offset = 'zero';
-                    } else if (offsetMode == 'stack') {
-                        graph.setRenderer('stack');
-                        graph.offset = offsetMode;
-                    } else if (offsetMode == 'bar') {
-                        graph.setRenderer('bar');
-                        graph.offset = offsetMode;
+                    } else {
+                        me.invalidData = false;
                     }
 
-                    graph.render();
+                    series.push(object);
 
-                }, false);
+                });
 
-                 yAxis.render();
-                 xAxis.render();
+                if (!me.invalidData) {
+                    var tempWidth = $(window).width() - 50;
 
-                 return this;
-             }
+                    // Time Series Chart
+
+                    var graph = new Rickshaw.Graph({
+                           element: document.getElementById("chart"),
+                           width: tempWidth,
+                           height: 400,
+                           renderer: 'line',
+                              series: series
+                         });
+
+                         graph.render();
+
+                         var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+                             graph: graph,
+                             xFormatter: function(x) { return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD')},
+                             yFormatter: function(y) { return Math.floor(y) }
+                         });
+
+                         var legend = new Rickshaw.Graph.Legend( {
+                            graph: graph,
+                            element: document.getElementById('legend')
+                         });
+
+                         var xAxis = new Rickshaw.Graph.Axis.Time( {
+                             graph: graph
+                         });
+
+                         var yAxis = new Rickshaw.Graph.Axis.Y( {
+                             graph: graph
+                         });
+
+                         var slider = new Rickshaw.Graph.RangeSlider({
+                             graph: graph,
+                             element: document.querySelector('#slider')
+                        });
+
+                        var offsetForm = document.getElementById('offset_form');
+
+                        // Change chart type on button change
+                        offsetForm.addEventListener('change', function(e) {
+                            var offsetMode = e.target.value;
+
+                            if (offsetMode == 'lines') {
+                                graph.setRenderer('line');
+                                graph.offset = 'zero';
+                            } else if (offsetMode == 'stack') {
+                                graph.setRenderer('stack');
+                                graph.offset = offsetMode;
+                            } else if (offsetMode == 'bar') {
+                                graph.setRenderer('bar');
+                                graph.offset = offsetMode;
+                            }
+
+                            graph.render();
+
+                        }, false);
+
+                         yAxis.render();
+                         xAxis.render();
+
+
+                     } else {
+                         this.$el.addClass("bad-data");
+                         this.$el.html("Time Series incompatible, please choose another");
+                     }
+
+                     return this;
+            }
+        }
     });
 
     return View;

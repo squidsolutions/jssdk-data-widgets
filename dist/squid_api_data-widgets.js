@@ -4,104 +4,21 @@ this["squid_api"]["template"] = this["squid_api"]["template"] || {};
 this["squid_api"]["template"]["squid_api_datatable_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
+  
 
-function program1(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\r\n\r\n	";
-  stack1 = helpers['with'].call(depth0, (depth0 && depth0.results), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n";
-  return buffer;
-  }
-function program2(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\r\n\r\n	<table class='sq-table'>\r\n	    <thead>\r\n	        <tr>\r\n	            ";
-  options={hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data}
-  if (helper = helpers.cols) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.cols); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.cols) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n	        </tr>\r\n	    </thead>\r\n	    <tbody>\r\n	        ";
-  options={hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data}
-  if (helper = helpers.rows) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.rows); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.rows) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n	    </tbody>\r\n	</table>\r\n	";
-  return buffer;
-  }
-function program3(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "<th>";
-  if (helper = helpers.lname) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.lname); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "</th>";
-  return buffer;
-  }
 
-function program5(depth0,data) {
-  
-  var buffer = "", stack1, helper, options;
-  buffer += "\r\n	           <tr>\r\n	               ";
-  options={hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data}
-  if (helper = helpers.v) { stack1 = helper.call(depth0, options); }
-  else { helper = (depth0 && depth0.v); stack1 = typeof helper === functionType ? helper.call(depth0, options) : helper; }
-  if (!helpers.v) { stack1 = blockHelperMissing.call(depth0, stack1, {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data}); }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n	           </tr>\r\n	        ";
-  return buffer;
-  }
-function program6(depth0,data) {
-  
-  var buffer = "";
-  buffer += "\r\n	                  <td>"
-    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
-    + "</td>\r\n	               ";
-  return buffer;
-  }
-
-function program8(depth0,data) {
-  
-  var buffer = "", stack1;
-  buffer += "\r\n\r\n	";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.done), {hash:{},inverse:self.program(11, program11, data),fn:self.program(9, program9, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n";
-  return buffer;
-  }
-function program9(depth0,data) {
-  
-  
-  return "\r\n  		No Data\r\n  	";
-  }
-
-function program11(depth0,data) {
-  
-  
-  return "\r\n\r\n  	";
-  }
-
-  buffer += "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n\r\n";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.results), {hash:{},inverse:self.program(8, program8, data),fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n";
-  return buffer;
+  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n<table class=\"sq-table\">\r\n	<thead>\r\n		<tr></tr>\r\n	</thead>\r\n	<tbody></tbody>\r\n</table>\r\n";
   });
 
 this["squid_api"]["template"]["squid_api_dimension_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\r\n    <select class=\"sq-select form-control\">\r\n        ";
+  buffer += "\r\n    <select class=\"sq-select form-control\" multiple=\"multiple\">\r\n        ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n    </select>\r\n";
@@ -142,8 +59,36 @@ function program5(depth0,data) {
   }
 
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(5, program5, data),fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { return stack1; }
-  else { return ''; }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n";
+  return buffer;
+  });
+
+this["squid_api"]["template"]["squid_api_displaytype_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, self=this;
+
+function program1(depth0,data) {
+  
+  
+  return "\n        <li data-content=\"TimeSeriesView\"><i class=\"fa fa-line-chart fa-2x\"></i></li>\n    ";
+  }
+
+function program3(depth0,data) {
+  
+  
+  return "\n        <li data-content=\"DataTableView\"><i class=\"fa fa-table fa-2x\"></i></li>\n    ";
+  }
+
+  buffer += "<ul class=\"widget-selector\">\n    ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.TimeSeriesView), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n\n    ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.DataTableView), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n</div>\n";
+  return buffer;
   });
 
 this["squid_api"]["template"]["squid_api_kpi_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -255,6 +200,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.model) {
                 this.model.on('change', this.render, this);
             }
+
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -283,8 +229,46 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.initialize();
         },
 
+        dataTableInsert : function(data) {
+
+            var globalID;
+
+            if (this.$el.attr("id")) {
+                globalID = "#" + this.$el.attr('id');
+            } else {
+                console.log("No ID assigned to DOM element for Data Table");
+            }
+
+            d3.select(globalID + " tbody").selectAll("tr").remove();
+
+            // header
+            var th = d3.select(globalID + " thead tr").selectAll("th")
+                .data(data.results.cols)
+                .enter().append("th")
+                .text(function(d) {
+                    return d.name;
+                })
+
+            // Rows
+            var tr = d3.select(globalID + " tbody").selectAll("tr")
+                .data(data.results.rows)
+                .enter().append("tr")
+
+            // Cells
+            var td = tr.selectAll("td")
+                .data(function(d) {
+                    return d.v;
+                })
+                .enter().append("td")
+                .text(function(d) {
+                    return d;
+                });
+        },
+
         render : function() {
             var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
+
+            var me = this;
 
             analysis = this.model;
 
@@ -326,11 +310,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 $(".sq-loading").hide();
             } else {
                 // display
-                $(".sq-loading").hide();
-            }
+                this.dataTableInsert(data);
 
-            // Initiate the Data Table after render
-            this.$el.find(".sq-table").DataTable();
+                $(".sq-loading").hide();
+                // Initiate the Data Table after render
+
+                this.$el.find(".sq-table").DataTable();
+
+            }
 
             return this;
         }
@@ -356,11 +343,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             } else {
                 this.template = template;
             }
-            
+
             if (options.dimensionIdList) {
                 this.dimensionIdList = options.dimensionIdList;
             }
-            
+
             var me = this;
             squid_api.model.project.on('change', function(model) {
                 // get the dimensions from the api
@@ -407,17 +394,22 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         events: {
             "change": function(event) {
-                var oid = this.$el.find("select").val();
+                var oid = this.$el.find("select option:selected");
+                var selected = [];
+
+                $(oid).each(function(index, metric){
+                    selected.push($(this).val());
+                });
 
                 if (this.model.get("analyses")) {
                     // If instance of array
                     if (this.model.get("analyses")[0]) {
-                        this.model.get("analyses")[0].setDimensionId(oid);
+                        this.model.get("analyses")[0].setDimensionIds(selected);
                     } else {
-                        this.model.get("analyses").setDimensionId(oid);
+                        this.model.get("analyses").setDimensionIds(selected);
                     }
                 } else {
-                    this.model.setDimensionId(oid);
+                    this.model.setDimensionIds(selected);
                 }
             }
         },
@@ -431,33 +423,162 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var dim = this.dimensions[i];
                 if (dim) {
                     var selected = false;
-    
+
                     /* See if we can obtain the dimensions.
                     If not check for a multi analysis array */
-    
+
                     var dimensions = this.model.get("dimensions");
-    
+
                     if (!dimensions) {
                         dimensions = this.model.get("analyses")[0].get("dimensions");
                     }
-    
-                    if (dim.oid == dimensions[0].dimensionId) {
-                        selected = true;
-                    }
-    
+
+                    $.each(dimensions, function() {
+                        if (dim.oid == this.dimensionId) {
+                            selected = true;
+                        }
+                    });
+
                     var option = {"label" : dim.name, "value" : dim.oid, "selected" : selected};
                     jsonData.options.push(option);
                 }
             }
+
             var html = this.template(jsonData);
             this.$el.html(html);
             this.$el.show();
+
+            // Initialize plugin
+            this.$el.find("select").multiselect();
+
             return this;
         }
 
     });
 
     return View;
+}));
+
+(function (root, factory) {
+    root.squid_api.view.DisplayTypeSelectorView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_displaytype_selector_widget);
+
+}(this, function (Backbone, squid_api, template) {
+
+    var View = Backbone.View.extend({
+
+    template : null,
+    renderTo : null,
+    baseWidget : null,
+    squidApiPrefix : "squid_api.view.",
+    views: {},
+
+    initialize: function(options) {
+
+        var me = this;
+
+        if (squid_api.view.TimeSeriesView) {
+            this.views.TimeSeriesView = true;
+        }
+
+        if (squid_api.view.DataTableView) {
+            this.views.DataTableView = true;
+        }
+
+        if (squid_api.view.FlowChartView) {
+            this.views.FlowChartView = true;
+        }
+
+        // Store template
+        if (options.template) {
+            this.template = options.template;
+        } else {
+            this.template = template;
+        }
+
+        // Store Widget Render to element
+        if (options.renderTo) {
+            this.renderTo = options.renderTo;
+        }
+
+        if (options.baseWidget) {
+            this.baseWidget = options.baseWidget;
+        }
+
+        this.render();
+    },
+
+    setModel: function(model) {
+        this.model = model;
+        this.initialize();
+    },
+
+    events: {
+        "click li": "changeWidget"
+    },
+
+    changeWidget: function(item){
+        var me = this;
+        var view, widget;
+
+        // Check if a click event has been triggered
+        if (item.type === "click") {
+            view = this.squidApiPrefix + item.currentTarget.dataset.content;
+        } else {
+            view = this.squidApiPrefix + item;
+        }
+
+        this.$el.find(item.currentTarget).addClass("active");
+        this.$el.find(item.currentTarget).siblings().removeClass("active");
+
+        // Recreate the main-content div on widget reload
+        $("#main").html("<div id='main-content' />");
+
+        // Select Widget
+        if (view === this.squidApiPrefix + "DataTableView") {
+            widget = new squid_api.view.DataTableView ({
+                el : me.renderTo,
+                model : analysis
+            });
+        } else if (view === this.squidApiPrefix + "TimeSeriesView") {
+            widget = new squid_api.view.TimeSeriesView ({
+                el : me.renderTo,
+                model : analysis
+            });
+        }
+
+        // Render the widget
+        widget.render();
+    },
+
+    render: function() {
+        var me = this;
+
+        var availableViews = [];
+
+        // Display template
+        var html = this.template(this.views);
+        this.$el.html(html);
+
+        var baseElement = this.$el.find("li");
+
+        $.each(baseElement, function() {
+            $(this).removeClass("active");
+
+            if ($(this).attr("data-content") === me.baseWidget) {
+                $(this).addClass("active");
+            }
+        });
+
+        if (this.baseWidget) {
+            this.changeWidget(this.baseWidget)
+        }
+
+        return this;
+    }
+});
+
+return View;
+
 }));
 
 (function (root, factory) {
@@ -642,6 +763,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         metrics : null,
         statistics: null,
         dataToDisplay : 10000,
+        invalidData: false,
         format : null,
 
         initialize : function(options) {
@@ -649,6 +771,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.model.on('change:status', this.update, this);
                 this.model.on('change:error', this.render, this);
             }
+
             if (options.dataToDisplay) {
                 this.dataToDisplay = options.dataToDisplay;
             }
@@ -708,6 +831,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // Specify a colour return value for each metric
             switch (serie) {
+
                 case "count" :
                     color = "#fe6e70";
                 break;
@@ -821,89 +945,101 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // Time Series [Series Data]
             var series = [];
 
-            $.each(metricNames, function(index, value) {
-                // Array of objects
-                var object = {};
+            if (data.done) {
 
-                if (data.done) {
+                $.each(metricNames, function(index, value) {
+                    var object = {};
+
                     $(".sq-loading").hide();
+
                     object.color = me.seriesColorAssignment(value);
                     object.name = value;
                     object.data = me.seriesDataValues(value, index, me.sortDateValues(data.results.rows));
-                    series.push(object);
-                }
-            });
 
-            var tempWidth = $(window).width() - 50;
+                    if (isNaN(object.data[0].x)) {
+                        me.invalidData = true;
+                        return false;
 
-            // Time Series Chart
-
-            var graph = new Rickshaw.Graph({
-	               element: document.getElementById("chart"),
-	               width: tempWidth,
-	               height: 400,
-	               renderer: 'line',
-	                  series: series
-                 });
-
-                 graph.render();
-
-
-
-                 var hoverDetail = new Rickshaw.Graph.HoverDetail( {
-                     graph: graph,
-                     xFormatter: function(x) { 
-                             return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD');
-                         },
-                     yFormatter: function(y) { 
-                             return Math.floor(y);
-                         }
-                 });
-
-                 var legend = new Rickshaw.Graph.Legend( {
-	                graph: graph,
-	                element: document.getElementById('legend')
-                 });
-
-                 var xAxis = new Rickshaw.Graph.Axis.Time( {
-	                 graph: graph
-                 });
-
-                 var yAxis = new Rickshaw.Graph.Axis.Y( {
-                     graph: graph
-                 });
-
-                 var slider = new Rickshaw.Graph.RangeSlider({
-                     graph: graph,
-                     element: document.querySelector('#slider')
-                });
-
-                var offsetForm = document.getElementById('offset_form');
-
-                // Change chart type on button change
-                offsetForm.addEventListener('change', function(e) {
-                    var offsetMode = e.target.value;
-
-                    if (offsetMode == 'lines') {
-                        graph.setRenderer('line');
-                        graph.offset = 'zero';
-                    } else if (offsetMode == 'stack') {
-                        graph.setRenderer('stack');
-                        graph.offset = offsetMode;
-                    } else if (offsetMode == 'bar') {
-                        graph.setRenderer('bar');
-                        graph.offset = offsetMode;
+                    } else {
+                        me.invalidData = false;
                     }
 
-                    graph.render();
+                    series.push(object);
 
-                }, false);
+                });
 
-                 yAxis.render();
-                 xAxis.render();
+                if (!me.invalidData) {
+                    var tempWidth = $(window).width() - 50;
 
-                 return this;
-             }
+                    // Time Series Chart
+
+                    var graph = new Rickshaw.Graph({
+                           element: document.getElementById("chart"),
+                           width: tempWidth,
+                           height: 400,
+                           renderer: 'line',
+                              series: series
+                         });
+
+                         graph.render();
+
+                         var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+                             graph: graph,
+                             xFormatter: function(x) { return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD')},
+                             yFormatter: function(y) { return Math.floor(y) }
+                         });
+
+                         var legend = new Rickshaw.Graph.Legend( {
+                            graph: graph,
+                            element: document.getElementById('legend')
+                         });
+
+                         var xAxis = new Rickshaw.Graph.Axis.Time( {
+                             graph: graph
+                         });
+
+                         var yAxis = new Rickshaw.Graph.Axis.Y( {
+                             graph: graph
+                         });
+
+                         var slider = new Rickshaw.Graph.RangeSlider({
+                             graph: graph,
+                             element: document.querySelector('#slider')
+                        });
+
+                        var offsetForm = document.getElementById('offset_form');
+
+                        // Change chart type on button change
+                        offsetForm.addEventListener('change', function(e) {
+                            var offsetMode = e.target.value;
+
+                            if (offsetMode == 'lines') {
+                                graph.setRenderer('line');
+                                graph.offset = 'zero';
+                            } else if (offsetMode == 'stack') {
+                                graph.setRenderer('stack');
+                                graph.offset = offsetMode;
+                            } else if (offsetMode == 'bar') {
+                                graph.setRenderer('bar');
+                                graph.offset = offsetMode;
+                            }
+
+                            graph.render();
+
+                        }, false);
+
+                         yAxis.render();
+                         xAxis.render();
+
+
+                     } else {
+                         this.$el.addClass("bad-data");
+                         this.$el.html("Time Series incompatible, please choose another");
+                     }
+
+                     return this;
+            }
+        }
     });
 
     return View;

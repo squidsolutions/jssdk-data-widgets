@@ -15,11 +15,6 @@
 
         var me = this;
 
-        // Render on model change
-        if (this.model) {
-            this.model.on('change', this.render, this);
-        }
-
         if (squid_api.view.TimeSeriesView) {
             this.views.TimeSeriesView = true;
         }
@@ -47,6 +42,8 @@
         if (options.baseWidget) {
             this.baseWidget = options.baseWidget;
         }
+
+        this.render();
     },
 
     setModel: function(model) {
