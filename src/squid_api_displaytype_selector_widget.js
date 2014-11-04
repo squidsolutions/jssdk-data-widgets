@@ -69,9 +69,6 @@
         this.$el.find(item.currentTarget).addClass("active");
         this.$el.find(item.currentTarget).siblings().removeClass("active");
 
-        // Recreate the main-content div on widget reload
-        $("#main").html("<div id='main-content' />");
-
         // Select Widget
         if (view === this.squidApiPrefix + "DataTableView") {
             widget = new squid_api.view.DataTableView ({

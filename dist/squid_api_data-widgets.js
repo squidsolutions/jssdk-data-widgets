@@ -198,7 +198,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         initialize : function(options) {
             if (this.model) {
-                this.model.on('change', this.render, this);
+                this.model.on('change:status', this.render, this);
+                this.model.on('change:error', this.render, this);
             }
 
             // setup options
@@ -298,7 +299,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     data.results.rows.push(newRow);
                 }
             }
-            this.$el.html(this.template(data));
+
+            this.$el.html(this.template());
 
             if (!this.model.isDone()) {
                 // running
@@ -313,8 +315,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.dataTableInsert(data);
 
                 $(".sq-loading").hide();
-                // Initiate the Data Table after render
 
+                // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable();
 
             }
@@ -529,9 +531,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         this.$el.find(item.currentTarget).addClass("active");
         this.$el.find(item.currentTarget).siblings().removeClass("active");
-
-        // Recreate the main-content div on widget reload
-        $("#main").html("<div id='main-content' />");
 
         // Select Widget
         if (view === this.squidApiPrefix + "DataTableView") {
@@ -1033,8 +1032,7 @@ return View;
 
 
                      } else {
-                         this.$el.addClass("bad-data");
-                         this.$el.html("Time Series incompatible, please choose another");
+                         this.$el.html("<div class='bad-data'>Time Series incompatible, please choose another</span>");
                      }
 
                      return this;

@@ -278,8 +278,7 @@
 
 
                      } else {
-                         this.$el.addClass("bad-data");
-                         this.$el.html("Time Series incompatible, please choose another");
+                         this.$el.html("<div class='bad-data'>Time Series incompatible, please choose another</span>");
                      }
 
                      return this;

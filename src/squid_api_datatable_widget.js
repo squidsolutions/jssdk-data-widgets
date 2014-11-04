@@ -12,7 +12,8 @@
 
         initialize : function(options) {
             if (this.model) {
-                this.model.on('change', this.render, this);
+                this.model.on('change:status', this.render, this);
+                this.model.on('change:error', this.render, this);
             }
 
             // setup options
@@ -112,7 +113,8 @@
                     data.results.rows.push(newRow);
                 }
             }
-            this.$el.html(this.template(data));
+
+            this.$el.html(this.template());
 
             if (!this.model.isDone()) {
                 // running
@@ -127,8 +129,8 @@
                 this.dataTableInsert(data);
 
                 $(".sq-loading").hide();
-                // Initiate the Data Table after render
 
+                // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable();
 
             }
