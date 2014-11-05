@@ -809,7 +809,6 @@ return View;
 
         template : null,
         metrics : null,
-        statistics: null,
         dataToDisplay : 10000,
         invalidData: false,
         format : null,
@@ -833,15 +832,6 @@ return View;
 
             if (options.format) {
                 this.format = options.format;
-            } else {
-                // default number formatter
-                if (d3) {
-                    this.format = d3.format(",.f");
-                } else {
-                    this.format = function(f){
-                        return f;
-                    };
-                }
             }
 
             // Store the current metrics
@@ -991,21 +981,21 @@ return View;
 
             var data = this.getData();
 
-            // Metric Data Manipulation
-            var metricObject = this.metrics;
-            var metricNames = [];
-
-            $.each(metricObject, function(index, value) {
-                metricNames.push(value.metricId);
-            });
-
-            // Print Template
-            this.$el.html(this.template());
-
-            // Time Series [Series Data]
-            var series = [];
-
             if (data.done) {
+
+                // Metric Data Manipulation
+                var metricObject = this.metrics;
+                var metricNames = [];
+
+                for (i=0; i<metricObject.length; i++) {
+                    metricNames.push(metricObject[i].metricId);
+                }
+
+                // Print Template
+                this.$el.html(this.template());
+
+                // Time Series [Series Data]
+                var series = [];
 
                 for (i=0; i<metricNames.length; i++) {
                     var object = {};
