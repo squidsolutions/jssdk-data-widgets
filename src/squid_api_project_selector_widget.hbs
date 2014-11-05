@@ -1,0 +1,13 @@
+{{#if selAvailable}}
+    <select class="sq-select form-control">
+        {{#each options}}
+            <option value="{{value}}" {{#if selected}}selected{{/if}}>
+                {{label}}
+            </option>
+        {{/each}}
+    </select>
+{{else}}
+    <!-- just display filter name -->
+    <label>{{name}}</label>
+    <span>-</span>
+{{/if}}
