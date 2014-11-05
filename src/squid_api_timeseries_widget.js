@@ -6,7 +6,6 @@
 
         template : null,
         metrics : null,
-        statistics: null,
         dataToDisplay : 10000,
         invalidData: false,
         format : null,
@@ -30,15 +29,6 @@
 
             if (options.format) {
                 this.format = options.format;
-            } else {
-                // default number formatter
-                if (d3) {
-                    this.format = d3.format(",.f");
-                } else {
-                    this.format = function(f){
-                        return f;
-                    };
-                }
             }
 
             // Store the current metrics
@@ -188,29 +178,27 @@
 
             var data = this.getData();
 
-            // Metric Data Manipulation
-            var metricObject = this.metrics;
-            var metricNames = [];
-
-            $.each(metricObject, function(index, value) {
-                metricNames.push(value.metricId);
-            });
-
-            // Print Template
-            this.$el.html(this.template());
-
-            // Time Series [Series Data]
-            var series = [];
-
             if (data.done) {
+
+                // Metric Data Manipulation
+                var metricObject = this.metrics;
+                var metricNames = [];
+
+                for (i=0; i<metricObject.length; i++) {
+                    metricNames.push(metricObject[i].metricId);
+                }
+
+                // Print Template
+                this.$el.html(this.template());
+
+                // Time Series [Series Data]
+                var series = [];
 
                 for (i=0; i<metricNames.length; i++) {
                     var object = {};
                     var metricName;
 
                     $(".sq-loading").hide();
-
-                    object.color = me.seriesColorAssignment(metricNames[i]);
 
                     // Check ID with column data to get a human readable name
                     for (a=0; a<data.results.cols.length; a++) {
@@ -219,13 +207,14 @@
                         }
                     }
 
+                    object.color = me.seriesColorAssignment(metricNames[i]);
                     object.name = metricName;
                     object.data = me.seriesDataValues(metricNames[i], i, me.sortDateValues(data.results.rows));
 
                     // Detect if data returned has been processed properly
                     if (isNaN(object.data[0].x)) {
                         me.invalidData = true;
-                        return false;
+                        break;
 
                     } else {
                         me.invalidData = false;
