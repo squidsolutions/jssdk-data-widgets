@@ -848,6 +848,19 @@ return View;
             this.metrics = this.model.get("metrics");
 
             this.render();
+
+            // Resize
+            $(window).on("resize", _.bind(this.resize(),this));
+        },
+
+        resize : function() {
+            var resizing = true;
+            return function() {
+                if (this.resizing) {
+                    window.clearTimeout(resizing);
+                }
+                this.resizing = window.setTimeout(_.bind(this.render,this), 100);
+            };
         },
 
         setModel : function(model) {
