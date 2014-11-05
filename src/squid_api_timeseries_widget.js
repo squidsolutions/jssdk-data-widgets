@@ -121,7 +121,6 @@
                 // Convert date value into unix
                 object.x = moment(value[0]).unix();
                 object.y = parseFloat(value[currentIndex + 1]);
-
                 seriesData.push(object);
             });
 
@@ -205,15 +204,25 @@
 
             if (data.done) {
 
-                $.each(metricNames, function(index, value) {
+                for (i=0; i<metricNames.length; i++) {
                     var object = {};
+                    var metricName;
 
                     $(".sq-loading").hide();
 
-                    object.color = me.seriesColorAssignment(value);
-                    object.name = value;
-                    object.data = me.seriesDataValues(value, index, me.sortDateValues(data.results.rows));
+                    object.color = me.seriesColorAssignment(metricNames[i]);
 
+                    // Check ID with column data to get a human readable name
+                    for (a=0; a<data.results.cols.length; a++) {
+                        if (data.results.cols[a].id === metricNames[i]) {
+                            metricName = data.results.cols[a].name;
+                        }
+                    }
+
+                    object.name = metricName;
+                    object.data = me.seriesDataValues(metricNames[i], i, me.sortDateValues(data.results.rows));
+
+                    // Detect if data returned has been processed properly
                     if (isNaN(object.data[0].x)) {
                         me.invalidData = true;
                         return false;
@@ -223,14 +232,12 @@
                     }
 
                     series.push(object);
-
-                });
+                }
 
                 if (!me.invalidData) {
                     var tempWidth = $(window).width() - 50;
 
                     // Time Series Chart
-
                     var graph = new Rickshaw.Graph({
                            element: document.getElementById("chart"),
                            width: tempWidth,
