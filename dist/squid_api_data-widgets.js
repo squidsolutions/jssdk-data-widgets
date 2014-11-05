@@ -1013,8 +1013,6 @@ return View;
 
                     $(".sq-loading").hide();
 
-                    object.color = me.seriesColorAssignment(metricNames[i]);
-
                     // Check ID with column data to get a human readable name
                     for (a=0; a<data.results.cols.length; a++) {
                         if (data.results.cols[a].id === metricNames[i]) {
@@ -1022,13 +1020,14 @@ return View;
                         }
                     }
 
+                    object.color = me.seriesColorAssignment(metricNames[i]);
                     object.name = metricName;
                     object.data = me.seriesDataValues(metricNames[i], i, me.sortDateValues(data.results.rows));
 
                     // Detect if data returned has been processed properly
                     if (isNaN(object.data[0].x)) {
                         me.invalidData = true;
-                        return false;
+                        break;
 
                     } else {
                         me.invalidData = false;
