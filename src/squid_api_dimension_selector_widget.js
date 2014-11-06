@@ -5,14 +5,14 @@
 
     var View = Backbone.View.extend({
         template : null,
-        dimensions : [],
+        dimensions : null,
         dimensionIdList : null,
         dimensionIndex: null,
 
         initializeDimensions : function(me) {
-         // get the dimensions from the api
-
             var domainId, domain;
+            
+            me.dimensions = [];
 
             /* See if we can obtain the domain's.
             If not check for a multi analysis array */

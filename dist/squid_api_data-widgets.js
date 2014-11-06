@@ -398,14 +398,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var View = Backbone.View.extend({
         template : null,
-        dimensions : [],
+        dimensions : null,
         dimensionIdList : null,
         dimensionIndex: null,
 
         initializeDimensions : function(me) {
-         // get the dimensions from the api
-
             var domainId, domain;
+            
+            me.dimensions = [];
 
             /* See if we can obtain the domain's.
             If not check for a multi analysis array */
@@ -755,7 +755,7 @@ return View;
 
     var View = Backbone.View.extend({
         template : null,
-        metrics : [],
+        metrics : null,
         metricCollection: [],
 
         initialize: function(options) {
@@ -784,9 +784,9 @@ return View;
             }
 
             squid_api.model.project.on('change', function(model) {
-                // get the dimensions from the api
-
                 var domainId, domain;
+                
+                me.metrics = [];
 
                 /* See if we can obtain the domain's.
                 If not check for a multi analysis array */
