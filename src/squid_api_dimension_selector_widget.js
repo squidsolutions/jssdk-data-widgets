@@ -27,20 +27,17 @@
 
             var dims = domain.dimensions;
 
-            // filter categorical dimensions
             for (var i=0; i<dims.length; i++){
                 var dim = dims[i];
-                if (dim.type == "CATEGORICAL") {
-                    if (me.dimensionIdList) {
-                        // insert and sort
-                        var idx = me.dimensionIdList.indexOf(dim.oid);
-                        if (idx >= 0) {
-                            me.dimensions[idx] = dim;
-                        }
-                    } else {
-                        // default unordered behavior
-                        me.dimensions.push(dim);
+                if (me.dimensionIdList) {
+                    // insert and sort
+                    var idx = me.dimensionIdList.indexOf(dim.oid);
+                    if (idx >= 0) {
+                        me.dimensions[idx] = dim;
                     }
+                } else {
+                    // default unordered behavior
+                    me.dimensions.push(dim);
                 }
             }
             me.render();
@@ -141,13 +138,15 @@
 
                     var dimensions = this.model.get("dimensions");
 
-                    if (!dimensions) {
+                    if (!dimensions & (this.model.get("analyses"))) {
                         dimensions = this.model.get("analyses")[0].get("dimensions");
                     }
 
-                    for (var j=0; j<dimensions.length; j++) {
-                        if (dim.oid == dimensions[j].dimensionId) {
-                            selected = true;
+                    if (dimensions) {
+                        for (var j=0; j<dimensions.length; j++) {
+                            if (dim.oid == dimensions[j].dimensionId) {
+                                selected = true;
+                            }
                         }
                     }
 
