@@ -894,7 +894,7 @@ return View;
                 project = this.model.at(i);
                 if (project) {
                     var selected = false;
-                    if (project.get("oid") == squid_api.model.project.get("oid")) {
+                    if (project.get("oid") == squid_api.projectId) {
                         selected = true;
                     }
 
