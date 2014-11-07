@@ -24,20 +24,21 @@
             }
 
             domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", domains[0].domainId);
-
-            var dims = domain.dimensions;
-
-            for (var i=0; i<dims.length; i++){
-                var dim = dims[i];
-                if (me.dimensionIdList) {
-                    // insert and sort
-                    var idx = me.dimensionIdList.indexOf(dim.oid);
-                    if (idx >= 0) {
-                        me.dimensions[idx] = dim;
+            
+            if (domain) {
+                var dims = domain.dimensions;
+                for (var i=0; i<dims.length; i++){
+                    var dim = dims[i];
+                    if (me.dimensionIdList) {
+                        // insert and sort
+                        var idx = me.dimensionIdList.indexOf(dim.oid);
+                        if (idx >= 0) {
+                            me.dimensions[idx] = dim;
+                        }
+                    } else {
+                        // default unordered behavior
+                        me.dimensions.push(dim);
                     }
-                } else {
-                    // default unordered behavior
-                    me.dimensions.push(dim);
                 }
             }
             me.render();
