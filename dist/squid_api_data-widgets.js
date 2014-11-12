@@ -100,6 +100,60 @@ function program3(depth0,data) {
   return buffer;
   });
 
+this["squid_api"]["template"]["squid_api_domain_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\r\n    <select class=\"sq-select form-control\">\r\n        ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n    </select>\r\n";
+  return buffer;
+  }
+function program2(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\r\n            <option value=\"";
+  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += ">\r\n                ";
+  if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\r\n            </option>\r\n        ";
+  return buffer;
+  }
+function program3(depth0,data) {
+  
+  
+  return "selected";
+  }
+
+function program5(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\r\n    <!-- just display filter name -->\r\n    <label>";
+  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</label>\r\n    <span>-</span>\r\n";
+  return buffer;
+  }
+
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(5, program5, data),fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n";
+  return buffer;
+  });
+
 this["squid_api"]["template"]["squid_api_kpi_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -157,31 +211,59 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 function program1(depth0,data) {
   
-  var buffer = "", stack1, helper;
-  buffer += "\n        <option value=\"";
-  if (helper = helpers.oid) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.oid); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  var buffer = "", stack1;
+  buffer += "\r\n    <select class=\"sq-select form-control\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.multiple), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">\n            ";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\n        </option>\n    ";
+  buffer += ">\r\n        ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n</select>\n";
   return buffer;
   }
 function program2(depth0,data) {
   
   
+  return "multiple";
+  }
+
+function program4(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\r\n            <option value=\"";
+  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += ">\r\n                ";
+  if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\r\n        </option>\n    ";
+  return buffer;
+  }
+function program5(depth0,data) {
+  
+  
   return "selected";
   }
 
-  buffer += "<select class=\"form-control metric-selector\" multiple=\"multiple\">\n    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.metricCollection), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+function program7(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\r\n    <!-- just display filter name -->\r\n    <label>";
+  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</label>\r\n    <span>-</span>\r\n";
+  return buffer;
+  }
+
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(7, program7, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</select>\n";
+  buffer += "\r\n";
   return buffer;
   });
 
@@ -402,40 +484,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         dimensionIdList : null,
         dimensionIndex: null,
 
-        initializeDimensions : function(me) {
-            var domainId, domain;
-            
-            me.dimensions = [];
-
-            /* See if we can obtain the domain's.
-            If not check for a multi analysis array */
-
-            domains = me.model.get("domains");
-
-            if (!domains) {
-                domains = me.model.get("analyses")[0].get("domains");
-            }
-
-            domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", domains[0].domainId);
-
-            var dims = domain.dimensions;
-
-            for (var i=0; i<dims.length; i++){
-                var dim = dims[i];
-                if (me.dimensionIdList) {
-                    // insert and sort
-                    var idx = me.dimensionIdList.indexOf(dim.oid);
-                    if (idx >= 0) {
-                        me.dimensions[idx] = dim;
-                    }
-                } else {
-                    // default unordered behavior
-                    me.dimensions.push(dim);
-                }
-            }
-            me.render();
-        },
-
         initialize: function(options) {
             var me = this;
 
@@ -454,15 +502,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.dimensionIndex = options.dimensionIndex;
             }
 
-            // init the dimensions from the project
-            if (squid_api.model.project.get("domains")) {
-                me.initializeDimensions(me);
-            } else {
-                // project not loaded yet
-                squid_api.model.project.on('change', function(model) {
-                    me.initializeDimensions(me);
-                });
-            }
+            this.model.on('change', function() {
+                me.render();
+            });
         },
 
         setModel: function(model) {
@@ -478,41 +520,30 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 for (i = 0; i < oid.length; i++) {
                     selected.push($(oid[i]).val());
                 }
-
-                if (this.dimensionIndex !== null) {
-
-                    if (selected.length === 1) {
-                        selected = selected[0];
-                    }
-
-                    if (this.model.get("analyses")) {
-                        // If instance of array
-                        if (this.model.get("analyses")[0]) {
-                            this.model.get("analyses")[0].setDimensionId(selected, this.dimensionIndex);
-                        } else {
-                            this.model.get("analyses").setDimensionId(selected, this.dimensionIndex);
-                        }
-                    } else {
-                        this.model.setDimensionId(selected, this.dimensionIndex);
+                
+                var analysis = null;
+                if (this.model.get("analyses")) {
+                    // If instance of array
+                    if (this.model.get("analyses")[0]) {
+                        analysis = this.model.get("analyses")[0];
                     }
                 } else {
-                    if (this.model.get("analyses")) {
-                        // If instance of array
-                        if (this.model.get("analyses")[0]) {
-                            this.model.get("analyses")[0].setDimensionIds(selected);
-                        } else {
-                            this.model.get("analyses").setDimensionIds(selected);
+                    analysis = this.model;
+                }
+
+                if (analysis) {
+                    if (this.dimensionIndex !== null) {
+                        if (selected.length > 0) {
+                            analysis.setDimensionId(selected[0], this.dimensionIndex);
                         }
                     } else {
-                        this.model.setDimensionIds(selected);
+                        analysis.setDimensionIds(selected);
                     }
                 }
             }
         },
 
         render: function() {
-            // display
-
             var isMultiple = true;
 
             if (this.dimensionIndex !== null) {
@@ -520,31 +551,36 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
-
-            for (var i=0; i<this.dimensions.length; i++) {
-                var dim = this.dimensions[i];
-                if (dim) {
-                    var selected = false;
-
-                    /* See if we can obtain the dimensions.
-                    If not check for a multi analysis array */
-
-                    var dimensions = this.model.get("dimensions");
-
-                    if (!dimensions & (this.model.get("analyses"))) {
-                        dimensions = this.model.get("analyses")[0].get("dimensions");
-                    }
-
-                    if (dimensions) {
-                        for (var j=0; j<dimensions.length; j++) {
-                            if (dim.oid == dimensions[j].dimensionId) {
-                                selected = true;
+            
+            // iterate through all domains dimensions
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+            if (domain) {
+                if (domain.dimensions) {
+                    var dimensions = [];
+                    var dims = domain.dimensions;
+                    for (var i=0; i<dims.length; i++){
+                        var dim = dims[i];
+                        if (this.dimensionIdList) {
+                            // insert and sort
+                            var idx = this.dimensionIdList.indexOf(dim.oid);
+                            if (idx >= 0) {
+                                dimensions[idx] = dim;
                             }
+                        } else {
+                            // default unordered behavior
+                            dimensions.push(dim);
                         }
                     }
-
-                    var option = {"label" : dim.name, "value" : dim.oid, "selected" : selected};
-                    jsonData.options.push(option);
+                    
+                    for (var dimIdx=0; dimIdx<dimensions.length; dimIdx++) {
+                        var dimension = dimensions[dimIdx];
+                        // check if selected
+                        var selected = this.isSelected(dimension);
+                        
+                        // add to the list
+                        var option = {"label" : dimension.name, "value" : dimension.oid, "selected" : selected};
+                        jsonData.options.push(option);
+                    }
                 }
             }
 
@@ -553,9 +589,37 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.$el.show();
 
             // Initialize plugin
-            this.$el.find("select").multiselect();
+            var selector = this.$el.find("select");
+            if (isMultiple) {
+                selector.multiselect();
+            }
 
             return this;
+        },
+        
+        isSelected : function(dim) {
+            var selected = false;
+
+            var dimensions = this.model.get("dimensions");
+            if (!dimensions && (this.model.get("analyses"))) {
+                // multi-analysis case
+                dimensions = this.model.get("analyses")[0].get("dimensions");
+            }
+
+            if (dimensions) {
+                if (this.dimensionIndex !== null) {
+                    if (dim.oid == dimensions[this.dimensionIndex].dimensionId) {
+                        selected = true;
+                    }
+                } else {
+                    for (var j=0; j<dimensions.length; j++) {
+                        if (dim.oid == dimensions[j].dimensionId) {
+                            selected = true;
+                        }
+                    }
+                }
+            }
+            return selected;
         }
 
     });
@@ -683,6 +747,78 @@ return View;
 }));
 
 (function (root, factory) {
+    root.squid_api.view.DomainSelector = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_domain_selector_widget);
+
+}(this, function (Backbone, squid_api, template) {
+
+    var View = Backbone.View.extend({
+        template : null,
+        
+        initialize: function(options) {
+            var me = this;
+
+            // setup options
+            if (options.template) {
+                this.template = options.template;
+            } else {
+                this.template = template;
+            }
+
+            // init the domains
+            this.model = squid_api.model.project;
+            this.model.on("change", this.render, this);
+        },
+
+        events: {
+            "change .sq-select": function(event) {
+                var selectedOid = event.target.value;
+                // update the current domain
+                squid_api.setDomainId(selectedOid);
+            }
+        },
+
+        render: function() {
+            var domain, domains, jsonData = {"selAvailable" : true, "options" : [{"label" : "", "value" : "", "selected" : false}]};
+            
+            // get the domains from the project;
+            domains = this.model.get("domains");
+            if (domains) {
+                for (var i=0; i<domains.length; i++) {
+                    domain = domains[i];
+                    var selected = false;
+                    if (domain.oid == squid_api.domainId) {
+                        selected = true;
+                    }
+                    
+                    var displayed = true;
+                    // do not display domains with no dimensions
+                    if (!domain.dimensions) {
+                        displayed = false;
+                    }
+                    
+                    if (displayed) {
+                        var option = {"label" : domain.name, "value" : domain.oid, "selected" : selected};
+                        jsonData.options.push(option);
+                    }
+                }
+            }
+
+            var html = this.template(jsonData);
+            this.$el.html(html);
+            this.$el.show();
+
+            // Initialize plugin
+            this.$el.find("select");
+
+            return this;
+        }
+
+    });
+
+    return View;
+}));
+
+(function (root, factory) {
     root.squid_api.view.KPIView = factory(root.Backbone, root.squid_api);
 }(this, function (Backbone, squid_api) {
 
@@ -756,64 +892,30 @@ return View;
     var View = Backbone.View.extend({
         template : null,
         metrics : null,
-        metricCollection: [],
+        metricIdList : null,
+        metricIndex: null,
 
         initialize: function(options) {
+            var me = this;
 
-            var me, domains;
-
-            me = this;
-
+            // setup options
             if (options.template) {
                 this.template = options.template;
             } else {
                 this.template = template;
             }
 
-            // Check for existing metrics
-            if (this.model.get('metrics')) {
-
-                var metricsBaseObject = this.model.get('metrics');
-                var metricsNames = [];
-
-                $.each(metricsBaseObject, function() {
-                    metricsNames.push(this.metricId);
-                });
-
-                me.metrics = metricsNames;
+            if (options.metricIdList) {
+                this.metricIdList = options.metricIdList;
             }
 
-            squid_api.model.project.on('change', function(model) {
-                var domainId, domain;
-                
-                me.metrics = [];
+            if (options.metricIndex !== null) {
+                this.metricIndex = options.metricIndex;
+            }
 
-                /* See if we can obtain the domain's.
-                If not check for a multi analysis array */
-
-                domains = me.model.get("domains");
-
-                if (!domains) {
-                    domains = me.model.get("analyses")[0].get("domains");
-                }
-
-                domain = squid_api.utils.find(model.get("domains"), "oid", domains[0].domainId);
-
-                $.each(domain.metrics, function(index, value) {
-
-                    if ($.inArray(value.oid, me.metrics) !== -1) {
-                        value.selected = true;
-                    }
-
-                    me.metricCollection.push(value);
-
-                });
-
+            this.model.on('change', function() {
                 me.render();
-
             });
-
-            // this.render(me);
         },
 
         setModel: function(model) {
@@ -823,35 +925,99 @@ return View;
 
         events: {
             "change": function(event) {
-                // Collect list of desired metrics and trigger a model change
-                var metrics = this.$el.find("select option:selected");
+                var oid = this.$el.find("select option:selected");
                 var selected = [];
-                $(metrics).each(function(index, metric){
-                    selected.push($(this).val());
-                });
 
-                this.model.setMetricIds(selected);
+                for (i = 0; i < oid.length; i++) {
+                    selected.push($(oid[i]).val());
+                }
 
+                var analysis = null;
+                if (this.model.get("analyses")) {
+                    // If instance of array
+                    if (this.model.get("analyses")[0]) {
+                        analysis = this.model.get("analyses")[0];
+                    }
+                } else {
+                    analysis = this.model;
+                }
+
+                if (analysis) {
+                    if (this.metricIndex) {
+                        if (selected.length > 0) {
+                            analysis.setMetricId(selected[0], this.metricIndex);
+                        }
+                    } else {
+                        analysis.setMetricIds(selected);
+                    }
+                }
             }
         },
 
         render: function() {
-            var me = this;
+            var isMultiple = true;
 
-            // Display template
-            var html = this.template({ metricCollection: me.metricCollection });
+            if (this.metricIndex !== null) {
+                isMultiple = false;
+            }
+
+            var jsonData = {"selAvailable" : true, "options" : [{"label" : "", "value" : "", "selected" : false}], "multiple" : isMultiple};
+            
+            // iterate through all domains metrics
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+            if (domain) {
+                var metrics = domain.metrics;
+                if (metrics) {
+                    for (var idx=0; idx<metrics.length; idx++) {
+                        var metric = metrics[idx];
+                        // check if selected
+                        var selected = this.isSelected(metric);
+                        
+                        // add to the list
+                        var option = {"label" : metric.name, "value" : metric.oid, "selected" : selected};
+                        jsonData.options.push(option);
+                    }
+                }
+            }
+
+            var html = this.template(jsonData);
             this.$el.html(html);
+            this.$el.show();
 
             // Initialize plugin
-            this.$el.find("select").multiselect();
+            var selector = this.$el.find("select");
+            if (isMultiple) {
+                selector.multiselect();
+            }
 
             return this;
+        },
+        
+        isSelected : function(item) {
+            var selected = false;
+
+            /* See if we can obtain the metrics.
+            If not check for a multi analysis array */
+
+            var metrics = this.model.get("metrics");
+
+            if (!metrics && (this.model.get("analyses"))) {
+                metrics = this.model.get("analyses")[0].get("metrics");
+            }
+
+            if (metrics) {
+                for (var j=0; j<metrics.length; j++) {
+                    if (item.oid == metrics[j].metricId) {
+                        selected = true;
+                    }
+                }
+            }
+            return selected;
         }
 
     });
 
     return View;
-
 }));
 
 (function (root, factory) {
@@ -881,14 +1047,13 @@ return View;
                 var selectedOid = event.target.value;
                 // update the current project
                 squid_api.setProjectId(selectedOid);
-                squid_api.fetchProject();
             }
         },
 
         render: function() {
             // display
 
-            var project, jsonData = {"selAvailable" : true, "options" : []};
+            var project, jsonData = {"selAvailable" : true, "options" : [{"label" : "", "value" : "", "selected" : false}]};
 
             for (var i=0; i<this.model.size(); i++) {
                 project = this.model.at(i);
@@ -897,9 +1062,18 @@ return View;
                     if (project.get("oid") == squid_api.projectId) {
                         selected = true;
                     }
-
-                    var option = {"label" : project.get("name"), "value" : project.get("oid"), "selected" : selected};
-                    jsonData.options.push(option);
+                    
+                    var displayed = true;
+                    
+                    // do not display projects with no domains
+                    if (!project.get("domains")) {
+                        displayed = false;
+                    }
+                    
+                    if (displayed) {
+                        var option = {"label" : project.get("name"), "value" : project.get("oid"), "selected" : selected};
+                        jsonData.options.push(option);
+                    }
                 }
             }
 
@@ -908,7 +1082,7 @@ return View;
             this.$el.show();
 
             // Initialize plugin
-            this.$el.find("select").multiselect();
+            this.$el.find("select");
 
             return this;
         }

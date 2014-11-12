@@ -6,64 +6,30 @@
     var View = Backbone.View.extend({
         template : null,
         metrics : null,
-        metricCollection: [],
+        metricIdList : null,
+        metricIndex: null,
 
         initialize: function(options) {
+            var me = this;
 
-            var me, domains;
-
-            me = this;
-
+            // setup options
             if (options.template) {
                 this.template = options.template;
             } else {
                 this.template = template;
             }
 
-            // Check for existing metrics
-            if (this.model.get('metrics')) {
-
-                var metricsBaseObject = this.model.get('metrics');
-                var metricsNames = [];
-
-                $.each(metricsBaseObject, function() {
-                    metricsNames.push(this.metricId);
-                });
-
-                me.metrics = metricsNames;
+            if (options.metricIdList) {
+                this.metricIdList = options.metricIdList;
             }
 
-            squid_api.model.project.on('change', function(model) {
-                var domainId, domain;
-                
-                me.metrics = [];
+            if (options.metricIndex !== null) {
+                this.metricIndex = options.metricIndex;
+            }
 
-                /* See if we can obtain the domain's.
-                If not check for a multi analysis array */
-
-                domains = me.model.get("domains");
-
-                if (!domains) {
-                    domains = me.model.get("analyses")[0].get("domains");
-                }
-
-                domain = squid_api.utils.find(model.get("domains"), "oid", domains[0].domainId);
-
-                $.each(domain.metrics, function(index, value) {
-
-                    if ($.inArray(value.oid, me.metrics) !== -1) {
-                        value.selected = true;
-                    }
-
-                    me.metricCollection.push(value);
-
-                });
-
+            this.model.on('change', function() {
                 me.render();
-
             });
-
-            // this.render(me);
         },
 
         setModel: function(model) {
@@ -73,33 +39,97 @@
 
         events: {
             "change": function(event) {
-                // Collect list of desired metrics and trigger a model change
-                var metrics = this.$el.find("select option:selected");
+                var oid = this.$el.find("select option:selected");
                 var selected = [];
-                $(metrics).each(function(index, metric){
-                    selected.push($(this).val());
-                });
 
-                this.model.setMetricIds(selected);
+                for (i = 0; i < oid.length; i++) {
+                    selected.push($(oid[i]).val());
+                }
 
+                var analysis = null;
+                if (this.model.get("analyses")) {
+                    // If instance of array
+                    if (this.model.get("analyses")[0]) {
+                        analysis = this.model.get("analyses")[0];
+                    }
+                } else {
+                    analysis = this.model;
+                }
+
+                if (analysis) {
+                    if (this.metricIndex) {
+                        if (selected.length > 0) {
+                            analysis.setMetricId(selected[0], this.metricIndex);
+                        }
+                    } else {
+                        analysis.setMetricIds(selected);
+                    }
+                }
             }
         },
 
         render: function() {
-            var me = this;
+            var isMultiple = true;
 
-            // Display template
-            var html = this.template({ metricCollection: me.metricCollection });
+            if (this.metricIndex !== null) {
+                isMultiple = false;
+            }
+
+            var jsonData = {"selAvailable" : true, "options" : [{"label" : "", "value" : "", "selected" : false}], "multiple" : isMultiple};
+            
+            // iterate through all domains metrics
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+            if (domain) {
+                var metrics = domain.metrics;
+                if (metrics) {
+                    for (var idx=0; idx<metrics.length; idx++) {
+                        var metric = metrics[idx];
+                        // check if selected
+                        var selected = this.isSelected(metric);
+                        
+                        // add to the list
+                        var option = {"label" : metric.name, "value" : metric.oid, "selected" : selected};
+                        jsonData.options.push(option);
+                    }
+                }
+            }
+
+            var html = this.template(jsonData);
             this.$el.html(html);
+            this.$el.show();
 
             // Initialize plugin
-            this.$el.find("select").multiselect();
+            var selector = this.$el.find("select");
+            if (isMultiple) {
+                selector.multiselect();
+            }
 
             return this;
+        },
+        
+        isSelected : function(item) {
+            var selected = false;
+
+            /* See if we can obtain the metrics.
+            If not check for a multi analysis array */
+
+            var metrics = this.model.get("metrics");
+
+            if (!metrics && (this.model.get("analyses"))) {
+                metrics = this.model.get("analyses")[0].get("metrics");
+            }
+
+            if (metrics) {
+                for (var j=0; j<metrics.length; j++) {
+                    if (item.oid == metrics[j].metricId) {
+                        selected = true;
+                    }
+                }
+            }
+            return selected;
         }
 
     });
 
     return View;
-
 }));

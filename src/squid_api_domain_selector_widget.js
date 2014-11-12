@@ -1,5 +1,5 @@
 (function (root, factory) {
-    root.squid_api.view.ProjectSelector = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_project_selector_widget);
+    root.squid_api.view.DomainSelector = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_domain_selector_widget);
 
 }(this, function (Backbone, squid_api, template) {
 
@@ -16,40 +16,40 @@
                 this.template = template;
             }
 
-            // init the projects
-            this.model.on("reset sync", this.render, this);
+            // init the domains
+            this.model = squid_api.model.project;
+            this.model.on("change", this.render, this);
         },
 
         events: {
             "change .sq-select": function(event) {
                 var selectedOid = event.target.value;
-                // update the current project
-                squid_api.setProjectId(selectedOid);
+                // update the current domain
+                squid_api.setDomainId(selectedOid);
             }
         },
 
         render: function() {
-            // display
-
-            var project, jsonData = {"selAvailable" : true, "options" : [{"label" : "", "value" : "", "selected" : false}]};
-
-            for (var i=0; i<this.model.size(); i++) {
-                project = this.model.at(i);
-                if (project) {
+            var domain, domains, jsonData = {"selAvailable" : true, "options" : [{"label" : "", "value" : "", "selected" : false}]};
+            
+            // get the domains from the project;
+            domains = this.model.get("domains");
+            if (domains) {
+                for (var i=0; i<domains.length; i++) {
+                    domain = domains[i];
                     var selected = false;
-                    if (project.get("oid") == squid_api.projectId) {
+                    if (domain.oid == squid_api.domainId) {
                         selected = true;
                     }
                     
                     var displayed = true;
-                    
-                    // do not display projects with no domains
-                    if (!project.get("domains")) {
+                    // do not display domains with no dimensions
+                    if (!domain.dimensions) {
                         displayed = false;
                     }
                     
                     if (displayed) {
-                        var option = {"label" : project.get("name"), "value" : project.get("oid"), "selected" : selected};
+                        var option = {"label" : domain.name, "value" : domain.oid, "selected" : selected};
                         jsonData.options.push(option);
                     }
                 }
