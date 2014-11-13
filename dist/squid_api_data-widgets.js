@@ -1099,9 +1099,7 @@ return View;
     View = Backbone.View.extend({
 
         template : null,
-        metrics : null,
         dataToDisplay : 10000,
-        invalidData: false,
         format : null,
 
         initialize : function(options) {
@@ -1124,9 +1122,6 @@ return View;
             if (options.format) {
                 this.format = options.format;
             }
-
-            // Store the current metrics
-            this.metrics = this.model.get("metrics");
 
             this.render();
 
@@ -1160,9 +1155,6 @@ return View;
                 // error
                 $(".sq-loading").hide();
             }
-
-            // Store the current metrics
-            this.metrics = this.model.get("metrics");
 
             this.render();
         },
@@ -1266,7 +1258,7 @@ return View;
             if (data.done) {
 
                 // Metric Data Manipulation
-                var metricObject = this.metrics;
+                var metricObject = this.model.get("metrics");
                 var metricNames = [];
 
                 for (i=0; i<metricObject.length; i++) {
@@ -1278,7 +1270,7 @@ return View;
 
                 // Time Series [Series Data]
                 var series = [];
-
+                
                 for (i=0; i<metricNames.length; i++) {
                     var object = {};
                     var metricName;
@@ -1294,18 +1286,10 @@ return View;
                     object.name = metricName;
                     object.data = me.sortDateValues(me.seriesDataValues(metricNames[i], i, data.results.rows));
 
-                    // Detect if data returned has been processed properly
-                    if (isNaN(object.data[0].x)) {
-                        me.invalidData = true;
-                        break;
-                    } else {
-                        me.invalidData = false;
-                    }
-
                     series.push(object);
                 }
 
-                if (!me.invalidData) {
+                if (series.length>0 && (series[0].data.length>0)) {
                     var tempWidth = $(window).width() - 50;
 
                     // Time Series Chart
