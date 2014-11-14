@@ -76,25 +76,33 @@ function program7(depth0,data) {
 this["squid_api"]["template"]["squid_api_displaytype_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this;
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
   
-  
-  return "\n        <li data-content=\"TimeSeriesView\"><i class=\"fa fa-line-chart fa-2x\"></i></li>\n    ";
+  var buffer = "", stack1, helper;
+  buffer += "\n    	<li data-content=\"";
+  if (helper = helpers.view) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.view); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.isActive), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "><i class=\"fa ";
+  if (helper = helpers.icon) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.icon); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + " fa-2x\"></i></li>\n    ";
+  return buffer;
   }
-
-function program3(depth0,data) {
+function program2(depth0,data) {
   
   
-  return "\n        <li data-content=\"DataTableView\"><i class=\"fa fa-table fa-2x\"></i></li>\n    ";
+  return "class=\"active\"";
   }
 
   buffer += "<ul class=\"widget-selector\">\n    ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.TimeSeriesView), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n    ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.DataTableView), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n</div>\n";
   return buffer;
@@ -343,8 +351,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         initialize : function(options) {
             if (this.model) {
-                this.model.on('change:status', this.render, this);
-                this.model.on('change:error', this.render, this);
+                this.listenTo(this.model, 'change', this.render);
             }
 
             // setup options
@@ -373,6 +380,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         setModel : function(model) {
             this.model = model;
             this.initialize();
+        },
+        
+        /**
+         * see : http://stackoverflow.com/questions/10966440/recreating-a-removed-view-in-backbone-js
+         */
+        remove: function() {
+            this.undelegateEvents();
+            this.$el.empty();
+            this.stopListening();
+            return this;
         },
 
         dataTableInsert : function(data) {
@@ -416,7 +433,28 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var me = this;
 
-            analysis = this.model;
+            this.$el.html(this.template());
+
+            if (!this.model.isDone()) {
+                // running
+                if (this.model.get("status") == "RUNNING") {
+                    $(".sq-loading").show();
+                }
+            } else if (this.model.get("error")) {
+                // error
+                $(".sq-loading").hide();
+            } else {
+                // display
+                this.display();
+
+                $(".sq-loading").hide();
+            }
+
+            return this;
+        },
+        
+        display : function() {
+            var analysis = this.model;
 
             // Use the first analyses array
 
@@ -424,11 +462,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
               analysis = analysis.get("analyses")[0];
             }
 
-            jsonData = analysis.toJSON();
-
-            data = {};
-            data.done = this.model.isDone();
+            var jsonData = analysis.toJSON();
             if (jsonData.results) {
+                data = {};
+                data.done = this.model.isDone();
                 data.results = {"cols" : jsonData.results.cols, "rows" : []};
                 rows = jsonData.results.rows;
                 for (rowIdx = 0; (rowIdx<rows.length && rowIdx<this.maxRowsPerPage); rowIdx++) {
@@ -443,30 +480,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
                     data.results.rows.push(newRow);
                 }
-            }
-
-            this.$el.html(this.template());
-
-            if (!this.model.isDone()) {
-                // running
-                if (this.model.get("status") == "RUNNING") {
-                    $(".sq-loading").show();
-                }
-            } else if (this.model.get("error")) {
-                // error
-                $(".sq-loading").hide();
-            } else {
-                // display
                 this.dataTableInsert(data);
-
-                $(".sq-loading").hide();
-
                 // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable();
-
             }
-
-            return this;
         }
     });
 
@@ -634,115 +651,159 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var View = Backbone.View.extend({
 
-    template : null,
-    renderTo : null,
-    baseWidget : null,
-    squidApiPrefix : "squid_api.view.",
-    views: {},
-
-    initialize: function(options) {
-
-        var me = this;
-
-        if (squid_api.view.TimeSeriesView) {
-            this.views.TimeSeriesView = true;
-        }
-
-        if (squid_api.view.DataTableView) {
-            this.views.DataTableView = true;
-        }
-
-        if (squid_api.view.FlowChartView) {
-            this.views.FlowChartView = true;
-        }
-
-        // Store template
-        if (options.template) {
-            this.template = options.template;
-        } else {
-            this.template = template;
-        }
-
-        // Store Widget Render to element
-        if (options.renderTo) {
-            this.renderTo = options.renderTo;
-        }
-
-        if (options.baseWidget) {
-            this.baseWidget = options.baseWidget;
-        }
-
-        this.render();
-    },
-
-    setModel: function(model) {
-        this.model = model;
-        this.initialize();
-    },
-
-    events: {
-        "click li": "changeWidget"
-    },
-
-    changeWidget: function(item){
-        var me = this;
-        var view, widget;
-
-        // Check if a click event has been triggered
-        if (item.type === "click") {
-            view = this.squidApiPrefix + item.currentTarget.dataset.content;
-        } else {
-            view = this.squidApiPrefix + item;
-        }
-
-        this.$el.find(item.currentTarget).addClass("active");
-        this.$el.find(item.currentTarget).siblings().removeClass("active");
-
-        // Select Widget
-        if (view === this.squidApiPrefix + "DataTableView") {
-            widget = new squid_api.view.DataTableView ({
-                el : me.renderTo,
-                model : analysis
-            });
-        } else if (view === this.squidApiPrefix + "TimeSeriesView") {
-            widget = new squid_api.view.TimeSeriesView ({
-                el : me.renderTo,
-                model : analysis
-            });
-        }
-
-        // Render the widget
-        widget.render();
-    },
-
-    render: function() {
-        var me = this;
-
-        var availableViews = [];
-
-        // Display template
-        var html = this.template(this.views);
-        this.$el.html(html);
-
-        var baseElement = this.$el.find("li");
-
-        $.each(baseElement, function() {
-            $(this).removeClass("active");
-
-            if ($(this).attr("data-content") === me.baseWidget) {
-                $(this).addClass("active");
+        template : null,
+        renderTo : null,
+        defaultWidget : null,
+        currentView : null,
+        currentViewName : null,
+        currentSelectionName : null,
+    
+        initialize: function(options) {
+    
+            var me = this;
+    
+            // Store template
+            if (options.template) {
+                this.template = options.template;
+            } else {
+                this.template = template;
             }
-        });
-
-        if (this.baseWidget) {
-            this.changeWidget(this.baseWidget);
+    
+            // Store Widget Render to element
+            if (options.renderTo) {
+                this.renderTo = options.renderTo;
+            }
+    
+            if (options.defaultWidget) {
+                this.defaultWidget = options.defaultWidget;
+            }
+            
+            if (this.model) {
+                this.model.on('change', this.render, this);
+            }
+    
+            this.render();
+        },
+    
+        setModel: function(model) {
+            this.model = model;
+            this.initialize();
+        },
+    
+        events: {
+            "click li": "changeWidget"
+        },
+    
+        changeWidget: function(item){
+            this.currentSelectionName = item.currentTarget.dataset.content;
+            this.render();
+        },
+    
+        render: function() {
+            if (!this.model.isDone()) {
+                // running
+                if (this.model.get("status") == "RUNNING") {
+                    $(".sq-loading").show();
+                }
+            } else if (this.model.get("error")) {
+                // error
+                $(".sq-loading").hide();
+            } else {
+                this.display();
+            }
+        },
+        
+        addCompatibleView : function(list, name) {
+            // check it is available
+            if (squid_api.view[name]) {
+                list.push(name);
+            }
+        },
+        
+        display: function() {
+            var me = this;
+            
+            // compute the view types compatible with the analysis
+            var dimensions = this.model.get("dimensions");
+            var compatibleViews = [];
+            
+            this.addCompatibleView(compatibleViews, "DataTableView");
+            if (dimensions && (dimensions.length>0)) {
+                this.addCompatibleView(compatibleViews, "BarChartView");
+                if (dimensions.length>1) {
+                    this.addCompatibleView(compatibleViews, "FlowChartView");
+                }
+                var hasDateDimension = false;
+                var cols = this.model.get("results").cols;
+                for (var idx=0; idx < cols.length; idx++) {
+                    if (cols[idx].dataType == "DATE") {
+                        hasDateDimension = true;
+                    }
+                }
+                if (hasDateDimension) {
+                    this.addCompatibleView(compatibleViews, "TimeSeriesView");
+                }
+            }
+       
+            // compute the current selected view
+            var viewName;
+            if (!this.currentSelectionName) {
+                this.currentSelectionName = this.defaultWidget;
+            }
+            if (compatibleViews.indexOf(this.currentSelectionName)>-1) {
+                viewName = this.currentSelectionName;
+            } else {
+                viewName = "DataTableView";
+                this.currentSelectionName = viewName;
+            }
+            
+            // display the Widget
+            if (!this.currentViewName || (viewName != this.currentViewName)) {
+                // update the view
+                this.currentViewName = viewName;
+                if (this.currentView) {
+                    // dispose previous view
+                    this.currentView.remove();
+                }
+                // create the new view
+                if (viewName == "DataTableView") {
+                    this.currentView = new squid_api.view.DataTableView ({
+                        el : me.renderTo,
+                        model : analysis
+                    });
+                } else if (viewName == "TimeSeriesView") {
+                    this.currentView = new squid_api.view.TimeSeriesView ({
+                        el : me.renderTo,
+                        model : analysis
+                    });
+                }
+                this.currentView.render();
+            }
+            
+            // display the view selector
+            var data = {"options" : []};
+            for (idx2 = 0; idx2<compatibleViews.length; idx2++) {
+                var view2 = compatibleViews[idx2];
+                var icon;
+                if (view2 == "DataTableView") {
+                    icon = "fa-table";
+                } else if (view2 == "TimeSeriesView") {
+                    icon = "fa-line-chart";
+                }
+                var isActive = false;
+                if (view2 == this.currentViewName) {
+                    isActive = true;
+                }
+                data.options.push({"view" : view2, "icon" : icon, "isActive" : isActive});
+            }
+            var html = this.template(data);
+            this.$el.html(html);
+    
+            return this;
         }
+    });
 
-        return this;
-    }
-});
-
-return View;
+    return View;
 
 }));
 
@@ -1103,9 +1164,10 @@ return View;
         format : null,
 
         initialize : function(options) {
+            
             if (this.model) {
-                this.model.on('change:status', this.update, this);
-                this.model.on('change:error', this.render, this);
+                this.listenTo(this.model, 'change:status', this.update);
+                this.listenTo(this.model, 'change:error', this.render);
             }
 
             if (options.dataToDisplay) {
@@ -1122,8 +1184,6 @@ return View;
             if (options.format) {
                 this.format = options.format;
             }
-
-            this.render();
 
             // Resize
             $(window).on("resize", _.bind(this.resize(),this));
@@ -1142,6 +1202,17 @@ return View;
         setModel : function(model) {
             this.model = model;
             this.initialize();
+        },
+        
+        /**
+         * see : http://stackoverflow.com/questions/10966440/recreating-a-removed-view-in-backbone-js
+         */
+        remove: function() {
+            this.undelegateEvents();
+            this.$el.empty();
+            this.stopListening();
+            $(window).off("resize");
+            return this;
         },
 
         update : function() {

@@ -12,8 +12,7 @@
 
         initialize : function(options) {
             if (this.model) {
-                this.model.on('change:status', this.render, this);
-                this.model.on('change:error', this.render, this);
+                this.listenTo(this.model, 'change', this.render);
             }
 
             // setup options
@@ -42,6 +41,16 @@
         setModel : function(model) {
             this.model = model;
             this.initialize();
+        },
+        
+        /**
+         * see : http://stackoverflow.com/questions/10966440/recreating-a-removed-view-in-backbone-js
+         */
+        remove: function() {
+            this.undelegateEvents();
+            this.$el.empty();
+            this.stopListening();
+            return this;
         },
 
         dataTableInsert : function(data) {
@@ -85,7 +94,28 @@
 
             var me = this;
 
-            analysis = this.model;
+            this.$el.html(this.template());
+
+            if (!this.model.isDone()) {
+                // running
+                if (this.model.get("status") == "RUNNING") {
+                    $(".sq-loading").show();
+                }
+            } else if (this.model.get("error")) {
+                // error
+                $(".sq-loading").hide();
+            } else {
+                // display
+                this.display();
+
+                $(".sq-loading").hide();
+            }
+
+            return this;
+        },
+        
+        display : function() {
+            var analysis = this.model;
 
             // Use the first analyses array
 
@@ -93,11 +123,10 @@
               analysis = analysis.get("analyses")[0];
             }
 
-            jsonData = analysis.toJSON();
-
-            data = {};
-            data.done = this.model.isDone();
+            var jsonData = analysis.toJSON();
             if (jsonData.results) {
+                data = {};
+                data.done = this.model.isDone();
                 data.results = {"cols" : jsonData.results.cols, "rows" : []};
                 rows = jsonData.results.rows;
                 for (rowIdx = 0; (rowIdx<rows.length && rowIdx<this.maxRowsPerPage); rowIdx++) {
@@ -112,30 +141,10 @@
                     }
                     data.results.rows.push(newRow);
                 }
-            }
-
-            this.$el.html(this.template());
-
-            if (!this.model.isDone()) {
-                // running
-                if (this.model.get("status") == "RUNNING") {
-                    $(".sq-loading").show();
-                }
-            } else if (this.model.get("error")) {
-                // error
-                $(".sq-loading").hide();
-            } else {
-                // display
                 this.dataTableInsert(data);
-
-                $(".sq-loading").hide();
-
                 // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable();
-
             }
-
-            return this;
         }
     });
 

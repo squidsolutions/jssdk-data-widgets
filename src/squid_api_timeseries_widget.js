@@ -9,9 +9,10 @@
         format : null,
 
         initialize : function(options) {
+            
             if (this.model) {
-                this.model.on('change:status', this.update, this);
-                this.model.on('change:error', this.render, this);
+                this.listenTo(this.model, 'change:status', this.update);
+                this.listenTo(this.model, 'change:error', this.render);
             }
 
             if (options.dataToDisplay) {
@@ -28,8 +29,6 @@
             if (options.format) {
                 this.format = options.format;
             }
-
-            this.render();
 
             // Resize
             $(window).on("resize", _.bind(this.resize(),this));
@@ -48,6 +47,17 @@
         setModel : function(model) {
             this.model = model;
             this.initialize();
+        },
+        
+        /**
+         * see : http://stackoverflow.com/questions/10966440/recreating-a-removed-view-in-backbone-js
+         */
+        remove: function() {
+            this.undelegateEvents();
+            this.$el.empty();
+            this.stopListening();
+            $(window).off("resize");
+            return this;
         },
 
         update : function() {
