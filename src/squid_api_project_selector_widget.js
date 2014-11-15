@@ -5,7 +5,7 @@
 
     var View = Backbone.View.extend({
         template : null,
-        
+
         initialize: function(options) {
             var me = this;
 
@@ -31,7 +31,7 @@
         render: function() {
             // display
 
-            var project, jsonData = {"selAvailable" : true, "options" : [{"label" : "", "value" : "", "selected" : false}]};
+            var project, jsonData = {"selAvailable" : true, "options" : [{"label" : "Select Project", "value" : "", "selected" : false}]};
 
             for (var i=0; i<this.model.size(); i++) {
                 project = this.model.at(i);
@@ -40,14 +40,14 @@
                     if (project.get("oid") == squid_api.projectId) {
                         selected = true;
                     }
-                    
+
                     var displayed = true;
-                    
+
                     // do not display projects with no domains
                     if (!project.get("domains")) {
                         displayed = false;
                     }
-                    
+
                     if (displayed) {
                         var option = {"label" : project.get("name"), "value" : project.get("oid"), "selected" : selected};
                         jsonData.options.push(option);
