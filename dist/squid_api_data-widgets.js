@@ -1235,66 +1235,64 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         seriesColorAssignment : function(serie) {
-            // Default
-            var color = "#666666";
-
-            // Specify a colour return value for each metric
-            switch (serie) {
-
-            case "count" :
-                color = "#fe6e70";
-                break;
-            case "withFTA" :
-                color = "#67e363";
-                break;
-            case "max_date" :
-                color = "#b563e2";
-                break;
-            case "sum_fta" :
-                color = "#ffc46f";
-                break;
-            case "unique_ftas" :
-                color = "#67e363";
-                break;
-            }
-
+            var p = d3.scale.category10();
+            var color=p.range()[serie];
             return color;
         },
 
-        seriesDataValues : function(serie, dateIndex, metricIndex, modelData) {
-            var seriesData = [];
+        seriesDataValues : function(dateIndex, metricIndex, modelData) {
+            var series = [];
             var value, date;
-            for (var i=0; (i<modelData.length && i<this.dataToDisplay); i++) {
+            var serie;
+            var currentSerieName = null;
+            var serieName = "Date";
+            
+            for (var i=0; (i<modelData.length); i++) {
                 value = modelData[i].v;
                 date = moment(value[dateIndex]);
+                
+                // deal with series
+                if (dateIndex>0) {
+                    serieName = value[dateIndex-1];
+                }
+                if ((currentSerieName === null) || (serieName != currentSerieName)) {
+                    currentSerieName = serieName;
+                    // create a new serie
+                    serie = {};
+                    serie.color = this.seriesColorAssignment(series.length);
+                    serie.name = currentSerieName;
+                    serie.data = [];
+                    series.push(serie);
+                }
+                
                 if (date.isValid()) {
                     var object = {};
                     // Convert date value into unix
                     object.x = date.unix();
                     object.y = parseFloat(value[metricIndex]);
-                    seriesData.push(object);
+                    serie.data.push(object);
                 } else {
-                    console.debug("Invalid date : "+value[0]);
+                    console.debug("Invalid date : "+value[dateIndex]);
                 }
             }
-            return seriesData;
+            
+            // sort series data
+            for (var j=0; j<series.length; j++) {
+                series[j].data = this.sortDateValues(series[j].data);
+            }
+            return series;
         },
 
         getData: function() {
-
-            var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
+            var data, analysis;
 
             analysis = this.model;
-
             // Use the first analyses array
-
             if (analysis.get("analyses")) {
                 analysis = analysis.get("analyses")[0];
             }
 
-            jsonData = analysis.toJSON();
-
-            data = jsonData;
+            data = analysis.toJSON();
             data.done = this.model.isDone();
 
             return data;
@@ -1317,31 +1315,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 
                 // Print Template
                 this.$el.html(this.template());
-
-                // Metric Data Manipulation
-                var metrics = this.model.get("metrics");
+                
+                var dateColumnIndex=0; 
+                while (data.results.cols[dateColumnIndex].dataType != "DATE") {
+                    dateColumnIndex++;
+                }
 
                 // Time Series [Series Data]
-                var series = [];
-                
-                for (i=0; i<metrics.length; i++) {
-                    var object = {};
-                    var metricName;
-                    var metric = metrics[i].metricId;
-
-                    // Check metric ID with column data to get a human readable name
-                    for (a=0; a<data.results.cols.length; a++) {
-                        if (data.results.cols[a].id === metric) {
-                            metricName = data.results.cols[a].name;
-                        }
-                    }
-
-                    object.color = me.seriesColorAssignment(metric);
-                    object.name = metricName;
-                    object.data = me.sortDateValues(me.seriesDataValues(metric, 0, i+1, data.results.rows));
-
-                    series.push(object);
-                }
+                var series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows);
 
                 if (series.length>0 && (series[0].data.length>0)) {
                     var tempWidth = $(window).width() - 50;
