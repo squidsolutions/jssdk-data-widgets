@@ -81,79 +81,44 @@
 
             // Specify a colour return value for each metric
             switch (serie) {
-
-            case "count" :
-                color = "#fe6e70";
-                break;
-            case "withFTA" :
-                color = "#67e363";
-                break;
-            case "max_date" :
-                color = "#b563e2";
-                break;
-            case "sum_fta" :
-                color = "#ffc46f";
-                break;
-            case "unique_ftas" :
-                color = "#67e363";
-                break;
+                case "count" :
+                    color = "#fe6e70";
+                    break;
             }
 
             return color;
         },
 
-        seriesDataValues : function(serie, index, modelData) {
-            var currentIndex = index;
+        seriesDataValues : function(serie, dateIndex, metricIndex, modelData) {
             var seriesData = [];
             var value, date;
-            for (var i=0; i<modelData.length; i++) {
+            for (var i=0; (i<modelData.length && i<this.dataToDisplay); i++) {
                 value = modelData[i].v;
-                date = moment(value[0]);
+                date = moment(value[dateIndex]);
                 if (date.isValid()) {
                     var object = {};
                     // Convert date value into unix
                     object.x = date.unix();
-                    object.y = parseFloat(value[currentIndex + 1]);
+                    object.y = parseFloat(value[metricIndex]);
                     seriesData.push(object);
                 } else {
-                    console.debug("Invalid date : "+value[0]);
+                    console.debug("Invalid date : "+value[dateIndex]);
                 }
             }
             return seriesData;
         },
 
         getData: function() {
-
-            var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
+            var data, analysis;
 
             analysis = this.model;
-
             // Use the first analyses array
-
             if (analysis.get("analyses")) {
                 analysis = analysis.get("analyses")[0];
             }
 
-            jsonData = analysis.toJSON();
-
-            data = {};
+            data = analysis.toJSON();
             data.done = this.model.isDone();
-            if (jsonData.results) {
-                data.results = {"cols" : jsonData.results.cols, "rows" : []};
-                rows = jsonData.results.rows;
-                for (rowIdx = 0; (rowIdx<rows.length && rowIdx<this.dataToDisplay); rowIdx++) {
-                    row = rows[rowIdx];
-                    newRow = {v:[]};
-                    for (colIdx = 0; colIdx<jsonData.results.cols.length; colIdx++) {
-                        v = row.v[colIdx];
-                        if (jsonData.results.cols[colIdx].dataType == "NUMBER") {
-                            v = v;
-                        }
-                        newRow.v.push(v);
-                    }
-                    data.results.rows.push(newRow);
-                }
-            }
 
             return data;
         },
@@ -172,35 +137,31 @@
             var data = this.getData();
 
             if (data.done) {
-
-                // Metric Data Manipulation
-                var metricObject = this.model.get("metrics");
-                var metricNames = [];
-
-                for (i=0; i<metricObject.length; i++) {
-                    metricNames.push(metricObject[i].metricId);
-                }
-
+                
                 // Print Template
                 this.$el.html(this.template());
+
+                // Metric Data Manipulation
+                var metrics = this.model.get("metrics");
 
                 // Time Series [Series Data]
                 var series = [];
                 
-                for (i=0; i<metricNames.length; i++) {
+                for (i=0; i<metrics.length; i++) {
                     var object = {};
                     var metricName;
+                    var metric = metrics[i].metricId;
 
-                    // Check ID with column data to get a human readable name
+                    // Check metric ID with column data to get a human readable name
                     for (a=0; a<data.results.cols.length; a++) {
-                        if (data.results.cols[a].id === metricNames[i]) {
+                        if (data.results.cols[a].id === metric) {
                             metricName = data.results.cols[a].name;
                         }
                     }
 
-                    object.color = me.seriesColorAssignment(metricNames[i]);
+                    object.color = me.seriesColorAssignment(metric);
                     object.name = metricName;
-                    object.data = me.sortDateValues(me.seriesDataValues(metricNames[i], i, data.results.rows));
+                    object.data = me.sortDateValues(me.seriesDataValues(metric, 0, i+1, data.results.rows));
 
                     series.push(object);
                 }

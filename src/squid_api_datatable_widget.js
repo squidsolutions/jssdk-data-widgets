@@ -118,13 +118,13 @@
             var analysis = this.model;
 
             // Use the first analyses array
-
             if (analysis.get("analyses")) {
               analysis = analysis.get("analyses")[0];
             }
 
             var jsonData = analysis.toJSON();
             if (jsonData.results) {
+                // apply paging and number formatting
                 data = {};
                 data.done = this.model.isDone();
                 data.results = {"cols" : jsonData.results.cols, "rows" : []};
@@ -141,6 +141,8 @@
                     }
                     data.results.rows.push(newRow);
                 }
+                
+                // build the html datatable
                 this.dataTableInsert(data);
                 // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable();
