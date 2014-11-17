@@ -143,6 +143,8 @@
                     icon = "fa-table";
                 } else if (view2 == "TimeSeriesView") {
                     icon = "fa-line-chart";
+                } else if (view2 == "BarChartView") {
+                    icon = "fa-bar-chart";
                 }
                 var isActive = false;
                 if (view2 == this.currentViewName) {
