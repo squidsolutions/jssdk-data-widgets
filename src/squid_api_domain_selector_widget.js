@@ -5,7 +5,7 @@
 
     var View = Backbone.View.extend({
         template : null,
-        
+
         initialize: function(options) {
             var me = this;
 
@@ -30,8 +30,8 @@
         },
 
         render: function() {
-            var domain, domains, jsonData = {"selAvailable" : true, "options" : [{"label" : "", "value" : "", "selected" : false}]};
-            
+            var domain, domains, jsonData = {"selAvailable" : true, "options" : [{"label" : "Select Domain", "value" : "", "selected" : false}]};
+
             // get the domains from the project;
             domains = this.model.get("domains");
             if (domains) {
@@ -41,13 +41,13 @@
                     if (domain.oid == squid_api.domainId) {
                         selected = true;
                     }
-                    
+
                     var displayed = true;
                     // do not display domains with no dimensions
                     if (!domain.dimensions) {
                         displayed = false;
                     }
-                    
+
                     if (displayed) {
                         var option = {"label" : domain.name, "value" : domain.oid, "selected" : selected};
                         jsonData.options.push(option);

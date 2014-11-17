@@ -818,7 +818,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var View = Backbone.View.extend({
         template : null,
-        
+
         initialize: function(options) {
             var me = this;
 
@@ -843,8 +843,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render: function() {
-            var domain, domains, jsonData = {"selAvailable" : true, "options" : [{"label" : "", "value" : "", "selected" : false}]};
-            
+            var domain, domains, jsonData = {"selAvailable" : true, "options" : [{"label" : "Select Domain", "value" : "", "selected" : false}]};
+
             // get the domains from the project;
             domains = this.model.get("domains");
             if (domains) {
@@ -854,13 +854,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     if (domain.oid == squid_api.domainId) {
                         selected = true;
                     }
-                    
+
                     var displayed = true;
                     // do not display domains with no dimensions
                     if (!domain.dimensions) {
                         displayed = false;
                     }
-                    
+
                     if (displayed) {
                         var option = {"label" : domain.name, "value" : domain.oid, "selected" : selected};
                         jsonData.options.push(option);
@@ -1092,7 +1092,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var View = Backbone.View.extend({
         template : null,
-        
+
         initialize: function(options) {
             var me = this;
 
@@ -1118,7 +1118,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         render: function() {
             // display
 
-            var project, jsonData = {"selAvailable" : true, "options" : [{"label" : "", "value" : "", "selected" : false}]};
+            var project, jsonData = {"selAvailable" : true, "options" : [{"label" : "Select Project", "value" : "", "selected" : false}]};
 
             for (var i=0; i<this.model.size(); i++) {
                 project = this.model.at(i);
@@ -1127,14 +1127,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     if (project.get("oid") == squid_api.projectId) {
                         selected = true;
                     }
-                    
+
                     var displayed = true;
-                    
+
                     // do not display projects with no domains
                     if (!project.get("domains")) {
                         displayed = false;
                     }
-                    
+
                     if (displayed) {
                         var option = {"label" : project.get("name"), "value" : project.get("oid"), "selected" : selected};
                         jsonData.options.push(option);
