@@ -818,6 +818,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var View = Backbone.View.extend({
         template : null,
+        displayAllDomains : false,
 
         initialize: function(options) {
             var me = this;
@@ -827,6 +828,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.template = options.template;
             } else {
                 this.template = template;
+            }
+            
+            if (typeof options.displayAllDomains !== 'undefined') {
+                this.displayAllDomains = options.displayAllDomains;
             }
 
             // init the domains
@@ -856,9 +861,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
 
                     var displayed = true;
-                    // do not display domains with no dimensions
-                    if (!domain.dimensions) {
-                        displayed = false;
+                    
+                    if (!this.displayAllDomains) {
+                        // do not display domains with no dimensions nor metrics
+                        if ((!domain.dimensions) || (domain.dimensions.length === 0)) {
+                            displayed = false;
+                        }
+                        if ((!domain.metrics) || (domain.metrics.length === 0)) {
+                            displayed = false;
+                        }
                     }
 
                     if (displayed) {
