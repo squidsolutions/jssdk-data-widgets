@@ -25,6 +25,21 @@ A collection of data (from AnalysisJobs) visualization and manipulation widgets.
   * template : a custom Handlebars template
   * dimensionIdList : a list of dimension oids to filter an order the displayed list
   * dimensionIndex : the index of the dimension which will be changed in the analysis
+  
+## MetricSelectorView
+*Renders the metrics of an analysis as an INPUT select and modifies the analysis metrics if selection changes.*
+* model : an Analysis
+* options :
+  * template : a custom Handlebars template
+  * metricIdList : a list of metric oids to filter an order the displayed list
+  * metricIndex : the index of the metric which will be changed in the analysis
+  
+## MetricTotalView
+*Renders a total number for each metric*
+* model : an Analysis which computes the total for each metric
+* options :
+  * template : a custom Handlebars template
+  * selectionModel : an Analysis used to display current selected metrics
 
 
 

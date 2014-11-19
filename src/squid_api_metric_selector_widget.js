@@ -78,19 +78,16 @@
             var jsonData = {"selAvailable" : true, "options" : [{"label" : "", "value" : "", "selected" : false}], "multiple" : isMultiple};
             
             // iterate through all domains metrics
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
-            if (domain) {
-                var metrics = domain.metrics;
-                if (metrics) {
-                    for (var idx=0; idx<metrics.length; idx++) {
-                        var metric = metrics[idx];
-                        // check if selected
-                        var selected = this.isSelected(metric);
-                        
-                        // add to the list
-                        var option = {"label" : metric.name, "value" : metric.oid, "selected" : selected};
-                        jsonData.options.push(option);
-                    }
+            var metrics = this.getDomainMetrics();
+            if (metrics) {
+                for (var idx=0; idx<metrics.length; idx++) {
+                    var metric = metrics[idx];
+                    // check if selected
+                    var selected = this.isSelected(metric);
+                    
+                    // add to the list
+                    var option = {"label" : metric.name, "value" : metric.oid, "selected" : selected};
+                    jsonData.options.push(option);
                 }
             }
 
@@ -105,6 +102,15 @@
             }
 
             return this;
+        },
+        
+        getDomainMetrics : function() {
+            var metrics;
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+            if (domain) {
+                metrics = domain.metrics;
+            }
+            return metrics;
         },
         
         isSelected : function(item) {

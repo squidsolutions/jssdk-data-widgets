@@ -275,6 +275,63 @@ function program7(depth0,data) {
   return buffer;
   });
 
+this["squid_api"]["template"]["squid_api_metric_total_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, self=this, functionType="function", escapeExpression=this.escapeExpression;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\r\n	";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n";
+  return buffer;
+  }
+function program2(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\r\n	<div class=\"item";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\" style=\"padding: 3px; display: inline-block;\" id=\"";
+  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" >\r\n		<table style=\"border:1px solid #DDD; border-collapse: separate; border-spacing: 3px;\">\r\n			<tr>\r\n				<td><span class=\"name\">";
+  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</span></td>\r\n			</tr>\r\n			<tr>\r\n				<td><span class=\"value\" style=\"color:#999;\">"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.total)),stack1 == null || stack1 === false ? stack1 : stack1.value)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</span></td>\r\n			</tr>\r\n		</table>\r\n	</div>\r\n	";
+  return buffer;
+  }
+function program3(depth0,data) {
+  
+  
+  return " selected";
+  }
+
+function program5(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\r\n    <label>";
+  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</label>\r\n    <span>-</span>\r\n";
+  return buffer;
+  }
+
+  buffer += "\r\n";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(5, program5, data),fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n\r\n";
+  return buffer;
+  });
+
 this["squid_api"]["template"]["squid_api_project_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -1040,19 +1097,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var jsonData = {"selAvailable" : true, "options" : [{"label" : "", "value" : "", "selected" : false}], "multiple" : isMultiple};
             
             // iterate through all domains metrics
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
-            if (domain) {
-                var metrics = domain.metrics;
-                if (metrics) {
-                    for (var idx=0; idx<metrics.length; idx++) {
-                        var metric = metrics[idx];
-                        // check if selected
-                        var selected = this.isSelected(metric);
-                        
-                        // add to the list
-                        var option = {"label" : metric.name, "value" : metric.oid, "selected" : selected};
-                        jsonData.options.push(option);
-                    }
+            var metrics = this.getDomainMetrics();
+            if (metrics) {
+                for (var idx=0; idx<metrics.length; idx++) {
+                    var metric = metrics[idx];
+                    // check if selected
+                    var selected = this.isSelected(metric);
+                    
+                    // add to the list
+                    var option = {"label" : metric.name, "value" : metric.oid, "selected" : selected};
+                    jsonData.options.push(option);
                 }
             }
 
@@ -1067,6 +1121,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             return this;
+        },
+        
+        getDomainMetrics : function() {
+            var metrics;
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+            if (domain) {
+                metrics = domain.metrics;
+            }
+            return metrics;
         },
         
         isSelected : function(item) {
@@ -1085,6 +1148,110 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 for (var j=0; j<metrics.length; j++) {
                     if (item.oid == metrics[j].metricId) {
                         selected = true;
+                    }
+                }
+            }
+            return selected;
+        }
+
+    });
+
+    return View;
+}));
+
+(function (root, factory) {
+    root.squid_api.view.MetricTotalView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_metric_total_widget);
+
+}(this, function (Backbone, squid_api, template) {
+
+    var View = Backbone.View.extend({
+        template : null,
+        selectionModel: null,
+
+        initialize: function(options) {
+            var me = this;
+
+            // setup options
+            if (options.template) {
+                this.template = options.template;
+            } else {
+                this.template = template;
+            }
+            
+            if (options.selectionModel) {
+                this.selectionModel = options.selectionModel;
+                this.selectionModel.on('change', function() {
+                    me.render();
+                });
+            }
+
+            this.model.on('change', function() {
+                me.render();
+            });
+        },
+
+        setModel: function(model) {
+            this.model = model;
+            this.initialize();
+        },
+
+        render: function() {
+            var isMultiple = true;
+
+            var jsonData = {
+                "selAvailable" : true,
+                "options" : [],
+                "multiple" : isMultiple
+            };
+            
+            // iterate through all model metrics
+            var results = this.model.get("results");
+            if (!results && (this.model.get("analyses"))) {
+                results = this.model.get("analyses")[0].get("results");
+            }
+            
+            if (results) {
+                for (var idx = 0; idx < results.cols.length; idx++) {
+                    var col = results.cols[idx];
+                    // get the total for the metric
+                    totalValue = results.rows[0].v[idx];
+                    var selected = this.isSelected(col.id);
+
+                    // add to the list
+                    var option = {
+                        "name" : col.name,
+                        "value" : col.id,
+                        "total" : {
+                            "value" : totalValue,
+                            "unit" : null
+                        },
+                        "selected" : selected
+                    };
+                    jsonData.options.push(option);
+                }
+            }
+
+
+            var html = this.template(jsonData);
+            this.$el.html(html);
+            this.$el.show();
+
+            return this;
+        },
+        
+        isSelected : function(id) {
+            var selected = false;
+            var model = this.selectionModel;
+            if (model) {
+                var metrics = model.get("metrics");
+                if (!metrics && (model.get("analyses"))) {
+                    metrics = model.get("analyses")[0].get("metrics");
+                }
+                if (metrics) {
+                    for (var j=0; j<metrics.length; j++) {
+                        if (id == metrics[j].metricId) {
+                            selected = true;
+                        }
                     }
                 }
             }

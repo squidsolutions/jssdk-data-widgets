@@ -1,0 +1,19 @@
+
+{{#if selAvailable}}
+	{{#each options}}
+	<div class="item{{#if selected}} selected{{/if}}" style="padding: 3px; display: inline-block;" id="{{value}}" >
+		<table style="border:1px solid #DDD; border-collapse: separate; border-spacing: 3px;">
+			<tr>
+				<td><span class="name">{{name}}</span></td>
+			</tr>
+			<tr>
+				<td><span class="value" style="color:#999;">{{total.value}}</span></td>
+			</tr>
+		</table>
+	</div>
+	{{/each}}
+{{else}}
+    <label>{{name}}</label>
+    <span>-</span>
+{{/if}}
+
