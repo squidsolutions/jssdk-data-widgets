@@ -1,0 +1,20 @@
+.axis text {
+    font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+rect text {
+    color: #ffffff;
+}
+
+#bar_chart {
+    width: 75%;
+    margin-left: 10%;
+    padding: 30px;
+}
