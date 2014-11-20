@@ -415,7 +415,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var me = this;
 
             if (this.model) {
-                this.listenTo(this.model, 'change:status', this.render);
+                this.listenTo(this.model, 'change:status', this.update);
                 this.listenTo(this.model, 'change:error', this.render);
             }
 
@@ -471,6 +471,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.$el.empty();
             this.stopListening();
             return this;
+        },
+
+        update: function() {
+          if (this.model.get("dimensions").length < 2) {
+              this.render();
+          }
         },
 
         render: function() {
