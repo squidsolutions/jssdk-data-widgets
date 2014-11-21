@@ -11,48 +11,48 @@
         currentView : null,
         currentViewName : null,
         currentSelectionName : null,
-    
+
         initialize: function(options) {
-    
+
             var me = this;
-    
+
             // Store template
             if (options.template) {
                 this.template = options.template;
             } else {
                 this.template = template;
             }
-    
+
             // Store Widget Render to element
             if (options.renderTo) {
                 this.renderTo = options.renderTo;
             }
-    
+
             if (options.defaultWidget) {
                 this.defaultWidget = options.defaultWidget;
             }
-            
+
             if (this.model) {
                 this.model.on('change', this.render, this);
             }
-    
+
             this.render();
         },
-    
+
         setModel: function(model) {
             this.model = model;
             this.initialize();
         },
-    
+
         events: {
             "click li": "changeWidget"
         },
-    
+
         changeWidget: function(item){
             this.currentSelectionName = item.currentTarget.dataset.content;
             this.render();
         },
-    
+
         render: function() {
             if (!this.model.isDone()) {
                 // running
@@ -66,24 +66,26 @@
                 this.display();
             }
         },
-        
+
         addCompatibleView : function(list, name) {
             // check it is available
             if (squid_api.view[name]) {
                 list.push(name);
             }
         },
-        
+
         display: function() {
             var me = this;
-            
+
             // compute the view types compatible with the analysis
             var dimensions = this.model.get("dimensions");
             var compatibleViews = [];
-            
+
             this.addCompatibleView(compatibleViews, "DataTableView");
             if (dimensions && (dimensions.length>0)) {
-                this.addCompatibleView(compatibleViews, "BarChartView");
+                if (dimensions.length === 1) {
+                    this.addCompatibleView(compatibleViews, "BarChartView");
+                }
                 if (dimensions.length>1) {
                     this.addCompatibleView(compatibleViews, "FlowChartView");
                 }
@@ -98,7 +100,7 @@
                     this.addCompatibleView(compatibleViews, "TimeSeriesView");
                 }
             }
-       
+
             // compute the current selected view
             var viewName;
             if (!this.currentSelectionName) {
@@ -110,7 +112,7 @@
                 viewName = "DataTableView";
                 this.currentSelectionName = viewName;
             }
-            
+
             // display the Widget
             if (!this.currentViewName || (viewName != this.currentViewName)) {
                 // update the view
@@ -130,10 +132,15 @@
                         el : me.renderTo,
                         model : analysis
                     });
+                } else if (viewName == "BarChartView") {
+                    this.currentView = new squid_api.view.BarChartView ({
+                        el : me.renderTo,
+                        model : analysis
+                    });
                 }
                 this.currentView.render();
             }
-            
+
             // display the view selector
             var data = {"options" : []};
             for (idx2 = 0; idx2<compatibleViews.length; idx2++) {
@@ -154,7 +161,7 @@
             }
             var html = this.template(data);
             this.$el.html(html);
-    
+
             return this;
         }
     });
