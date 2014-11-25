@@ -1,0 +1,4 @@
+/* Don't display disabled elements */
+div.dataTables_paginate ul.pagination li.disabled {
+	display: none;
+}
