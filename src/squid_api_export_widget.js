@@ -22,20 +22,6 @@
             this.model = model;
             this.initialize();
         },
-        
-        /**
-         * see : http://stackoverflow.com/questions/10966440/recreating-a-removed-view-in-backbone-js
-         */
-        remove: function() {
-            this.undelegateEvents();
-            this.$el.empty();
-            this.stopListening();
-            return this;
-        },
-        
-        events : {
-            "click": "doExport"
-        },
 
         render : function() {
             var me = this;
@@ -46,42 +32,41 @@
                 // error
                 this.$el.html("");
             } else {
-                this.$el.html(this.template());
+                // render the export link
+                var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
+                analysisJobResults.addParameter("format","csv");
+                analysisJobResults.set({
+                    "id": this.model.get("id"),
+                    "oid": this.model.get("oid")
+                    });
+                console.log(analysisJobResults.url());
+                
+                // render the curl snippet
+                var exportAnalysis = new squid_api.model.ProjectAnalysisJob();
+                exportAnalysis.addParameter("format","csv");
+                exportAnalysis.set({
+                   "id": {
+                        "projectId": squid_api.projectId,
+                        "analysisJobId": null
+                    },
+                    "domains": analysis.get("domains"),
+                    "dimensions" : analysis.get("dimensions"),
+                    "metrics" : analysis.get("metrics"),
+                    "selection": squid_api.model.filters.get("selection")
+                    });
+                console.log(exportAnalysis.url());
+                // escape all spaces in the json injected into cURL
+                var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
+                
+                this.$el.html(this.template({
+                    csv: analysisJobResults.url(),
+                    curl: exportAnalysis.url(),
+                    origin: "https://api.squidsolutions.com",
+                    data: data
+                    })
+                );
             }
             return this;
-        },
-        
-        doExport : function() {
-            
-            // create the export analysis
-            var exportAnalysis = new squid_api.model.AnalysisJob();
-            var analysis = this.model;
-            exportAnalysis.set({
-                "domains": analysis.get("domains"),
-                "dimensions" : analysis.get("dimensions"),
-                "metrics" : analysis.get("metrics")
-                });
-            exportAnalysis.format = "csv";
-
-            
-            var selection =  squid_api.model.filters.get("selection");
-            squid_api.controller.analysisjob.createAnalysisJob(exportAnalysis, selection)
-                .done(function(model, response) {
-                    console.log(model.url());
-                    // get the analysis results
-                    var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                    analysisJobResults.set({
-                        "id": model.get("id"),
-                        "oid": model.get("oid")
-                        });
-                    analysisJobResults.format = "csv";
-                    // open the analysis results
-                    console.log(model.url());
-                    window.open(analysisJobResults.url());
-                })
-                .fail(function(model, response) {
-                    console.log(response);
-                });
         }
     });
 

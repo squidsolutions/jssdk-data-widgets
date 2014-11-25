@@ -174,10 +174,27 @@ function program5(depth0,data) {
 this["squid_api"]["template"]["squid_api_export_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  
+  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  return "<a>Export</a>\r\n";
+  buffer += "Export <a href=\"";
+  if (helper = helpers.csv) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.csv); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\">csv</a><br>\r\ncURL command : <br>\r\n<pre>\r\ncurl '";
+  if (helper = helpers.curl) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.curl); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "' -H 'Origin: ";
+  if (helper = helpers.origin) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.origin); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "' -H 'Accept-Encoding: gzip,deflate' -H 'Accept-Language: en-US,en;q=0.8,fr;q=0.6' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' -H 'Connection: keep-alive' -H 'DNT: 1' --data-binary $'";
+  if (helper = helpers.data) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.data); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "' --compressed\r\n</pre>\r\n";
+  return buffer;
   });
 
 this["squid_api"]["template"]["squid_api_kpi_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -1219,20 +1236,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.model = model;
             this.initialize();
         },
-        
-        /**
-         * see : http://stackoverflow.com/questions/10966440/recreating-a-removed-view-in-backbone-js
-         */
-        remove: function() {
-            this.undelegateEvents();
-            this.$el.empty();
-            this.stopListening();
-            return this;
-        },
-        
-        events : {
-            "click": "doExport"
-        },
 
         render : function() {
             var me = this;
@@ -1243,42 +1246,41 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // error
                 this.$el.html("");
             } else {
-                this.$el.html(this.template());
+                // render the export link
+                var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
+                analysisJobResults.addParameter("format","csv");
+                analysisJobResults.set({
+                    "id": this.model.get("id"),
+                    "oid": this.model.get("oid")
+                    });
+                console.log(analysisJobResults.url());
+                
+                // render the curl snippet
+                var exportAnalysis = new squid_api.model.ProjectAnalysisJob();
+                exportAnalysis.addParameter("format","csv");
+                exportAnalysis.set({
+                   "id": {
+                        "projectId": squid_api.projectId,
+                        "analysisJobId": null
+                    },
+                    "domains": analysis.get("domains"),
+                    "dimensions" : analysis.get("dimensions"),
+                    "metrics" : analysis.get("metrics"),
+                    "selection": squid_api.model.filters.get("selection")
+                    });
+                console.log(exportAnalysis.url());
+                // escape all spaces in the json injected into cURL
+                var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
+                
+                this.$el.html(this.template({
+                    csv: analysisJobResults.url(),
+                    curl: exportAnalysis.url(),
+                    origin: "https://api.squidsolutions.com",
+                    data: data
+                    })
+                );
             }
             return this;
-        },
-        
-        doExport : function() {
-            
-            // create the export analysis
-            var exportAnalysis = new squid_api.model.AnalysisJob();
-            var analysis = this.model;
-            exportAnalysis.set({
-                "domains": analysis.get("domains"),
-                "dimensions" : analysis.get("dimensions"),
-                "metrics" : analysis.get("metrics")
-                });
-            exportAnalysis.format = "csv";
-
-            
-            var selection =  squid_api.model.filters.get("selection");
-            squid_api.controller.analysisjob.createAnalysisJob(exportAnalysis, selection)
-                .done(function(model, response) {
-                    console.log(model.url());
-                    // get the analysis results
-                    var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                    analysisJobResults.set({
-                        "id": model.get("id"),
-                        "oid": model.get("oid")
-                        });
-                    analysisJobResults.format = "csv";
-                    // open the analysis results
-                    console.log(model.url());
-                    window.open(analysisJobResults.url());
-                })
-                .fail(function(model, response) {
-                    console.log(response);
-                });
         }
     });
 
@@ -1828,7 +1830,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // Print Template
                 this.$el.html(this.template());
                 
-                var dateColumnIndex=0;
+                var dateColumnIndex=0; 
                 while (data.results.cols[dateColumnIndex].dataType != "DATE") {
                     dateColumnIndex++;
                 }

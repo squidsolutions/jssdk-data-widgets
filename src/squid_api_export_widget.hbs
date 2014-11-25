@@ -1,1 +1,5 @@
-<a>Export</a>
+Export <a href="{{csv}}">csv</a><br>
+cURL command : <br>
+<pre>
+curl '{{curl}}' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Accept-Language: en-US,en;q=0.8,fr;q=0.6' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' -H 'Connection: keep-alive' -H 'DNT: 1' --data-binary $'{{data}}' --compressed
+</pre>
