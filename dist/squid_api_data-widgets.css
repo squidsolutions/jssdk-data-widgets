@@ -18,7 +18,9 @@ rect text {
     margin-left: 10%;
     padding: 30px;
 }
-
+div.dataTables_paginate ul.pagination li.disabled {
+	display: none;
+}
 
 
 

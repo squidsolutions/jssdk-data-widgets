@@ -1846,7 +1846,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows);
 
                 if (series.length>0 && (series[0].data.length>0)) {
-                    var tempWidth = $(window).width() - 50;
+
+                    var tempWidth = this.$el.width();
+
+                    console.log(this.$el);
 
                     // Time Series Chart
                     var graph = new Rickshaw.Graph({
