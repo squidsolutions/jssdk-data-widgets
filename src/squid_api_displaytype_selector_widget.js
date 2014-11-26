@@ -57,13 +57,17 @@
             if (!this.model.isDone()) {
                 // running
                 if (this.model.get("status") == "RUNNING") {
-                    $(".sq-loading").show();
+                    this.$el.html("");
                 }
             } else if (this.model.get("error")) {
                 // error
-                $(".sq-loading").hide();
+                this.$el.html("");
             } else {
-                this.display();
+                if (this.model.get("results")) {
+                    this.display();
+                } else {
+                    this.$el.html("");
+                }
             }
         },
 

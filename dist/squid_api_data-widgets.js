@@ -1016,13 +1016,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (!this.model.isDone()) {
                 // running
                 if (this.model.get("status") == "RUNNING") {
-                    $(".sq-loading").show();
+                    this.$el.html("");
                 }
             } else if (this.model.get("error")) {
                 // error
-                $(".sq-loading").hide();
+                this.$el.html("");
             } else {
-                this.display();
+                if (this.model.get("results")) {
+                    this.display();
+                } else {
+                    this.$el.html("");
+                }
             }
         },
 
@@ -1238,20 +1242,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render : function() {
-            var me = this;
+            var me = this, analysis = this.model;
 
-            if (!this.model.isDone()) {
+            if (!analysis.isDone()) {
                 this.$el.html("");
-            } else if (this.model.get("error")) {
+            } else if (analysis.get("error")) {
                 // error
+                this.$el.html("");
+            } else if (!analysis.get("oid")) {
+                // analysis not ready yet
                 this.$el.html("");
             } else {
                 // render the export link
                 var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
                 analysisJobResults.addParameter("format","csv");
                 analysisJobResults.set({
-                    "id": this.model.get("id"),
-                    "oid": this.model.get("oid")
+                    "id": analysis.get("id"),
+                    "oid": analysis.get("oid")
                     });
                 console.log(analysisJobResults.url());
                 
@@ -1260,13 +1267,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 exportAnalysis.addParameter("format","csv");
                 exportAnalysis.set({
                    "id": {
-                        "projectId": squid_api.projectId,
+                        "projectId": analysis.get("id").projectId,
                         "analysisJobId": null
                     },
                     "domains": analysis.get("domains"),
                     "dimensions" : analysis.get("dimensions"),
                     "metrics" : analysis.get("metrics"),
-                    "selection": squid_api.model.filters.get("selection")
+                    "selection": analysis.get("selection")
                     });
                 console.log(exportAnalysis.url());
                 // escape all spaces in the json injected into cURL
