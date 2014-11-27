@@ -174,14 +174,18 @@ function program5(depth0,data) {
 this["squid_api"]["template"]["squid_api_export_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
+function program1(depth0,data) {
+  
+  
+  return "checked";
+  }
 
-  buffer += "Export <a href=\"";
-  if (helper = helpers.csv) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.csv); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\">csv</a><br>\r\ncURL command : <br>\r\n<pre>\r\ncurl '";
+function program3(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\r\n<div>\r\n	cURL command :\r\n</div>\r\n<div class=\"curl\">\r\n	curl '";
   if (helper = helpers.curl) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.curl); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -193,7 +197,27 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (helper = helpers.data) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.data); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "' --compressed\r\n</pre>\r\n";
+    + "' --compressed\r\n</div>\r\n";
+  return buffer;
+  }
+
+  buffer += "<div>Export</div>\r\n<div>\r\n	<label>Format</label> \r\n	<input type=\"radio\" name=\"format\" value=\"csv\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatCSV), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "> csv \r\n	<input type=\"radio\" name=\"format\" value=\"json\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatJSON), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "> json\r\n</div>\r\n<div>\r\n	<label>Compression</label> <input type=\"checkbox\" name=\"compression\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "> gzip\r\n</div>\r\n<a href=\"";
+  if (helper = helpers['export']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0['export']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" class=\"btn\" id=\"export\">Export file</a>\r\n";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n";
   return buffer;
   });
 
@@ -1223,7 +1247,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     View = Backbone.View.extend( {
 
         template : null,
-
+        format : "csv",
+        compression : true,
+        
         initialize : function(options) {
             if (this.model) {
                 this.listenTo(this.model, 'change', this.render);
@@ -1241,6 +1267,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.initialize();
         },
 
+        events : {
+            'click [name="format"]': 'clickedFormat',
+            'click [name="compression"]': 'clickedCompression'
+        },
+        
+        clickedFormat : function (event) {
+            var t = event.target;
+            this.format = t.value;
+            this.render();
+        },
+        
+        clickedCompression : function (event) {
+            var t = event.target;
+            this.compression = (t.checked);
+            this.render();
+        },
+        
         render : function() {
             var me = this, analysis = this.model;
 
@@ -1255,7 +1298,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             } else {
                 // render the export link
                 var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                analysisJobResults.addParameter("format","csv");
+                analysisJobResults.addParameter("format",this.format);
+                if (this.compression) {
+                    analysisJobResults.addParameter("compression","gzip");
+                }
                 analysisJobResults.set({
                     "id": analysis.get("id"),
                     "oid": analysis.get("oid")
@@ -1264,7 +1310,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 
                 // render the curl snippet
                 var exportAnalysis = new squid_api.model.ProjectAnalysisJob();
-                exportAnalysis.addParameter("format","csv");
+                exportAnalysis.addParameter("format",this.format);
+                if (this.compression) {
+                    exportAnalysis.addParameter("compression","gzip");
+                }
                 exportAnalysis.set({
                    "id": {
                         "projectId": analysis.get("id").projectId,
@@ -1280,10 +1329,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
                 
                 this.$el.html(this.template({
-                    csv: analysisJobResults.url(),
-                    curl: exportAnalysis.url(),
-                    origin: "https://api.squidsolutions.com",
-                    data: data
+                    "formatCSV": (this.format == "csv"),
+                    "formatJSON": (this.format == "json"),
+                    "compression": (this.compression),
+                    "export": analysisJobResults.url(),
+                    "curl": exportAnalysis.url(),
+                    "origin": "https://api.squidsolutions.com",
+                    "data": data
                     })
                 );
             }
@@ -1848,8 +1900,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (series.length>0 && (series[0].data.length>0)) {
 
                     var tempWidth = this.$el.width();
-
-                    console.log(this.$el);
 
                     // Time Series Chart
                     var graph = new Rickshaw.Graph({

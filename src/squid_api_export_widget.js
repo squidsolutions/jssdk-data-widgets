@@ -5,7 +5,9 @@
     View = Backbone.View.extend( {
 
         template : null,
-
+        format : "csv",
+        compression : true,
+        
         initialize : function(options) {
             if (this.model) {
                 this.listenTo(this.model, 'change', this.render);
@@ -23,6 +25,23 @@
             this.initialize();
         },
 
+        events : {
+            'click [name="format"]': 'clickedFormat',
+            'click [name="compression"]': 'clickedCompression'
+        },
+        
+        clickedFormat : function (event) {
+            var t = event.target;
+            this.format = t.value;
+            this.render();
+        },
+        
+        clickedCompression : function (event) {
+            var t = event.target;
+            this.compression = (t.checked);
+            this.render();
+        },
+        
         render : function() {
             var me = this, analysis = this.model;
 
@@ -37,7 +56,10 @@
             } else {
                 // render the export link
                 var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                analysisJobResults.addParameter("format","csv");
+                analysisJobResults.addParameter("format",this.format);
+                if (this.compression) {
+                    analysisJobResults.addParameter("compression","gzip");
+                }
                 analysisJobResults.set({
                     "id": analysis.get("id"),
                     "oid": analysis.get("oid")
@@ -46,7 +68,10 @@
                 
                 // render the curl snippet
                 var exportAnalysis = new squid_api.model.ProjectAnalysisJob();
-                exportAnalysis.addParameter("format","csv");
+                exportAnalysis.addParameter("format",this.format);
+                if (this.compression) {
+                    exportAnalysis.addParameter("compression","gzip");
+                }
                 exportAnalysis.set({
                    "id": {
                         "projectId": analysis.get("id").projectId,
@@ -62,10 +87,13 @@
                 var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
                 
                 this.$el.html(this.template({
-                    csv: analysisJobResults.url(),
-                    curl: exportAnalysis.url(),
-                    origin: "https://api.squidsolutions.com",
-                    data: data
+                    "formatCSV": (this.format == "csv"),
+                    "formatJSON": (this.format == "json"),
+                    "compression": (this.compression),
+                    "export": analysisJobResults.url(),
+                    "curl": exportAnalysis.url(),
+                    "origin": "https://api.squidsolutions.com",
+                    "data": data
                     })
                 );
             }

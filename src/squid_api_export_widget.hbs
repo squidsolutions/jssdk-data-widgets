@@ -1,5 +1,18 @@
-Export <a href="{{csv}}">csv</a><br>
-cURL command : <br>
-<pre>
-curl '{{curl}}' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Accept-Language: en-US,en;q=0.8,fr;q=0.6' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' -H 'Connection: keep-alive' -H 'DNT: 1' --data-binary $'{{data}}' --compressed
-</pre>
+<div>Export</div>
+<div>
+	<label>Format</label> 
+	<input type="radio" name="format" value="csv" {{#if formatCSV}}checked{{/if}}> csv 
+	<input type="radio" name="format" value="json" {{#if formatJSON}}checked{{/if}}> json
+</div>
+<div>
+	<label>Compression</label> <input type="checkbox" name="compression" {{#if compression}}checked{{/if}}> gzip
+</div>
+<a href="{{export}}" class="btn" id="export">Export file</a>
+{{#if data}}
+<div>
+	cURL command :
+</div>
+<div class="curl">
+	curl '{{curl}}' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Accept-Language: en-US,en;q=0.8,fr;q=0.6' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' -H 'Connection: keep-alive' -H 'DNT: 1' --data-binary $'{{data}}' --compressed
+</div>
+{{/if }}
