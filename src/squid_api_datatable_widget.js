@@ -117,7 +117,7 @@
         display : function() {
             var analysis = this.model;
 
-            // Use the first analyses array
+            // in case of a multi-analysis model
             if (analysis.get("analyses")) {
               analysis = analysis.get("analyses")[0];
             }
