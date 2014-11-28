@@ -1,4 +1,4 @@
-<div>Export</div>
+<h2>Export</h2>
 <div>
 	<label>Format</label> 
 	<input type="radio" name="format" value="csv" {{#if formatCSV}}checked{{/if}}> csv 
@@ -7,12 +7,24 @@
 <div>
 	<label>Compression</label> <input type="checkbox" name="compression" {{#if compression}}checked{{/if}}> gzip
 </div>
-<a href="{{export}}" class="btn" id="export">Export file</a>
+<h3>
+Download
+</h3>
+<a href="{{export}}" class="btn btn-default">Download</a> current analysis results
 {{#if data}}
-<div>
-	cURL command :
-</div>
-<div class="curl">
-	curl '{{curl}}' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Accept-Language: en-US,en;q=0.8,fr;q=0.6' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' -H 'Connection: keep-alive' -H 'DNT: 1' --data-binary $'{{data}}' --compressed
-</div>
+<h3>
+cURL process
+</h3>
+<h4>
+1 - get an authentication token
+</h4>
+<pre class="curl">
+curl '{{apiURL}}/v4.2/rs/auth-token' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept: */*' -H 'Cache-Control: no-cache' --data 'client_id={{clientId}}&redirect_uri={{redirectURI}}&login=<b>[login]</b>&password=<b>[password]</b>'
+</pre>
+<h4>
+2 - download the export
+</h4>
+<pre class="curl">
+curl '{{curl}}' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' --data-binary $'{{data}}' --compressed
+</pre>
 {{/if }}

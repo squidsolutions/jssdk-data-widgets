@@ -185,7 +185,23 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\r\n<div>\r\n	cURL command :\r\n</div>\r\n<div class=\"curl\">\r\n	curl '";
+  buffer += "\r\n<h3>\r\ncURL process\r\n</h3>\r\n<h4>\r\n1 - get an authentication token\r\n</h4>\r\n<pre class=\"curl\">\r\ncurl '";
+  if (helper = helpers.apiURL) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.apiURL); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "/v4.2/rs/auth-token' -H 'Origin: ";
+  if (helper = helpers.origin) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.origin); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept: */*' -H 'Cache-Control: no-cache' --data 'client_id=";
+  if (helper = helpers.clientId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.clientId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "&redirect_uri=";
+  if (helper = helpers.redirectURI) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.redirectURI); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "&login=<b>[login]</b>&password=<b>[password]</b>'\r\n</pre>\r\n<h4>\r\n2 - download the export\r\n</h4>\r\n<pre class=\"curl\">\r\ncurl '";
   if (helper = helpers.curl) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.curl); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -193,15 +209,15 @@ function program3(depth0,data) {
   if (helper = helpers.origin) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.origin); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "' -H 'Accept-Encoding: gzip,deflate' -H 'Accept-Language: en-US,en;q=0.8,fr;q=0.6' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' -H 'Connection: keep-alive' -H 'DNT: 1' --data-binary $'";
+    + "' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' --data-binary $'";
   if (helper = helpers.data) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.data); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "' --compressed\r\n</div>\r\n";
+    + "' --compressed\r\n</pre>\r\n";
   return buffer;
   }
 
-  buffer += "<div>Export</div>\r\n<div>\r\n	<label>Format</label> \r\n	<input type=\"radio\" name=\"format\" value=\"csv\" ";
+  buffer += "<h2>Export</h2>\r\n<div>\r\n	<label>Format</label> \r\n	<input type=\"radio\" name=\"format\" value=\"csv\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatCSV), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "> csv \r\n	<input type=\"radio\" name=\"format\" value=\"json\" ";
@@ -210,11 +226,11 @@ function program3(depth0,data) {
   buffer += "> json\r\n</div>\r\n<div>\r\n	<label>Compression</label> <input type=\"checkbox\" name=\"compression\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> gzip\r\n</div>\r\n<a href=\"";
+  buffer += "> gzip\r\n</div>\r\n<h3>\r\nDownload\r\n</h3>\r\n<a href=\"";
   if (helper = helpers['export']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['export']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" class=\"btn\" id=\"export\">Export file</a>\r\n";
+    + "\" class=\"btn btn-default\">Download</a> current analysis results\r\n";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n";
@@ -791,7 +807,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         display : function() {
             var analysis = this.model;
 
-            // Use the first analyses array
+            // in case of a multi-analysis model
             if (analysis.get("analyses")) {
               analysis = analysis.get("analyses")[0];
             }
@@ -1335,7 +1351,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "export": analysisJobResults.url(),
                     "curl": exportAnalysis.url(),
                     "origin": "https://api.squidsolutions.com",
-                    "data": data
+                    "data": data,
+                    "clientId" : squid_api.clientId,
+                    "redirectURI":"https://api.squidsolutions.com",
+                    "apiURL":squid_api.apiURL
                     })
                 );
             }

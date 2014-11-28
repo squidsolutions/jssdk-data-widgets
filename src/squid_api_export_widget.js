@@ -93,7 +93,10 @@
                     "export": analysisJobResults.url(),
                     "curl": exportAnalysis.url(),
                     "origin": "https://api.squidsolutions.com",
-                    "data": data
+                    "data": data,
+                    "clientId" : squid_api.clientId,
+                    "redirectURI":"https://api.squidsolutions.com",
+                    "apiURL":squid_api.apiURL
                     })
                 );
             }
