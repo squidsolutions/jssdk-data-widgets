@@ -5,6 +5,7 @@
     View = Backbone.View.extend( {
 
         template : null,
+        renderTo: null,
         format : "csv",
         compression : true,
         
@@ -17,6 +18,9 @@
                 this.template = options.template;
             } else {
                 this.template = squid_api.template.squid_api_export_widget;
+            }
+            if (options.renderTo) {
+                this.renderTo = options.renderTo;
             }
         },
 
@@ -46,12 +50,15 @@
             var me = this, analysis = this.model;
 
             if (!analysis.isDone()) {
+                $(this.renderTo).html("");
                 this.$el.html("");
             } else if (analysis.get("error")) {
                 // error
+                $(this.renderTo).html("");
                 this.$el.html("");
             } else if (!analysis.get("oid")) {
                 // analysis not ready yet
+                $(this.renderTo).html("");
                 this.$el.html("");
             } else {
                 // render the export link
@@ -86,7 +93,8 @@
                 // escape all spaces in the json injected into cURL
                 var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
                 
-                this.$el.html(this.template({
+                $(this.renderTo).html(this.template({
+                    "renderTo": this.renderTo,
                     "formatCSV": (this.format == "csv"),
                     "formatJSON": (this.format == "json"),
                     "compression": (this.compression),
@@ -99,6 +107,8 @@
                     "apiURL":squid_api.apiURL
                     })
                 );
+
+                this.$el.html("<button type='button' class='btn' data-toggle='collapse' data-target=" + this.renderTo + ">Export</button>");
             }
             return this;
         }

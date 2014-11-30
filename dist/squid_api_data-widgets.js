@@ -82,6 +82,29 @@ function program7(depth0,data) {
   return buffer;
   });
 
+this["squid_api"]["template"]["squid_api_dimension_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "";
+  buffer += "\n        <li class=\"item\" data-content="
+    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
+    + ">"
+    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
+    + "</li>\n    ";
+  return buffer;
+  }
+
+  buffer += "<ul class=\"sortable\">\n    ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.chosenDimensions), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n</ul>\n";
+  return buffer;
+  });
+
 this["squid_api"]["template"]["squid_api_displaytype_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -185,7 +208,7 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\r\n<h3>\r\ncURL process\r\n</h3>\r\n<h4>\r\n1 - get an authentication token\r\n</h4>\r\n<pre class=\"curl\">\r\ncurl '";
+  buffer += "\r\n				<h3>cURL process</h3>\r\n				<h4>1 - get an authentication token</h4>\r\n				<pre class=\"curl\">\r\n					curl '";
   if (helper = helpers.apiURL) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.apiURL); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -201,7 +224,7 @@ function program3(depth0,data) {
   if (helper = helpers.redirectURI) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.redirectURI); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "&login=<b>[login]</b>&password=<b>[password]</b>'\r\n</pre>\r\n<h4>\r\n2 - download the export\r\n</h4>\r\n<pre class=\"curl\">\r\ncurl '";
+    + "&login=<b>[login]</b>&password=<b>[password]</b>'\r\n				</pre>\r\n				<h4>2 - download the export</h4>\r\n				<pre class=\"curl\">\r\n					curl '";
   if (helper = helpers.curl) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.curl); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -213,27 +236,27 @@ function program3(depth0,data) {
   if (helper = helpers.data) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.data); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "' --compressed\r\n</pre>\r\n";
+    + "' --compressed\r\n				</pre>\r\n			";
   return buffer;
   }
 
-  buffer += "<h2>Export</h2>\r\n<div>\r\n	<label>Format</label> \r\n	<input type=\"radio\" name=\"format\" value=\"csv\" ";
+  buffer += "<div class=\"container\">\r\n	<div class=\"row\">\r\n		<div class=\"col-md-12\">\r\n			<h2>Export</h2>\r\n			<label>Format</label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatCSV), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> csv \r\n	<input type=\"radio\" name=\"format\" value=\"json\" ";
+  buffer += "> csv \r\n			<input type=\"radio\" name=\"format\" value=\"json\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatJSON), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> json\r\n</div>\r\n<div>\r\n	<label>Compression</label> <input type=\"checkbox\" name=\"compression\" ";
+  buffer += "> json\r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			<label>Compression</label> <input type=\"checkbox\" name=\"compression\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> gzip\r\n</div>\r\n<h3>\r\nDownload\r\n</h3>\r\n<a href=\"";
+  buffer += "> gzip\r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			<h3>Download</h3>\r\n			<a href=\"";
   if (helper = helpers['export']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['export']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" class=\"btn btn-default\">Download</a> current analysis results\r\n";
+    + "\" class=\"btn btn-default\">Download</a> current analysis results\r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n";
+  buffer += "\r\n		</div>\r\n	</div>\r\n</div>\r\n\r\n\r\n\r\n";
   return buffer;
   });
 
@@ -998,6 +1021,106 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 }));
 
 (function (root, factory) {
+    root.squid_api.view.DimensionView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_dimension_widget);
+
+}(this, function (Backbone, squid_api, template) {
+
+    var View = Backbone.View.extend({
+        template : null,
+        dimensions : null,
+        chosenDimensions : null,
+        selectedDimensions : null,
+
+        initialize: function(options) {
+            var me = this;
+
+            // setup options
+            if (options.template) {
+                this.template = options.template;
+            } else {
+                this.template = template;
+            }
+
+            if (options.chosenDimensionModel) {
+                this.chosenDimensions = options.chosenDimensionModel;
+            }
+
+            if (options.selectedDimensionModel) {
+                this.selectedDimensions = options.selectedDimensionModel;
+            }
+
+            this.chosenDimensions.on("change", function() {
+                me.render();
+            });
+        },
+
+        setModel: function(model) {
+            this.model = model;
+            this.initialize();
+        },
+
+        events: {
+            // Dimension Sorting
+            "change": function(event) {
+                var selectedItems = this.$el.find(".sortable").sortable("toArray", {attribute: 'data-content'});
+                this.chosenDimensions.set({"dimensions": selectedItems});
+            },
+            // Dimension Selection
+            "click li": function(item) {
+                var selectionList = this.$el.find(".sortable li");
+                var selectedItems = [];
+
+                for (i=0; i<selectionList.length; i++) {
+                    if ($(selectionList[i]).attr("data-value") === "active") {
+                        selectedItems.push($(selectionList[i]).attr("data-content"));
+                    }
+                }
+
+                this.selectedDimensions.set({"dimensions": selectedItems});
+            }
+        },
+
+        render: function() {
+            console.log(this.chosenDimensions.toJSON().dimensions);
+            var html = this.template({"chosenDimensions" : this.chosenDimensions.toJSON().dimensions});
+            this.$el.html(html);
+            this.$el.show();
+                
+            // Make dimensions selectable
+            this.dimensionSelect();
+
+            // Make dimesions sortable & selectable
+            this.dimensionSort();
+
+            return this;
+        },
+
+        dimensionSelect : function() {
+            this.$el.find(".sortable li").click(function() {
+                if ($(this).attr("data-value") === "active") {
+                    $(this).removeAttr("data-value");
+
+                    $(this).removeClass("ui-selected");
+                } else {
+                    $(this).attr("data-value", "active");
+
+                    $(this).addClass("ui-selected");
+                }
+            });
+        },
+
+        dimensionSort : function() {
+            this.$el.find(".sortable").sortable({
+                revert: true,
+                stop: function(event, ui) { ui.item.trigger("change"); }
+            });
+        }
+    });
+
+    return View;
+}));
+
+(function (root, factory) {
     root.squid_api.view.DisplayTypeSelectorView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_displaytype_selector_widget);
 
 }(this, function (Backbone, squid_api, template) {
@@ -1263,6 +1386,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     View = Backbone.View.extend( {
 
         template : null,
+        renderTo: null,
         format : "csv",
         compression : true,
         
@@ -1275,6 +1399,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.template = options.template;
             } else {
                 this.template = squid_api.template.squid_api_export_widget;
+            }
+            if (options.renderTo) {
+                this.renderTo = options.renderTo;
             }
         },
 
@@ -1304,12 +1431,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var me = this, analysis = this.model;
 
             if (!analysis.isDone()) {
+                $(this.renderTo).html("");
                 this.$el.html("");
             } else if (analysis.get("error")) {
                 // error
+                $(this.renderTo).html("");
                 this.$el.html("");
             } else if (!analysis.get("oid")) {
                 // analysis not ready yet
+                $(this.renderTo).html("");
                 this.$el.html("");
             } else {
                 // render the export link
@@ -1344,7 +1474,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // escape all spaces in the json injected into cURL
                 var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
                 
-                this.$el.html(this.template({
+                $(this.renderTo).html(this.template({
+                    "renderTo": this.renderTo,
                     "formatCSV": (this.format == "csv"),
                     "formatJSON": (this.format == "json"),
                     "compression": (this.compression),
@@ -1357,6 +1488,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "apiURL":squid_api.apiURL
                     })
                 );
+
+                this.$el.html("<button type='button' class='btn' data-toggle='collapse' data-target=" + this.renderTo + ">Export</button>");
             }
             return this;
         }
