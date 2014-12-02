@@ -5,11 +5,8 @@
 
     var View = Backbone.View.extend({
         template : null,
-        dimensions : null,
         dimensionIdList : null,
         dimensionIndex: null,
-        chosenDimensionModel : null,
-        selectedDimensionsModel : null,
 
         initialize: function(options) {
             var me = this;
@@ -27,14 +24,8 @@
             if (options.dimensionIndex !== null) {
                 this.dimensionIndex = options.dimensionIndex;
             }
-            if (options.chosenDimensionModel) {
-                this.chosenDimensionModel = options.chosenDimensionModel;
-            }
-            if (options.selectedDimensionsModel) {
-                this.selectedDimensionsModel = options.selectedDimensionsModel;
-            }
-
-            this.model.on('change', function() {
+            
+            api.model.status.on("change:domain", function() {
                 me.render();
             });
 
@@ -42,7 +33,7 @@
         },
 
         setModel: function(model) {
-            this.model = this.chosenDimensionModel;
+            this.model = model;
             this.initialize();
         },
 
@@ -52,16 +43,11 @@
                 var selected = [];
 
                 for (i = 0; i < oid.length; i++) {
-                    var dimension = {};
-                    
-                    dimension.name = $(oid[i]).text();
-                    dimension.value = $(oid[i]).val();
-
-                    selected.push(dimension);
+                    selected.push($(oid[i]).val());
                 }
 
                 // Update
-                this.chosenDimensionModel.set({"dimensions" : selected});
+                this.model.set({"chosenDimensions" : selected});
             }
         },
 
@@ -114,15 +100,7 @@
             // Initialize plugin
             var selector = this.$el.find("select");
             if (isMultiple) {
-                selector.multiselect({
-                    onChange: function(option, checked) {
-                        if (checked) {
-                            // Update Selected Item
-                            var selectedItem = [$(option).attr("value")];
-                            me.selectedDimensionsModel.set({"dimensions": selectedItem});
-                        }
-                    }
-                });
+                selector.multiselect();
             }
 
             return this;
@@ -131,20 +109,16 @@
         isSelected : function(dim) {
             var selected = false;
 
-            var dimensions = this.model.get("dimensions");
-            if (!dimensions && (this.model.get("analyses"))) {
-                // multi-analysis case
-                dimensions = this.model.get("analyses")[0].get("dimensions");
-            }
+            var dimensions = this.model.get("chosenDimensions");
 
             if (dimensions) {
                 if (this.dimensionIndex !== null) {
-                    if (dim.oid == dimensions[this.dimensionIndex].dimensionId) {
+                    if (dim.oid == dimensions[this.dimensionIndex]) {
                         selected = true;
                     }
                 } else {
                     for (var j=0; j<dimensions.length; j++) {
-                        if (dim.oid == dimensions[j].dimensionId) {
+                        if (dim.oid == dimensions[j]) {
                             selected = true;
                         }
                     }

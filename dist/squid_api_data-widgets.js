@@ -877,11 +877,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var View = Backbone.View.extend({
         template : null,
-        dimensions : null,
         dimensionIdList : null,
         dimensionIndex: null,
-        chosenDimensionModel : null,
-        selectedDimensionsModel : null,
 
         initialize: function(options) {
             var me = this;
@@ -899,14 +896,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.dimensionIndex !== null) {
                 this.dimensionIndex = options.dimensionIndex;
             }
-            if (options.chosenDimensionModel) {
-                this.chosenDimensionModel = options.chosenDimensionModel;
-            }
-            if (options.selectedDimensionsModel) {
-                this.selectedDimensionsModel = options.selectedDimensionsModel;
-            }
-
-            this.model.on('change', function() {
+            
+            api.model.status.on("change:domain", function() {
                 me.render();
             });
 
@@ -914,7 +905,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         setModel: function(model) {
-            this.model = this.chosenDimensionModel;
+            this.model = model;
             this.initialize();
         },
 
@@ -924,16 +915,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var selected = [];
 
                 for (i = 0; i < oid.length; i++) {
-                    var dimension = {};
-                    
-                    dimension.name = $(oid[i]).text();
-                    dimension.value = $(oid[i]).val();
-
-                    selected.push(dimension);
+                    selected.push($(oid[i]).val());
                 }
 
                 // Update
-                this.chosenDimensionModel.set({"dimensions" : selected});
+                this.model.set({"chosenDimensions" : selected});
             }
         },
 
@@ -986,15 +972,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // Initialize plugin
             var selector = this.$el.find("select");
             if (isMultiple) {
-                selector.multiselect({
-                    onChange: function(option, checked) {
-                        if (checked) {
-                            // Update Selected Item
-                            var selectedItem = [$(option).attr("value")];
-                            me.selectedDimensionsModel.set({"dimensions": selectedItem});
-                        }
-                    }
-                });
+                selector.multiselect();
             }
 
             return this;
@@ -1003,20 +981,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         isSelected : function(dim) {
             var selected = false;
 
-            var dimensions = this.model.get("dimensions");
-            if (!dimensions && (this.model.get("analyses"))) {
-                // multi-analysis case
-                dimensions = this.model.get("analyses")[0].get("dimensions");
-            }
+            var dimensions = this.model.get("chosenDimensions");
 
             if (dimensions) {
                 if (this.dimensionIndex !== null) {
-                    if (dim.oid == dimensions[this.dimensionIndex].dimensionId) {
+                    if (dim.oid == dimensions[this.dimensionIndex]) {
                         selected = true;
                     }
                 } else {
                     for (var j=0; j<dimensions.length; j++) {
-                        if (dim.oid == dimensions[j].dimensionId) {
+                        if (dim.oid == dimensions[j]) {
                             selected = true;
                         }
                     }
@@ -1161,11 +1135,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     var View = Backbone.View.extend({
 
         template : null,
-        renderTo : null,
         defaultWidget : null,
         currentView : null,
         currentViewName : null,
         currentSelectionName : null,
+        tableView : null,
+        barView : null,
+        timeView : null,
 
         initialize: function(options) {
 
@@ -1178,17 +1154,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.template = template;
             }
 
-            // Store Widget Render to element
-            if (options.renderTo) {
-                this.renderTo = options.renderTo;
-            }
-
             if (options.defaultWidget) {
                 this.defaultWidget = options.defaultWidget;
             }
+            
+            this.tableView = options.tableView;
+            this.barView = options.barView;
+            this.timeView = options.timeView;
 
             if (this.model) {
-                this.model.on('change', this.render, this);
+                this.model.get("currentAnalysis").on('change', this.render, this);
             }
 
             this.render();
@@ -1209,26 +1184,29 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render: function() {
-            if (!this.model.isDone()) {
-                // running
-                if (this.model.get("status") == "RUNNING") {
+            var analysis = this.model.get("currentAnalysis");
+            if (analysis) {
+                if (!analysis.isDone()) {
+                    // running
+                    if (analysis.get("status") == "RUNNING") {
+                        this.$el.html("");
+                    }
+                } else if (analysis.get("error")) {
+                    // error
                     this.$el.html("");
-                }
-            } else if (this.model.get("error")) {
-                // error
-                this.$el.html("");
-            } else {
-                if (this.model.get("results")) {
-                    this.display();
                 } else {
-                    this.$el.html("");
+                    if (analysis.get("results")) {
+                        this.display();
+                    } else {
+                        this.$el.html("");
+                    }
                 }
             }
         },
 
         addCompatibleView : function(list, name) {
             // check it is available
-            if (squid_api.view[name]) {
+            if (this[name]) {
                 list.push(name);
             }
         },
@@ -1237,26 +1215,27 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var me = this;
 
             // compute the view types compatible with the analysis
-            var dimensions = this.model.get("dimensions");
+            var analysis = this.model.get("currentAnalysis");
+            var dimensions = analysis.get("dimensions");
             var compatibleViews = [];
 
-            this.addCompatibleView(compatibleViews, "DataTableView");
+            this.addCompatibleView(compatibleViews, "tableView");
             if (dimensions && (dimensions.length>0)) {
                 if (dimensions.length === 1) {
-                    this.addCompatibleView(compatibleViews, "BarChartView");
+                    this.addCompatibleView(compatibleViews, "barView");
                 }
                 if (dimensions.length>1) {
-                    this.addCompatibleView(compatibleViews, "FlowChartView");
+                    this.addCompatibleView(compatibleViews, "timeView");
                 }
                 var hasDateDimension = false;
-                var cols = this.model.get("results").cols;
+                var cols = analysis.get("results").cols;
                 for (var idx=0; idx < cols.length; idx++) {
                     if (cols[idx].dataType == "DATE") {
                         hasDateDimension = true;
                     }
                 }
                 if (hasDateDimension) {
-                    this.addCompatibleView(compatibleViews, "TimeSeriesView");
+                    this.addCompatibleView(compatibleViews, "timeView");
                 }
             }
 
@@ -1268,7 +1247,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (compatibleViews.indexOf(this.currentSelectionName)>-1) {
                 viewName = this.currentSelectionName;
             } else {
-                viewName = "DataTableView";
+                viewName = "tableView";
                 this.currentSelectionName = viewName;
             }
 
@@ -1281,23 +1260,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.currentView.remove();
                 }
                 // create the new view
-                if (viewName == "DataTableView") {
-                    this.currentView = new squid_api.view.DataTableView ({
-                        el : me.renderTo,
-                        model : analysis
-                    });
-                } else if (viewName == "TimeSeriesView") {
-                    this.currentView = new squid_api.view.TimeSeriesView ({
-                        el : me.renderTo,
-                        model : analysis
-                    });
-                } else if (viewName == "BarChartView") {
-                    this.currentView = new squid_api.view.BarChartView ({
-                        el : me.renderTo,
-                        model : analysis
-                    });
+                if (viewName == "tableView") {
+                    tableView.render();
+                } else if (viewName == "timeView") {
+                    timeView.render();
+                } else if (viewName == "barView") {
+                    barView.render();
                 }
-                this.currentView.render();
             }
 
             // display the view selector
@@ -1305,11 +1274,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             for (idx2 = 0; idx2<compatibleViews.length; idx2++) {
                 var view2 = compatibleViews[idx2];
                 var icon;
-                if (view2 == "DataTableView") {
+                if (view2 == "tableView") {
                     icon = "fa-table";
-                } else if (view2 == "TimeSeriesView") {
+                } else if (view2 == "timeView") {
                     icon = "fa-line-chart";
-                } else if (view2 == "BarChartView") {
+                } else if (view2 == "barView") {
                     icon = "fa-bar-chart";
                 }
                 var isActive = false;
@@ -1604,7 +1573,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var View = Backbone.View.extend({
         template : null,
-        metrics : null,
         metricIdList : null,
         metricIndex: null,
 
@@ -1626,7 +1594,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.metricIndex = options.metricIndex;
             }
 
-            this.model.on('change', function() {
+            api.model.status.on("change:domain", function() {
                 me.render();
             });
         },
@@ -1645,25 +1613,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     selected.push($(oid[i]).val());
                 }
 
-                var analysis = null;
-                if (this.model.get("analyses")) {
-                    // If instance of array
-                    if (this.model.get("analyses")[0]) {
-                        analysis = this.model.get("analyses")[0];
-                    }
-                } else {
-                    analysis = this.model;
-                }
-
-                if (analysis) {
-                    if (this.metricIndex) {
-                        if (selected.length > 0) {
-                            analysis.setMetricId(selected[0], this.metricIndex);
-                        }
-                    } else {
-                        analysis.setMetricIds(selected);
-                    }
-                }
+                // Update
+                this.model.set({"chosenMetrics" : selected});
             }
         },
 
@@ -1718,15 +1669,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             /* See if we can obtain the metrics.
             If not check for a multi analysis array */
 
-            var metrics = this.model.get("metrics");
-
-            if (!metrics && (this.model.get("analyses"))) {
-                metrics = this.model.get("analyses")[0].get("metrics");
-            }
+            var metrics = this.model.get("selectedMetrics");
 
             if (metrics) {
                 for (var j=0; j<metrics.length; j++) {
-                    if (item.oid == metrics[j].metricId) {
+                    if (item.oid == metrics[j]) {
                         selected = true;
                     }
                 }

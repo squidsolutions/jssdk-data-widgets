@@ -6,11 +6,13 @@
     var View = Backbone.View.extend({
 
         template : null,
-        renderTo : null,
         defaultWidget : null,
         currentView : null,
         currentViewName : null,
         currentSelectionName : null,
+        tableView : null,
+        barView : null,
+        timeView : null,
 
         initialize: function(options) {
 
@@ -23,17 +25,16 @@
                 this.template = template;
             }
 
-            // Store Widget Render to element
-            if (options.renderTo) {
-                this.renderTo = options.renderTo;
-            }
-
             if (options.defaultWidget) {
                 this.defaultWidget = options.defaultWidget;
             }
+            
+            this.tableView = options.tableView;
+            this.barView = options.barView;
+            this.timeView = options.timeView;
 
             if (this.model) {
-                this.model.on('change', this.render, this);
+                this.model.get("currentAnalysis").on('change', this.render, this);
             }
 
             this.render();
@@ -54,26 +55,29 @@
         },
 
         render: function() {
-            if (!this.model.isDone()) {
-                // running
-                if (this.model.get("status") == "RUNNING") {
+            var analysis = this.model.get("currentAnalysis");
+            if (analysis) {
+                if (!analysis.isDone()) {
+                    // running
+                    if (analysis.get("status") == "RUNNING") {
+                        this.$el.html("");
+                    }
+                } else if (analysis.get("error")) {
+                    // error
                     this.$el.html("");
-                }
-            } else if (this.model.get("error")) {
-                // error
-                this.$el.html("");
-            } else {
-                if (this.model.get("results")) {
-                    this.display();
                 } else {
-                    this.$el.html("");
+                    if (analysis.get("results")) {
+                        this.display();
+                    } else {
+                        this.$el.html("");
+                    }
                 }
             }
         },
 
         addCompatibleView : function(list, name) {
             // check it is available
-            if (squid_api.view[name]) {
+            if (this[name]) {
                 list.push(name);
             }
         },
@@ -82,26 +86,27 @@
             var me = this;
 
             // compute the view types compatible with the analysis
-            var dimensions = this.model.get("dimensions");
+            var analysis = this.model.get("currentAnalysis");
+            var dimensions = analysis.get("dimensions");
             var compatibleViews = [];
 
-            this.addCompatibleView(compatibleViews, "DataTableView");
+            this.addCompatibleView(compatibleViews, "tableView");
             if (dimensions && (dimensions.length>0)) {
                 if (dimensions.length === 1) {
-                    this.addCompatibleView(compatibleViews, "BarChartView");
+                    this.addCompatibleView(compatibleViews, "barView");
                 }
                 if (dimensions.length>1) {
-                    this.addCompatibleView(compatibleViews, "FlowChartView");
+                    this.addCompatibleView(compatibleViews, "timeView");
                 }
                 var hasDateDimension = false;
-                var cols = this.model.get("results").cols;
+                var cols = analysis.get("results").cols;
                 for (var idx=0; idx < cols.length; idx++) {
                     if (cols[idx].dataType == "DATE") {
                         hasDateDimension = true;
                     }
                 }
                 if (hasDateDimension) {
-                    this.addCompatibleView(compatibleViews, "TimeSeriesView");
+                    this.addCompatibleView(compatibleViews, "timeView");
                 }
             }
 
@@ -113,7 +118,7 @@
             if (compatibleViews.indexOf(this.currentSelectionName)>-1) {
                 viewName = this.currentSelectionName;
             } else {
-                viewName = "DataTableView";
+                viewName = "tableView";
                 this.currentSelectionName = viewName;
             }
 
@@ -126,23 +131,13 @@
                     this.currentView.remove();
                 }
                 // create the new view
-                if (viewName == "DataTableView") {
-                    this.currentView = new squid_api.view.DataTableView ({
-                        el : me.renderTo,
-                        model : analysis
-                    });
-                } else if (viewName == "TimeSeriesView") {
-                    this.currentView = new squid_api.view.TimeSeriesView ({
-                        el : me.renderTo,
-                        model : analysis
-                    });
-                } else if (viewName == "BarChartView") {
-                    this.currentView = new squid_api.view.BarChartView ({
-                        el : me.renderTo,
-                        model : analysis
-                    });
+                if (viewName == "tableView") {
+                    tableView.render();
+                } else if (viewName == "timeView") {
+                    timeView.render();
+                } else if (viewName == "barView") {
+                    barView.render();
                 }
-                this.currentView.render();
             }
 
             // display the view selector
@@ -150,11 +145,11 @@
             for (idx2 = 0; idx2<compatibleViews.length; idx2++) {
                 var view2 = compatibleViews[idx2];
                 var icon;
-                if (view2 == "DataTableView") {
+                if (view2 == "tableView") {
                     icon = "fa-table";
-                } else if (view2 == "TimeSeriesView") {
+                } else if (view2 == "timeView") {
                     icon = "fa-line-chart";
-                } else if (view2 == "BarChartView") {
+                } else if (view2 == "barView") {
                     icon = "fa-bar-chart";
                 }
                 var isActive = false;

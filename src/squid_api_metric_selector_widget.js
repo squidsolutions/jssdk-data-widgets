@@ -5,7 +5,6 @@
 
     var View = Backbone.View.extend({
         template : null,
-        metrics : null,
         metricIdList : null,
         metricIndex: null,
 
@@ -27,7 +26,7 @@
                 this.metricIndex = options.metricIndex;
             }
 
-            this.model.on('change', function() {
+            api.model.status.on("change:domain", function() {
                 me.render();
             });
         },
@@ -46,25 +45,8 @@
                     selected.push($(oid[i]).val());
                 }
 
-                var analysis = null;
-                if (this.model.get("analyses")) {
-                    // If instance of array
-                    if (this.model.get("analyses")[0]) {
-                        analysis = this.model.get("analyses")[0];
-                    }
-                } else {
-                    analysis = this.model;
-                }
-
-                if (analysis) {
-                    if (this.metricIndex) {
-                        if (selected.length > 0) {
-                            analysis.setMetricId(selected[0], this.metricIndex);
-                        }
-                    } else {
-                        analysis.setMetricIds(selected);
-                    }
-                }
+                // Update
+                this.model.set({"chosenMetrics" : selected});
             }
         },
 
@@ -119,15 +101,11 @@
             /* See if we can obtain the metrics.
             If not check for a multi analysis array */
 
-            var metrics = this.model.get("metrics");
-
-            if (!metrics && (this.model.get("analyses"))) {
-                metrics = this.model.get("analyses")[0].get("metrics");
-            }
+            var metrics = this.model.get("selectedMetrics");
 
             if (metrics) {
                 for (var j=0; j<metrics.length; j++) {
-                    if (item.oid == metrics[j].metricId) {
+                    if (item.oid == metrics[j]) {
                         selected = true;
                     }
                 }

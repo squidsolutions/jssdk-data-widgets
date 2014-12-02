@@ -12,22 +12,22 @@ A collection of data (from AnalysisJobs) visualization and manipulation widgets.
   * format : a formatter function for metrics (default is `d3.format(",.f");`)
 
 ## DomainSelector
-*Renders the domains of the API's current project as an INPUT select and modifies the API's current domain if selection changes*
+*Renders the domains of the API's current project as an INPUT.  Selects and modifies the API's current domain if selection changes*
 * model : the API's current project (squid_api.model.project)
 * options :
   * template : a custom Handlebars template
   * displayAllDomains : if false, do not display domains with empty dimensions or metrics (default is false)
 
 ## DimensionSelector
-*Renders the dimensions of an analysis as an INPUT select and modifies the analysis dimensions if selection changes*
-* model : an Analysis
+*Renders the dimensions of the current Domain as an INPUT.  Selects and modifies the model if selection changes.  Optionally works as a single selection*
+* model : an array of Dimensions
 * options :
   * template : a custom Handlebars template
   * dimensionIdList : a list of dimension oids to filter an order the displayed list
-  * dimensionIndex : the index of the dimension which will be changed in the analysis
+  * dimensionIndex : the index of the dimension which will be changed in the model (single selection mode)
   
 ## MetricSelectorView
-*Renders the metrics of an analysis as an INPUT select and modifies the analysis metrics if selection changes.*
+*Renders the metrics of an analysis as an INPUT.  Select and modifies the analysis metrics if selection changes.*
 * model : an Analysis
 * options :
   * template : a custom Handlebars template
