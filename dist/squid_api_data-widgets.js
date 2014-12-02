@@ -82,29 +82,6 @@ function program7(depth0,data) {
   return buffer;
   });
 
-this["squid_api"]["template"]["squid_api_dimension_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
-
-function program1(depth0,data) {
-  
-  var buffer = "";
-  buffer += "\n        <li class=\"item\" data-content="
-    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
-    + ">"
-    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
-    + "</li>\n    ";
-  return buffer;
-  }
-
-  buffer += "<ul class=\"sortable\">\n    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.chosenDimensions), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</ul>\n";
-  return buffer;
-  });
-
 this["squid_api"]["template"]["squid_api_displaytype_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -1015,106 +992,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return selected;
         }
 
-    });
-
-    return View;
-}));
-
-(function (root, factory) {
-    root.squid_api.view.DimensionView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_dimension_widget);
-
-}(this, function (Backbone, squid_api, template) {
-
-    var View = Backbone.View.extend({
-        template : null,
-        dimensions : null,
-        chosenDimensions : null,
-        selectedDimensions : null,
-
-        initialize: function(options) {
-            var me = this;
-
-            // setup options
-            if (options.template) {
-                this.template = options.template;
-            } else {
-                this.template = template;
-            }
-
-            if (options.chosenDimensionModel) {
-                this.chosenDimensions = options.chosenDimensionModel;
-            }
-
-            if (options.selectedDimensionModel) {
-                this.selectedDimensions = options.selectedDimensionModel;
-            }
-
-            this.chosenDimensions.on("change", function() {
-                me.render();
-            });
-        },
-
-        setModel: function(model) {
-            this.model = model;
-            this.initialize();
-        },
-
-        events: {
-            // Dimension Sorting
-            "change": function(event) {
-                var selectedItems = this.$el.find(".sortable").sortable("toArray", {attribute: 'data-content'});
-                this.chosenDimensions.set({"dimensions": selectedItems});
-            },
-            // Dimension Selection
-            "click li": function(item) {
-                var selectionList = this.$el.find(".sortable li");
-                var selectedItems = [];
-
-                for (i=0; i<selectionList.length; i++) {
-                    if ($(selectionList[i]).attr("data-value") === "active") {
-                        selectedItems.push($(selectionList[i]).attr("data-content"));
-                    }
-                }
-
-                this.selectedDimensions.set({"dimensions": selectedItems});
-            }
-        },
-
-        render: function() {
-            console.log(this.chosenDimensions.toJSON().dimensions);
-            var html = this.template({"chosenDimensions" : this.chosenDimensions.toJSON().dimensions});
-            this.$el.html(html);
-            this.$el.show();
-                
-            // Make dimensions selectable
-            this.dimensionSelect();
-
-            // Make dimesions sortable & selectable
-            this.dimensionSort();
-
-            return this;
-        },
-
-        dimensionSelect : function() {
-            this.$el.find(".sortable li").click(function() {
-                if ($(this).attr("data-value") === "active") {
-                    $(this).removeAttr("data-value");
-
-                    $(this).removeClass("ui-selected");
-                } else {
-                    $(this).attr("data-value", "active");
-
-                    $(this).addClass("ui-selected");
-                }
-            });
-        },
-
-        dimensionSort : function() {
-            this.$el.find(".sortable").sortable({
-                revert: true,
-                stop: function(event, ui) { ui.item.trigger("change"); }
-            });
-        }
     });
 
     return View;
