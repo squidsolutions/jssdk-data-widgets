@@ -82,6 +82,33 @@ function program7(depth0,data) {
   return buffer;
   });
 
+this["squid_api"]["template"]["squid_api_dimension_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\n        <li class=\"item\" data-content=";
+  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ">";
+  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</li>\n    ";
+  return buffer;
+  }
+
+  buffer += "<ul class=\"sortable\">\n    ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.chosenDimensions), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n</ul>\n";
+  return buffer;
+  });
+
 this["squid_api"]["template"]["squid_api_displaytype_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -853,6 +880,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         dimensions : null,
         dimensionIdList : null,
         dimensionIndex: null,
+        chosenDimensionModel : null,
+        selectedDimensionsModel : null,
 
         initialize: function(options) {
             var me = this;
@@ -867,18 +896,25 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.dimensionIdList) {
                 this.dimensionIdList = options.dimensionIdList;
             }
-
             if (options.dimensionIndex !== null) {
                 this.dimensionIndex = options.dimensionIndex;
+            }
+            if (options.chosenDimensionModel) {
+                this.chosenDimensionModel = options.chosenDimensionModel;
+            }
+            if (options.selectedDimensionsModel) {
+                this.selectedDimensionsModel = options.selectedDimensionsModel;
             }
 
             this.model.on('change', function() {
                 me.render();
             });
+
+            this.render();
         },
 
         setModel: function(model) {
-            this.model = model;
+            this.model = this.chosenDimensionModel;
             this.initialize();
         },
 
@@ -888,38 +924,27 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var selected = [];
 
                 for (i = 0; i < oid.length; i++) {
-                    selected.push($(oid[i]).val());
-                }
-                
-                var analysis = null;
-                if (this.model.get("analyses")) {
-                    // If instance of array
-                    if (this.model.get("analyses")[0]) {
-                        analysis = this.model.get("analyses")[0];
-                    }
-                } else {
-                    analysis = this.model;
+                    var dimension = {};
+                    
+                    dimension.name = $(oid[i]).text();
+                    dimension.value = $(oid[i]).val();
+
+                    selected.push(dimension);
                 }
 
-                if (analysis) {
-                    if (this.dimensionIndex !== null) {
-                        if (selected.length > 0) {
-                            analysis.setDimensionId(selected[0], this.dimensionIndex);
-                        }
-                    } else {
-                        analysis.setDimensionIds(selected);
-                    }
-                }
+                // Update
+                this.chosenDimensionModel.set({"dimensions" : selected});
             }
         },
 
         render: function() {
             var isMultiple = true;
+            var me = this;
 
             if (this.dimensionIndex !== null) {
                 isMultiple = false;
             }
-
+            
             var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
             
             // iterate through all domains dimensions
@@ -961,7 +986,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // Initialize plugin
             var selector = this.$el.find("select");
             if (isMultiple) {
-                selector.multiselect();
+                selector.multiselect({
+                    onChange: function(option, checked) {
+                        if (checked) {
+                            // Update Selected Item
+                            var selectedItem = [$(option).attr("value")];
+                            me.selectedDimensionsModel.set({"dimensions": selectedItem});
+                        }
+                    }
+                });
             }
 
             return this;
@@ -992,6 +1025,129 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return selected;
         }
 
+    });
+
+    return View;
+}));
+
+(function (root, factory) {
+    root.squid_api.view.DimensionView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_dimension_widget);
+
+}(this, function (Backbone, squid_api, template) {
+
+    var View = Backbone.View.extend({
+        template : null,
+        dimensions : null,
+        chosenDimension : null,
+        selectedDimensions : null,
+
+        initialize: function(options) {
+            var me = this;
+
+            // setup options
+            if (options.template) {
+                this.template = options.template;
+            } else {
+                this.template = template;
+            }
+
+            if (options.chosenDimensionModel) {
+                this.chosenDimensions = options.chosenDimensionModel;
+            }
+
+            if (options.selectedDimensionModel) {
+                this.selectedDimensions = options.selectedDimensionModel;
+            }
+
+            this.chosenDimensions.on("change", function() {
+                me.render();
+            });
+
+            this.selectedDimensions.on("change", function() {
+                me.selectItem();
+            });
+        },
+
+        setModel: function(model) {
+            this.model = model;
+            this.initialize();
+        },
+
+        events: {
+            // Dimension Sorting
+            "change": function(event) {
+                var dimensions = this.$el.find(".sortable li");
+                var selected = [];
+
+                for (i = 0; i < dimensions.length; i++) {
+                    var dimension = {};
+                    
+                    dimension.name = $(dimensions[i]).text();
+                    dimension.value = $(dimensions[i]).attr("data-content");
+
+                    selected.push(dimension);
+                }
+
+                // Update
+                this.chosenDimensions.set({"dimensions" : selected});
+
+            },
+            // Dimension Selection
+            "click li": function(item) {
+                var selectionList = this.$el.find(".sortable li");
+                var selectedItem = [];
+
+                // Remove currently selected dimension
+                for (i=0; i<selectionList.length; i++) {
+                    $(selectionList[i]).removeAttr("data-selected");
+                    $(selectionList[i]).removeClass("ui-selected");
+                }
+                
+                // Add class and data attributes
+                $(item.currentTarget).attr("data-selected", "true");
+                $(item.currentTarget).addClass("ui-selected");
+
+                // Add to array
+                selectedItem.push($(item.currentTarget).attr("data-content"));
+
+                // Update
+                this.selectedDimensions.set({"dimensions": selectedItem});
+            }
+        },
+
+        render: function() {
+            var html = this.template({"chosenDimensions" : this.chosenDimensions.toJSON().dimensions});
+            this.$el.html(html);
+
+            this.$el.show();
+
+            // Make dimesions sortable & selectable
+            this.dimensionSort();
+
+            return this;
+        },
+
+        selectItem: function() {
+            var me = this;
+            var dimensions = this.$el.find(".sortable li");
+
+            for (i = 0; i < dimensions.length; i++) {
+                $(dimensions[i]).removeAttr("data-selected");
+                $(dimensions[i]).removeClass("ui-selected");
+
+                if ($(dimensions[i]).attr("data-content") === me.selectedDimensions.toJSON().dimensions[0]) {
+                    $(dimensions[i]).attr("data-selected", "true");
+                    $(dimensions[i]).addClass("ui-selected");
+                }
+            }
+        },
+
+        dimensionSort : function() {
+            this.$el.find(".sortable").sortable({
+                revert: true,
+                stop: function(event, ui) { ui.item.trigger("change"); }
+            });
+        }
     });
 
     return View;

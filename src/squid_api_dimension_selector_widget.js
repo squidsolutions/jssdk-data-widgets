@@ -8,6 +8,8 @@
         dimensions : null,
         dimensionIdList : null,
         dimensionIndex: null,
+        chosenDimensionModel : null,
+        selectedDimensionsModel : null,
 
         initialize: function(options) {
             var me = this;
@@ -22,18 +24,25 @@
             if (options.dimensionIdList) {
                 this.dimensionIdList = options.dimensionIdList;
             }
-
             if (options.dimensionIndex !== null) {
                 this.dimensionIndex = options.dimensionIndex;
+            }
+            if (options.chosenDimensionModel) {
+                this.chosenDimensionModel = options.chosenDimensionModel;
+            }
+            if (options.selectedDimensionsModel) {
+                this.selectedDimensionsModel = options.selectedDimensionsModel;
             }
 
             this.model.on('change', function() {
                 me.render();
             });
+
+            this.render();
         },
 
         setModel: function(model) {
-            this.model = model;
+            this.model = this.chosenDimensionModel;
             this.initialize();
         },
 
@@ -43,38 +52,27 @@
                 var selected = [];
 
                 for (i = 0; i < oid.length; i++) {
-                    selected.push($(oid[i]).val());
-                }
-                
-                var analysis = null;
-                if (this.model.get("analyses")) {
-                    // If instance of array
-                    if (this.model.get("analyses")[0]) {
-                        analysis = this.model.get("analyses")[0];
-                    }
-                } else {
-                    analysis = this.model;
+                    var dimension = {};
+                    
+                    dimension.name = $(oid[i]).text();
+                    dimension.value = $(oid[i]).val();
+
+                    selected.push(dimension);
                 }
 
-                if (analysis) {
-                    if (this.dimensionIndex !== null) {
-                        if (selected.length > 0) {
-                            analysis.setDimensionId(selected[0], this.dimensionIndex);
-                        }
-                    } else {
-                        analysis.setDimensionIds(selected);
-                    }
-                }
+                // Update
+                this.chosenDimensionModel.set({"dimensions" : selected});
             }
         },
 
         render: function() {
             var isMultiple = true;
+            var me = this;
 
             if (this.dimensionIndex !== null) {
                 isMultiple = false;
             }
-
+            
             var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
             
             // iterate through all domains dimensions
@@ -116,7 +114,15 @@
             // Initialize plugin
             var selector = this.$el.find("select");
             if (isMultiple) {
-                selector.multiselect();
+                selector.multiselect({
+                    onChange: function(option, checked) {
+                        if (checked) {
+                            // Update Selected Item
+                            var selectedItem = [$(option).attr("value")];
+                            me.selectedDimensionsModel.set({"dimensions": selectedItem});
+                        }
+                    }
+                });
             }
 
             return this;
