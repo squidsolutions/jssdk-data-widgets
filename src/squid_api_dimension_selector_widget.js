@@ -10,7 +10,7 @@
 
         initialize: function(options) {
             var me = this;
-
+            
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -28,6 +28,12 @@
             api.model.status.on("change:domain", function() {
                 me.render();
             });
+            
+            if (this.model) {
+                this.model.on("change:chosenDimensions", function() {
+                    me.render();
+                });
+            }
 
             this.render();
         },
@@ -84,7 +90,7 @@
                     for (var dimIdx=0; dimIdx<dimensions.length; dimIdx++) {
                         var dimension = dimensions[dimIdx];
                         // check if selected
-                        var selected = this.isSelected(dimension);
+                        var selected = this.isChosen(dimension);
                         
                         // add to the list
                         var option = {"label" : dimension.name, "value" : dimension.oid, "selected" : selected};
@@ -106,7 +112,7 @@
             return this;
         },
         
-        isSelected : function(dim) {
+        isChosen : function(dim) {
             var selected = false;
 
             var dimensions = this.model.get("chosenDimensions");

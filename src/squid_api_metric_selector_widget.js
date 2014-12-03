@@ -10,7 +10,7 @@
 
         initialize: function(options) {
             var me = this;
-
+          
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -26,9 +26,11 @@
                 this.metricIndex = options.metricIndex;
             }
 
-            api.model.status.on("change:domain", function() {
-                me.render();
-            });
+            if (this.model) {
+                this.model.on("change:chosenMetrics", function() {
+                    me.render();
+                });
+            }
         },
 
         setModel: function(model) {
@@ -57,7 +59,7 @@
                 isMultiple = false;
             }
 
-            var jsonData = {"selAvailable" : true, "options" : [{"label" : "", "value" : "", "selected" : false}], "multiple" : isMultiple};
+            var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
             
             // iterate through all domains metrics
             var metrics = this.getDomainMetrics();
@@ -65,7 +67,7 @@
                 for (var idx=0; idx<metrics.length; idx++) {
                     var metric = metrics[idx];
                     // check if selected
-                    var selected = this.isSelected(metric);
+                    var selected = this.isChosen(metric);
                     
                     // add to the list
                     var option = {"label" : metric.name, "value" : metric.oid, "selected" : selected};
@@ -95,13 +97,9 @@
             return metrics;
         },
         
-        isSelected : function(item) {
+        isChosen : function(item) {
             var selected = false;
-
-            /* See if we can obtain the metrics.
-            If not check for a multi analysis array */
-
-            var metrics = this.model.get("selectedMetrics");
+            var metrics = this.model.get("chosenMetrics");
 
             if (metrics) {
                 for (var j=0; j<metrics.length; j++) {

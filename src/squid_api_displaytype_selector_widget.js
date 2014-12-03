@@ -6,10 +6,7 @@
     var View = Backbone.View.extend({
 
         template : null,
-        defaultWidget : null,
-        currentView : null,
-        currentViewName : null,
-        currentSelectionName : null,
+
         tableView : null,
         barView : null,
         timeView : null,
@@ -24,20 +21,16 @@
             } else {
                 this.template = template;
             }
-
-            if (options.defaultWidget) {
-                this.defaultWidget = options.defaultWidget;
-            }
             
             this.tableView = options.tableView;
             this.barView = options.barView;
             this.timeView = options.timeView;
-
+            
             if (this.model) {
-                this.model.get("currentAnalysis").on('change', this.render, this);
+                this.model.on("change:currentAnalysis", this.render, this);
+                this.model.on("change:selectedDimension", this.render, this);
+                this.model.on("change:timeDimension", this.render, this);
             }
-
-            this.render();
         },
 
         setModel: function(model) {
@@ -50,29 +43,18 @@
         },
 
         changeWidget: function(item){
-            this.currentSelectionName = item.currentTarget.dataset.content;
-            this.render();
-        },
-
-        render: function() {
-            var analysis = this.model.get("currentAnalysis");
-            if (analysis) {
-                if (!analysis.isDone()) {
-                    // running
-                    if (analysis.get("status") == "RUNNING") {
-                        this.$el.html("");
-                    }
-                } else if (analysis.get("error")) {
-                    // error
-                    this.$el.html("");
-                } else {
-                    if (analysis.get("results")) {
-                        this.display();
-                    } else {
-                        this.$el.html("");
-                    }
-                }
+            var viewName = item.currentTarget.dataset.content;
+            var analysis;
+            
+            // create the new view
+            if (viewName == "tableView") {
+                analysis = tableView.model;
+            } else if (viewName == "timeView") {
+                analysis = timeView.model;
+            } else if (viewName == "barView") {
+                analysis = barView.model;
             }
+            this.model.set("currentAnalysis", analysis);
         },
 
         addCompatibleView : function(list, name) {
@@ -82,62 +64,33 @@
             }
         },
 
-        display: function() {
+        render: function() {
             var me = this;
 
-            // compute the view types compatible with the analysis
-            var analysis = this.model.get("currentAnalysis");
-            var dimensions = analysis.get("dimensions");
+            // compute the view types compatible with the model
+            var selectedDimension = this.model.get("selectedDimension");
             var compatibleViews = [];
-
             this.addCompatibleView(compatibleViews, "tableView");
-            if (dimensions && (dimensions.length>0)) {
-                if (dimensions.length === 1) {
-                    this.addCompatibleView(compatibleViews, "barView");
-                }
-                if (dimensions.length>1) {
-                    this.addCompatibleView(compatibleViews, "timeView");
-                }
-                var hasDateDimension = false;
-                var cols = analysis.get("results").cols;
-                for (var idx=0; idx < cols.length; idx++) {
-                    if (cols[idx].dataType == "DATE") {
-                        hasDateDimension = true;
-                    }
-                }
-                if (hasDateDimension) {
-                    this.addCompatibleView(compatibleViews, "timeView");
-                }
+            
+            if (selectedDimension && (selectedDimension.length>0)) {
+                this.addCompatibleView(compatibleViews, "barView");
+                
             }
-
+            if (this.model.get("timeDimension")) {
+                this.addCompatibleView(compatibleViews, "timeView");
+            }
+            
             // compute the current selected view
-            var viewName;
-            if (!this.currentSelectionName) {
-                this.currentSelectionName = this.defaultWidget;
+            var analysis = this.model.get("currentAnalysis");
+            var currentViewName;
+            if (analysis == this.tableView.model) {
+                currentViewName = "tableView";
             }
-            if (compatibleViews.indexOf(this.currentSelectionName)>-1) {
-                viewName = this.currentSelectionName;
-            } else {
-                viewName = "tableView";
-                this.currentSelectionName = viewName;
+            if (analysis == this.barView.model) {
+                currentViewName = "barView";
             }
-
-            // display the Widget
-            if (!this.currentViewName || (viewName != this.currentViewName)) {
-                // update the view
-                this.currentViewName = viewName;
-                if (this.currentView) {
-                    // dispose previous view
-                    this.currentView.remove();
-                }
-                // create the new view
-                if (viewName == "tableView") {
-                    tableView.render();
-                } else if (viewName == "timeView") {
-                    timeView.render();
-                } else if (viewName == "barView") {
-                    barView.render();
-                }
+            if (analysis == this.timeView.model) {
+                currentViewName = "timeView";
             }
 
             // display the view selector
@@ -153,7 +106,7 @@
                     icon = "fa-bar-chart";
                 }
                 var isActive = false;
-                if (view2 == this.currentViewName) {
+                if (view2 == currentViewName) {
                     isActive = true;
                 }
                 data.options.push({"view" : view2, "icon" : icon, "isActive" : isActive});
