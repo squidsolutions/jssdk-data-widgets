@@ -38,11 +38,6 @@
             this.render();
         },
 
-        setModel: function(model) {
-            this.model = this.chosenDimensionModel;
-            this.initialize();
-        },
-
         events: {
             "change": function(event) {
                 var oid = this.$el.find("select option:selected");
@@ -110,8 +105,8 @@
                     onChange: function(option, checked) {
                         if (checked) {
                             // Update Selected Item
-                            var selectedItem = [$(option).attr("value")];
-                            me.selectedDimensionsModel.set({"dimensions": selectedItem});
+                            var selectedItem = $(option).attr("value");
+                            me.model.set({"selectedDimension" : selectedItem});
                         }
                     }
                 });
