@@ -1057,19 +1057,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             },
             // Dimension Selection
             "click li": function(item) {
-                var selectionList = this.$el.find(".sortable li");
-
-                // Remove currently selected dimension
-                for (i=0; i<selectionList.length; i++) {
-                    $(selectionList[i]).removeAttr("data-selected");
-                    $(selectionList[i]).removeClass("ui-selected");
-                }
-                
-                // Add class and data attributes
-                $(item.currentTarget).attr("data-selected", "true");
-                $(item.currentTarget).addClass("ui-selected");
-
                 var selectedItem = $(item.currentTarget).attr("data-content");
+
+                var dimensions = this.$el.find(".sortable li");
+
+                for (i = 0; i < dimensions.length; i++) {
+                    $(dimensions[i]).removeAttr("data-selected");
+                    $(dimensions[i]).removeClass("ui-selected");
+                }   
 
                 // Update
                 this.model.set({"selectedDimension" : selectedItem});
@@ -1118,10 +1113,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var dimensions = this.$el.find(".sortable li");
 
             for (i = 0; i < dimensions.length; i++) {
-                $(dimensions[i]).removeAttr("data-selected");
-                $(dimensions[i]).removeClass("ui-selected");
-
-                if ($(dimensions[i]).attr("data-content") === me.model.get("selectedDimension")[0]) {
+                if ($(dimensions[i]).attr("data-content") === me.model.get("selectedDimension")) {
                     $(dimensions[i]).attr("data-selected", "true");
                     $(dimensions[i]).addClass("ui-selected");
                 }
