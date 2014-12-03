@@ -5,9 +5,6 @@
 
     var View = Backbone.View.extend({
         template : null,
-        dimensions : null,
-        chosenDimension : null,
-        selectedDimensions : null,
 
         initialize: function(options) {
             var me = this;
@@ -19,19 +16,11 @@
                 this.template = template;
             }
 
-            if (options.chosenDimensionModel) {
-                this.chosenDimensions = options.chosenDimensionModel;
-            }
-
-            if (options.selectedDimensionModel) {
-                this.selectedDimensions = options.selectedDimensionModel;
-            }
-
-            this.chosenDimensions.on("change", function() {
+            this.model.on("change:chosenDimensions", function() {
                 me.render();
             });
 
-            this.selectedDimensions.on("change", function() {
+            this.model.on("change:selectedDimension", function() {
                 me.selectItem();
             });
         },
@@ -48,22 +37,16 @@
                 var selected = [];
 
                 for (i = 0; i < dimensions.length; i++) {
-                    var dimension = {};
-                    
-                    dimension.name = $(dimensions[i]).text();
-                    dimension.value = $(dimensions[i]).attr("data-content");
-
-                    selected.push(dimension);
+                    selected.push($(dimensions[i]).attr("data-content"));
                 }
 
                 // Update
-                this.chosenDimensions.set({"dimensions" : selected});
+                this.model.set({"chosenDimensions" : selected});
 
             },
             // Dimension Selection
             "click li": function(item) {
                 var selectionList = this.$el.find(".sortable li");
-                var selectedItem = [];
 
                 // Remove currently selected dimension
                 for (i=0; i<selectionList.length; i++) {
@@ -75,16 +58,40 @@
                 $(item.currentTarget).attr("data-selected", "true");
                 $(item.currentTarget).addClass("ui-selected");
 
-                // Add to array
-                selectedItem.push($(item.currentTarget).attr("data-content"));
+                var selectedItem = $(item.currentTarget).attr("data-content");
 
                 // Update
-                this.selectedDimensions.set({"dimensions": selectedItem});
+                this.model.set({"selectedDimension" : selectedItem});
             }
         },
 
         render: function() {
-            var html = this.template({"chosenDimensions" : this.chosenDimensions.toJSON().dimensions});
+            var chosenDimensions = this.model.get("chosenDimensions");
+            var jsonData = {"chosenDimensions" : {}};
+            
+            // iterate through all domains dimensions
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+
+            if (domain) {
+                if (domain.dimensions) {
+                    var dimensions = [];
+                    var dims = domain.dimensions;
+                    for (var dc=0; dc<chosenDimensions.length; dc++) {
+                        for (var d=0; d<dims.length; d++){
+                            var dim = dims[d];
+                            if (chosenDimensions[dc] == dims[d].oid) {
+                                var item = {};
+                                item.id = dims[d].oid;
+                                item.value = dims[d].name;
+                                dimensions.push(item);
+                            }
+                        } 
+                    }
+                    jsonData.chosenDimensions = dimensions;
+                }
+            }
+
+            var html = this.template(jsonData);
             this.$el.html(html);
 
             this.$el.show();
@@ -103,7 +110,7 @@
                 $(dimensions[i]).removeAttr("data-selected");
                 $(dimensions[i]).removeClass("ui-selected");
 
-                if ($(dimensions[i]).attr("data-content") === me.selectedDimensions.toJSON().dimensions[0]) {
+                if ($(dimensions[i]).attr("data-content") === me.model.get("selectedDimension")[0]) {
                     $(dimensions[i]).attr("data-selected", "true");
                     $(dimensions[i]).addClass("ui-selected");
                 }

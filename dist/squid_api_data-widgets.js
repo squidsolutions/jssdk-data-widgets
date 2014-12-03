@@ -89,15 +89,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 function program1(depth0,data) {
   
-  var buffer = "", stack1, helper;
-  buffer += "\n        <li class=\"item\" data-content=";
-  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + ">";
-  if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
+  var buffer = "", stack1;
+  buffer += "\n        <li class=\"item\" data-content="
+    + escapeExpression(((stack1 = (depth0 && depth0.id)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + ">"
+    + escapeExpression(((stack1 = (depth0 && depth0.value)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "</li>\n    ";
   return buffer;
   }
@@ -911,7 +907,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         setModel: function(model) {
-            this.model = model;
+            this.model = this.chosenDimensionModel;
             this.initialize();
         },
 
@@ -978,7 +974,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // Initialize plugin
             var selector = this.$el.find("select");
             if (isMultiple) {
-                selector.multiselect();
+                selector.multiselect({
+                    onChange: function(option, checked) {
+                        if (checked) {
+                            // Update Selected Item
+                            var selectedItem = [$(option).attr("value")];
+                            me.selectedDimensionsModel.set({"dimensions": selectedItem});
+                        }
+                    }
+                });
             }
 
             return this;
@@ -1017,9 +1021,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var View = Backbone.View.extend({
         template : null,
-        dimensions : null,
-        chosenDimension : null,
-        selectedDimensions : null,
 
         initialize: function(options) {
             var me = this;
@@ -1031,19 +1032,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.template = template;
             }
 
-            if (options.chosenDimensionModel) {
-                this.chosenDimensions = options.chosenDimensionModel;
-            }
-
-            if (options.selectedDimensionModel) {
-                this.selectedDimensions = options.selectedDimensionModel;
-            }
-
-            this.chosenDimensions.on("change", function() {
+            this.model.on("change:chosenDimensions", function() {
                 me.render();
             });
 
-            this.selectedDimensions.on("change", function() {
+            this.model.on("change:selectedDimension", function() {
                 me.selectItem();
             });
         },
@@ -1060,22 +1053,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var selected = [];
 
                 for (i = 0; i < dimensions.length; i++) {
-                    var dimension = {};
-                    
-                    dimension.name = $(dimensions[i]).text();
-                    dimension.value = $(dimensions[i]).attr("data-content");
-
-                    selected.push(dimension);
+                    selected.push($(dimensions[i]).attr("data-content"));
                 }
 
                 // Update
-                this.chosenDimensions.set({"dimensions" : selected});
+                this.model.set({"chosenDimensions" : selected});
 
             },
             // Dimension Selection
             "click li": function(item) {
                 var selectionList = this.$el.find(".sortable li");
-                var selectedItem = [];
 
                 // Remove currently selected dimension
                 for (i=0; i<selectionList.length; i++) {
@@ -1087,16 +1074,40 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 $(item.currentTarget).attr("data-selected", "true");
                 $(item.currentTarget).addClass("ui-selected");
 
-                // Add to array
-                selectedItem.push($(item.currentTarget).attr("data-content"));
+                var selectedItem = $(item.currentTarget).attr("data-content");
 
                 // Update
-                this.selectedDimensions.set({"dimensions": selectedItem});
+                this.model.set({"selectedDimension" : selectedItem});
             }
         },
 
         render: function() {
-            var html = this.template({"chosenDimensions" : this.chosenDimensions.toJSON().dimensions});
+            var chosenDimensions = this.model.get("chosenDimensions");
+            var jsonData = {"chosenDimensions" : {}};
+            
+            // iterate through all domains dimensions
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+
+            if (domain) {
+                if (domain.dimensions) {
+                    var dimensions = [];
+                    var dims = domain.dimensions;
+                    for (var dc=0; dc<chosenDimensions.length; dc++) {
+                        for (var d=0; d<dims.length; d++){
+                            var dim = dims[d];
+                            if (chosenDimensions[dc] == dims[d].oid) {
+                                var item = {};
+                                item.id = dims[d].oid;
+                                item.value = dims[d].name;
+                                dimensions.push(item);
+                            }
+                        } 
+                    }
+                    jsonData.chosenDimensions = dimensions;
+                }
+            }
+
+            var html = this.template(jsonData);
             this.$el.html(html);
 
             this.$el.show();
@@ -1115,7 +1126,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 $(dimensions[i]).removeAttr("data-selected");
                 $(dimensions[i]).removeClass("ui-selected");
 
-                if ($(dimensions[i]).attr("data-content") === me.selectedDimensions.toJSON().dimensions[0]) {
+                if ($(dimensions[i]).attr("data-content") === me.model.get("selectedDimension")[0]) {
                     $(dimensions[i]).attr("data-selected", "true");
                     $(dimensions[i]).addClass("ui-selected");
                 }

@@ -39,7 +39,7 @@
         },
 
         setModel: function(model) {
-            this.model = model;
+            this.model = this.chosenDimensionModel;
             this.initialize();
         },
 
@@ -106,7 +106,15 @@
             // Initialize plugin
             var selector = this.$el.find("select");
             if (isMultiple) {
-                selector.multiselect();
+                selector.multiselect({
+                    onChange: function(option, checked) {
+                        if (checked) {
+                            // Update Selected Item
+                            var selectedItem = [$(option).attr("value")];
+                            me.selectedDimensionsModel.set({"dimensions": selectedItem});
+                        }
+                    }
+                });
             }
 
             return this;
