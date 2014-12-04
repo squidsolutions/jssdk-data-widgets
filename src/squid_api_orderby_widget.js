@@ -56,10 +56,13 @@
         },
 
         render : function() {
+            var jsonData = {direction : this.model.get("orderbyDirection"), limit : this.model.get("limit")};
 
-            var html = this.template();
+            var html = this.template(jsonData);
             this.$el.html(html);
-            this.$el.show();
+             
+            // Set Limit Value
+            this.$el.find(".sq-select").val(jsonData.limit);
 
             return this;
         }

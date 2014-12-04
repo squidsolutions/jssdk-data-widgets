@@ -436,7 +436,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"orderby-container\">\n	<div class=\"row-md-12 orderby-widget\">\n		<div class=\"col-md-4\">\n			<div class=\"onoffswitch\">\n    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" checked>\n    			<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n        			<span class=\"onoffswitch-inner\"></span>\n       				 <span class=\"onoffswitch-switch\"></span>\n    			</label>\n			</div>\n		</div>\n		<div class=\"col-md-3\">\n			<select class=\"sq-select form-control\">\n            	<option value=\"10\">\n                	10\n        		</option>\n        		<option value=\"100\">\n                	100\n        		</option>\n        		<option value=\"1000\">\n                	1000\n        		</option> \n			</select>\n		</div>\n		<div class=\"col-sm-2 col-sm-offset-1\">\n			<label class=\"records\">Records</label>\n		</div>\n	</div>\n</div>";
+  return "<div class=\"orderby-container\">\n	<div class=\"row-md-12 orderby-widget\">\n		<div class=\"col-md-4\">\n			<div class=\"onoffswitch\">\n    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" checked>\n    			<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n        			<span class=\"onoffswitch-inner\"></span>\n       				 <span class=\"onoffswitch-switch\"></span>\n    			</label>\n			</div>\n		</div>\n		<div class=\"col-md-4\">\n			<select class=\"sq-select form-control\">\n            	<option value=\"10\">\n                	10\n        		</option>\n        		<option value=\"100\">\n                	100\n        		</option>\n        		<option value=\"1000\">\n                	1000\n        		</option> \n			</select>\n		</div>\n		<div class=\"col-sm-2\">\n			<label class=\"records\">Records</label>\n		</div>\n	</div>\n</div>";
   });
 
 this["squid_api"]["template"]["squid_api_project_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -1804,10 +1804,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render : function() {
+            var jsonData = {direction : this.model.get("orderbyDirection"), limit : this.model.get("limit")};
 
-            var html = this.template();
+            var html = this.template(jsonData);
             this.$el.html(html);
-            this.$el.show();
+             
+            // Set Limit Value
+            this.$el.find(".sq-select").val(jsonData.limit);
 
             return this;
         }
