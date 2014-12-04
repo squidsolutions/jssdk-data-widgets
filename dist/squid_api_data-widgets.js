@@ -895,7 +895,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             
             api.model.status.on("change:domain", function() {
                 me.render();
-            });
+            }); 
             
             if (this.model) {
                 this.model.on("change:chosenDimensions", function() {
@@ -918,7 +918,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // Update
                 this.model.set({"chosenDimensions" : selected});
             }
-        },
+        }, 
 
         render: function() {
             var isMultiple = true;
@@ -969,15 +969,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // Initialize plugin
             var selector = this.$el.find("select");
             if (isMultiple) {
-                selector.multiselect({
-                    onChange: function(option, checked) {
-                        if (checked) {
-                            // Update Selected Item
-                            var selectedItem = $(option).attr("value");
-                            me.model.set({"selectedDimension" : selectedItem});
-                        }
-                    }
-                });
+                selector.multiselect();
             }
 
             return this;
