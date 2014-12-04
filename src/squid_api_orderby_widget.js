@@ -39,24 +39,23 @@
 
         events: {
             "change": function(event) {
+
+
                 if (event.target.checked !== undefined) {
                     if (event.target.checked) {
-                        this.model.set({"orderbyDirection" : "DESC"});
-                        console.log("ORDER BY: " + this.model.get("orderbyDirection"));
+                        this.model.set({"orderByDirection" : "DESC"});
                     } else {
-                        this.model.set({"orderbyDirection" : "ASC"});
-                        console.log("ORDER BY: " + this.model.get("orderbyDirection"));
+                        this.model.set({"orderByDirection" : "ASC"});
                     }
                 } else {
                     var limit = parseInt($(event.target).val());
                     this.model.set({"limit" : limit});
-                    console.log("LIMIT: " + this.model.get("limit"));
                 }
             }
         },
 
         render : function() {
-            var jsonData = {direction : this.model.get("orderbyDirection"), limit : this.model.get("limit")};
+            var jsonData = {direction : this.model.get("orderByDirection"), limit : this.model.get("limit")};
 
             var html = this.template(jsonData);
             this.$el.html(html);

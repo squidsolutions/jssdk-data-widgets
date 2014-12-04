@@ -426,6 +426,31 @@ function program5(depth0,data) {
   return buffer;
   });
 
+this["squid_api"]["template"]["squid_api_metric_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n        <li class=\"item\" data-content="
+    + escapeExpression(((stack1 = (depth0 && depth0.value)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + ">\n        	<div class=\"name\">"
+    + escapeExpression(((stack1 = (depth0 && depth0.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</div>\n        	<span class=\"value\">"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.total)),stack1 == null || stack1 === false ? stack1 : stack1.value)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</span>\n        </li>\n    ";
+  return buffer;
+  }
+
+  buffer += "<ul class=\"chosen-metrics\">\n    ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.chosenMetrics), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n</ul>\n";
+  return buffer;
+  });
+
 this["squid_api"]["template"]["squid_api_orderby_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -1777,6 +1802,109 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 }));
 
 (function (root, factory) {
+    root.squid_api.view.MetricView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_metric_widget);
+
+}(this, function (Backbone, squid_api, template) {
+
+    var View = Backbone.View.extend({
+        template : null,
+
+        initialize: function(options) {
+            var me = this;
+
+            // setup options
+            if (options.template) {
+                this.template = options.template;
+            } else {
+                this.template = template;
+            }
+
+            if (this.model) {
+                this.model.on("change:chosenMetrics", function() {
+                    me.render();
+                });
+
+                this.model.get("totalAnalysis").on("change:results", function() {
+                    me.render();
+                });
+            }
+        },
+
+        setModel: function(model) {
+            this.model = model;
+            this.initialize();
+        },
+
+        events: {
+            // Dimension Sorting
+            "click li": function(item) {
+                var metrics = this.$el.find(".chosen-metrics li");
+
+                for (i = 0; i < metrics.length; i++) {
+                    $(metrics[i]).removeAttr("data-selected");
+                    $(metrics[i]).removeClass("ui-selected");
+                }
+
+                $(item.currentTarget).addClass("ui-selected");
+                $(item.currentTarget).attr("data-selected", true);
+
+                var selectedItem = $(item.currentTarget).attr("data-content");
+
+                // Update
+                this.model.set({"selectedMetric" : selectedItem});
+            }
+        },
+
+        render: function() {
+
+            var results;
+            var currentAnalysis = this.model.get("totalAnalysis");
+            var chosenMetrics = this.model.get("chosenMetrics");
+            var jsonData = {"chosenMetrics" : []};
+
+            if (currentAnalysis) {
+                results = currentAnalysis.get("results");
+            }
+            
+            // iterate through all domains dimensions
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+
+            if (results) {
+                for (var idx = 0; idx < results.cols.length; idx++) {
+
+                    for (var cm = 0; cm < chosenMetrics.length; cm++) {
+                        var col = results.cols[idx];
+
+                        if (chosenMetrics[cm] === col.id) {
+                            // get the total for the metric
+                            totalValue = results.rows[0].v[idx];
+
+                             // add to the list
+                            var option = {
+                                "name" : col.name,
+                                "value" : col.id,
+                                "total" : {
+                                    "value" : totalValue,
+                                    "unit" : null
+                                }
+                            };
+                            jsonData.chosenMetrics.push(option);
+                        }
+                    }
+                }
+                var html = this.template(jsonData);
+                this.$el.html(html);
+                this.$el.show();
+            }
+
+            return this;
+        }
+    });
+
+    return View;
+}));
+
+(function (root, factory) {
     root.squid_api.view.OrderByView = factory(root.Backbone, root.squid_api);
 }(this, function (Backbone, squid_api) {
 
@@ -1817,24 +1945,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         events: {
             "change": function(event) {
+
+
                 if (event.target.checked !== undefined) {
                     if (event.target.checked) {
-                        this.model.set({"orderbyDirection" : "DESC"});
-                        console.log("ORDER BY: " + this.model.get("orderbyDirection"));
+                        this.model.set({"orderByDirection" : "DESC"});
                     } else {
-                        this.model.set({"orderbyDirection" : "ASC"});
-                        console.log("ORDER BY: " + this.model.get("orderbyDirection"));
+                        this.model.set({"orderByDirection" : "ASC"});
                     }
                 } else {
                     var limit = parseInt($(event.target).val());
                     this.model.set({"limit" : limit});
-                    console.log("LIMIT: " + this.model.get("limit"));
                 }
             }
         },
 
         render : function() {
-            var jsonData = {direction : this.model.get("orderbyDirection"), limit : this.model.get("limit")};
+            var jsonData = {direction : this.model.get("orderByDirection"), limit : this.model.get("limit")};
 
             var html = this.template(jsonData);
             this.$el.html(html);
