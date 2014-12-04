@@ -430,6 +430,15 @@ function program5(depth0,data) {
   return buffer;
   });
 
+this["squid_api"]["template"]["squid_api_orderby_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div class=\"orderby-container\">\n	<div class=\"row-md-12 orderby-widget\">\n		<div class=\"col-md-4\">\n			<div class=\"onoffswitch\">\n    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" checked>\n    			<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n        			<span class=\"onoffswitch-inner\"></span>\n       				 <span class=\"onoffswitch-switch\"></span>\n    			</label>\n			</div>\n		</div>\n		<div class=\"col-md-3\">\n			<select class=\"sq-select form-control\">\n            	<option value=\"10\">\n                	10\n        		</option>\n        		<option value=\"100\">\n                	100\n        		</option>\n        		<option value=\"1000\">\n                	1000\n        		</option> \n			</select>\n		</div>\n		<div class=\"col-sm-2 col-sm-offset-1\">\n			<label class=\"records\">Records</label>\n		</div>\n	</div>\n</div>";
+  });
+
 this["squid_api"]["template"]["squid_api_project_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -1732,6 +1741,76 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return selected;
         }
 
+    });
+
+    return View;
+}));
+
+(function (root, factory) {
+    root.squid_api.view.OrderByView = factory(root.Backbone, root.squid_api);
+}(this, function (Backbone, squid_api) {
+
+    View = Backbone.View.extend( {
+
+        template : null,
+        
+        format : null,
+
+        initialize : function(options) {
+            if (this.model) {
+                this.model.on('change', this.render, this);
+            }
+            // setup options
+            if (options.template) {
+                this.template = options.template;
+            } else {
+                this.template = squid_api.template.squid_api_orderby_widget;
+            }
+            if (options.format) {
+                this.format = options.format;
+            } else {
+                // default number formatter
+                if (d3) {
+                    this.format = d3.format(",.1f");
+                } else {
+                    this.format = function(f){
+                        return f;
+                    };
+                }
+            }
+        },
+
+        setModel: function(model) {
+            this.model = model;
+            this.initialize();
+        },
+
+        events: {
+            "change": function(event) {
+                if (event.target.checked !== undefined) {
+                    if (event.target.checked) {
+                        this.model.set({"orderbyDirection" : "DESC"});
+                        console.log("ORDER BY: " + this.model.get("orderbyDirection"));
+                    } else {
+                        this.model.set({"orderbyDirection" : "ASC"});
+                        console.log("ORDER BY: " + this.model.get("orderbyDirection"));
+                    }
+                } else {
+                    var limit = parseInt($(event.target).val());
+                    this.model.set({"limit" : limit});
+                    console.log("LIMIT: " + this.model.get("limit"));
+                }
+            }
+        },
+
+        render : function() {
+
+            var html = this.template();
+            this.$el.html(html);
+            this.$el.show();
+
+            return this;
+        }
     });
 
     return View;
