@@ -87,7 +87,8 @@
                     "domains": analysis.get("domains"),
                     "dimensions" : analysis.get("dimensions"),
                     "metrics" : analysis.get("metrics"),
-                    "selection": analysis.get("selection")
+                    "selection": analysis.get("selection"),
+                    "orderBy": analysis.get("orderBy")
                     });
                 console.log(exportAnalysis.url());
                 // escape all spaces in the json injected into cURL
