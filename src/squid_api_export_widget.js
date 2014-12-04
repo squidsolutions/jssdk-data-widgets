@@ -8,6 +8,7 @@
         renderTo: null,
         format : "csv",
         compression : true,
+        downloadStatus : 0,
         
         initialize : function(options) {
             if (this.model) {
@@ -28,11 +29,6 @@
             this.model = model;
             this.initialize();
         },
-
-        events : {
-            'click [name="format"]': 'clickedFormat',
-            'click [name="compression"]': 'clickedCompression'
-        },
         
         clickedFormat : function (event) {
             var t = event.target;
@@ -44,6 +40,51 @@
             var t = event.target;
             this.compression = (t.checked);
             this.render();
+        },
+        
+        download : function(event) {
+            var me = this, analysis = this.model;
+      
+            if (this.downloadStatus === 0) {
+                event.preventDefault();
+                this.downloadStatus = 1;
+                $(this.renderTo).find("#download").html("Computing...");
+                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                downloadAnalysis.set({
+                   "id": {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": null
+                    },
+                    "domains": analysis.get("domains"),
+                    "dimensions" : analysis.get("dimensions"),
+                    "metrics" : analysis.get("metrics"),
+                    "selection": analysis.get("selection"),
+                    "orderBy": analysis.get("orderBy")
+                    });
+                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis)
+                    .done(function(model, response) {
+                        me.downloadStatus = 2;
+                        // create download link
+                        var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
+                        analysisJobResults.addParameter("format",me.format);
+                        if (me.compression) {
+                            analysisJobResults.addParameter("compression","gzip");
+                        }
+                        analysisJobResults.set({
+                                "id": downloadAnalysis.get("id"),
+                                "oid": downloadAnalysis.get("oid")
+                            });
+                        console.log(analysisJobResults.url());
+                        $(me.renderTo).find("#download").html("Click again to download");
+                        $(me.renderTo).find("#download").attr("href",analysisJobResults.url());
+                    })
+                    .fail(function(model, response) {
+                        console.error("createAnalysisJob failed");
+                    });
+            } else {
+                me.downloadStatus = 0;
+                $(me.renderTo).find("#download").html("Download");
+            }
         },
         
         render : function() {
@@ -61,18 +102,6 @@
                 $(this.renderTo).html("");
                 this.$el.html("");
             } else {
-                // render the export link
-                var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                analysisJobResults.addParameter("format",this.format);
-                if (this.compression) {
-                    analysisJobResults.addParameter("compression","gzip");
-                }
-                analysisJobResults.set({
-                    "id": analysis.get("id"),
-                    "oid": analysis.get("oid")
-                    });
-                console.log(analysisJobResults.url());
-                
                 // render the curl snippet
                 var exportAnalysis = new squid_api.model.ProjectAnalysisJob();
                 exportAnalysis.addParameter("format",this.format);
@@ -90,7 +119,7 @@
                     "selection": analysis.get("selection"),
                     "orderBy": analysis.get("orderBy")
                     });
-                console.log(exportAnalysis.url());
+
                 // escape all spaces in the json injected into cURL
                 var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
                 
@@ -99,7 +128,6 @@
                     "formatCSV": (this.format == "csv"),
                     "formatJSON": (this.format == "json"),
                     "compression": (this.compression),
-                    "export": analysisJobResults.url(),
                     "curl": exportAnalysis.url(),
                     "origin": "https://api.squidsolutions.com",
                     "data": data,
@@ -110,6 +138,11 @@
                 );
 
                 this.$el.html("<button type='button' class='btn' data-toggle='collapse' data-target=" + this.renderTo + ">Export</button>");
+                
+                // register click handlers
+                $(this.renderTo).find("#download").click(function(event) {me.download(event);});
+                $(this.renderTo).find('[name="format"]').click(this.clickedFormat);
+                $(this.renderTo).find('[name="compression"]').click(this.clickedCompression);
             }
             return this;
         }

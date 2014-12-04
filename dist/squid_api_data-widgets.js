@@ -197,7 +197,7 @@ function program5(depth0,data) {
 this["squid_api"]["template"]["squid_api_export_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
   
@@ -208,7 +208,7 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\r\n				<h3>cURL process</h3>\r\n				<h4>1 - get an authentication token</h4>\r\n				<pre class=\"curl\">\r\n					curl '";
+  buffer += "\r\n				<h3>cURL process</h3>\r\n				<h4>1 - get an authentication token</h4>\r\n				<pre class=\"curl\">\r\ncurl '";
   if (helper = helpers.apiURL) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.apiURL); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -224,7 +224,7 @@ function program3(depth0,data) {
   if (helper = helpers.redirectURI) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.redirectURI); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "&login=<b>[login]</b>&password=<b>[password]</b>'\r\n				</pre>\r\n				<h4>2 - download the export</h4>\r\n				<pre class=\"curl\">\r\n					curl '";
+    + "&login=<b>[login]</b>&password=<b>[password]</b>'\r\n				</pre>\r\n				<h4>2 - download the export</h4>\r\n				<pre class=\"curl\">\r\ncurl '";
   if (helper = helpers.curl) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.curl); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -249,11 +249,7 @@ function program3(depth0,data) {
   buffer += "> json\r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			<label>Compression</label> <input type=\"checkbox\" name=\"compression\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> gzip\r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			<h3>Download</h3>\r\n			<a href=\"";
-  if (helper = helpers['export']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0['export']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" class=\"btn btn-default\">Download</a> current analysis results\r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			";
+  buffer += "> gzip\r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			<h3>Download</h3>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\">Download</a> current analysis results\r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n		</div>\r\n	</div>\r\n</div>\r\n\r\n\r\n\r\n";
@@ -1349,6 +1345,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         renderTo: null,
         format : "csv",
         compression : true,
+        downloadStatus : 0,
         
         initialize : function(options) {
             if (this.model) {
@@ -1369,11 +1366,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.model = model;
             this.initialize();
         },
-
-        events : {
-            'click [name="format"]': 'clickedFormat',
-            'click [name="compression"]': 'clickedCompression'
-        },
         
         clickedFormat : function (event) {
             var t = event.target;
@@ -1385,6 +1377,51 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var t = event.target;
             this.compression = (t.checked);
             this.render();
+        },
+        
+        download : function(event) {
+            var me = this, analysis = this.model;
+      
+            if (this.downloadStatus === 0) {
+                event.preventDefault();
+                this.downloadStatus = 1;
+                $(this.renderTo).find("#download").html("Computing...");
+                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                downloadAnalysis.set({
+                   "id": {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": null
+                    },
+                    "domains": analysis.get("domains"),
+                    "dimensions" : analysis.get("dimensions"),
+                    "metrics" : analysis.get("metrics"),
+                    "selection": analysis.get("selection"),
+                    "orderBy": analysis.get("orderBy")
+                    });
+                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis)
+                    .done(function(model, response) {
+                        me.downloadStatus = 2;
+                        // create download link
+                        var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
+                        analysisJobResults.addParameter("format",me.format);
+                        if (me.compression) {
+                            analysisJobResults.addParameter("compression","gzip");
+                        }
+                        analysisJobResults.set({
+                                "id": downloadAnalysis.get("id"),
+                                "oid": downloadAnalysis.get("oid")
+                            });
+                        console.log(analysisJobResults.url());
+                        $(me.renderTo).find("#download").html("Click again to download");
+                        $(me.renderTo).find("#download").attr("href",analysisJobResults.url());
+                    })
+                    .fail(function(model, response) {
+                        console.error("createAnalysisJob failed");
+                    });
+            } else {
+                me.downloadStatus = 0;
+                $(me.renderTo).find("#download").html("Download");
+            }
         },
         
         render : function() {
@@ -1402,18 +1439,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 $(this.renderTo).html("");
                 this.$el.html("");
             } else {
-                // render the export link
-                var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                analysisJobResults.addParameter("format",this.format);
-                if (this.compression) {
-                    analysisJobResults.addParameter("compression","gzip");
-                }
-                analysisJobResults.set({
-                    "id": analysis.get("id"),
-                    "oid": analysis.get("oid")
-                    });
-                console.log(analysisJobResults.url());
-                
                 // render the curl snippet
                 var exportAnalysis = new squid_api.model.ProjectAnalysisJob();
                 exportAnalysis.addParameter("format",this.format);
@@ -1428,9 +1453,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "domains": analysis.get("domains"),
                     "dimensions" : analysis.get("dimensions"),
                     "metrics" : analysis.get("metrics"),
-                    "selection": analysis.get("selection")
+                    "selection": analysis.get("selection"),
+                    "orderBy": analysis.get("orderBy")
                     });
-                console.log(exportAnalysis.url());
+
                 // escape all spaces in the json injected into cURL
                 var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
                 
@@ -1439,7 +1465,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "formatCSV": (this.format == "csv"),
                     "formatJSON": (this.format == "json"),
                     "compression": (this.compression),
-                    "export": analysisJobResults.url(),
                     "curl": exportAnalysis.url(),
                     "origin": "https://api.squidsolutions.com",
                     "data": data,
@@ -1450,6 +1475,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 );
 
                 this.$el.html("<button type='button' class='btn' data-toggle='collapse' data-target=" + this.renderTo + ">Export</button>");
+                
+                // register click handlers
+                $(this.renderTo).find("#download").click(function(event) {me.download(event);});
+                $(this.renderTo).find('[name="format"]').click(this.clickedFormat);
+                $(this.renderTo).find('[name="compression"]').click(this.clickedCompression);
             }
             return this;
         }
