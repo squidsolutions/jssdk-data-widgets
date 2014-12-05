@@ -434,9 +434,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\n        <li class=\"item\" data-content="
+  buffer += "\n        <li class=\"item "
+    + escapeExpression(((stack1 = (depth0 && depth0.selected)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "\" data-selected=\""
+    + escapeExpression(((stack1 = (depth0 && depth0.attrSelected)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "\" data-content=\""
     + escapeExpression(((stack1 = (depth0 && depth0.value)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + ">\n        	<div class=\"name\">"
+    + "\">\n        	<div class=\"name\">"
     + escapeExpression(((stack1 = (depth0 && depth0.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "</div>\n        	<span class=\"value\">"
     + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.total)),stack1 == null || stack1 === false ? stack1 : stack1.value)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
@@ -1862,8 +1866,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var results;
             var currentAnalysis = this.model.get("totalAnalysis");
-            var chosenMetrics = this.model.get("chosenMetrics");
-            var jsonData = {"chosenMetrics" : []};
+            var chosenMetrics   = this.model.get("chosenMetrics");
+            var selectedMetric  = this.model.get("selectedMetric");
+            var jsonData        = {"chosenMetrics" : []};
 
             if (currentAnalysis) {
                 results = currentAnalysis.get("results");
@@ -1882,10 +1887,22 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             // get the total for the metric
                             totalValue = results.rows[0].v[idx];
 
+                            var selected, attrSelected;
+
+                            if (selectedMetric === col.id) {
+                                selected     = "ui-selected";
+                                attrSelected = "true";
+                            } else {
+                                selected     = "";
+                                attrSelected = "";
+                            }
+
                              // add to the list
                             var option = {
                                 "name" : col.name,
                                 "value" : col.id,
+                                "selected" : selected,
+                                "attrSelected" : attrSelected,
                                 "total" : {
                                     "value" : totalValue,
                                     "unit" : null

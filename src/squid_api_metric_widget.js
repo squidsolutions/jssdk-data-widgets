@@ -56,8 +56,9 @@
 
             var results;
             var currentAnalysis = this.model.get("totalAnalysis");
-            var chosenMetrics = this.model.get("chosenMetrics");
-            var jsonData = {"chosenMetrics" : []};
+            var chosenMetrics   = this.model.get("chosenMetrics");
+            var selectedMetric  = this.model.get("selectedMetric");
+            var jsonData        = {"chosenMetrics" : []};
 
             if (currentAnalysis) {
                 results = currentAnalysis.get("results");
@@ -76,10 +77,22 @@
                             // get the total for the metric
                             totalValue = results.rows[0].v[idx];
 
+                            var selected, attrSelected;
+
+                            if (selectedMetric === col.id) {
+                                selected     = "ui-selected";
+                                attrSelected = "true";
+                            } else {
+                                selected     = "";
+                                attrSelected = "";
+                            }
+
                              // add to the list
                             var option = {
                                 "name" : col.name,
                                 "value" : col.id,
+                                "selected" : selected,
+                                "attrSelected" : attrSelected,
                                 "total" : {
                                     "value" : totalValue,
                                     "unit" : null
