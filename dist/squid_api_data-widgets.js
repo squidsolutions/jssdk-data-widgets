@@ -843,6 +843,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // running
                 if (this.model.get("status") == "RUNNING") {
                     $(".sq-loading").show();
+                } else {
+                    $(".sq-loading").hide();
                 }
             } else if (this.model.get("error")) {
                 // error
