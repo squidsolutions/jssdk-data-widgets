@@ -46,7 +46,7 @@
                 $(item.currentTarget).attr("data-selected", true);
 
                 var selectedItem = $(item.currentTarget).attr("data-content");
-
+                
                 // Update
                 this.model.set({"selectedMetric" : selectedItem});
             }
