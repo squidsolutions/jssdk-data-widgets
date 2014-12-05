@@ -243,10 +243,7 @@ function program3(depth0,data) {
   buffer += "<div class=\"container\">\r\n	<div class=\"row\">\r\n		<div class=\"col-md-12\">\r\n			<h2>Export</h2>\r\n			<label>Format</label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatCSV), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> csv \r\n			<input type=\"radio\" name=\"format\" value=\"json\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatJSON), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> json\r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			<label>Compression</label> <input type=\"checkbox\" name=\"compression\" ";
+  buffer += "> csv \r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			<label>Compression</label> <input type=\"checkbox\" name=\"compression\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "> gzip\r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			<h3>Download</h3>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\">Download</a> current analysis results\r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			";
@@ -756,8 +753,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         maxRowsPerPage : 10000,
 
         format : null,
+        
+        d3Formatter : null,
 
         initialize : function(options) {
+   
             if (this.model) {
                 this.listenTo(this.model, 'change', this.render);
             }
@@ -771,12 +771,22 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.maxRowsPerPage) {
                 this.maxRowsPerPage = options.maxRowsPerPage;
             }
+            if (d3) {
+                this.d3Formatter = d3.format(",.f");
+            }
             if (options.format) {
                 this.format = options.format;
             } else {
                 // default number formatter
-                if (d3) {
-                    this.format = d3.format(",.f");
+                if (this.d3Formatter) {
+                    var me = this;
+                    this.format = function(f){
+                        if (isNaN(f)) {
+                            return f;
+                        } else {
+                            return me.d3Formatter(f);
+                        }
+                    };
                 } else {
                     this.format = function(f){
                         return f;
@@ -2138,6 +2148,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // running
                 if (this.model.get("status") == "RUNNING") {
                     $(".sq-loading").show();
+                } else {
+                    $(".sq-loading").hide();
                 }
             } else if (this.model.get("error")) {
                 // error

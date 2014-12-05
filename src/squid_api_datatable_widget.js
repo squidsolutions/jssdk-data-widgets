@@ -9,8 +9,11 @@
         maxRowsPerPage : 10000,
 
         format : null,
+        
+        d3Formatter : null,
 
         initialize : function(options) {
+   
             if (this.model) {
                 this.listenTo(this.model, 'change', this.render);
             }
@@ -24,12 +27,22 @@
             if (options.maxRowsPerPage) {
                 this.maxRowsPerPage = options.maxRowsPerPage;
             }
+            if (d3) {
+                this.d3Formatter = d3.format(",.f");
+            }
             if (options.format) {
                 this.format = options.format;
             } else {
                 // default number formatter
-                if (d3) {
-                    this.format = d3.format(",.f");
+                if (this.d3Formatter) {
+                    var me = this;
+                    this.format = function(f){
+                        if (isNaN(f)) {
+                            return f;
+                        } else {
+                            return me.d3Formatter(f);
+                        }
+                    };
                 } else {
                     this.format = function(f){
                         return f;
