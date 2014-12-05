@@ -1996,8 +1996,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 checked = "";
             }
 
-            console.log("STATUS: " + checked);
-
             var jsonData = {direction : checked, limit : this.model.get("limit")};
 
             var html = this.template(jsonData);
