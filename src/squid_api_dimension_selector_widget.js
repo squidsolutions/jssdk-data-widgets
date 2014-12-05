@@ -39,15 +39,45 @@
         },
 
         events: {
-            "change": function(event) {
+            "change": function(item) {
                 var oid = this.$el.find("select option:selected");
+                var chosenDimensions = this.model.get("chosenDimensions");
+
                 var selected = [];
 
                 for (i = 0; i < oid.length; i++) {
                     selected.push($(oid[i]).val());
                 }
 
-                // Update
+                // Compare selected with chosen
+                var compare = [];
+                for (i=0; i<selected.length; i++) {
+                    var count = 0;
+                    for (s=0; s<chosenDimensions.length; s++) {
+                        if (selected[i] === chosenDimensions[s]) {
+                            count++;
+                        }
+                    }
+                    var obj = {};
+                    obj.dimension = selected[i];
+                    obj.count = count;
+                    compare.push(obj);
+                }
+
+                // Get different dimension and set as selected
+                var diffDimension;
+                for (i=0; i<compare.length; i++) {
+                    if (compare[i].count === 0) {
+                        diffDimension = compare[i].dimension;
+                    }
+                }
+
+                // Set selected Dimension
+                if (diffDimension !== undefined) {
+                    this.model.set({"selectedDimension" : diffDimension});
+                }
+
+                // Update chosen Dimensions
                 this.model.set({"chosenDimensions" : selected});
             }
         }, 

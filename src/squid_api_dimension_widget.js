@@ -21,7 +21,7 @@
             });
 
             this.model.on("change:selectedDimension", function() {
-                me.selectItem();
+                me.render();
             });
         },
 
@@ -93,6 +93,9 @@
 
             // Make dimesions sortable & selectable
             this.dimensionSort();
+
+            // Select selected dimension
+            this.selectItem();
 
             return this;
         },
