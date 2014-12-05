@@ -145,7 +145,10 @@
                 // build the html datatable
                 this.dataTableInsert(data);
                 // Initiate the Data Table after render
-                this.$el.find(".sq-table").DataTable();
+                this.$el.find(".sq-table").DataTable({
+                    "ordering": false,
+                    "lengthChange": false
+                });
             }
         }
     });
