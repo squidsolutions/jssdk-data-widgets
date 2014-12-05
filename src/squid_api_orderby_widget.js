@@ -55,13 +55,21 @@
         },
 
         render : function() {
-            var jsonData = {direction : this.model.get("orderByDirection"), limit : this.model.get("limit")};
+            var checked;
+
+            if (this.model.get("orderByDirection") === "DESC") {
+                checked = "checked";
+            } else {
+                checked = "";
+            }
+
+            var jsonData = {direction : checked, limit : this.model.get("limit")};
 
             var html = this.template(jsonData);
             this.$el.html(html);
              
             // Set Limit Value
-            this.$el.find(".sq-select").val(jsonData.limit);
+            this.$el.find(".sq-select").val(jsonData.limit);  
 
             return this;
         }
