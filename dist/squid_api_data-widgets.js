@@ -526,7 +526,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\">\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	 <form id=\"offset_form\" class=\"toggler\">\n                <input type=\"radio\" name=\"offset\" id=\"lines\" value=\"lines\" checked>\n                <label class=\"lines\" for=\"lines\">lines</label>\n                <input type=\"radio\" name=\"offset\" id=\"stack\" value=\"stack\">\n                <label class=\"stack\" for=\"stack\">stack</label>\n				<input type=\"radio\" name=\"offset\" id=\"bar\" value=\"bar\">\n				<label class=\"bar\" for=\"bar\">bar</label>\n        </form>\n	<div id=\"slider\"></div>\n</div>\n";
+  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\">\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	<div id=\"slider\"></div>\n</div>\n";
   });
 (function (root, factory) {
     root.squid_api.view.BarChartView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_barchart_widget);
@@ -2335,25 +2335,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     });
 
                     var offsetForm = document.getElementById('offset_form');
-
-                    // Change chart type on button change
-                    offsetForm.addEventListener('change', function(e) {
-                        var offsetMode = e.target.value;
-
-                        if (offsetMode == 'lines') {
-                            graph.setRenderer('line');
-                            graph.offset = 'zero';
-                        } else if (offsetMode == 'stack') {
-                            graph.setRenderer('stack');
-                            graph.offset = offsetMode;
-                        } else if (offsetMode == 'bar') {
-                            graph.setRenderer('bar');
-                            graph.offset = offsetMode;
-                        }
-
-                        graph.render();
-
-                    }, false);
 
                     yAxis.render();
                     xAxis.render();

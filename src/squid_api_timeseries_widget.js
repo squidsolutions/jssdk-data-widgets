@@ -208,25 +208,6 @@
 
                     var offsetForm = document.getElementById('offset_form');
 
-                    // Change chart type on button change
-                    offsetForm.addEventListener('change', function(e) {
-                        var offsetMode = e.target.value;
-
-                        if (offsetMode == 'lines') {
-                            graph.setRenderer('line');
-                            graph.offset = 'zero';
-                        } else if (offsetMode == 'stack') {
-                            graph.setRenderer('stack');
-                            graph.offset = offsetMode;
-                        } else if (offsetMode == 'bar') {
-                            graph.setRenderer('bar');
-                            graph.offset = offsetMode;
-                        }
-
-                        graph.render();
-
-                    }, false);
-
                     yAxis.render();
                     xAxis.render();
 
