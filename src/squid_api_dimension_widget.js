@@ -46,17 +46,17 @@
             },
             // Dimension Selection
             "click li": function(item) {
-                var selectedItem = $(item.currentTarget).attr("data-content");
+                var itemClicked = $(item.currentTarget);
 
-                var dimensions = this.$el.find(".sortable li");
-
-                for (i = 0; i < dimensions.length; i++) {
-                    $(dimensions[i]).removeAttr("data-selected");
-                    $(dimensions[i]).removeClass("ui-selected");
-                }   
-
-                // Update
-                this.model.set({"selectedDimension" : selectedItem});
+                if (itemClicked.attr("data-selected")) {
+                    itemClicked.removeAttr("data-selected");
+                    itemClicked.removeClass("ui-selected");
+                    this.model.set({"selectedDimension" : null});
+                } else {
+                    itemClicked.attr("data-selected", "true");
+                    itemClicked.siblings().removeAttr("data-selected").removeClass("ui-selected");
+                    this.model.set({"selectedDimension" : itemClicked.attr("data-content")});
+                }     
             }
         },
 
