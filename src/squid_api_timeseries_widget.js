@@ -78,7 +78,7 @@
         },
 
         seriesColorAssignment : function(serie) {
-            var p = d3.scale.category10();
+            var p = d3.scale.category20();
             var color=p.range()[serie];
             return color;
         },
