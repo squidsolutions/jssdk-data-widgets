@@ -208,15 +208,19 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\r\n				<h3>cURL process</h3>\r\n				<h4>1 - get an authentication token</h4>\r\n				<pre class=\"curl\">\r\ncurl '";
+  buffer += "\r\n		<div>\r\n			<h3>Scripted Download</h3>\r\n			<a data-toggle='collapse' data-target=\"#curl\">View</a> cURL commands\r\n			<div class=\"collapse\" id=\"curl\">\r\n				<p>Sample code to download the analysis results using curl shell command.</p>\r\n				<b>1 - get an authentication token</b>\r\n				<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n<pre class=\"curl\">curl '";
   if (helper = helpers.apiURL) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.apiURL); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "/v4.2/rs/auth-token' -H 'Origin: ";
+    + "/auth-token' -H 'Origin: ";
   if (helper = helpers.origin) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.origin); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept: */*' -H 'Cache-Control: no-cache' --data 'client_id=";
+    + "' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept: */*' -H 'Cache-Control: no-cache' --data 'customerId=";
+  if (helper = helpers.customerId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.customerId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "&client_id=";
   if (helper = helpers.clientId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.clientId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -224,11 +228,11 @@ function program3(depth0,data) {
   if (helper = helpers.redirectURI) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.redirectURI); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "&login=<b>[login]</b>&password=<b>[password]</b>'\r\n				</pre>\r\n				<h4>2 - download the export</h4>\r\n				<pre class=\"curl\">\r\ncurl '";
+    + "&login=<b>[login]</b>&password=<b>[password]</b>'</pre>\r\n				<b>2 - download the export</b>\r\n				<p>replace the 'access_token' field in the following snippet by the value returned by the previous script</p>\r\n<pre class=\"curl\">curl '";
   if (helper = helpers.curl) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.curl); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "' -H 'Origin: ";
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "' -H 'Origin: ";
   if (helper = helpers.origin) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.origin); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -236,7 +240,15 @@ function program3(depth0,data) {
   if (helper = helpers.data) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.data); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "' --compressed\r\n				</pre>\r\n			";
+    + "' --compressed -O ";
+  if (helper = helpers.curlFileName) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.curlFileName); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</pre>\r\n				<b>3 - view the export</b>\r\n				<p>your analysis results should now be downloaded as</p>\r\n<pre class=\"curl\">ls ";
+  if (helper = helpers.curlFileName) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.curlFileName); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</pre>\r\n			</div>\r\n		</div>\r\n		";
   return buffer;
   }
 
@@ -250,10 +262,10 @@ function program3(depth0,data) {
   buffer += "> csv \r\n		</div>\r\n		<div>\r\n			<label>Compression</label> <input type=\"checkbox\" name=\"compression\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> gzip\r\n		</div>\r\n		<div>\r\n			<h3>Direct Download</h3>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\">Download</a> analysis results\r\n		</div>\r\n		<div>\r\n			";
+  buffer += "> gzip\r\n		</div>\r\n		<div>\r\n			<h3>Direct Download</h3>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\">Download</a> analysis results\r\n		</div>\r\n		";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n		</div>\r\n	</div>\r\n</div>\r\n\r\n\r\n\r\n";
+  buffer += "\r\n	</div>\r\n</div>\r\n\r\n\r\n\r\n";
   return buffer;
   });
 
@@ -1536,6 +1548,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (this.compression) {
                     exportAnalysis.addParameter("compression","gzip");
                 }
+                exportAnalysis.addParameter("access_token","[access_token]");
                 exportAnalysis.set({
                    "id": {
                         "projectId": analysis.get("id").projectId,
@@ -1556,9 +1569,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "formatCSV": (this.format == "csv"),
                     "formatJSON": (this.format == "json"),
                     "compression": (this.compression),
-                    "curl": exportAnalysis.url(),
+                    "curl": exportAnalysis.url().replace(/\[access_token\]/g, '<b>[access_token]</b>'),
+                    "curlFileName" : "analysis."+((this.format == "csv")?"csv":"")+((this.format == "json")?"json":"")+((this.compression)?".gz":""),
                     "origin": "https://api.squidsolutions.com",
                     "data": data,
+                    "customerId" : squid_api.customerId,
                     "clientId" : squid_api.clientId,
                     "redirectURI":"https://api.squidsolutions.com",
                     "apiURL":squid_api.apiURL

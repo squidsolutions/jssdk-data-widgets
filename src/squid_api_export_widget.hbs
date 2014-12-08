@@ -18,19 +18,24 @@
 			<h3>Direct Download</h3>
 			<a href="#" class="btn btn-default" id="download">Download</a> analysis results
 		</div>
+		{{#if data}}
 		<div>
-			{{#if data}}
-				<h3>cURL process</h3>
-				<h4>1 - get an authentication token</h4>
-				<pre class="curl">
-curl '{{apiURL}}/v4.2/rs/auth-token' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept: */*' -H 'Cache-Control: no-cache' --data 'client_id={{clientId}}&redirect_uri={{redirectURI}}&login=<b>[login]</b>&password=<b>[password]</b>'
-				</pre>
-				<h4>2 - download the export</h4>
-				<pre class="curl">
-curl '{{curl}}' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' --data-binary $'{{data}}' --compressed
-				</pre>
-			{{/if }}
+			<h3>Scripted Download</h3>
+			<a data-toggle='collapse' data-target="#curl">View</a> cURL commands
+			<div class="collapse" id="curl">
+				<p>Sample code to download the analysis results using curl shell command.</p>
+				<b>1 - get an authentication token</b>
+				<p>replace the 'login' and 'password' fields in the following snippet</p>
+<pre class="curl">curl '{{apiURL}}/auth-token' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept: */*' -H 'Cache-Control: no-cache' --data 'customerId={{customerId}}&client_id={{clientId}}&redirect_uri={{redirectURI}}&login=<b>[login]</b>&password=<b>[password]</b>'</pre>
+				<b>2 - download the export</b>
+				<p>replace the 'access_token' field in the following snippet by the value returned by the previous script</p>
+<pre class="curl">curl '{{{curl}}}' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' --data-binary $'{{data}}' --compressed -O {{curlFileName}}</pre>
+				<b>3 - view the export</b>
+				<p>your analysis results should now be downloaded as</p>
+<pre class="curl">ls {{curlFileName}}</pre>
+			</div>
 		</div>
+		{{/if }}
 	</div>
 </div>
 

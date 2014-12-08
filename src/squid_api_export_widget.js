@@ -113,6 +113,7 @@
                 if (this.compression) {
                     exportAnalysis.addParameter("compression","gzip");
                 }
+                exportAnalysis.addParameter("access_token","[access_token]");
                 exportAnalysis.set({
                    "id": {
                         "projectId": analysis.get("id").projectId,
@@ -133,9 +134,11 @@
                     "formatCSV": (this.format == "csv"),
                     "formatJSON": (this.format == "json"),
                     "compression": (this.compression),
-                    "curl": exportAnalysis.url(),
+                    "curl": exportAnalysis.url().replace(/\[access_token\]/g, '<b>[access_token]</b>'),
+                    "curlFileName" : "analysis."+((this.format == "csv")?"csv":"")+((this.format == "json")?"json":"")+((this.compression)?".gz":""),
                     "origin": "https://api.squidsolutions.com",
                     "data": data,
+                    "customerId" : squid_api.customerId,
                     "clientId" : squid_api.clientId,
                     "redirectURI":"https://api.squidsolutions.com",
                     "apiURL":squid_api.apiURL
