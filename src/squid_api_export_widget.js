@@ -61,6 +61,7 @@
                     "selection": analysis.get("selection"),
                     "orderBy": analysis.get("orderBy")
                     });
+                downloadAnalysis.addParameter("timeout",null);
                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis)
                     .done(function(model, response) {
                         me.downloadStatus = 2;
@@ -75,8 +76,10 @@
                                 "oid": downloadAnalysis.get("oid")
                             });
                         console.log(analysisJobResults.url());
-                        $(me.renderTo).find("#download").html("Click again to download");
+                        $(me.renderTo).find("#download").html("Click this link to download");
                         $(me.renderTo).find("#download").attr("href",analysisJobResults.url());
+                        $(me.renderTo).find("#download").removeClass("btn-default");
+                        $(me.renderTo).find("#download").addClass("btn-link");
                     })
                     .fail(function(model, response) {
                         console.error("createAnalysisJob failed");
@@ -84,6 +87,8 @@
             } else {
                 me.downloadStatus = 0;
                 $(me.renderTo).find("#download").html("Download");
+                $(me.renderTo).find("#download").removeClass("btn-link");
+                $(me.renderTo).find("#download").addClass("btn-default");
             }
         },
         
@@ -124,7 +129,7 @@
                 var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
                 
                 $(this.renderTo).html(this.template({
-                    "renderTo": this.renderTo,
+                    "data-target" : this.renderTo,
                     "formatCSV": (this.format == "csv"),
                     "formatJSON": (this.format == "json"),
                     "compression": (this.compression),

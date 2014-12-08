@@ -197,7 +197,7 @@ function program5(depth0,data) {
 this["squid_api"]["template"]["squid_api_export_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
   
@@ -240,13 +240,17 @@ function program3(depth0,data) {
   return buffer;
   }
 
-  buffer += "<div class=\"container\">\r\n	<div class=\"row\">\r\n		<div class=\"col-md-12\">\r\n			<h2>Export</h2>\r\n			<label>Format</label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
+  buffer += "<div class=\"panel panel-default filter-panel\">\r\n	<div class=\"panel-heading\">\r\n		<button type=\"button\" class=\"close\" data-toggle=\"collapse\"\r\n			data-target=\"";
+  if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n			<i class=\"glyphicon glyphicon-chevron-up\"></i>\r\n		</button>\r\n		<h4 class=\"panel-title\" id=\"myModalLabel\">Export</h4>\r\n	</div>\r\n	<div class=\"panel-body\">\r\n		<div>\r\n			<label>Format</label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatCSV), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> csv \r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			<label>Compression</label> <input type=\"checkbox\" name=\"compression\" ";
+  buffer += "> csv \r\n		</div>\r\n		<div>\r\n			<label>Compression</label> <input type=\"checkbox\" name=\"compression\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> gzip\r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			<h3>Download</h3>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\">Download</a> current analysis results\r\n		</div>\r\n		<div class=\"col-md-12\">\r\n			";
+  buffer += "> gzip\r\n		</div>\r\n		<div>\r\n			<h3>Direct Download</h3>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\">Download</a> analysis results\r\n		</div>\r\n		<div>\r\n			";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n		</div>\r\n	</div>\r\n</div>\r\n\r\n\r\n\r\n";
@@ -1480,6 +1484,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "selection": analysis.get("selection"),
                     "orderBy": analysis.get("orderBy")
                     });
+                downloadAnalysis.addParameter("timeout",null);
                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis)
                     .done(function(model, response) {
                         me.downloadStatus = 2;
@@ -1494,8 +1499,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 "oid": downloadAnalysis.get("oid")
                             });
                         console.log(analysisJobResults.url());
-                        $(me.renderTo).find("#download").html("Click again to download");
+                        $(me.renderTo).find("#download").html("Click this link to download");
                         $(me.renderTo).find("#download").attr("href",analysisJobResults.url());
+                        $(me.renderTo).find("#download").removeClass("btn-default");
+                        $(me.renderTo).find("#download").addClass("btn-link");
                     })
                     .fail(function(model, response) {
                         console.error("createAnalysisJob failed");
@@ -1503,6 +1510,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             } else {
                 me.downloadStatus = 0;
                 $(me.renderTo).find("#download").html("Download");
+                $(me.renderTo).find("#download").removeClass("btn-link");
+                $(me.renderTo).find("#download").addClass("btn-default");
             }
         },
         
@@ -1543,7 +1552,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
                 
                 $(this.renderTo).html(this.template({
-                    "renderTo": this.renderTo,
+                    "data-target" : this.renderTo,
                     "formatCSV": (this.format == "csv"),
                     "formatJSON": (this.format == "json"),
                     "compression": (this.compression),
