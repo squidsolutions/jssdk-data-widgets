@@ -2235,7 +2235,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var serie;
             var currentSerieName = null;
             var serieName = "Date";
-            var palette = new Rickshaw.Color.Palette();
+            var palette = new Rickshaw.Color.Palette({ scheme: 'cool' });
             
             for (var i=0; (i<modelData.length); i++) {
                 value = modelData[i].v;
