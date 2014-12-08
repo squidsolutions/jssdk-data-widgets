@@ -77,18 +77,13 @@
             this.render();
         },
 
-        seriesColorAssignment : function(serie) {
-            var p = d3.scale.category20();
-            var color=p.range()[serie];
-            return color;
-        },
-
         seriesDataValues : function(dateIndex, metricIndex, modelData) {
             var series = [];
             var value, date;
             var serie;
             var currentSerieName = null;
             var serieName = "Date";
+            var palette = new Rickshaw.Color.Palette();
             
             for (var i=0; (i<modelData.length); i++) {
                 value = modelData[i].v;
@@ -102,7 +97,7 @@
                     currentSerieName = serieName;
                     // create a new serie
                     serie = {};
-                    serie.color = this.seriesColorAssignment(series.length);
+                    serie.color = palette.color();
                     serie.name = currentSerieName;
                     serie.data = [];
                     series.push(serie);
