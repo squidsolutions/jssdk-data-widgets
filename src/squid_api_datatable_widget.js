@@ -162,7 +162,8 @@
                 // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable({
                     "ordering": false,
-                    "lengthChange": false
+                    "lengthChange": false,
+                    "searching": false
                 });
             }
         }

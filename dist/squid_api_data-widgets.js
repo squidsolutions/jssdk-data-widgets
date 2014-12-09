@@ -927,7 +927,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable({
                     "ordering": false,
-                    "lengthChange": false
+                    "lengthChange": false,
+                    "searching": false
                 });
             }
         }
@@ -1069,7 +1070,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // Initialize plugin
             var selector = this.$el.find("select");
             if (isMultiple) {
-                selector.multiselect();
+                selector.multiselect({
+                    buttonText: function(options, select) {
+                        return 'Select Dimension(s)';
+                    },
+                });
             }
 
             return this;
@@ -1564,7 +1569,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // escape all spaces in the json injected into cURL
                 var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
                 
-                $(this.renderTo).html(this.template({
+                this.$el.html(this.template({
                     "data-target" : this.renderTo,
                     "formatCSV": (this.format == "csv"),
                     "formatJSON": (this.format == "json"),
@@ -1579,8 +1584,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "apiURL":squid_api.apiURL
                     })
                 );
-
-                this.$el.html("<button type='button' class='btn' data-toggle='collapse' data-target=" + this.renderTo + ">Export</button>");
                 
                 // register click handlers
                 $(this.renderTo).find("#download").click(function(event) {me.download(event);});
@@ -1744,7 +1747,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // Initialize plugin
             var selector = this.$el.find("select");
             if (isMultiple) {
-                selector.multiselect();
+                selector.multiselect({
+                    buttonText: function(options, select) {
+                        return 'Select Metric(s)';
+                    },
+                });
             }
 
             return this;

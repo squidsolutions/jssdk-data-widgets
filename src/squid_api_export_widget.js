@@ -129,7 +129,7 @@
                 // escape all spaces in the json injected into cURL
                 var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
                 
-                $(this.renderTo).html(this.template({
+                this.$el.html(this.template({
                     "data-target" : this.renderTo,
                     "formatCSV": (this.format == "csv"),
                     "formatJSON": (this.format == "json"),
@@ -144,8 +144,6 @@
                     "apiURL":squid_api.apiURL
                     })
                 );
-
-                this.$el.html("<button type='button' class='btn' data-toggle='collapse' data-target=" + this.renderTo + ">Export</button>");
                 
                 // register click handlers
                 $(this.renderTo).find("#download").click(function(event) {me.download(event);});

@@ -82,7 +82,11 @@
             // Initialize plugin
             var selector = this.$el.find("select");
             if (isMultiple) {
-                selector.multiselect();
+                selector.multiselect({
+                    buttonText: function(options, select) {
+                        return 'Select Metric(s)';
+                    },
+                });
             }
 
             return this;
