@@ -23,6 +23,8 @@
             this.model.on("change:selectedDimension", function() {
                 me.render();
             });
+
+            this.render();
         },
 
         setModel: function(model) {
@@ -62,7 +64,8 @@
 
         render: function() {
             var chosenDimensions = this.model.get("chosenDimensions");
-            var jsonData = {"chosenDimensions" : {}};
+            var jsonData = {"chosenDimensions" : []};
+            var html;
             
             // iterate through all domains dimensions
             var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
@@ -84,9 +87,16 @@
                     }
                     jsonData.chosenDimensions = dimensions;
                 }
+            } else {
+                html = this.template({"noChosenDimensions" : true});
             }
-
-            var html = this.template(jsonData);
+                
+            if (jsonData.chosenDimensions.length === 0) {
+                html = this.template({"noChosenDimensions" : true});
+            } else {
+                html = this.template(jsonData);
+            }
+            
             this.$el.html(html);
 
             this.$el.show();

@@ -1,5 +1,11 @@
+{{#if noChosenDimensions}}
+	<div class="information">No Dimensions have been chosen</div>
+{{else}}
 <ul class="sortable">
+	
     {{#each chosenDimensions}}
         <li class="item" data-content={{this.id}}>{{this.value}}</li>
     {{/each}}
 </ul>
+{{/if}}
+

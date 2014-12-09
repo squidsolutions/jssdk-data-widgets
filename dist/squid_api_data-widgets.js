@@ -89,6 +89,21 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 function program1(depth0,data) {
   
+  
+  return "\n	<div class=\"information\">No Dimensions have been chosen</div>\n";
+  }
+
+function program3(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n<ul class=\"sortable\">\n	\n    ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.chosenDimensions), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n</ul>\n";
+  return buffer;
+  }
+function program4(depth0,data) {
+  
   var buffer = "", stack1;
   buffer += "\n        <li class=\"item\" data-content="
     + escapeExpression(((stack1 = (depth0 && depth0.id)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
@@ -98,10 +113,9 @@ function program1(depth0,data) {
   return buffer;
   }
 
-  buffer += "<ul class=\"sortable\">\n    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.chosenDimensions), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.noChosenDimensions), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</ul>\n";
+  buffer += "\n\n";
   return buffer;
   });
 
@@ -1157,6 +1171,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.model.on("change:selectedDimension", function() {
                 me.render();
             });
+
+            this.render();
         },
 
         setModel: function(model) {
@@ -1196,7 +1212,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         render: function() {
             var chosenDimensions = this.model.get("chosenDimensions");
-            var jsonData = {"chosenDimensions" : {}};
+            var jsonData = {"chosenDimensions" : []};
+            var html;
             
             // iterate through all domains dimensions
             var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
@@ -1218,9 +1235,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
                     jsonData.chosenDimensions = dimensions;
                 }
+            } else {
+                html = this.template({"noChosenDimensions" : true});
             }
-
-            var html = this.template(jsonData);
+                
+            if (jsonData.chosenDimensions.length === 0) {
+                html = this.template({"noChosenDimensions" : true});
+            } else {
+                html = this.template(jsonData);
+            }
+            
             this.$el.html(html);
 
             this.$el.show();
