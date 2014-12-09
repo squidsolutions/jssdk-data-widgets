@@ -84,7 +84,7 @@
             if (isMultiple) {
                 selector.multiselect({
                     buttonText: function(options, select) {
-                        return 'Select Metric(s)';
+                        return 'Metrics';
                     },
                 });
             }

@@ -133,7 +133,7 @@
             if (isMultiple) {
                 selector.multiselect({
                     buttonText: function(options, select) {
-                        return 'Select Dimension(s)';
+                        return 'Dimensions';
                     },
                 });
             }
