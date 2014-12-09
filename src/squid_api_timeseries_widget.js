@@ -6,7 +6,10 @@
 
         template : null,
         dataToDisplay : 10000,
+        
         format : null,
+        
+        d3Formatter : null,
 
         initialize : function(options) {
             
@@ -26,8 +29,27 @@
                 this.template = squid_api.template.squid_api_timeseries_widget;
             }
 
+            if (d3) {
+                this.d3Formatter = d3.format(",.f");
+            }
             if (options.format) {
                 this.format = options.format;
+            } else {
+                // default number formatter
+                if (this.d3Formatter) {
+                    var me = this;
+                    this.format = function(f){
+                        if (isNaN(f)) {
+                            return f;
+                        } else {
+                            return me.d3Formatter(f);
+                        }
+                    };
+                } else {
+                    this.format = function(f){
+                        return f;
+                    };
+                }
             }
 
             // Resize
@@ -82,7 +104,7 @@
             var value, date;
             var serie;
             var currentSerieName = null;
-            var serieName = "Date";
+            var serieName = "";
             var palette = new Rickshaw.Color.Palette({ scheme: 'cool' });
             
             for (var i=0; (i<modelData.length); i++) {
@@ -161,7 +183,7 @@
 
                 // Time Series [Series Data]
                 var series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows);
-
+                var metricName = data.results.cols[dateColumnIndex+1].name;
                 if (series.length>0 && (series[0].data.length>0)) {
 
                     var tempWidth = this.$el.width();
@@ -180,7 +202,15 @@
                     var hoverDetail = new Rickshaw.Graph.HoverDetail( {
                         graph: graph,
                         xFormatter: function(x) { return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD');},
-                        yFormatter: function(y) { return Math.floor(y); }
+                        yFormatter: function(y) { return Math.floor(y); },
+                        formatter: function(series, x, y) {
+                            var content = "";
+                            if (series.name) {
+                                content = series.name + ": ";
+                            }
+                            content += me.format(y) + " " + metricName;
+                            return content;
+                        }
                     });
 
                     var legend = new Rickshaw.Graph.Legend( {

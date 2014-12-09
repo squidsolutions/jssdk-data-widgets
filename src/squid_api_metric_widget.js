@@ -5,6 +5,10 @@
 
     var View = Backbone.View.extend({
         template : null,
+        
+        format : null,
+        
+        d3Formatter : null,
 
         initialize: function(options) {
             var me = this;
@@ -16,6 +20,28 @@
                 this.template = template;
             }
 
+            if (d3) {
+                this.d3Formatter = d3.format(",.f");
+            }
+            if (options.format) {
+                this.format = options.format;
+            } else {
+                // default number formatter
+                if (this.d3Formatter) {
+                    this.format = function(f){
+                        if (isNaN(f)) {
+                            return f;
+                        } else {
+                            return me.d3Formatter(f);
+                        }
+                    };
+                } else {
+                    this.format = function(f){
+                        return f;
+                    };
+                }
+            }
+            
             if (this.model) {
                 this.model.on("change:chosenMetrics", function() {
                     me.render();
@@ -76,6 +102,9 @@
                         if (chosenMetrics[cm] === col.id) {
                             // get the total for the metric
                             totalValue = results.rows[0].v[idx];
+                            if (col.dataType == "NUMBER") {
+                                totalValue = this.format(totalValue);
+                            }
 
                             var selected, attrSelected;
 

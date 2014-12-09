@@ -551,6 +551,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var View = Backbone.View.extend({
         template : null,
+        
+        format : null,
+        
+        d3Formatter : null,
 
         initialize: function(options) {
             var me = this;
@@ -565,6 +569,28 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.template = options.template;
             } else {
                 this.template = template;
+            }
+            
+            if (d3) {
+                this.d3Formatter = d3.format(",.f");
+            }
+            if (options.format) {
+                this.format = options.format;
+            } else {
+                // default number formatter
+                if (this.d3Formatter) {
+                    this.format = function(f){
+                        if (isNaN(f)) {
+                            return f;
+                        } else {
+                            return me.d3Formatter(f);
+                        }
+                    };
+                } else {
+                    this.format = function(f){
+                        return f;
+                    };
+                }
             }
         },
 
@@ -621,7 +647,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render: function() {
-
+            var me = this;
             var data = this.getData();
 
             if (data.done) {
@@ -707,7 +733,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     .on('mouseover', function(d) {
                         tooltip.transition()
                             .style('opacity', 1);
-                        tooltip.html(d[0] + " - " + parseInt(d[1]))
+                        tooltip.html(d[0] + " - " + me.format(d[1]))
                             .style('left', (d3.event.pageX - 35) + 'px')
                             .style('top',  (d3.event.pageY - 30) + 'px');
                         tempColor = this.style.fill;
@@ -1896,6 +1922,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var View = Backbone.View.extend({
         template : null,
+        
+        format : null,
+        
+        d3Formatter : null,
 
         initialize: function(options) {
             var me = this;
@@ -1907,6 +1937,28 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.template = template;
             }
 
+            if (d3) {
+                this.d3Formatter = d3.format(",.f");
+            }
+            if (options.format) {
+                this.format = options.format;
+            } else {
+                // default number formatter
+                if (this.d3Formatter) {
+                    this.format = function(f){
+                        if (isNaN(f)) {
+                            return f;
+                        } else {
+                            return me.d3Formatter(f);
+                        }
+                    };
+                } else {
+                    this.format = function(f){
+                        return f;
+                    };
+                }
+            }
+            
             if (this.model) {
                 this.model.on("change:chosenMetrics", function() {
                     me.render();
@@ -1967,6 +2019,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         if (chosenMetrics[cm] === col.id) {
                             // get the total for the metric
                             totalValue = results.rows[0].v[idx];
+                            if (col.dataType == "NUMBER") {
+                                totalValue = this.format(totalValue);
+                            }
 
                             var selected, attrSelected;
 
@@ -2165,7 +2220,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         template : null,
         dataToDisplay : 10000,
+        
         format : null,
+        
+        d3Formatter : null,
 
         initialize : function(options) {
             
@@ -2185,8 +2243,27 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.template = squid_api.template.squid_api_timeseries_widget;
             }
 
+            if (d3) {
+                this.d3Formatter = d3.format(",.f");
+            }
             if (options.format) {
                 this.format = options.format;
+            } else {
+                // default number formatter
+                if (this.d3Formatter) {
+                    var me = this;
+                    this.format = function(f){
+                        if (isNaN(f)) {
+                            return f;
+                        } else {
+                            return me.d3Formatter(f);
+                        }
+                    };
+                } else {
+                    this.format = function(f){
+                        return f;
+                    };
+                }
             }
 
             // Resize
@@ -2241,7 +2318,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var value, date;
             var serie;
             var currentSerieName = null;
-            var serieName = "Date";
+            var serieName = "";
             var palette = new Rickshaw.Color.Palette({ scheme: 'cool' });
             
             for (var i=0; (i<modelData.length); i++) {
@@ -2320,7 +2397,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                 // Time Series [Series Data]
                 var series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows);
-
+                var metricName = data.results.cols[dateColumnIndex+1].name;
                 if (series.length>0 && (series[0].data.length>0)) {
 
                     var tempWidth = this.$el.width();
@@ -2339,7 +2416,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     var hoverDetail = new Rickshaw.Graph.HoverDetail( {
                         graph: graph,
                         xFormatter: function(x) { return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD');},
-                        yFormatter: function(y) { return Math.floor(y); }
+                        yFormatter: function(y) { return Math.floor(y); },
+                        formatter: function(series, x, y) {
+                            var content = "";
+                            if (series.name) {
+                                content = series.name + ": ";
+                            }
+                            content += me.format(y) + " " + metricName;
+                            return content;
+                        }
                     });
 
                     var legend = new Rickshaw.Graph.Legend( {

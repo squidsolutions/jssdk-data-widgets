@@ -5,6 +5,10 @@
 
     var View = Backbone.View.extend({
         template : null,
+        
+        format : null,
+        
+        d3Formatter : null,
 
         initialize: function(options) {
             var me = this;
@@ -19,6 +23,28 @@
                 this.template = options.template;
             } else {
                 this.template = template;
+            }
+            
+            if (d3) {
+                this.d3Formatter = d3.format(",.f");
+            }
+            if (options.format) {
+                this.format = options.format;
+            } else {
+                // default number formatter
+                if (this.d3Formatter) {
+                    this.format = function(f){
+                        if (isNaN(f)) {
+                            return f;
+                        } else {
+                            return me.d3Formatter(f);
+                        }
+                    };
+                } else {
+                    this.format = function(f){
+                        return f;
+                    };
+                }
             }
         },
 
@@ -75,7 +101,7 @@
         },
 
         render: function() {
-
+            var me = this;
             var data = this.getData();
 
             if (data.done) {
@@ -161,7 +187,7 @@
                     .on('mouseover', function(d) {
                         tooltip.transition()
                             .style('opacity', 1);
-                        tooltip.html(d[0] + " - " + parseInt(d[1]))
+                        tooltip.html(d[0] + " - " + me.format(d[1]))
                             .style('left', (d3.event.pageX - 35) + 'px')
                             .style('top',  (d3.event.pageY - 30) + 'px');
                         tempColor = this.style.fill;
