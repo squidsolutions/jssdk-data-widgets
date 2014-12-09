@@ -1488,7 +1488,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.downloadStatus === 0) {
                 event.preventDefault();
                 this.downloadStatus = 1;
-                $(this.renderTo).find("#download").html("Computing...");
+                this.$el.find("#download").html("Computing...");
                 var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
                 downloadAnalysis.set({
                    "id": {
@@ -1516,19 +1516,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 "oid": downloadAnalysis.get("oid")
                             });
                         console.log(analysisJobResults.url());
-                        $(me.renderTo).find("#download").html("Click this link to download");
-                        $(me.renderTo).find("#download").attr("href",analysisJobResults.url());
-                        $(me.renderTo).find("#download").removeClass("btn-default");
-                        $(me.renderTo).find("#download").addClass("btn-link");
+                        me.$el.find("#download").html("Click this link to download");
+                        me.$el.find("#download").attr("href",analysisJobResults.url());
+                        me.$el.find("#download").removeClass("btn-default");
+                        me.$el.find("#download").addClass("btn-link");
                     })
                     .fail(function(model, response) {
                         console.error("createAnalysisJob failed");
                     });
             } else {
                 me.downloadStatus = 0;
-                $(me.renderTo).find("#download").html("Download");
-                $(me.renderTo).find("#download").removeClass("btn-link");
-                $(me.renderTo).find("#download").addClass("btn-default");
+                me.$el.find("#download").html("Download");
+                me.$el.find("#download").removeClass("btn-link");
+                me.$el.find("#download").addClass("btn-default");
             }
         },
         
@@ -1536,15 +1536,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var me = this, analysis = this.model;
 
             if (!analysis.isDone()) {
-                $(this.renderTo).html("");
                 this.$el.html("");
             } else if (analysis.get("error")) {
                 // error
-                $(this.renderTo).html("");
                 this.$el.html("");
             } else if (!analysis.get("oid")) {
                 // analysis not ready yet
-                $(this.renderTo).html("");
                 this.$el.html("");
             } else {
                 // render the curl snippet
@@ -1586,9 +1583,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 );
                 
                 // register click handlers
-                $(this.renderTo).find("#download").click(function(event) {me.download(event);});
-                $(this.renderTo).find('[name="format"]').click(this.clickedFormat);
-                $(this.renderTo).find('[name="compression"]').click(this.clickedCompression);
+                this.$el.find("#download").click(function(event) {me.download(event);});
+                this.$el.find('[name="format"]').click(this.clickedFormat);
+                this.$el.find('[name="compression"]').click(this.clickedCompression);
             }
             return this;
         }
