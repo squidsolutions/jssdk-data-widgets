@@ -148,7 +148,7 @@
                 this.$el.find('[name="compression"]').click(this.clickedCompression);
 
                 // Close cURL panel by default
-                this.$el.find('.collapse').collapse('hide');
+                // this.$el.find('.collapse').collapse('hide');
             }
             return this;
         }
