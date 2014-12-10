@@ -485,14 +485,27 @@ function program1(depth0,data) {
 this["squid_api"]["template"]["squid_api_orderby_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
-
-  buffer += "<div class=\"orderby-container\">\n	<div class=\"row-md-12 orderby-widget\">\n		<div class=\"col-md-4\">\n			<div class=\"onoffswitch\">\n    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
+function program1(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\n	<div class=\"row-md-12 orderby-widget\">\n		<div class=\"col-md-4\">\n			<div class=\"onoffswitch\">\n    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
   if (helper = helpers.direction) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.direction); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + ">\n    			<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n        			<span class=\"onoffswitch-inner\"></span>\n       				 <span class=\"onoffswitch-switch\"></span>\n    			</label>\n			</div>\n		</div>\n		<div class=\"col-md-4\">\n			<select class=\"sq-select form-control\">\n            	<option value=\"10\">\n                	10\n        		</option>\n        		<option value=\"100\">\n                	100\n        		</option>\n        		<option value=\"1000\">\n                	1000\n        		</option> \n			</select>\n		</div>\n		<div class=\"col-sm-2\">\n			<label class=\"records\">Records</label>\n		</div>\n	</div>\n</div>";
+    + ">\n    			<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n        			<span class=\"onoffswitch-inner\"></span>\n       				 <span class=\"onoffswitch-switch\"></span>\n    			</label>\n			</div>\n		</div>\n		\n		<div class=\"col-md-4\">\n			";
+  if (helper = helpers.limit) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.limit); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\n		</div>\n		<div class=\"col-sm-2\">\n			<label class=\"records\">Records</label>\n		</div>\n	</div>\n	";
+  return buffer;
+  }
+
+  buffer += "<div class=\"orderby-container\">\n	";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.limit), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n</div>";
   return buffer;
   });
 
@@ -2122,6 +2135,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.model) {
                 this.model.on('change', this.render, this);
             }
+
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -2172,8 +2186,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             } else {
                 checked = "";
             }
+            var limit = null;
+            if (this.model.get("currentAnalysis")) {
+                limit = this.model.get("currentAnalysis").get("limit");
+            }
 
-            var jsonData = {direction : checked, limit : this.model.get("limit")};
+            var jsonData = {"direction" : checked, "limit" : limit};
 
             var html = this.template(jsonData);
             this.$el.html(html);

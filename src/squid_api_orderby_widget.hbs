@@ -1,4 +1,5 @@
 <div class="orderby-container">
+	{{#if limit}}
 	<div class="row-md-12 orderby-widget">
 		<div class="col-md-4">
 			<div class="onoffswitch">
@@ -10,20 +11,11 @@
 			</div>
 		</div>
 		<div class="col-md-4">
-			<select class="sq-select form-control">
-            	<option value="10">
-                	10
-        		</option>
-        		<option value="100">
-                	100
-        		</option>
-        		<option value="1000">
-                	1000
-        		</option> 
-			</select>
+			{{limit}}
 		</div>
 		<div class="col-sm-2">
 			<label class="records">Records</label>
 		</div>
 	</div>
+	{{/if}}
 </div>

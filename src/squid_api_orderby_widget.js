@@ -12,6 +12,7 @@
             if (this.model) {
                 this.model.on('change', this.render, this);
             }
+
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -62,8 +63,12 @@
             } else {
                 checked = "";
             }
+            var limit = null;
+            if (this.model.get("currentAnalysis")) {
+                limit = this.model.get("currentAnalysis").get("limit");
+            }
 
-            var jsonData = {direction : checked, limit : this.model.get("limit")};
+            var jsonData = {"direction" : checked, "limit" : limit};
 
             var html = this.template(jsonData);
             this.$el.html(html);
