@@ -12,10 +12,14 @@
         
         d3Formatter : null,
 
+        mainModel : null,
+
         initialize : function(options) {
-   
+            this.mainModel = options.mainModel;
+
             if (this.model) {
                 this.listenTo(this.model, 'change', this.render);
+                this.mainModel.on("change:selectedMetric", this.selectColumn, this);
             }
 
             // setup options
@@ -26,6 +30,9 @@
             }
             if (options.maxRowsPerPage) {
                 this.maxRowsPerPage = options.maxRowsPerPage;
+            }
+            if (options.selectedMetric) {
+                this.selectedMetric = options.selectedMetric;
             }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
@@ -84,6 +91,9 @@
                 .enter().append("th")
                 .text(function(d) {
                     return d.name;
+                })
+                .attr("data-content", function(d) {
+                    return d.id;
                 });
 
             // Rows
@@ -100,6 +110,18 @@
                 .text(function(d) {
                     return d;
                 });
+        },
+
+        selectColumn : function() {
+            // Get Table Headers
+            var tableHeaders = this.$el.find("table th");
+
+            // Loop over each one and match the value
+            for (i=0; i<tableHeaders.length; i++) { 
+                if (this.mainModel.get("selectedMetric") == $(tableHeaders[i]).attr("data-content")) {
+                    $(tableHeaders[i]).addClass("filtered-by");
+                }
+            }
         },
 
         render : function() {
@@ -125,6 +147,8 @@
 
                 $(".sq-loading").hide();
             }
+
+            this.selectColumn();
 
             return this;
         },
