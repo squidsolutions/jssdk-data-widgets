@@ -912,6 +912,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 })
                 .attr("data-content", function(d) {
                     return d.id;
+                })
+                .attr("class", function(d) {
+                    return d.dataType;
                 });
 
             // Rows
@@ -940,6 +943,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     $(tableHeaders[i]).addClass("filtered-by");
                 }
             }
+
+            // Add remaining Classes
+            this.addMetricClasses();
         },
 
         render : function() {
@@ -968,7 +974,35 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             this.selectColumn();
 
+            this.addMetricClasses();
+
             return this;
+        },
+
+        addMetricClasses : function() {
+            var index = [];
+            var me = this;
+            var columnHeaders = this.$el.find("th");
+
+            for (i=0; i<columnHeaders.length; i++) {
+                if ($(columnHeaders[i]).hasClass("NUMBER")) {
+                    index.push(i);
+                }
+            }
+
+            var bodyTr = this.$el.find("tbody tr");
+
+            for (i=0; i<bodyTr.length; i++) {
+                var items = $(bodyTr[i]).find("td");
+
+                for (i1=0; i1<index.length; i1++) {
+                    for (i2=0; i2<items.length; i2++) {
+                        if (i2 === index[i1]) {
+                            $(items[i2]).addClass("NUMBER");
+                        }
+                    }
+                }
+            }
         },
         
         display : function() {
@@ -1675,7 +1709,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.$el.find('[name="compression"]').click(this.clickedCompression);
 
                 // Close cURL panel by default
-                this.$el.find('.collapse').collapse('hide');
+                // this.$el.find('.collapse').collapse('hide');
             }
             return this;
         }
