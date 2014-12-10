@@ -490,15 +490,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\n	<div class=\"row-md-12 orderby-widget\">\n		<div class=\"col-md-4\">\n			<div class=\"onoffswitch\">\n    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
+  buffer += "\n	<div class=\"row-md-12 orderby-widget\">\n		<div class=\"col-md-6\">\n			<div class=\"onoffswitch\">\n    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
   if (helper = helpers.direction) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.direction); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + ">\n    			<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n        			<span class=\"onoffswitch-inner\"></span>\n       				 <span class=\"onoffswitch-switch\"></span>\n    			</label>\n			</div>\n		</div>\n		\n		<div class=\"col-md-4\">\n			";
+    + ">\n    			<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n        			<span class=\"onoffswitch-inner\"></span>\n       				 <span class=\"onoffswitch-switch\"></span>\n    			</label>\n			</div>\n		</div>\n		<div class=\"col-md-6\">\n			<label class=\"records\">";
   if (helper = helpers.limit) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.limit); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\n		</div>\n		<div class=\"col-sm-2\">\n			<label class=\"records\">Records</label>\n		</div>\n	</div>\n	";
+    + " Records</label>\n		</div>\n	</div>\n	";
   return buffer;
   }
 

@@ -1,7 +1,7 @@
 <div class="orderby-container">
 	{{#if limit}}
 	<div class="row-md-12 orderby-widget">
-		<div class="col-md-4">
+		<div class="col-md-6">
 			<div class="onoffswitch">
     			<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" {{direction}}>
     			<label class="onoffswitch-label" for="myonoffswitch">
@@ -10,11 +10,8 @@
     			</label>
 			</div>
 		</div>
-		<div class="col-md-4">
-			{{limit}}
-		</div>
-		<div class="col-sm-2">
-			<label class="records">Records</label>
+		<div class="col-md-6">
+			<label class="records">{{limit}} Records</label>
 		</div>
 	</div>
 	{{/if}}
