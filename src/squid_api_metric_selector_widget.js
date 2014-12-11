@@ -47,6 +47,9 @@
                     selected.push($(oid[i]).val());
                 }
 
+                // Remove Button Title Tag
+                this.$el.find("button").removeAttr('title');
+
                 // Update
                 this.model.set({"chosenMetrics" : selected});
             }
@@ -88,6 +91,9 @@
                     },
                 });
             }
+
+            // Remove Button Title Tag
+            this.$el.find("button").removeAttr('title');
 
             return this;
         },

@@ -109,7 +109,7 @@
             
             for (var i=0; (i<modelData.length); i++) {
                 value = modelData[i].v;
-                date = moment(value[dateIndex]);
+                date = moment.utc(value[dateIndex]);
                 
                 // deal with series
                 if (dateIndex>0) {
