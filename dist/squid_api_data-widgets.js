@@ -1127,6 +1127,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.model.set({"selectedDimension" : diffDimension});
                 }
 
+                // Remove Button Title Tag
+                this.$el.find("button").removeAttr('title');
+
                 // Update chosen Dimensions
                 this.model.set({"chosenDimensions" : selected});
             }
@@ -1184,9 +1187,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 selector.multiselect({
                     buttonText: function(options, select) {
                         return 'Dimensions';
-                    },
+                    }
                 });
             }
+
+            // Remove Button Title Tag
+            this.$el.find("button").removeAttr('title');
 
             return this;
         },
@@ -1833,6 +1839,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     selected.push($(oid[i]).val());
                 }
 
+                // Remove Button Title Tag
+                this.$el.find("button").removeAttr('title');
+
                 // Update
                 this.model.set({"chosenMetrics" : selected});
             }
@@ -1874,6 +1883,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     },
                 });
             }
+
+            // Remove Button Title Tag
+            this.$el.find("button").removeAttr('title');
 
             return this;
         },
