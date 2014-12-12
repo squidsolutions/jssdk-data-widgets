@@ -47,6 +47,10 @@
                     me.render();
                 });
 
+                this.model.on("change:selectedMetric", function() {
+                    me.render();
+                });
+
                 this.model.get("totalAnalysis").on("change:results", function() {
                     me.render();
                 });

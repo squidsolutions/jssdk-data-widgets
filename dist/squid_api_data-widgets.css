@@ -22,6 +22,9 @@ div.dataTables_paginate ul.pagination li.disabled {
 	display: none;
 }
 
+.dataTable thead th {
+	cursor: pointer;
+}
 
 
 

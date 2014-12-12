@@ -876,6 +876,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
         },
 
+        events : ({
+            "click thead th" : function(item) {
+                var selectedMetric = $(item.target).attr("data-content");
+                this.mainModel.set("selectedMetric", selectedMetric);
+            }
+        }),
+
         setModel : function(model) {
             this.model = model;
             this.initialize();
@@ -2082,6 +2089,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             
             if (this.model) {
                 this.model.on("change:chosenMetrics", function() {
+                    me.render();
+                });
+
+                this.model.on("change:selectedMetric", function() {
                     me.render();
                 });
 

@@ -58,6 +58,13 @@
             }
         },
 
+        events : ({
+            "click thead th" : function(item) {
+                var selectedMetric = $(item.target).attr("data-content");
+                this.mainModel.set("selectedMetric", selectedMetric);
+            }
+        }),
+
         setModel : function(model) {
             this.model = model;
             this.initialize();
