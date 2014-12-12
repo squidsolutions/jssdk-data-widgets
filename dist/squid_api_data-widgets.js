@@ -877,7 +877,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         events : ({
-            "click thead th" : function(item) {
+            "click thead th.NUMBER" : function(item) {
                 var selectedMetric = $(item.target).attr("data-content");
                 this.mainModel.set("selectedMetric", selectedMetric);
             }
