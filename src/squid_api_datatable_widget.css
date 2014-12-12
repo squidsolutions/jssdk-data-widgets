@@ -3,6 +3,6 @@ div.dataTables_paginate ul.pagination li.disabled {
 	display: none;
 }
 
-.dataTable thead th {
+.dataTable thead th.NUMBER {
 	cursor: pointer;
 }
