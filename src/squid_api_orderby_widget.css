@@ -44,7 +44,3 @@
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0px; 
 }
-
-.orderby-container .records {
-    padding-top: 7px;
-}
