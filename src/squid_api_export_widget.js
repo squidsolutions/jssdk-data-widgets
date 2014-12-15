@@ -59,11 +59,10 @@
                     "domains": analysis.get("domains"),
                     "dimensions" : analysis.get("dimensions"),
                     "metrics" : analysis.get("metrics"),
-                    "selection": analysis.get("selection"),
                     "orderBy": analysis.get("orderBy")
                     });
                 downloadAnalysis.addParameter("timeout",null);
-                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis)
+                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
                     .done(function(model, response) {
                         me.downloadStatus = 2;
                         // create download link
