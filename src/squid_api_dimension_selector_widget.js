@@ -28,12 +28,6 @@
             api.model.status.on("change:domain", function() {
                 me.render();
             }); 
-            
-            if (this.model) {
-                this.model.on("change:chosenDimensions", function() {
-                    me.render();
-                });
-            }
 
             this.render();
         },

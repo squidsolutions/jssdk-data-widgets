@@ -78,22 +78,26 @@
                 }
             }
 
-            var html = this.template(jsonData);
-            this.$el.html(html);
-            this.$el.show();
+            if (this.$el.find("select").length > 0) {
 
-            // Initialize plugin
-            var selector = this.$el.find("select");
-            if (isMultiple) {
-                selector.multiselect({
-                    buttonText: function(options, select) {
-                        return 'Metrics';
-                    },
-                });
+            } else {
+                var html = this.template(jsonData);
+                this.$el.html(html);
+                this.$el.show();
+
+                // Initialize plugin
+                var selector = this.$el.find("select");
+                if (isMultiple) {
+                    selector.multiselect({
+                        buttonText: function(options, select) {
+                            return 'Metrics';
+                        },
+                    });
+                }
+
+                // Remove Button Title Tag
+                this.$el.find("button").removeAttr('title');
             }
-
-            // Remove Button Title Tag
-            this.$el.find("button").removeAttr('title');
 
             return this;
         },
