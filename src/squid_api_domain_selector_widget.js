@@ -23,7 +23,7 @@
 
             // init the domains
             this.model = squid_api.model.project;
-            this.model.on("change", this.render, this);
+            this.model.on("change", this.process, this);
         },
 
         events: {
@@ -31,6 +31,19 @@
                 var selectedOid = event.target.value;
                 // update the current domain
                 squid_api.setDomainId(selectedOid);
+            }
+        },
+        
+        process : function() {
+            var domains = this.model.get("domains");
+            if (!squid_api.domainId) {
+                squid_api.model.status.on("change:domain", this.render, this);
+                if (domains && (domains.length == 1)) {
+                    // auto-select the single domain
+                    squid_api.setDomainId(domains[0].oid);
+                }
+            } else {
+                this.render();
             }
         },
 

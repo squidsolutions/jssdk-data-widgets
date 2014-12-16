@@ -17,7 +17,7 @@
             }
 
             // init the projects
-            this.model.on("reset sync", this.render, this);
+            this.model.on("reset sync", this.process, this);
         },
 
         events: {
@@ -25,6 +25,18 @@
                 var selectedOid = event.target.value;
                 // update the current project
                 squid_api.setProjectId(selectedOid);
+            }
+        },
+        
+        process : function() {
+            if (!squid_api.projectId) {
+                squid_api.model.status.on("change:project", this.render, this);
+                if ((this.model.size() == 1)) {
+                    // auto-select the single project
+                    squid_api.setProjectId(this.model.at(0).get("oid"));
+                } 
+            } else {
+                this.render();
             }
         },
 

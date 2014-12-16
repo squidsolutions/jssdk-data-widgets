@@ -1508,7 +1508,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // init the domains
             this.model = squid_api.model.project;
-            this.model.on("change", this.render, this);
+            this.model.on("change", this.process, this);
         },
 
         events: {
@@ -1516,6 +1516,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var selectedOid = event.target.value;
                 // update the current domain
                 squid_api.setDomainId(selectedOid);
+            }
+        },
+        
+        process : function() {
+            var domains = this.model.get("domains");
+            if (!squid_api.domainId) {
+                squid_api.model.status.on("change:domain", this.render, this);
+                if (domains && (domains.length == 1)) {
+                    // auto-select the single domain
+                    squid_api.setDomainId(domains[0].oid);
+                }
+            } else {
+                this.render();
             }
         },
 
@@ -2293,7 +2306,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             // init the projects
-            this.model.on("reset sync", this.render, this);
+            this.model.on("reset sync", this.process, this);
         },
 
         events: {
@@ -2301,6 +2314,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var selectedOid = event.target.value;
                 // update the current project
                 squid_api.setProjectId(selectedOid);
+            }
+        },
+        
+        process : function() {
+            if (!squid_api.projectId) {
+                squid_api.model.status.on("change:project", this.render, this);
+                if ((this.model.size() == 1)) {
+                    // auto-select the single project
+                    squid_api.setProjectId(this.model.at(0).get("oid"));
+                } 
+            } else {
+                this.render();
             }
         },
 
