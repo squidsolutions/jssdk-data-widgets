@@ -270,7 +270,7 @@ function program3(depth0,data) {
   if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n			<i class=\"glyphicon glyphicon-chevron-up\"></i>\r\n		</button>\r\n		<h4 class=\"panel-title\" id=\"myModalLabel\">Export</h4>\r\n	</div>\r\n	<div class=\"panel-body\">\r\n		<div>\r\n			<label>Format</label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
+    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<h4 class=\"panel-title\" id=\"myModalLabel\">Export</h4>\r\n	</div>\r\n	<div class=\"panel-body\">\r\n		<div>\r\n			<label>Format</label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatCSV), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "> csv \r\n		</div>\r\n		<div>\r\n			<label>Compression</label> <input type=\"checkbox\" name=\"compression\" ";
@@ -961,7 +961,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var me = this;
 
             this.$el.html(this.template());
-
+            
+            // display
+            this.display();
+            
             if (!this.model.isDone()) {
                 // running
                 if (this.model.get("status") == "RUNNING") {
@@ -973,9 +976,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // error
                 $(".sq-loading").hide();
             } else {
-                // display
-                this.display();
-
                 $(".sq-loading").hide();
             }
 

@@ -143,7 +143,10 @@
             var me = this;
 
             this.$el.html(this.template());
-
+            
+            // display
+            this.display();
+            
             if (!this.model.isDone()) {
                 // running
                 if (this.model.get("status") == "RUNNING") {
@@ -155,9 +158,6 @@
                 // error
                 $(".sq-loading").hide();
             } else {
-                // display
-                this.display();
-
                 $(".sq-loading").hide();
             }
 
