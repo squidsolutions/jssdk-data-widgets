@@ -25,7 +25,7 @@
                 this.dimensionIndex = options.dimensionIndex;
             }
             
-            api.model.status.on("change:domain", function() {
+            squid_api.model.status.on("change:domain", function() {
                 me.render();
             }); 
 
