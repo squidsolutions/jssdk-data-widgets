@@ -32,53 +32,6 @@
 
         },
 
-        events: {
-            "change": function(item) {
-                var oid = this.$el.find("select option:selected");
-                var chosenDimensions = this.model.get("chosenDimensions");
-
-                var selected = [];
-
-                for (i = 0; i < oid.length; i++) {
-                    selected.push($(oid[i]).val());
-                }
-
-                // Compare selected with chosen
-                var compare = [];
-                for (i=0; i<selected.length; i++) {
-                    var count = 0;
-                    for (s=0; s<chosenDimensions.length; s++) {
-                        if (selected[i] === chosenDimensions[s]) {
-                            count++;
-                        }
-                    }
-                    var obj = {};
-                    obj.dimension = selected[i];
-                    obj.count = count;
-                    compare.push(obj);
-                }
-
-                // Get different dimension and set as selected
-                var diffDimension;
-                for (i=0; i<compare.length; i++) {
-                    if (compare[i].count === 0) {
-                        diffDimension = compare[i].dimension;
-                    }
-                }
-
-                // Set selected Dimension
-                if (diffDimension !== undefined) {
-                    this.model.set({"selectedDimension" : diffDimension});
-                }
-
-                // Remove Button Title Tag
-                this.$el.find("button").removeAttr('title');
-
-                // Update chosen Dimensions
-                this.model.set({"chosenDimensions" : selected});
-            }
-        }, 
-
         render: function() {
             var isMultiple = true;
             var me = this;
@@ -151,9 +104,27 @@
             // Initialize plugin
             var selector = this.$el.find("select");
             if (isMultiple) {
-                selector.multiselect({
+                 selector.multiselect({
                     buttonText: function(options, select) {
                         return 'Dimensions';
+                    },
+                    onChange: function(option, selected, index) {
+                        var chosenModel = _.clone(me.model.get("chosenDimensions"));
+                        var currentItem = option.attr("value");
+
+                        if (selected) {
+                            chosenModel.push(option.attr("value"));
+                            me.model.set({"chosenDimensions": chosenModel});
+                            me.model.set("selectedDimension", currentItem);
+                        } else {
+                            // If deselected remove item from array
+                            for (var i = chosenModel.length; i--;) {
+                                if (chosenModel[i] === currentItem) {
+                                    chosenModel.splice(i, 1);
+                                }
+                            }
+                            me.model.set({"chosenDimensions": chosenModel});
+                        }
                     }
                 });
             }
