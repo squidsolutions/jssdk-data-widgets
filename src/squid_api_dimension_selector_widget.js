@@ -24,12 +24,12 @@
             if (options.dimensionIndex !== null) {
                 this.dimensionIndex = options.dimensionIndex;
             }
-            
-            squid_api.model.status.on("change:domain", function() {
+
+            // listen for filters change as we use them to filter out boolean dimensions
+            squid_api.model.filters.on("change", function() {
                 me.render();
             }); 
 
-            this.render();
         },
 
         events: {
@@ -97,15 +97,38 @@
                     var dims = domain.dimensions;
                     for (var i=0; i<dims.length; i++){
                         var dim = dims[i];
-                        if (this.dimensionIdList) {
-                            // insert and sort
-                            var idx = this.dimensionIdList.indexOf(dim.oid);
-                            if (idx >= 0) {
-                                dimensions[idx] = dim;
+                        // do not display boolean dimensions
+                        // this is a workaround as the API should return a dimension type
+                        var isBoolean = false;
+                        var filters = squid_api.model.filters;
+                        if (filters ) {
+                            var sel = filters.get("selection");
+                            if (sel) {
+                                var facets = sel.facets;
+                                var fi = 0;
+                                while ((fi < facets.length) && (!isBoolean)) {
+                                    var facet = facets[fi];
+                                    fi++;
+                                    if (facet.dimension.oid == dim.oid) {
+                                        if ((facet.items.length == 1) && (facet.items[0].value == "true")) {
+                                            isBoolean = true; 
+                                        }
+                                    }
+                                }
                             }
-                        } else {
-                            // default unordered behavior
-                            dimensions.push(dim);
+                        }
+                        
+                        if (!isBoolean) {
+                            if (this.dimensionIdList) {
+                                // insert and sort
+                                var idx = this.dimensionIdList.indexOf(dim.oid);
+                                if (idx >= 0) {
+                                    dimensions[idx] = dim;
+                                }
+                            } else {
+                                // default unordered behavior
+                                dimensions.push(dim);
+                            }
                         }
                     }
                     
