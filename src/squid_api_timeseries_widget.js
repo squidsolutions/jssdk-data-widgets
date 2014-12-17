@@ -194,6 +194,7 @@
                         width: tempWidth,
                         height: 400,
                         renderer: 'line',
+                        interpolation: 'linear',
                         series: series
                     });
 

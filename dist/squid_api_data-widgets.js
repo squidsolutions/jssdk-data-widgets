@@ -2590,6 +2590,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         width: tempWidth,
                         height: 400,
                         renderer: 'line',
+                        interpolation: 'linear',
                         series: series
                     });
 
