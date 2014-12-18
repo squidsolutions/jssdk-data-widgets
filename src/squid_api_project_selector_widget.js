@@ -34,7 +34,9 @@
                 if ((this.model.size() == 1)) {
                     // auto-select the single project
                     squid_api.setProjectId(this.model.at(0).get("oid"));
-                } 
+                } else {
+                    this.render();
+                }
             } else {
                 this.render();
             }

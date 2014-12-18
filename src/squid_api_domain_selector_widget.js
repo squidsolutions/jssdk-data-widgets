@@ -41,6 +41,8 @@
                 if (domains && (domains.length == 1)) {
                     // auto-select the single domain
                     squid_api.setDomainId(domains[0].oid);
+                } else {
+                    this.render();
                 }
             } else {
                 this.render();

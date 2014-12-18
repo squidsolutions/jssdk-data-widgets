@@ -1520,6 +1520,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (domains && (domains.length == 1)) {
                     // auto-select the single domain
                     squid_api.setDomainId(domains[0].oid);
+                } else {
+                    this.render();
                 }
             } else {
                 this.render();
@@ -2317,7 +2319,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if ((this.model.size() == 1)) {
                     // auto-select the single project
                     squid_api.setProjectId(this.model.at(0).get("oid"));
-                } 
+                } else {
+                    this.render();
+                }
             } else {
                 this.render();
             }
