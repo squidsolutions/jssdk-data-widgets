@@ -106,7 +106,7 @@
             if (isMultiple) {
                  selector.multiselect({
                     buttonText: function(options, select) {
-                        return 'Dimensions';
+                        return 'Dimensions <span class="caret"></span>';
                     },
                     onChange: function(option, selected, index) {
                         var chosenModel = _.clone(me.model.get("chosenDimensions"));
