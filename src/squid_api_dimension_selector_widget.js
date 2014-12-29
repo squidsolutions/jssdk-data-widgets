@@ -28,8 +28,35 @@
             // listen for filters change as we use them to filter out boolean dimensions
             squid_api.model.filters.on("change", function() {
                 me.render();
-            }); 
+            });
+            
+            // listen for global status change
+            squid_api.model.status.on('change:status', this.enable, this);
 
+        },
+        
+        enable: function() {
+            var select = this.$el.find("select");
+            if (select) {
+                var isMultiple = true;
+                if (this.dimensionIndex !== null) {
+                    isMultiple = false;
+                }
+                var running = (squid_api.model.status.get("status") != squid_api.model.status.STATUS_DONE);
+                if (running) {
+                    // computation is running : disable input
+                    select.attr("disabled","disabled");
+                    if (isMultiple) {
+                        select.multiselect('disable');
+                    }
+                } else {
+                    // computation is done : enable input
+                    select.removeAttr("disabled");
+                    if (isMultiple) {
+                        select.multiselect('enable');
+                    }
+                }
+            }
         },
 
         render: function() {
