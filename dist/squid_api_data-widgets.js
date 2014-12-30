@@ -1094,6 +1094,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         
         enable: function() {
             var select = this.$el.find("select");
+            var multiSelectDropdown = this.$el.find(".multiselect-container");
             if (select) {
                 var isMultiple = true;
                 if (this.dimensionIndex !== null) {
@@ -1105,12 +1106,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     select.attr("disabled","disabled");
                     if (isMultiple) {
                         select.multiselect('disable');
+                        console.log(multiSelectDropdown);
+                        multiSelectDropdown.append("<div class='dropdownDisabled'></div>");
                     }
                 } else {
                     // computation is done : enable input
                     select.removeAttr("disabled");
                     if (isMultiple) {
                         select.multiselect('enable');
+                        console.log(multiSelectDropdown);
+                        multiSelectDropdown.find(".dropdownDisabled").remove();
                     }
                 }
             }

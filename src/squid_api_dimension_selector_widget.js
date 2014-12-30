@@ -37,6 +37,7 @@
         
         enable: function() {
             var select = this.$el.find("select");
+            var multiSelectDropdown = this.$el.find(".multiselect-container");
             if (select) {
                 var isMultiple = true;
                 if (this.dimensionIndex !== null) {
@@ -48,12 +49,14 @@
                     select.attr("disabled","disabled");
                     if (isMultiple) {
                         select.multiselect('disable');
+                        multiSelectDropdown.append("<div class='dropdownDisabled'></div>");
                     }
                 } else {
                     // computation is done : enable input
                     select.removeAttr("disabled");
                     if (isMultiple) {
                         select.multiselect('enable');
+                        multiSelectDropdown.find(".dropdownDisabled").remove();
                     }
                 }
             }
