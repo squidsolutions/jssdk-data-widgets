@@ -6,3 +6,7 @@ div.dataTables_paginate ul.pagination li.disabled {
 .dataTable thead th.NUMBER {
 	cursor: pointer;
 }
+
+.dataTable .NUMBER {
+    text-align: right;
+}
