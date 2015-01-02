@@ -40,8 +40,19 @@ div.dataTables_paginate ul.pagination li.disabled {
 	background: #ffffff;
 }
 
+.squid-api-data-widgets-displaytype-selector {
+	padding: 0px;
+}
 
+.squid-api-data-widgets-displaytype-selector li {
+	display: inline-block;
+	padding: 0px 20px 0px 10px;
+	opacity: 0.3;
+}
 
+.squid-api-data-widgets-displaytype-selector li.active, .squid-api-data-widgets-displaytype-selector li:hover {
+	opacity: 1;
+}
 #metric .dropdownDisabled {
 	top: 0px;
 	height: 100%;
@@ -51,7 +62,31 @@ div.dataTables_paginate ul.pagination li.disabled {
 	opacity: 0.5;
 	background: #ffffff;
 }
+.squid-api-data-widgets-metric-widget {
+    position: relative;
+    border-radius: 10px;
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+}
 
+.squid-api-data-widgets-metric-widget li {
+    font-size: 15px;
+    padding: 7px;
+    float: left;
+    min-height: 40px;
+    min-width: 150px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.squid-api-data-widgets-metric-widget li.ui-selected {
+    background: #e7e7e7;
+}
+
+.squid-api-data-widgets-metric-widget .name, .squid-api-data-widgets-metric-widget .value {
+    text-align: center;
+}
 .onoffswitch {
     position: relative; width: 90px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;

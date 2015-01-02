@@ -171,8 +171,9 @@
 
             var data = this.getData();
 
-            if (data.done) {
-                
+            if (data.done) {           
+                // Temp Fix for correct resizing
+                this.$el.css("width", "100%");
                 // Print Template
                 this.$el.html(this.template());
                 
