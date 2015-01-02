@@ -1,0 +1,31 @@
+.squid-api-data-widgets-dimension-widget .sortable {
+	list-style-type: none;
+	margin: 0px;
+    padding: 0px;
+}
+
+.squid-api-data-widgets-dimension-widget li {
+	margin: 0px 20px 0px 0px;
+    padding: 8px 7px 7px 15px;
+    float: left;
+    background: #fff;
+    font-size: 15px;
+    min-height: 40px;
+    min-width: 150px;
+    border: 1px solid #e7e7e7;
+    border-radius: 4px;
+    cursor: move;
+    position: relative;
+    text-align: center;
+}
+
+.squid-api-data-widgets-dimension-widget li .fa {
+	position: absolute;
+    left: 9px;
+    font-size: 13px;
+    top: 11px;
+}
+
+.squid-api-data-widgets-dimension-widget li.ui-selected {
+	background: #e7e7e7;
+}
