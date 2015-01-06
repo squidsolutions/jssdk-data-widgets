@@ -272,7 +272,7 @@ function program3(depth0,data) {
   if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<div>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\">Download</a> <span class=\"download-label\"></span>\r\n		</div>\r\n		<div class=\"download-formats\">\r\n			<label>Format: </label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
+    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<div>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\">Prepare Download</a> <span class=\"download-label\"></span>\r\n		</div>\r\n		<div class=\"download-formats\">\r\n			<label>Format: </label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatCSV), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "> csv \r\n			<div>\r\n				<label>Compression: </label> <input type=\"checkbox\" name=\"compression\" ";
@@ -1618,7 +1618,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         compression : true,
         downloadStatus : 0,
         curlCollapsed : true,
-        optionsCollapsed : true,
         
         initialize : function(options) {
             if (this.model) {
@@ -1686,7 +1685,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 "oid": downloadAnalysis.get("oid")
                             });
                         console.log(analysisJobResults.url());
-                        me.$el.find("#download").html("Download");
+                        me.$el.find("#download").html("Click here to download your data");
                         me.$el.find("#download").attr("href",analysisJobResults.url());
                         me.$el.find("#download").removeClass("btn-default");
                         me.$el.find("#download").addClass("btn-link");

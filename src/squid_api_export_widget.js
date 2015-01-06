@@ -77,7 +77,7 @@
                                 "oid": downloadAnalysis.get("oid")
                             });
                         console.log(analysisJobResults.url());
-                        me.$el.find("#download").html("Download");
+                        me.$el.find("#download").html("Click here to download your data");
                         me.$el.find("#download").attr("href",analysisJobResults.url());
                         me.$el.find("#download").removeClass("btn-default");
                         me.$el.find("#download").addClass("btn-link");
