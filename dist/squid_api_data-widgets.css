@@ -46,7 +46,7 @@ div.dataTables_paginate ul.pagination li.disabled {
 }
 
 .squid-api-data-widgets-dimension-widget li {
-	margin: 0px 20px 0px 0px;
+	margin: 0px 20px 20px 0px;
     padding: 8px 7px 7px 15px;
     float: left;
     background: #fff;
@@ -137,7 +137,9 @@ div.dataTables_paginate ul.pagination li.disabled {
 
 .squid-api-data-widgets-metric-widget li {
     font-size: 15px;
-    padding: 7px;
+    margin: 0px 20px 20px 0px;
+    border: 1px solid #e7e7e7;
+    padding: 10px;
     float: left;
     min-height: 40px;
     min-width: 150px;

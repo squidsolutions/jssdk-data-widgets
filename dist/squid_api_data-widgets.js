@@ -2544,6 +2544,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             for (var i=0; (i<modelData.length); i++) {
                 value = modelData[i].v;
                 date = moment.utc(value[dateIndex]);
+                console.log(date._i);
                 
                 // deal with series
                 if (dateIndex>0) {
