@@ -224,7 +224,7 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\r\n		<div>\r\n			<h3>Scripted Download</h3>\r\n			<a id=\"curlbtn\">View</a> cURL commands\r\n			<div id=\"curl\">\r\n				<p>Sample code to download the analysis results using curl shell command.</p>\r\n				<b>1 - get an authentication token</b>\r\n				<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n<pre class=\"curl\">curl '";
+  buffer += "\r\n		<hr>\r\n		<div>\r\n			<h3>Scripted Download</h3>\r\n			<a id=\"curlbtn\">View</a> cURL commands\r\n			<div id=\"curl\">\r\n				<p>Sample code to download the analysis results using curl shell command.</p>\r\n				<b>1 - get an authentication token</b>\r\n				<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n<pre class=\"curl\">curl '";
   if (helper = helpers.apiURL) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.apiURL); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -268,20 +268,20 @@ function program3(depth0,data) {
   return buffer;
   }
 
-  buffer += "<div class=\"panel panel-default filter-panel squid-api-data-widgets-export-widget\">\r\n	<div class=\"panel-heading\">\r\n		<button type=\"button\" class=\"close\" data-toggle=\"collapse\"\r\n			data-target=\"";
+  buffer += "<div class=\"squid-api-data-widgets-export-widget\">\r\n		<button type=\"button\" class=\"close\" data-toggle=\"collapse\"\r\n			data-target=\"";
   if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<h4 class=\"panel-title\" id=\"myModalLabel\">Export</h4>\r\n	</div>\r\n	<div class=\"panel-body\">\r\n		<div>\r\n			<label>Format</label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
+    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<div>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\">Download</a> <span class=\"download-label\"></span>\r\n		</div>\r\n		<div class=\"download-formats\">\r\n			<label>Format: </label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatCSV), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> csv \r\n		</div>\r\n		<div>\r\n			<label>Compression</label> <input type=\"checkbox\" name=\"compression\" ";
+  buffer += "> csv \r\n			<div>\r\n				<label>Compression: </label> <input type=\"checkbox\" name=\"compression\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> gzip\r\n		</div>\r\n		<div>\r\n			<h3>Direct Download</h3>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\">Download</a> analysis results\r\n		</div>\r\n		";
+  buffer += "> gzip\r\n			</div>\r\n		</div>\r\n		";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n	</div>\r\n</div>\r\n\r\n\r\n\r\n";
+  buffer += "\r\n</div>\r\n\r\n\r\n\r\n";
   return buffer;
   });
 
@@ -1618,6 +1618,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         compression : true,
         downloadStatus : 0,
         curlCollapsed : true,
+        optionsCollapsed : true,
         
         initialize : function(options) {
             if (this.model) {
@@ -1657,7 +1658,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.downloadStatus === 0) {
                 event.preventDefault();
                 this.downloadStatus = 1;
-                this.$el.find("#download").html("Computing...");
+                // Before analysis job creation
+                this.$el.find("#download").html("<i class='fa fa-spinner fa-spin'></i>");
                 var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
                 downloadAnalysis.set({
                    "id": {
@@ -1684,7 +1686,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 "oid": downloadAnalysis.get("oid")
                             });
                         console.log(analysisJobResults.url());
-                        me.$el.find("#download").html("Click this link to download");
+                        me.$el.find("#download").html("Download");
                         me.$el.find("#download").attr("href",analysisJobResults.url());
                         me.$el.find("#download").removeClass("btn-default");
                         me.$el.find("#download").addClass("btn-link");
@@ -1748,12 +1750,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 me.$el.find('#curl').show();
             }
             
+            // Click Handlers
             this.$el.find("#curlbtn").click(function() {
                 me.curlCollapsed = !me.curlCollapsed;
                 if (me.curlCollapsed) {
-                    me.$el.find('#curl').hide();
+                    me.$el.find('#curl').fadeOut();
                 } else {
-                    me.$el.find('#curl').show();
+                    me.$el.find('#curl').fadeIn();
                 }
             });
             

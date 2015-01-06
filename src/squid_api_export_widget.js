@@ -49,7 +49,8 @@
             if (this.downloadStatus === 0) {
                 event.preventDefault();
                 this.downloadStatus = 1;
-                this.$el.find("#download").html("Computing...");
+                // Before analysis job creation
+                this.$el.find("#download").html("<i class='fa fa-spinner fa-spin'></i>");
                 var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
                 downloadAnalysis.set({
                    "id": {
@@ -76,7 +77,7 @@
                                 "oid": downloadAnalysis.get("oid")
                             });
                         console.log(analysisJobResults.url());
-                        me.$el.find("#download").html("Click this link to download");
+                        me.$el.find("#download").html("Download");
                         me.$el.find("#download").attr("href",analysisJobResults.url());
                         me.$el.find("#download").removeClass("btn-default");
                         me.$el.find("#download").addClass("btn-link");
@@ -140,12 +141,13 @@
                 me.$el.find('#curl').show();
             }
             
+            // Click Handlers
             this.$el.find("#curlbtn").click(function() {
                 me.curlCollapsed = !me.curlCollapsed;
                 if (me.curlCollapsed) {
-                    me.$el.find('#curl').hide();
+                    me.$el.find('#curl').fadeOut();
                 } else {
-                    me.$el.find('#curl').show();
+                    me.$el.find('#curl').fadeIn();
                 }
             });
             

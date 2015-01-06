@@ -1,23 +1,19 @@
-<div class="panel panel-default filter-panel squid-api-data-widgets-export-widget">
-	<div class="panel-heading">
+<div class="squid-api-data-widgets-export-widget">
 		<button type="button" class="close" data-toggle="collapse"
 			data-target="{{data-target}}" data-clavier="true" aria-hidden="true">
 		</button>
-		<h4 class="panel-title" id="myModalLabel">Export</h4>
-	</div>
-	<div class="panel-body">
 		<div>
-			<label>Format</label> 
+			<a href="#" class="btn btn-default" id="download">Download</a> <span class="download-label"></span>
+		</div>
+		<div class="download-formats">
+			<label>Format: </label> 
 			<input type="radio" name="format" value="csv" {{#if formatCSV}}checked{{/if}}> csv 
-		</div>
-		<div>
-			<label>Compression</label> <input type="checkbox" name="compression" {{#if compression}}checked{{/if}}> gzip
-		</div>
-		<div>
-			<h3>Direct Download</h3>
-			<a href="#" class="btn btn-default" id="download">Download</a> analysis results
+			<div>
+				<label>Compression: </label> <input type="checkbox" name="compression" {{#if compression}}checked{{/if}}> gzip
+			</div>
 		</div>
 		{{#if data}}
+		<hr>
 		<div>
 			<h3>Scripted Download</h3>
 			<a id="curlbtn">View</a> cURL commands
@@ -35,7 +31,6 @@
 			</div>
 		</div>
 		{{/if }}
-	</div>
 </div>
 
 
