@@ -2440,10 +2440,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         template : null,
         dataToDisplay : 10000,
-        
         format : null,
-        
         d3Formatter : null,
+        startDate: null,
+        endDate: null,
 
         initialize : function(options) {
             
@@ -2541,12 +2541,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var serieName = "";
             var palette = new Rickshaw.Color.Palette({ scheme: 'cool' });
             
+            // Start of Data Manipulation
+            var manipTimeStart = new Date();
+
+            // Store Serie Values from data
             for (var i=0; (i<modelData.length); i++) {
                 value = modelData[i].v;
                 date = moment.utc(value[dateIndex]);
-                console.log(date._i);
                 
-                // deal with series
+                // Obtain the correct name based on index
                 if (dateIndex>0) {
                     serieName = value[dateIndex-1];
                 }
@@ -2562,20 +2565,84 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 
                 if (date.isValid()) {
                     var object = {};
-                    // Convert date value into unix
-                    object.x = date.unix();
-                    object.y = parseFloat(value[metricIndex]);
+                    object.x = moment(date).format("YYYY-MM-DD");
+                    if (value[metricIndex] === null) {
+                        object.y = 0;
+                    } else {
+                        object.y = parseFloat(value[metricIndex]);
+                    }
                     serie.data.push(object);
                 } else {
                     console.debug("Invalid date : "+value[dateIndex]);
                 }
             }
-            
-            // sort series data
-            for (var j=0; j<series.length; j++) {
-                series[j].data = this.sortDateValues(series[j].data);
+
+            var currentDate = moment(this.startDate);
+
+            // Store new Series Values
+            var newSerie = {};
+            var updatedData = [];
+
+            // Calculate the difference in days between the start / end date
+            var dateDifference = moment(this.endDate).diff(currentDate, 'days') + 1;
+
+            /*
+                Hashmaps with date as object key values / include a default y value of 0
+                Add a value for each day
+            */
+            while (currentDate.diff(this.endDate, 'days') <= 0) {
+                newSerie[currentDate.format("YYYY-MM-DD")] = { y : 0 };
+                currentDate = currentDate.add(1, 'days');
             }
+
+            for (serieIdx=0; serieIdx<series.length; serieIdx++) {
+                // Get each serie
+                var existingSerie = series[serieIdx].data;
+
+                // Check if there is a difference between numbers of days / serie values
+                if (series[serieIdx].data.length !== dateDifference) {
+
+                    // Fill in the values from existing serie
+                    for (i=0; i<existingSerie.length; i++) {
+                        var s = newSerie[existingSerie[i].x]; 
+                        s.y = existingSerie[i].y;
+                    }
+
+                    // Update the array with the new data
+                    var updatedArray = [];
+                    for (var key in newSerie) {
+                        var obj = {};
+                        obj.x = moment.utc(key).unix();
+                        obj.y = newSerie[key].y;
+                        updatedArray.push(obj);
+                    }
+
+                    // Update the existing data
+                    series[serieIdx].data = updatedArray;
+                } else {
+                    
+                    // Convert API date into UNIX + Sort if no manipulation occurs
+                    for (i=0; i<existingSerie.length; i++) {
+                        existingSerie[i].x = moment.utc(existingSerie[i].x).unix();
+                    }
+
+                    series[serieIdx].data = this.sortDateValues(series[serieIdx].data);
+                }
+            }
+
+            // End of Data Manipulation
+            var manipTimeEnd = new Date();
+            var manipTimeDifference = manipTimeEnd - manipTimeStart;
+            console.log("TimeSeries manipulation time: " + manipTimeDifference + " ms");
+
             return series;
+        },
+
+        sortDateValues : function(dates) {
+            dates.sort(function(a,b){
+                return (a.x - b.x);
+            });
+            return dates;
         },
 
         getData: function() {
@@ -2593,13 +2660,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return data;
         },
 
-        sortDateValues : function(dates) {
-            dates.sort(function(a,b){
-                return (a.x - b.x);
-            });
-            return dates;
-        },
-
         render : function() {
 
             var me = this;
@@ -2611,8 +2671,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.$el.css("width", "100%");
                 // Print Template
                 this.$el.html(this.template());
+                // Store Start and end Dates
+                var lastFacet = data.selection.facets.length - 1;
+                if (data.selection.facets[lastFacet]) {
+                    this.startDate = data.selection.facets[lastFacet].selectedItems[0].lowerBound;
+                    this.endDate = data.selection.facets[lastFacet].selectedItems[0].upperBound;
+                }
                 
-                var dateColumnIndex=0; 
+                var dateColumnIndex=0;
+                
                 while (data.results.cols[dateColumnIndex].dataType != "DATE") {
                     dateColumnIndex++;
                 }
