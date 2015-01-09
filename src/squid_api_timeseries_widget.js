@@ -170,8 +170,10 @@
 
                     // Fill in the values from existing serie
                     for (i=0; i<existingSerie.length; i++) {
-                        var s = newSerie[existingSerie[i].x]; 
-                        s.y = existingSerie[i].y;
+                        var s = newSerie[existingSerie[i].x];
+                        if (s !== undefined) {
+                            s.y = existingSerie[i].y;
+                        }
                     }
 
                     // Update the array with the new data
@@ -308,7 +310,7 @@
 
 
                 } else {
-                    this.$el.html("<div class='bad-data'>Time Series incompatible, please choose another</span>");
+                    this.$el.html("<div class='bad-data'>No Series data to View</span>");
                 }
                 $(".sq-loading").hide();
                 return this;
