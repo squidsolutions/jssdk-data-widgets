@@ -78,26 +78,22 @@
                 }
             }
 
-            if (this.$el.find("select").length > 0) {
+            var html = this.template(jsonData);
+            this.$el.html(html);
+            this.$el.show();
 
-            } else {
-                var html = this.template(jsonData);
-                this.$el.html(html);
-                this.$el.show();
-
-                // Initialize plugin
-                var selector = this.$el.find("select");
-                if (isMultiple) {
-                    selector.multiselect({
-                        buttonText: function(options, select) {
-                            return 'Metrics <span class="caret"></span>';
-                        },
-                    });
-                }
-
-                // Remove Button Title Tag
-                this.$el.find("button").removeAttr('title');
+            // Initialize plugin
+            var selector = this.$el.find("select");
+            if (isMultiple) {
+                selector.multiselect({
+                    buttonText: function(options, select) {
+                        return 'Metrics <span class="caret"></span>';
+                    },
+                });
             }
+
+            // Remove Button Title Tag
+            this.$el.find("button").removeAttr('title');
 
             return this;
         },
