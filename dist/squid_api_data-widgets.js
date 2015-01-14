@@ -7,7 +7,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div id=\"bar_chart\" />";
+  return "<div id=\"bar_chart\" class=\"squid-api-data-widgets-bar-chart\" />";
   });
 
 this["squid_api"]["template"]["squid_api_datatable_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -16,7 +16,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n<table class=\"sq-table\">\r\n	<thead>\r\n		<tr></tr>\r\n	</thead>\r\n	<tbody></tbody>\r\n</table>\r\n";
+  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n<table class=\"sq-table squid-api-data-widgets-data-table\">\r\n	<thead>\r\n		<tr></tr>\r\n	</thead>\r\n	<tbody></tbody>\r\n</table>\r\n";
   });
 
 this["squid_api"]["template"]["squid_api_dimension_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -27,7 +27,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\r\n    <select class=\"sq-select form-control\" ";
+  buffer += "\r\n    <select class=\"sq-select form-control squid-api-data-widgets-dimension-selector\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.multiple), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\r\n        ";
@@ -68,7 +68,7 @@ function program5(depth0,data) {
 function program7(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\r\n    <!-- just display filter name -->\r\n    <label>";
+  buffer += "\r\n    <!-- just display filter name -->\r\n    <label class=\"squid-api-data-widgets-dimension-selector\">";
   if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.name); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -113,9 +113,10 @@ function program4(depth0,data) {
   return buffer;
   }
 
+  buffer += "<div class=\"squid-api-data-widgets-dimension-widget\">\n";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.noChosenDimensions), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n\n";
+  buffer += "\n</div>\n\n\n";
   return buffer;
   });
 
@@ -147,7 +148,7 @@ function program2(depth0,data) {
   return "class=\"active\"";
   }
 
-  buffer += "<ul class=\"widget-selector\">\n    ";
+  buffer += "<ul class=\"squid-api-data-widgets-displaytype-selector\">\n    ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n</div>\n";
@@ -202,9 +203,10 @@ function program5(depth0,data) {
   return buffer;
   }
 
+  buffer += "<div class=\"squid-api-data-widgets-domain-selector\">\r\n";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(5, program5, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n";
+  buffer += "\r\n</div>\r\n";
   return buffer;
   });
 
@@ -222,7 +224,7 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\r\n		<div>\r\n			<h3>Scripted Download</h3>\r\n			<a id=\"curlbtn\">View</a> cURL commands\r\n			<div id=\"curl\">\r\n				<p>Sample code to download the analysis results using curl shell command.</p>\r\n				<b>1 - get an authentication token</b>\r\n				<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n<pre class=\"curl\">curl '";
+  buffer += "\r\n		<hr>\r\n		<div>\r\n			<h3>Scripted Download</h3>\r\n			<a id=\"curlbtn\">View</a> cURL commands\r\n			<div id=\"curl\">\r\n				<p>Sample code to download the analysis results using curl shell command.</p>\r\n				<b>1 - get an authentication token</b>\r\n				<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n<pre class=\"curl\">curl '";
   if (helper = helpers.apiURL) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.apiURL); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -266,20 +268,20 @@ function program3(depth0,data) {
   return buffer;
   }
 
-  buffer += "<div class=\"panel panel-default filter-panel\">\r\n	<div class=\"panel-heading\">\r\n		<button type=\"button\" class=\"close\" data-toggle=\"collapse\"\r\n			data-target=\"";
+  buffer += "<div class=\"squid-api-data-widgets-export-widget\">\r\n		<button type=\"button\" class=\"close\" data-toggle=\"collapse\"\r\n			data-target=\"";
   if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<h4 class=\"panel-title\" id=\"myModalLabel\">Export</h4>\r\n	</div>\r\n	<div class=\"panel-body\">\r\n		<div>\r\n			<label>Format</label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
+    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<div>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\">Prepare Download</a> <span class=\"download-label\"></span>\r\n		</div>\r\n		<div class=\"download-formats\">\r\n			<label>Format: </label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatCSV), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> csv \r\n		</div>\r\n		<div>\r\n			<label>Compression</label> <input type=\"checkbox\" name=\"compression\" ";
+  buffer += "> csv \r\n			<div>\r\n				<label>Compression: </label> <input type=\"checkbox\" name=\"compression\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> gzip\r\n		</div>\r\n		<div>\r\n			<h3>Direct Download</h3>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\">Download</a> analysis results\r\n		</div>\r\n		";
+  buffer += "> gzip\r\n			</div>\r\n		</div>\r\n		";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n	</div>\r\n</div>\r\n\r\n\r\n\r\n";
+  buffer += "\r\n</div>\r\n\r\n\r\n\r\n";
   return buffer;
   });
 
@@ -291,7 +293,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\r\n	<div class='sq-kpi'>\r\n		<span class=\"value\" style=\"font-size: large;\">";
+  buffer += "\r\n	<div class='sq-kpi squid-api-data-widgets-kpi-widget'>\r\n		<span class=\"value\" style=\"font-size: large;\">";
   if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -341,7 +343,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\r\n    <select class=\"sq-select form-control\" ";
+  buffer += "\r\n    <select class=\"sq-select form-control squid-api-data-widgets-metric-selector\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.multiple), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\r\n        ";
@@ -407,7 +409,7 @@ function program1(depth0,data) {
   buffer += "\r\n	";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n";
+  buffer += "\r\n";
   return buffer;
   }
 function program2(depth0,data) {
@@ -416,7 +418,7 @@ function program2(depth0,data) {
   buffer += "\r\n	<div class=\"item";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\" style=\"padding: 3px; display: inline-block;\" id=\"";
+  buffer += " squid-api-data-widgets-metrictotal-widget\" style=\"padding: 3px; display: inline-block;\" id=\"";
   if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -446,7 +448,6 @@ function program5(depth0,data) {
   return buffer;
   }
 
-  buffer += "\r\n";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(5, program5, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n\r\n";
@@ -469,13 +470,13 @@ function program1(depth0,data) {
     + escapeExpression(((stack1 = (depth0 && depth0.value)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "\">\n        	<div class=\"name\">"
     + escapeExpression(((stack1 = (depth0 && depth0.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</div>\n        	<span class=\"value\">"
+    + "</div>\n        	<div class=\"value\">"
     + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.total)),stack1 == null || stack1 === false ? stack1 : stack1.value)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "</span>\n        </li>\n    ";
   return buffer;
   }
 
-  buffer += "<ul class=\"chosen-metrics\">\n    ";
+  buffer += "<ul class=\"squid-api-data-widgets-metric-widget\">\n    ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.chosenMetrics), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n</ul>\n";
@@ -502,7 +503,7 @@ function program1(depth0,data) {
   return buffer;
   }
 
-  buffer += "<div class=\"orderby-container\">\n	";
+  buffer += "<div class=\"orderby-container squid-api-data-widgets-orderby-widget\">\n	";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.limit), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n</div>";
@@ -517,7 +518,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\r\n    <select class=\"sq-select form-control\">\r\n        ";
+  buffer += "\r\n    <select class=\"sq-select form-control squid-api-data-widgets-project-selector\">\r\n        ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n    </select>\r\n";
@@ -569,7 +570,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\">\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	<div id=\"slider\"></div>\n</div>\n";
+  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\" class=\"squid-api-data-widgets-timeseries-widget\">\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	<div id=\"slider\"></div>\n</div>\n";
   });
 (function (root, factory) {
     root.squid_api.view.BarChartView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_barchart_widget);
@@ -1656,7 +1657,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.downloadStatus === 0) {
                 event.preventDefault();
                 this.downloadStatus = 1;
-                this.$el.find("#download").html("Computing...");
+                // Before analysis job creation
+                this.$el.find("#download").html("<i class='fa fa-spinner fa-spin'></i>");
                 var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
                 downloadAnalysis.set({
                    "id": {
@@ -1683,7 +1685,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 "oid": downloadAnalysis.get("oid")
                             });
                         console.log(analysisJobResults.url());
-                        me.$el.find("#download").html("Click this link to download");
+                        me.$el.find("#download").html("Click here to download your data");
                         me.$el.find("#download").attr("href",analysisJobResults.url());
                         me.$el.find("#download").removeClass("btn-default");
                         me.$el.find("#download").addClass("btn-link");
@@ -1747,12 +1749,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 me.$el.find('#curl').show();
             }
             
+            // Click Handlers
             this.$el.find("#curlbtn").click(function() {
                 me.curlCollapsed = !me.curlCollapsed;
                 if (me.curlCollapsed) {
-                    me.$el.find('#curl').hide();
+                    me.$el.find('#curl').fadeOut();
                 } else {
-                    me.$el.find('#curl').show();
+                    me.$el.find('#curl').fadeIn();
                 }
             });
             
@@ -1875,6 +1878,36 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.model.on("change:chosenMetrics", function() {
                     me.render();
                 });
+            }
+
+            // listen for global status change
+            squid_api.model.status.on('change:status', this.enable, this);
+        },
+
+        enable: function() {
+            var select = this.$el.find("select");
+            var multiSelectDropdown = this.$el.find(".multiselect-container");
+            if (select) {
+                var isMultiple = true;
+                if (this.metricIndex !== null) {
+                    isMultiple = false;
+                }
+                var running = (squid_api.model.status.get("status") != squid_api.model.status.STATUS_DONE);
+                if (running) {
+                    // computation is running : disable input
+                    select.attr("disabled","disabled");
+                    if (isMultiple) {
+                        select.multiselect('disable');
+                        multiSelectDropdown.append("<div class='dropdownDisabled'></div>");
+                    }
+                } else {
+                    // computation is done : enable input
+                    select.removeAttr("disabled");
+                    if (isMultiple) {
+                        select.multiselect('enable');
+                        multiSelectDropdown.find(".dropdownDisabled").remove();
+                    }
+                }
             }
         },
 
@@ -2403,10 +2436,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         template : null,
         dataToDisplay : 10000,
-        
         format : null,
-        
         d3Formatter : null,
+        startDate: null,
+        endDate: null,
 
         initialize : function(options) {
             
@@ -2504,11 +2537,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var serieName = "";
             var palette = new Rickshaw.Color.Palette({ scheme: 'cool' });
             
+            // Start of Data Manipulation
+            var manipTimeStart = new Date();
+
+            // Store Serie Values from data
             for (var i=0; (i<modelData.length); i++) {
                 value = modelData[i].v;
                 date = moment.utc(value[dateIndex]);
                 
-                // deal with series
+                // Obtain the correct name based on index
                 if (dateIndex>0) {
                     serieName = value[dateIndex-1];
                 }
@@ -2524,20 +2561,86 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 
                 if (date.isValid()) {
                     var object = {};
-                    // Convert date value into unix
-                    object.x = date.unix();
-                    object.y = parseFloat(value[metricIndex]);
+                    object.x = moment(date).format("YYYY-MM-DD");
+                    if (value[metricIndex] === null) {
+                        object.y = 0;
+                    } else {
+                        object.y = parseFloat(value[metricIndex]);
+                    }
                     serie.data.push(object);
                 } else {
                     console.debug("Invalid date : "+value[dateIndex]);
                 }
             }
-            
-            // sort series data
-            for (var j=0; j<series.length; j++) {
-                series[j].data = this.sortDateValues(series[j].data);
+
+            var currentDate = moment(this.startDate);
+
+            // Store new Series Values
+            var newSerie = {};
+            var updatedData = [];
+
+            // Calculate the difference in days between the start / end date
+            var dateDifference = moment(this.endDate).diff(currentDate, 'days') + 1;
+
+            /*
+                Hashmaps with date as object key values / include a default y value of 0
+                Add a value for each day
+            */
+            while (currentDate.diff(this.endDate, 'days') <= 0) {
+                newSerie[currentDate.format("YYYY-MM-DD")] = { y : 0 };
+                currentDate = currentDate.add(1, 'days');
             }
+
+            for (serieIdx=0; serieIdx<series.length; serieIdx++) {
+                // Get each serie
+                var existingSerie = series[serieIdx].data;
+
+                // Check if there is a difference between numbers of days / serie values
+                if (series[serieIdx].data.length !== dateDifference) {
+
+                    // Fill in the values from existing serie
+                    for (i=0; i<existingSerie.length; i++) {
+                        var s = newSerie[existingSerie[i].x];
+                        if (s !== undefined) {
+                            s.y = existingSerie[i].y;
+                        }
+                    }
+
+                    // Update the array with the new data
+                    var updatedArray = [];
+                    for (var key in newSerie) {
+                        var obj = {};
+                        obj.x = moment.utc(key).unix();
+                        obj.y = newSerie[key].y;
+                        updatedArray.push(obj);
+                    }
+
+                    // Update the existing data
+                    series[serieIdx].data = updatedArray;
+                } else {
+                    
+                    // Convert API date into UNIX + Sort if no manipulation occurs
+                    for (i=0; i<existingSerie.length; i++) {
+                        existingSerie[i].x = moment.utc(existingSerie[i].x).unix();
+                    }
+
+                    series[serieIdx].data = this.sortDateValues(series[serieIdx].data);
+                }
+            }
+
+            // End of Data Manipulation
+            var manipTimeEnd = new Date();
+            var manipTimeDifference = manipTimeEnd - manipTimeStart;
+            console.log("TimeSeries manipulation time: " + manipTimeDifference + " ms");
+
             return series;
+        },
+
+        sortDateValues : function(dates) {
+            dates.sort(function(a,b){
+                return (a.x - b.x);
+            });
+            return dates;
         },
 
         getData: function() {
@@ -2555,25 +2658,26 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return data;
         },
 
-        sortDateValues : function(dates) {
-            dates.sort(function(a,b){
-                return (a.x - b.x);
-            });
-            return dates;
-        },
-
         render : function() {
 
             var me = this;
 
             var data = this.getData();
 
-            if (data.done) {
-                
+            if (data.done) {           
+                // Temp Fix for correct resizing
+                this.$el.css("width", "100%");
                 // Print Template
                 this.$el.html(this.template());
+                // Store Start and end Dates
+                var lastFacet = data.selection.facets.length - 1;
+                if (data.selection.facets[lastFacet]) {
+                    this.startDate = data.selection.facets[lastFacet].selectedItems[0].lowerBound;
+                    this.endDate = data.selection.facets[lastFacet].selectedItems[0].upperBound;
+                }
                 
-                var dateColumnIndex=0; 
+                var dateColumnIndex=0;
+                
                 while (data.results.cols[dateColumnIndex].dataType != "DATE") {
                     dateColumnIndex++;
                 }
@@ -2636,7 +2740,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 
                 } else {
-                    this.$el.html("<div class='bad-data'>Time Series incompatible, please choose another</span>");
+                    this.$el.html("<div class='bad-data'>No Series data to View</span>");
                 }
                 $(".sq-loading").hide();
                 return this;

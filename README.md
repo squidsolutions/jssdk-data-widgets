@@ -18,6 +18,12 @@ A collection of data (from AnalysisJobs) visualization and manipulation widgets.
   * template : a custom Handlebars template
   * displayAllDomains : if false, do not display domains with empty dimensions or metrics (default is false)
 
+## ProjectSelector
+*Renders the available projects of the API as an INPUT.  Selects and modifies the API's current project if selection changes*
+* model : an Analysis
+* options :
+  * template : a custom Handlebars template
+
 ## DimensionSelector
 *Renders the dimensions of the current Domain as an INPUT.  Selects and modifies the model if selection changes.  Optionally works as a single selection*
 * model : an array of Dimensions
@@ -40,6 +46,27 @@ A collection of data (from AnalysisJobs) visualization and manipulation widgets.
 * options :
   * template : a custom Handlebars template
   * selectionModel : an Analysis used to display current selected metrics
+
+## BarChartView
+*Renders an AnalysisJob's results as a Bar Chart.*
+* model : an Analysis
+* options :
+  * template : a custom Handlebars template
+  * format : a formatter function for number values (default is `d3.format(",.f");`)
+
+## OrderByView
+*Sets the Main Model's order by direction to Ascending / Descending. *
+* model : an Order By Direction value
+* options :
+  * template : a custom Handlebars template
+  * format : a formatter function for number values (default is `d3.format(",.f");`)
+
+## TimeSeriesView
+*Renders an AnalysisJob's results as a time series chart. (Relies on a date) *
+* model : an Analysis
+* options :
+  * template : a custom Handlebars template
+  * format : a formatter function for number values (default is `d3.format(",.f");`)
 
 
 

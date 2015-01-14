@@ -1,8 +1,8 @@
-<ul class="chosen-metrics">
+<ul class="squid-api-data-widgets-metric-widget">
     {{#each chosenMetrics}}
         <li class="item {{this.selected}}" data-selected="{{this.attrSelected}}" data-content="{{this.value}}">
         	<div class="name">{{this.name}}</div>
-        	<span class="value">{{this.total.value}}</span>
+        	<div class="value">{{this.total.value}}</span>
         </li>
     {{/each}}
 </ul>

@@ -1,0 +1,27 @@
+.squid-api-data-widgets-metric-widget {
+    position: relative;
+    border-radius: 10px;
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.squid-api-data-widgets-metric-widget li {
+    font-size: 15px;
+    margin: 0px 20px 20px 0px;
+    border: 1px solid #e7e7e7;
+    padding: 10px;
+    float: left;
+    min-height: 40px;
+    min-width: 150px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.squid-api-data-widgets-metric-widget li.ui-selected {
+    background: #e7e7e7;
+}
+
+.squid-api-data-widgets-metric-widget .name, .squid-api-data-widgets-metric-widget .value {
+    text-align: center;
+}
