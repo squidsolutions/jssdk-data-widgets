@@ -10,6 +10,7 @@
         compression : true,
         downloadStatus : 0,
         curlCollapsed : true,
+        currentJobId : null,
         
         initialize : function(options) {
             if (this.model) {
@@ -66,6 +67,7 @@
                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
                     .done(function(model, response) {
                         me.downloadStatus = 2;
+                        me.currentJobId = downloadAnalysis.get("id");
                         // create download link
                         var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
                         analysisJobResults.addParameter("format",me.format);
@@ -73,7 +75,7 @@
                             analysisJobResults.addParameter("compression","gzip");
                         }
                         analysisJobResults.set({
-                                "id": downloadAnalysis.get("id"),
+                                "id": me.currentJobId,
                                 "oid": downloadAnalysis.get("oid")
                             });
                         console.log(analysisJobResults.url());
@@ -85,11 +87,26 @@
                     .fail(function(model, response) {
                         console.error("createAnalysisJob failed");
                     });
-            } else {
-                me.downloadStatus = 0;
-                me.$el.find("#download").html("Download");
-                me.$el.find("#download").removeClass("btn-link");
-                me.$el.find("#download").addClass("btn-default");
+            } if  (this.downloadStatus === 2) {
+                // poll job status
+                this.$el.find("#download").html("<i class='fa fa-spinner fa-spin'></i>");
+                var observer = $.Deferred();
+                var pollAnalysis = new squid_api.model.AnalysisJob();
+                pollAnalysis.set({
+                   "id": {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": me.currentJobId.analysisJobId,
+                    }});
+                observer.always(function(){
+                    // Done
+                    squid_api.model.status.pullTask(pollAnalysis);
+                    me.downloadStatus = 0;
+                    me.$el.find("#download").html("Proceed with Export");
+                    me.$el.find("#download").removeClass("btn-link");
+                    me.$el.find("#download").addClass("btn-default");
+                });
+                squid_api.model.status.pushTask(pollAnalysis);
+                squid_api.controller.analysisjob.getAnalysisJob(observer, pollAnalysis);
             }
         },
         
@@ -133,6 +150,7 @@
                 "apiURL":squid_api.apiURL
                 })
             );
+            me.$el.find("#download").html("Proceed with Export");
             
             // apply cURL panel state
             if (me.curlCollapsed) {

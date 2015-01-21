@@ -272,7 +272,7 @@ function program3(depth0,data) {
   if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<div>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\">Prepare Download</a> <span class=\"download-label\"></span>\r\n		</div>\r\n		<div class=\"download-formats\">\r\n			<label>Format: </label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
+    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<div>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\"></a> <span class=\"download-label\"></span>\r\n		</div>\r\n		<div class=\"download-formats\">\r\n			<label>Format: </label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatCSV), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "> csv \r\n			<div>\r\n				<label>Compression: </label> <input type=\"checkbox\" name=\"compression\" ";
@@ -1618,6 +1618,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         compression : true,
         downloadStatus : 0,
         curlCollapsed : true,
+        currentJobId : null,
         
         initialize : function(options) {
             if (this.model) {
@@ -1674,6 +1675,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
                     .done(function(model, response) {
                         me.downloadStatus = 2;
+                        me.currentJobId = downloadAnalysis.get("id");
                         // create download link
                         var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
                         analysisJobResults.addParameter("format",me.format);
@@ -1681,7 +1683,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             analysisJobResults.addParameter("compression","gzip");
                         }
                         analysisJobResults.set({
-                                "id": downloadAnalysis.get("id"),
+                                "id": me.currentJobId,
                                 "oid": downloadAnalysis.get("oid")
                             });
                         console.log(analysisJobResults.url());
@@ -1693,11 +1695,26 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     .fail(function(model, response) {
                         console.error("createAnalysisJob failed");
                     });
-            } else {
-                me.downloadStatus = 0;
-                me.$el.find("#download").html("Download");
-                me.$el.find("#download").removeClass("btn-link");
-                me.$el.find("#download").addClass("btn-default");
+            } if  (this.downloadStatus === 2) {
+                // poll job status
+                this.$el.find("#download").html("<i class='fa fa-spinner fa-spin'></i>");
+                var observer = $.Deferred();
+                var pollAnalysis = new squid_api.model.AnalysisJob();
+                pollAnalysis.set({
+                   "id": {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": me.currentJobId.analysisJobId,
+                    }});
+                observer.always(function(){
+                    // Done
+                    squid_api.model.status.pullTask(pollAnalysis);
+                    me.downloadStatus = 0;
+                    me.$el.find("#download").html("Proceed with Export");
+                    me.$el.find("#download").removeClass("btn-link");
+                    me.$el.find("#download").addClass("btn-default");
+                });
+                squid_api.model.status.pushTask(pollAnalysis);
+                squid_api.controller.analysisjob.getAnalysisJob(observer, pollAnalysis);
             }
         },
         
@@ -1741,6 +1758,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "apiURL":squid_api.apiURL
                 })
             );
+            me.$el.find("#download").html("Proceed with Export");
             
             // apply cURL panel state
             if (me.curlCollapsed) {
