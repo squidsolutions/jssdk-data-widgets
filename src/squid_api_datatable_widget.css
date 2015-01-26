@@ -10,3 +10,7 @@ div.dataTables_paginate ul.pagination li.disabled {
 .dataTable .NUMBER {
     text-align: right;
 }
+
+.dataTables_wrapper .col-xs-12 {
+	overflow-x: auto;
+}
