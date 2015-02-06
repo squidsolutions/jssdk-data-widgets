@@ -10,6 +10,9 @@ A collection of data (from AnalysisJobs) visualization and manipulation widgets.
   * template : a custom Handlebars template
   * maxRowsPerPage : limits the number of rows displayed (default is 10000)
   * format : a formatter function for metrics (default is `d3.format(",.f");`)
+  * selectMetricHeader : setting to true will allow metric's to be selected directly from the header of the column header
+  * searching : if set to true, this allow the data table to be searchable
+  * paging : if set to true this will activate pagination on the data table
 
 ## DomainSelector
 *Renders the domains of the API's current project as an INPUT.  Selects and modifies the API's current domain if selection changes*
@@ -31,6 +34,20 @@ A collection of data (from AnalysisJobs) visualization and manipulation widgets.
   * template : a custom Handlebars template
   * dimensionIdList : a list of dimension oids to filter an order the displayed list
   * dimensionIndex : the index of the dimension which will be changed in the model (single selection mode)
+
+## DimensionWidget
+*Displays the list of selected dimensions*
+* model : selectedDimensions / chosenDimensions
+* options :
+  * template : a custom Handlebars template
+  * selectDimension : if set to true, this permits the ability to change the selectedDimensions within the model
+
+## ExportWidget
+*Exports a complete dataset*
+* model : exportAnalysis
+* options :
+  * template : a custom Handlebars template
+  * displayInAccordion : if set to true, this provides a button to click which opens the export panel in an accordion
   
 ## MetricSelectorView
 *Renders the metrics of an analysis as an INPUT.  Select and modifies the analysis metrics if selection changes.*
@@ -39,6 +56,14 @@ A collection of data (from AnalysisJobs) visualization and manipulation widgets.
   * template : a custom Handlebars template
   * metricIdList : a list of metric oids to filter an order the displayed list
   * metricIndex : the index of the metric which will be changed in the analysis
+
+## MetricWidget
+*Renders metric's which have been selected*
+* model : selectedMetric
+* options :
+  * template : a custom Handlebars template
+  * displayMetricValue : if set to true, will display the value of the metric when shown
+  * selectMetric : if set to true will allow the metric to be selected and update the model 'selectedMetric' 
   
 ## MetricTotalView
 *Renders a total number for each metric*
