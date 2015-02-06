@@ -5,6 +5,7 @@
 
     var View = Backbone.View.extend({
         template : null,
+        selectDimension: false,
 
         initialize: function(options) {
             var me = this;
@@ -14,6 +15,10 @@
                 this.template = options.template;
             } else {
                 this.template = template;
+            }
+
+            if (options.selectDimension) {
+                this.selectDimension = options.selectDimension;
             }
 
             this.model.on("change:chosenDimensions", function() {
@@ -48,17 +53,19 @@
             },
             // Dimension Selection
             "click li": function(item) {
-                var itemClicked = $(item.currentTarget);
+                if (this.selectDimension) {
+                    var itemClicked = $(item.currentTarget);
 
-                if (itemClicked.attr("data-selected")) {
-                    itemClicked.removeAttr("data-selected");
-                    itemClicked.removeClass("ui-selected");
-                    this.model.set({"selectedDimension" : null});
-                } else {
-                    itemClicked.attr("data-selected", "true");
-                    itemClicked.siblings().removeAttr("data-selected").removeClass("ui-selected");
-                    this.model.set({"selectedDimension" : itemClicked.attr("data-content")});
-                }     
+                    if (itemClicked.attr("data-selected")) {
+                        itemClicked.removeAttr("data-selected");
+                        itemClicked.removeClass("ui-selected");
+                        this.model.set({"selectedDimension" : null});
+                    } else {
+                        itemClicked.attr("data-selected", "true");
+                        itemClicked.siblings().removeAttr("data-selected").removeClass("ui-selected");
+                        this.model.set({"selectedDimension" : itemClicked.attr("data-content")});
+                    } 
+                } 
             }
         },
 
@@ -113,11 +120,12 @@
         selectItem: function() {
             var me = this;
             var dimensions = this.$el.find(".sortable li");
-
-            for (i = 0; i < dimensions.length; i++) {
-                if ($(dimensions[i]).attr("data-content") === me.model.get("selectedDimension")) {
-                    $(dimensions[i]).attr("data-selected", "true");
-                    $(dimensions[i]).addClass("ui-selected");
+            if (this.selectDimension) {
+                for (i = 0; i < dimensions.length; i++) {
+                    if ($(dimensions[i]).attr("data-content") === me.model.get("selectedDimension")) {
+                        $(dimensions[i]).attr("data-selected", "true");
+                        $(dimensions[i]).addClass("ui-selected");
+                    }
                 }
             }
         },

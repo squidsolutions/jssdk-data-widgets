@@ -1,8 +1,14 @@
 <ul class="squid-api-data-widgets-metric-widget">
     {{#each chosenMetrics}}
-        <li class="item {{this.selected}}" data-selected="{{this.attrSelected}}" data-content="{{this.value}}">
+    	{{#if this.selectMetric}}
+    		<li class="item {{this.selected}}" data-selected="{{this.attrSelected}}" data-content="{{this.value}}">
+    		{{else}}
+    		<li class="item" data-selected="{{this.attrSelected}}" data-content="{{this.value}}">
+    	{{/if}}
         	<div class="name">{{this.name}}</div>
-        	<div class="value">{{this.total.value}}</span>
+        	{{#if this.displayMetricValue}}
+        		<div class="value">{{this.total.value}}</div>
+        	{{/if}}
         </li>
     {{/each}}
 </ul>

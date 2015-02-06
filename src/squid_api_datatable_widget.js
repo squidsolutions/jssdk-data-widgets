@@ -14,6 +14,12 @@
 
         mainModel : null,
 
+        selectMetricHeader : false,
+
+        searching : false,
+
+        paging : false,
+
         initialize : function(options) {
             this.mainModel = options.mainModel;
 
@@ -33,6 +39,15 @@
             }
             if (options.selectedMetric) {
                 this.selectedMetric = options.selectedMetric;
+            }
+            if (options.selectMetricHeader) {
+                this.selectMetricHeader = options.selectMetricHeader;
+            }
+            if (options.searching) {
+                this.searching = options.searching;
+            }
+            if (options.paging) {
+                this.paging = options.paging;
             }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
@@ -60,8 +75,12 @@
 
         events : ({
             "click thead th.NUMBER" : function(item) {
-                var selectedMetric = $(item.target).attr("data-content");
-                this.mainModel.set("selectedMetric", selectedMetric);
+                if (this.selectMetricHeader) {
+                    var selectedMetric = $(item.target).attr("data-content");
+                    this.mainModel.set("selectedMetric", selectedMetric);
+                } else {
+                    this.$el.off("click", "thead th.NUMBER");
+                }
             }
         }),
 
@@ -142,8 +161,15 @@
 
             var me = this;
 
-            this.$el.html(this.template());
-            
+            var model = this.model.toJSON();
+            var dataAvailable = true;
+
+            if (!model.dimensions || !model.metrics) {
+                dataAvailable = false;
+            }
+
+            this.$el.html(this.template({'dataAvailable' : dataAvailable}));
+
             // display
             this.display();
             
@@ -196,6 +222,7 @@
         
         display : function() {
             var analysis = this.model;
+            var me = this;
 
             // in case of a multi-analysis model
             if (analysis.get("analyses")) {
@@ -226,9 +253,9 @@
                 this.dataTableInsert(data);
                 // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable({
-                    "ordering": false,
                     "lengthChange": false,
-                    "searching": false
+                    "searching": me.searching,
+                    "paging" : me.paging,
                 });
             }
         }

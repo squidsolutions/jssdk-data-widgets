@@ -11,6 +11,8 @@
         downloadStatus : 0,
         curlCollapsed : true,
         currentJobId : null,
+        displayInAccordion : false,
+        renderStore : null,
         
         initialize : function(options) {
             if (this.model) {
@@ -24,6 +26,12 @@
             }
             if (options.renderTo) {
                 this.renderTo = options.renderTo;
+            }
+            if (options.displayInAccordion) {
+                this.displayInAccordion = options.displayInAccordion;
+                this.renderStore = this.renderTo;
+            } else {
+                this.renderStore = this.$el;
             }
         },
 
@@ -51,7 +59,7 @@
                 event.preventDefault();
                 this.downloadStatus = 1;
                 // Before analysis job creation
-                this.$el.find("#download").html("<i class='fa fa-spinner fa-spin'></i>");
+                $(this.renderStore).find("#download").html("<i class='fa fa-spinner fa-spin'></i>");
                 var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
                 downloadAnalysis.set({
                    "id": {
@@ -79,17 +87,18 @@
                                 "oid": downloadAnalysis.get("oid")
                             });
                         console.log(analysisJobResults.url());
-                        me.$el.find("#download").html("Click here to download your data");
-                        me.$el.find("#download").attr("href",analysisJobResults.url());
-                        me.$el.find("#download").removeClass("btn-default");
-                        me.$el.find("#download").addClass("btn-link");
+                            $(me.renderStore).find("#download").html("Click here to download your data");
+                            $(me.renderStore).find("#download").attr("href",analysisJobResults.url());
+                            $(me.renderStore).find("#download").removeClass("btn-default");
+                            $(me.renderStore).find("#download").addClass("btn-link");
                     })
                     .fail(function(model, response) {
                         console.error("createAnalysisJob failed");
                     });
             } if  (this.downloadStatus === 2) {
                 // poll job status
-                this.$el.find("#download").html("<i class='fa fa-spinner fa-spin'></i>");
+                $(this.renderStore).find("#download").html("<i class='fa fa-spinner fa-spin'></i>");
+                
                 var observer = $.Deferred();
                 var pollAnalysis = new squid_api.model.AnalysisJob();
                 pollAnalysis.set({
@@ -101,9 +110,9 @@
                     // Done
                     squid_api.model.status.pullTask(pollAnalysis);
                     me.downloadStatus = 0;
-                    me.$el.find("#download").html("Proceed with Export");
-                    me.$el.find("#download").removeClass("btn-link");
-                    me.$el.find("#download").addClass("btn-default");
+                        $(me.renderStore).find("#download").html("Proceed with Export");
+                        $(me.renderStore).find("#download").removeClass("btn-link");
+                        $(me.renderStore).find("#download").addClass("btn-default");
                 });
                 squid_api.model.status.pushTask(pollAnalysis);
                 squid_api.controller.analysisjob.getAnalysisJob(observer, pollAnalysis);
@@ -135,54 +144,75 @@
             // escape all spaces in the json injected into cURL
             var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
             
-            this.$el.html(this.template({
-                "data-target" : this.renderTo,
-                "formatCSV": (this.format == "csv"),
-                "formatJSON": (this.format == "json"),
-                "compression": (this.compression),
-                "curl": exportAnalysis.url().replace(/\[access_token\]/g, '<b>[access_token]</b>'),
-                "curlFileName" : "analysis."+((this.format == "csv")?"csv":"")+((this.format == "json")?"json":"")+((this.compression)?".gz":""),
-                "origin": "https://api.squidsolutions.com",
-                "data": data,
-                "customerId" : squid_api.customerId,
-                "clientId" : squid_api.clientId,
-                "redirectURI":"https://api.squidsolutions.com",
-                "apiURL":squid_api.apiURL
-                })
-            );
-            me.$el.find("#download").html("Proceed with Export");
+                $(this.renderStore).html(this.template({
+                    "displayInAccordion" : this.displayInAccordion,
+                    "data-target" : this.renderTo,
+                    "formatCSV": (this.format == "csv"),
+                    "formatJSON": (this.format == "json"),
+                    "compression": (this.compression),
+                    "curl": exportAnalysis.url().replace(/\[access_token\]/g, '<b>[access_token]</b>'),
+                    "curlFileName" : "analysis."+((this.format == "csv")?"csv":"")+((this.format == "json")?"json":"")+((this.compression)?".gz":""),
+                    "origin": "https://api.squidsolutions.com",
+                    "data": data,
+                    "customerId" : squid_api.customerId,
+                    "clientId" : squid_api.clientId,
+                    "redirectURI":"https://api.squidsolutions.com",
+                    "apiURL":squid_api.apiURL
+                    })
+                );
+
+            if (this.displayInAccordion) {
+                this.$el.html("<button type='button' class='btn' data-toggle='collapse' data-target=" + this.renderTo + ">Export</button>");
+                $(this.renderStore).find("#download").html("Proceed with Export");
+            } else {
+                this.$el.find("#download").html("Proceed with Export");
+            }
             
             // apply cURL panel state
             if (me.curlCollapsed) {
-                me.$el.find('#curl').hide();
+                $(this.renderStore).find('#curl').hide();
             } else {
-                me.$el.find('#curl').show();
+                $(this.renderStore).find('#curl').show();
             }
             
             // Click Handlers
-            this.$el.find("#curlbtn").click(function() {
+            $(this.renderStore).find("#curlbtn").click(function() {
                 me.curlCollapsed = !me.curlCollapsed;
                 if (me.curlCollapsed) {
-                    me.$el.find('#curl').fadeOut();
+                    $(me.renderStore).find('#curl').fadeOut();      
                 } else {
-                    me.$el.find('#curl').fadeIn();
+                    $(me.renderStore).find('#curl').fadeIn();
                 }
             });
             
             // register click handlers
-            this.$el.find("#download").click(
+            if (me.displayInAccordion) {
+                $(this.renderStore).find("#download").click(
                     function(event) {
                         me.download(event);
                     });
-            this.$el.find('[name="format"]').click(
+                $(this.renderStore).find('[name="format"]').click(
                     function(event) {
                         me.clickedFormat(event);
                     });
-            this.$el.find('[name="compression"]')
+                $(this.renderStore).find('[name="compression"]')
                     .click(function(event) {
                         me.clickedCompression(event);
                     });
-
+            } else {
+                 $(this.renderStore).find("#download").click(
+                    function(event) {
+                        me.download(event);
+                    });
+                 $(this.renderStore).find('[name="format"]').click(
+                    function(event) {
+                        me.clickedFormat(event);
+                    });
+                 $(this.renderStore).find('[name="compression"]')
+                    .click(function(event) {
+                        me.clickedCompression(event);
+                    });
+            }
             return this;
         }
     });

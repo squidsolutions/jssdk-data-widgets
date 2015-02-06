@@ -1,4 +1,15 @@
 <div class="squid-api-data-widgets-export-widget">
+{{#if displayInAccordion}}
+	<div class="panel panel-default filter-panel">
+		<div class="panel-heading">
+			<button type="button" class="close" data-toggle="collapse"
+				data-target="{{data-target}}" data-clavier="true" aria-hidden="true">
+				<i class="glyphicon glyphicon-chevron-up"></i>
+			</button>
+			<h4 class="panel-title" id="myModalLabel">Export</h4>
+		</div>
+		<div class="panel-body">
+{{/if}}
 		<button type="button" class="close" data-toggle="collapse"
 			data-target="{{data-target}}" data-clavier="true" aria-hidden="true">
 		</button>
@@ -21,17 +32,24 @@
 				<p>Sample code to download the analysis results using curl shell command.</p>
 				<b>1 - get an authentication token</b>
 				<p>replace the 'login' and 'password' fields in the following snippet</p>
-<pre class="curl">curl '{{apiURL}}/auth-token' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept: */*' -H 'Cache-Control: no-cache' --data 'customerId={{customerId}}&client_id={{clientId}}&redirect_uri={{redirectURI}}&login=<b>[login]</b>&password=<b>[password]</b>'</pre>
+				<pre class="curl">curl '{{apiURL}}/auth-token' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept: */*' -H 'Cache-Control: no-cache' --data 'customerId={{customerId}}&client_id={{clientId}}&redirect_uri={{redirectURI}}&login=<b>[login]</b>&password=<b>[password]</b>'</pre>
 				<b>2 - download the export</b>
 				<p>replace the 'access_token' field in the following snippet by the value of the 'tokenId' field returned by the previous script</p>
-<pre class="curl">curl '{{{curl}}}' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' --data-binary $'{{data}}' --compressed -o {{curlFileName}}</pre>
+				<pre class="curl">curl '{{{curl}}}' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' --data-binary $'{{data}}' --compressed -o {{curlFileName}}</pre>
 				<b>3 - view the export</b>
 				<p>your analysis results should now be downloaded as</p>
-<pre class="curl">ls {{curlFileName}}</pre>
+				<pre class="curl">ls {{curlFileName}}</pre>
 			</div>
 		</div>
 		{{/if }}
+	</div>
+{{#if displayInAccordion}}
+	<div class="panel-footer">
+		<button type="button" class="btn btn-default" data-toggle="collapse"
+			data-target="{{data-target}}" data-clavier="true">Close</button>
+	</div>
 </div>
-
+</div>
+{{/if}}
 
 

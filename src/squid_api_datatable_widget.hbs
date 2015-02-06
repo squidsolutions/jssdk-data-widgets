@@ -11,9 +11,15 @@
 	<div class="rect5"></div>
 	</div>
 </div>
-<table class="sq-table squid-api-data-widgets-data-table">
-	<thead>
-		<tr></tr>
-	</thead>
-	<tbody></tbody>
-</table>
+{{#if dataAvailable}}
+    <table class="sq-table squid-api-data-widgets-data-table">
+		<thead>
+			<tr></tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+{{else}}
+    <span class="noTableData"></span>
+{{/if}}
+
+

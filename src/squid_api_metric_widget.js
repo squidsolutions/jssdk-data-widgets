@@ -10,6 +10,10 @@
         
         d3Formatter : null,
 
+        displayMetricValue : false,
+
+        selectMetric : false,
+
         initialize: function(options) {
             var me = this;
 
@@ -18,6 +22,12 @@
                 this.template = options.template;
             } else {
                 this.template = template;
+            }
+            if (options.displayMetricValue) {
+                this.displayMetricValue = options.displayMetricValue;
+            }
+            if (options.selectMetric) {
+                this.selectMetric = options.selectMetric;
             }
 
             if (d3) {
@@ -65,20 +75,22 @@
         events: {
             // Dimension Sorting
             "click li": function(item) {
-                var metrics = this.$el.find(".chosen-metrics li");
+                if (this.selectMetric) {
+                    var metrics = this.$el.find(".chosen-metrics li");
 
-                for (i = 0; i < metrics.length; i++) {
-                    $(metrics[i]).removeAttr("data-selected");
-                    $(metrics[i]).removeClass("ui-selected");
-                }
+                    for (i = 0; i < metrics.length; i++) {
+                        $(metrics[i]).removeAttr("data-selected");
+                        $(metrics[i]).removeClass("ui-selected");
+                    }
 
-                $(item.currentTarget).addClass("ui-selected");
-                $(item.currentTarget).attr("data-selected", true);
+                    $(item.currentTarget).addClass("ui-selected");
+                    $(item.currentTarget).attr("data-selected", true);
 
-                var selectedItem = $(item.currentTarget).attr("data-content");
+                    var selectedItem = $(item.currentTarget).attr("data-content");
                 
-                // Update
-                this.model.set({"selectedMetric" : selectedItem});
+                    // Update
+                    this.model.set({"selectedMetric" : selectedItem});
+                }
             }
         },
 
@@ -126,6 +138,8 @@
                                 "value" : col.id,
                                 "selected" : selected,
                                 "attrSelected" : attrSelected,
+                                "displayMetricValue" : this.displayMetricValue,
+                                "selectMetric" : this.selectMetric,
                                 "total" : {
                                     "value" : totalValue,
                                     "unit" : null
