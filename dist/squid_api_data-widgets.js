@@ -1878,7 +1878,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 );
 
             if (this.displayInAccordion) {
-                this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export</button>");
+                this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-chevron-down'></span></button>");
                 $(this.renderStore).find("#download").html("Proceed with Export");
             } else {
                 this.$el.find("#download").html("Proceed with Export");
