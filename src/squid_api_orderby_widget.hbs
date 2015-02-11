@@ -1,6 +1,6 @@
 <div class="orderby-container squid-api-data-widgets-orderby-widget">
 	{{#if limit}}
-		<div class="pull-right">
+		<div class="pull-left">
 			<table>
 				<tr>
 					<td>
@@ -14,7 +14,11 @@
 					</td>
 					<td>
 						&nbsp;
-						<span style="font-size : x-large;">{{limit}}</span> <label class="records">Records</label>
+						<span style="font-size : x-large; padding-right: 5px; position: relative; top: 3px;">{{limit}}</span> <label>by</label> <select class="sq-select form-control" style="display: inline-block; position: relative; bottom: 5px; max-width: 100px;">
+						{{#each chosenMetrics}}
+						<option value="{{value}}">{{label}}</option>
+						{{/each}}
+						</select>
 					</td>
 				</tr>
 			</table>

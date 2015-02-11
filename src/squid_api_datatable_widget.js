@@ -20,6 +20,8 @@
 
         paging : false,
 
+        ordering : false,
+
         initialize : function(options) {
             this.mainModel = options.mainModel;
 
@@ -48,6 +50,9 @@
             }
             if (options.paging) {
                 this.paging = options.paging;
+            }
+            if (options.ordering) {
+                this.ordering = options.ordering;
             }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
@@ -256,6 +261,7 @@
                     "lengthChange": false,
                     "searching": me.searching,
                     "paging" : me.paging,
+                    "ordering":  me.ordering,
                 });
             }
         }

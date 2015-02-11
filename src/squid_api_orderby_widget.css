@@ -1,36 +1,36 @@
-.onoffswitch {
+.squid-api-data-widgets-orderby-widget .onoffswitch {
     position: relative; width: 90px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
 }
-.onoffswitch-checkbox {
+.squid-api-data-widgets-orderby-widget .onoffswitch-checkbox {
     display: none;
 }
-.onoffswitch-label {
+.squid-api-data-widgets-orderby-widget .onoffswitch-label {
     display: block; overflow: hidden; cursor: pointer;
     border: 2px solid #999999; border-radius: 20px;
 }
-.onoffswitch-inner {
+.squid-api-data-widgets-orderby-widget .onoffswitch-inner {
     display: block; width: 200%; margin-left: -100%;
     -moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;
     -o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;
 }
-.onoffswitch-inner:before, .onoffswitch-inner:after {
+.squid-api-data-widgets-orderby-widget .onoffswitch-inner:before, .onoffswitch-inner:after {
     display: block; float: left; width: 50%; height: 28px; padding: 0; line-height: 30px;
     font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
-.onoffswitch-inner:before {
+.squid-api-data-widgets-orderby-widget .onoffswitch-inner:before {
     content: "TOP";
     padding-left: 10px;
     background-color: #707070; color: #FFFFFF;
 }
-.onoffswitch-inner:after {
+.squid-api-data-widgets-orderby-widget .onoffswitch-inner:after {
     content: "LAST";
     padding-right: 10px;
     background-color: #FFFFFF; color: #999999;
     text-align: right;
 }
-.onoffswitch-switch {
+.squid-api-data-widgets-orderby-widget .onoffswitch-switch {
     display: block; width: 18px; margin: 6px;
     background: #FFFFFF;
     border: 2px solid #999999; border-radius: 20px;
@@ -38,9 +38,24 @@
     -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;
     -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s; 
 }
-.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+.squid-api-data-widgets-orderby-widget .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
     margin-left: 0;
 }
-.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+.squid-api-data-widgets-orderby-widget .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
     right: 0px; 
+}
+.squid-api-data-widgets-orderby-widget button {
+    border: none;
+}
+.squid-api-data-widgets-orderby-widget button:hover, .squid-api-data-widgets-orderby-widget button:active {
+    background: none;
+}
+.squid-api-data-widgets-orderby-widget .btn-group.open .dropdown-toggle, .squid-api-data-widgets-orderby-widget .btn-group .dropdown-toggle:active, .btn-group.open .dropdown-toggle {
+    box-shadow: none;
+    background: none;
+}
+.squid-api-data-widgets-orderby-widget button.multiselect {
+    color: #777;
+    font-size: 20px;
+    padding-left: 5px;
 }

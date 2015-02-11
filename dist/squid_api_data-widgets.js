@@ -564,15 +564,32 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\n		<div class=\"pull-right\">\n			<table>\n				<tr>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
+  buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
   if (helper = helpers.direction) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.direction); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + ">\n			    			<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n			        			<span class=\"onoffswitch-inner\"></span>\n			       				 <span class=\"onoffswitch-switch\"></span>\n			    			</label>\n						</div>\n					</td>\n					<td>\n						&nbsp;\n						<span style=\"font-size : x-large;\">";
+    + ">\n			    			<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n			        			<span class=\"onoffswitch-inner\"></span>\n			       				 <span class=\"onoffswitch-switch\"></span>\n			    			</label>\n						</div>\n					</td>\n					<td>\n						&nbsp;\n						<span style=\"font-size : x-large; padding-right: 5px; position: relative; top: 3px;\">";
   if (helper = helpers.limit) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.limit); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</span> <label class=\"records\">Records</label>\n					</td>\n				</tr>\n			</table>\n		</div>\n	";
+    + "</span> <label>by</label> <select class=\"sq-select form-control\" style=\"display: inline-block; position: relative; bottom: 5px; max-width: 100px;\">\n						";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.chosenMetrics), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n						</select>\n					</td>\n				</tr>\n			</table>\n		</div>\n	";
+  return buffer;
+  }
+function program2(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\n						<option value=\"";
+  if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\">";
+  if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</option>\n						";
   return buffer;
   }
 
@@ -912,6 +929,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         paging : false,
 
+        ordering : false,
+
         initialize : function(options) {
             this.mainModel = options.mainModel;
 
@@ -940,6 +959,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.paging) {
                 this.paging = options.paging;
+            }
+            if (options.ordering) {
+                this.ordering = options.ordering;
             }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
@@ -1148,6 +1170,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "lengthChange": false,
                     "searching": me.searching,
                     "paging" : me.paging,
+                    "ordering":  me.ordering,
                 });
             }
         }
@@ -2469,8 +2492,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         events: {
             "change": function(event) {
-
-
                 if (event.target.checked !== undefined) {
                     if (event.target.checked) {
                         this.model.set({"orderByDirection" : "DESC"});
@@ -2484,8 +2505,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
         },
 
+        getDomainMetrics : function() {
+            var metrics;
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+            if (domain) {
+                metrics = domain.metrics;
+            }
+            return metrics;
+        },
+
         render : function() {
             var checked;
+            var me = this;
 
             if (this.model.get("orderByDirection") === "DESC") {
                 checked = "checked";
@@ -2493,15 +2524,44 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 checked = "";
             }
             var limit = null;
-            if (this.model.get("currentAnalysis")) {
-                limit = this.model.get("currentAnalysis").get("limit");
+            if (this.model.get("tableAnalysis")) {
+                limit = this.model.get("tableAnalysis").get("limit");
             }
 
-            var jsonData = {"direction" : checked, "limit" : limit};
+            var metrics = this.getDomainMetrics();
+            var chosenMetrics = this.model.get("chosenMetrics");
+            var metricList = [];
+            if (metrics) {
+                for (var idx=0; idx<metrics.length; idx++) {
+                    var metric = metrics[idx];
+                    // Match with chosen
+                    for (var match=0; match<chosenMetrics.length; match++) {
+                        if (metric.oid === chosenMetrics[match]) {
+                            var option = {"label" : metric.name, "value" : metric.oid};
+                            metricList.push(option);
+                        }
+                    }
+                }
+            }
+
+            var jsonData = {"direction" : checked, "limit" : limit, "chosenMetrics" : metricList};
 
             var html = this.template(jsonData);
             this.$el.html(html);
-             
+
+            this.$el.find("select").multiselect({
+                onChange: function(option, selected, index) {
+                    var metric = option.attr("value");
+                    me.model.set({"selectedMetric": metric});
+                }
+            });
+
+            if (this.model.get("selectedMetric")) {
+                this.$el.find("select").multiselect('select', this.model.get("selectedMetric"));
+            }
+
+            this.$el.find("select").multiselect("refresh");
+
             // Set Limit Value
             this.$el.find(".sq-select").val(jsonData.limit);  
 
