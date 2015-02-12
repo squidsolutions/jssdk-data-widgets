@@ -13,7 +13,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 this["squid_api"]["template"]["squid_api_datatable_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this;
+  var buffer = "", stack1, functionType="function", self=this;
 
 function program1(depth0,data) {
   
@@ -23,8 +23,13 @@ function program1(depth0,data) {
 
 function program3(depth0,data) {
   
-  
-  return "\r\n    <span class=\"noTableData\"></span>\r\n";
+  var buffer = "", stack1, helper;
+  buffer += "\r\n	<div class=\"noDataInTable\">\r\n    	";
+  if (helper = helpers.noDataMessage) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.noDataMessage); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n    </div>\r\n";
+  return buffer;
   }
 
   buffer += "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n";
@@ -931,12 +936,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         ordering : false,
 
+        noDataMessage : "No data available in table",
+
         initialize : function(options) {
             this.mainModel = options.mainModel;
 
             if (this.model) {
                 this.listenTo(this.model, 'change', this.render);
-                this.mainModel.on("change:selectedMetric", this.selectColumn, this);
             }
 
             // setup options
@@ -962,6 +968,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.ordering) {
                 this.ordering = options.ordering;
+            }
+            if (options.noDataMessage) {
+                this.noDataMessage = options.noDataMessage;
             }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
@@ -1082,17 +1091,20 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 dataAvailable = false;
             }
 
-            this.$el.html(this.template({'dataAvailable' : dataAvailable}));
+            this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
 
             // display
             this.display();
             
             if (!this.model.isDone()) {
+                this.$el.find(".squid-api-data-widgets-data-table").removeClass("blur");
                 // running
                 if (this.model.get("status") == "RUNNING") {
                     $(".sq-loading").show();
+                    this.$el.find(".dataTables_wrapper").addClass("blur");
                 } else {
                     $(".sq-loading").hide();
+                    this.$el.find(".dataTables_wrapper").addClass("blur");
                 }
             } else if (this.model.get("error")) {
                 // error

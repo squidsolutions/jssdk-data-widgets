@@ -22,12 +22,13 @@
 
         ordering : false,
 
+        noDataMessage : "No data available in table",
+
         initialize : function(options) {
             this.mainModel = options.mainModel;
 
             if (this.model) {
                 this.listenTo(this.model, 'change', this.render);
-                this.mainModel.on("change:selectedMetric", this.selectColumn, this);
             }
 
             // setup options
@@ -53,6 +54,9 @@
             }
             if (options.ordering) {
                 this.ordering = options.ordering;
+            }
+            if (options.noDataMessage) {
+                this.noDataMessage = options.noDataMessage;
             }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
@@ -173,17 +177,20 @@
                 dataAvailable = false;
             }
 
-            this.$el.html(this.template({'dataAvailable' : dataAvailable}));
+            this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
 
             // display
             this.display();
             
             if (!this.model.isDone()) {
+                this.$el.find(".squid-api-data-widgets-data-table").removeClass("blur");
                 // running
                 if (this.model.get("status") == "RUNNING") {
                     $(".sq-loading").show();
+                    this.$el.find(".dataTables_wrapper").addClass("blur");
                 } else {
                     $(".sq-loading").hide();
+                    this.$el.find(".dataTables_wrapper").addClass("blur");
                 }
             } else if (this.model.get("error")) {
                 // error
