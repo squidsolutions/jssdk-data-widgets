@@ -162,7 +162,7 @@
                 );
 
             if (this.displayInAccordion) {
-                this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-chevron-down'></span></button>");
+                this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-chevron-up'></span></button>");
                 $(this.renderStore).find("#download").html("Proceed with Export");
             } else {
                 this.$el.find("#download").html("Proceed with Export");
