@@ -312,10 +312,10 @@ function program7(depth0,data) {
   if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<div>\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\"></a> <span class=\"download-label\"></span>\r\n		</div>\r\n		<div class=\"download-formats\">\r\n			<label>Format: </label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
+    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<div style=\"display: inline-block;\">\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\"></a> <span class=\"download-label\"></span>\r\n		</div>\r\n		<div class=\"download-formats\">\r\n			<label>Format: </label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatCSV), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> csv \r\n			<div>\r\n				<label>Compression: </label> <input type=\"checkbox\" name=\"compression\" ";
+  buffer += "> csv \r\n			<div style=\"display: inline-block;\">\r\n				<label>Compression: </label> <input type=\"checkbox\" name=\"compression\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "> gzip\r\n			</div>\r\n		</div>\r\n		";
@@ -1909,7 +1909,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             if (this.displayInAccordion) {
                 this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-chevron-up'></span></button>");
-                $(this.renderStore).find("#download").html("Proceed with Export");
+                $(this.renderStore).find("#download").html("Start Export");
             } else {
                 this.$el.find("#download").html("Proceed with Export");
             }

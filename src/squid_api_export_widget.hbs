@@ -13,13 +13,13 @@
 		<button type="button" class="close" data-toggle="collapse"
 			data-target="{{data-target}}" data-clavier="true" aria-hidden="true">
 		</button>
-		<div>
+		<div style="display: inline-block;">
 			<a href="#" class="btn btn-default" id="download"></a> <span class="download-label"></span>
 		</div>
 		<div class="download-formats">
 			<label>Format: </label> 
 			<input type="radio" name="format" value="csv" {{#if formatCSV}}checked{{/if}}> csv 
-			<div>
+			<div style="display: inline-block;">
 				<label>Compression: </label> <input type="checkbox" name="compression" {{#if compression}}checked{{/if}}> gzip
 			</div>
 		</div>
