@@ -52,6 +52,9 @@
             this.render();
         },
         
+        /*
+         * deprecated, this method was used to detect download end, but this behavior only works correctly on Chrome.
+         */
         download : function(event) {
             var me = this, analysis = this.model;
       
@@ -143,10 +146,6 @@
             });
             
             // register click handlers    
-             $(this.renderStore).find("#download").click(
-                function(event) {
-                    me.download(event);
-                });
              $(this.renderStore).find('[name="format"]').click(
                 function(event) {
                     me.clickedFormat(event);
@@ -188,7 +187,7 @@
                              "id": me.currentJobId,
                              "oid": downloadAnalysis.get("oid")
                          });
-                     console.log(analysisJobResults.url());
+                     console.log("download url : "+analysisJobResults.url());
                      downloadBtn.attr("href",analysisJobResults.url());
                      downloadBtn.removeClass("disabled");
                  })
