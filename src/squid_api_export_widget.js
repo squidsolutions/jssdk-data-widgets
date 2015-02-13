@@ -55,49 +55,11 @@
         download : function(event) {
             var me = this, analysis = this.model;
       
-            if (this.downloadStatus === 0) {
-                event.preventDefault();
-                this.downloadStatus = 1;
-                // Before analysis job creation
-                $(this.renderStore).find("#download").html("<i class='fa fa-spinner fa-spin'></i>");
-                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
-                downloadAnalysis.set({
-                   "id": {
-                        "projectId": analysis.get("id").projectId,
-                        "analysisJobId": null
-                    },
-                    "domains": analysis.get("domains"),
-                    "dimensions" : analysis.get("dimensions"),
-                    "metrics" : analysis.get("metrics"),
-                    "orderBy": analysis.get("orderBy")
-                    });
-                downloadAnalysis.addParameter("timeout",null);
-                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                    .done(function(model, response) {
-                        me.downloadStatus = 2;
-                        me.currentJobId = downloadAnalysis.get("id");
-                        // create download link
-                        var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                        analysisJobResults.addParameter("format",me.format);
-                        if (me.compression) {
-                            analysisJobResults.addParameter("compression","gzip");
-                        }
-                        analysisJobResults.set({
-                                "id": me.currentJobId,
-                                "oid": downloadAnalysis.get("oid")
-                            });
-                        console.log(analysisJobResults.url());
-                            $(me.renderStore).find("#download").html("Click here to download your data");
-                            $(me.renderStore).find("#download").attr("href",analysisJobResults.url());
-                            $(me.renderStore).find("#download").removeClass("btn-default");
-                            $(me.renderStore).find("#download").addClass("btn-link");
-                    })
-                    .fail(function(model, response) {
-                        console.error("createAnalysisJob failed");
-                    });
-            } if  (this.downloadStatus === 2) {
+            if  (this.downloadStatus === 2) {
                 // poll job status
-                $(this.renderStore).find("#download").html("<i class='fa fa-spinner fa-spin'></i>");
+                var downloadBtn = $(me.renderStore).find("#download");
+                downloadBtn.addClass("hidden");
+                $(me.renderStore).find("#downloading").removeClass("hidden");
                 
                 var observer = $.Deferred();
                 var pollAnalysis = new squid_api.model.AnalysisJob();
@@ -110,9 +72,7 @@
                     // Done
                     squid_api.model.status.pullTask(pollAnalysis);
                     me.downloadStatus = 0;
-                        $(me.renderStore).find("#download").html("Proceed with Export");
-                        $(me.renderStore).find("#download").removeClass("btn-link");
-                        $(me.renderStore).find("#download").addClass("btn-default");
+                    me.render();
                 });
                 squid_api.model.status.pushTask(pollAnalysis);
                 squid_api.controller.analysisjob.getAnalysisJob(observer, pollAnalysis);
@@ -163,9 +123,6 @@
 
             if (this.displayInAccordion) {
                 this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-chevron-up'></span></button>");
-                $(this.renderStore).find("#download").html("Start Export");
-            } else {
-                this.$el.find("#download").html("Proceed with Export");
             }
             
             // apply cURL panel state
@@ -185,34 +142,59 @@
                 }
             });
             
-            // register click handlers
-            if (me.displayInAccordion) {
-                $(this.renderStore).find("#download").click(
-                    function(event) {
-                        me.download(event);
-                    });
-                $(this.renderStore).find('[name="format"]').click(
-                    function(event) {
-                        me.clickedFormat(event);
-                    });
-                $(this.renderStore).find('[name="compression"]')
-                    .click(function(event) {
-                        me.clickedCompression(event);
-                    });
-            } else {
-                 $(this.renderStore).find("#download").click(
-                    function(event) {
-                        me.download(event);
-                    });
-                 $(this.renderStore).find('[name="format"]').click(
-                    function(event) {
-                        me.clickedFormat(event);
-                    });
-                 $(this.renderStore).find('[name="compression"]')
-                    .click(function(event) {
-                        me.clickedCompression(event);
-                    });
-            }
+            // register click handlers    
+             $(this.renderStore).find("#download").click(
+                function(event) {
+                    me.download(event);
+                });
+             $(this.renderStore).find('[name="format"]').click(
+                function(event) {
+                    me.clickedFormat(event);
+                });
+             $(this.renderStore).find('[name="compression"]')
+                .click(function(event) {
+                    me.clickedCompression(event);
+                });
+             
+             
+             // prepare download link
+             this.downloadStatus = 1;
+             var downloadBtn = $(me.renderStore).find("#download");
+             // Before analysis job creation
+             downloadBtn.addClass("disabled");
+             var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+             downloadAnalysis.set({
+                "id": {
+                     "projectId": analysis.get("id").projectId,
+                     "analysisJobId": null
+                 },
+                 "domains": analysis.get("domains"),
+                 "dimensions" : analysis.get("dimensions"),
+                 "metrics" : analysis.get("metrics"),
+                 "orderBy": analysis.get("orderBy")
+                 });
+             downloadAnalysis.addParameter("timeout",null);
+             squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
+                 .done(function(model, response) {
+                     me.downloadStatus = 2;
+                     me.currentJobId = downloadAnalysis.get("id");
+                     // create download link
+                     var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
+                     analysisJobResults.addParameter("format",me.format);
+                     if (me.compression) {
+                         analysisJobResults.addParameter("compression","gzip");
+                     }
+                     analysisJobResults.set({
+                             "id": me.currentJobId,
+                             "oid": downloadAnalysis.get("oid")
+                         });
+                     console.log(analysisJobResults.url());
+                     downloadBtn.attr("href",analysisJobResults.url());
+                 })
+                 .fail(function(model, response) {
+                     console.error("createAnalysisJob failed");
+                 });
+
             return this;
         }
     });

@@ -312,13 +312,13 @@ function program7(depth0,data) {
   if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<div style=\"display: inline-block;\">\r\n			<a href=\"#\" class=\"btn btn-default\" id=\"download\"></a> <span class=\"download-label\"></span>\r\n		</div>\r\n		<div class=\"download-formats\">\r\n			<label>Format: </label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
+    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<div class=\"download-formats\">\r\n			<label>Format: </label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatCSV), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "> csv \r\n			<div style=\"display: inline-block;\">\r\n				<label>Compression: </label> <input type=\"checkbox\" name=\"compression\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> gzip\r\n			</div>\r\n		</div>\r\n		";
+  buffer += "> gzip\r\n			</div>\r\n		</div>\r\n		<hr>\r\n		<div>\r\n			<a id=\"download\">Click here to download your data</a>\r\n			<span id=\"downloading\" class=\"hidden\">Downloading, please wait &nbsp;<i class='fa fa-spinner fa-spin'></i></span>\r\n		</div>\r\n		";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n	</div>\r\n";
@@ -1801,49 +1801,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         download : function(event) {
             var me = this, analysis = this.model;
       
-            if (this.downloadStatus === 0) {
-                event.preventDefault();
-                this.downloadStatus = 1;
-                // Before analysis job creation
-                $(this.renderStore).find("#download").html("<i class='fa fa-spinner fa-spin'></i>");
-                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
-                downloadAnalysis.set({
-                   "id": {
-                        "projectId": analysis.get("id").projectId,
-                        "analysisJobId": null
-                    },
-                    "domains": analysis.get("domains"),
-                    "dimensions" : analysis.get("dimensions"),
-                    "metrics" : analysis.get("metrics"),
-                    "orderBy": analysis.get("orderBy")
-                    });
-                downloadAnalysis.addParameter("timeout",null);
-                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                    .done(function(model, response) {
-                        me.downloadStatus = 2;
-                        me.currentJobId = downloadAnalysis.get("id");
-                        // create download link
-                        var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                        analysisJobResults.addParameter("format",me.format);
-                        if (me.compression) {
-                            analysisJobResults.addParameter("compression","gzip");
-                        }
-                        analysisJobResults.set({
-                                "id": me.currentJobId,
-                                "oid": downloadAnalysis.get("oid")
-                            });
-                        console.log(analysisJobResults.url());
-                            $(me.renderStore).find("#download").html("Click here to download your data");
-                            $(me.renderStore).find("#download").attr("href",analysisJobResults.url());
-                            $(me.renderStore).find("#download").removeClass("btn-default");
-                            $(me.renderStore).find("#download").addClass("btn-link");
-                    })
-                    .fail(function(model, response) {
-                        console.error("createAnalysisJob failed");
-                    });
-            } if  (this.downloadStatus === 2) {
+            if  (this.downloadStatus === 2) {
                 // poll job status
-                $(this.renderStore).find("#download").html("<i class='fa fa-spinner fa-spin'></i>");
+                var downloadBtn = $(me.renderStore).find("#download");
+                downloadBtn.addClass("hidden");
+                $(me.renderStore).find("#downloading").removeClass("hidden");
                 
                 var observer = $.Deferred();
                 var pollAnalysis = new squid_api.model.AnalysisJob();
@@ -1856,9 +1818,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     // Done
                     squid_api.model.status.pullTask(pollAnalysis);
                     me.downloadStatus = 0;
-                        $(me.renderStore).find("#download").html("Proceed with Export");
-                        $(me.renderStore).find("#download").removeClass("btn-link");
-                        $(me.renderStore).find("#download").addClass("btn-default");
+                    me.render();
                 });
                 squid_api.model.status.pushTask(pollAnalysis);
                 squid_api.controller.analysisjob.getAnalysisJob(observer, pollAnalysis);
@@ -1909,9 +1869,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             if (this.displayInAccordion) {
                 this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-chevron-up'></span></button>");
-                $(this.renderStore).find("#download").html("Start Export");
-            } else {
-                this.$el.find("#download").html("Proceed with Export");
             }
             
             // apply cURL panel state
@@ -1931,34 +1888,59 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             });
             
-            // register click handlers
-            if (me.displayInAccordion) {
-                $(this.renderStore).find("#download").click(
-                    function(event) {
-                        me.download(event);
-                    });
-                $(this.renderStore).find('[name="format"]').click(
-                    function(event) {
-                        me.clickedFormat(event);
-                    });
-                $(this.renderStore).find('[name="compression"]')
-                    .click(function(event) {
-                        me.clickedCompression(event);
-                    });
-            } else {
-                 $(this.renderStore).find("#download").click(
-                    function(event) {
-                        me.download(event);
-                    });
-                 $(this.renderStore).find('[name="format"]').click(
-                    function(event) {
-                        me.clickedFormat(event);
-                    });
-                 $(this.renderStore).find('[name="compression"]')
-                    .click(function(event) {
-                        me.clickedCompression(event);
-                    });
-            }
+            // register click handlers    
+             $(this.renderStore).find("#download").click(
+                function(event) {
+                    me.download(event);
+                });
+             $(this.renderStore).find('[name="format"]').click(
+                function(event) {
+                    me.clickedFormat(event);
+                });
+             $(this.renderStore).find('[name="compression"]')
+                .click(function(event) {
+                    me.clickedCompression(event);
+                });
+             
+             
+             // prepare download link
+             this.downloadStatus = 1;
+             var downloadBtn = $(me.renderStore).find("#download");
+             // Before analysis job creation
+             downloadBtn.addClass("disabled");
+             var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+             downloadAnalysis.set({
+                "id": {
+                     "projectId": analysis.get("id").projectId,
+                     "analysisJobId": null
+                 },
+                 "domains": analysis.get("domains"),
+                 "dimensions" : analysis.get("dimensions"),
+                 "metrics" : analysis.get("metrics"),
+                 "orderBy": analysis.get("orderBy")
+                 });
+             downloadAnalysis.addParameter("timeout",null);
+             squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
+                 .done(function(model, response) {
+                     me.downloadStatus = 2;
+                     me.currentJobId = downloadAnalysis.get("id");
+                     // create download link
+                     var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
+                     analysisJobResults.addParameter("format",me.format);
+                     if (me.compression) {
+                         analysisJobResults.addParameter("compression","gzip");
+                     }
+                     analysisJobResults.set({
+                             "id": me.currentJobId,
+                             "oid": downloadAnalysis.get("oid")
+                         });
+                     console.log(analysisJobResults.url());
+                     downloadBtn.attr("href",analysisJobResults.url());
+                 })
+                 .fail(function(model, response) {
+                     console.error("createAnalysisJob failed");
+                 });
+
             return this;
         }
     });
