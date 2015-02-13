@@ -33,6 +33,10 @@ div.dataTables_paginate ul.pagination li.disabled {
 .dataTables_wrapper .col-xs-12 {
 	overflow-x: auto;
 }
+
+.dataTable .badge {
+	margin-left: 5px;
+}
 #origin .dropdownDisabled {
 	top: 0px;
 	height: 100%;

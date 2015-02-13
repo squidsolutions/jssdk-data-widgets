@@ -1060,6 +1060,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         selectColumn : function() {
+            var me = this;
+
             // Get Table Headers
             var tableHeaders = this.$el.find("table th");
 
@@ -1067,6 +1069,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             for (i=0; i<tableHeaders.length; i++) { 
                 if (this.mainModel.get("selectedMetric") == $(tableHeaders[i]).attr("data-content")) {
                     $(tableHeaders[i]).addClass("filtered-by");
+                    if (me.mainModel.get("orderByDirection") === "DESC") {
+                        $(tableHeaders[i]).append("<span class='badge'>Top</span>");
+                    } else {
+                        $(tableHeaders[i]).append("<span class='badge'>Bottom</span>");
+                    }
                 }
             }
 
