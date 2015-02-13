@@ -2042,8 +2042,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.metricIndex = options.metricIndex;
             }
 
+            this.model.on("change", function() {
+                me.render();
+            });
+
             // listen for global status change
-            squid_api.model.status.on('change:status', this.render, this);
+            squid_api.model.status.on('change:status', this.enable, this);
         },
 
         enable: function() {
