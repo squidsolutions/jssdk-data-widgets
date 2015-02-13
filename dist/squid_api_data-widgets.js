@@ -564,7 +564,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<span style=\"font-size : large; padding-right: 5px; position: relative; top: -2px;\">preview</span>\n					</td>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
+  buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<span style=\"font-size : large; padding-right: 8px; position: relative; top: -2px;\">preview</span>\n					</td>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
   if (helper = helpers.direction) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.direction); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -2060,14 +2060,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.metricIndex = options.metricIndex;
             }
 
-            if (this.model) {
-                this.model.on("change:chosenMetrics", function() {
-                    me.render();
-                });
-            }
-
             // listen for global status change
-            squid_api.model.status.on('change:status', this.enable, this);
+            squid_api.model.status.on('change:status', this.render, this);
         },
 
         enable: function() {

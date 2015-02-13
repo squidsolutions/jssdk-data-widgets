@@ -26,14 +26,8 @@
                 this.metricIndex = options.metricIndex;
             }
 
-            if (this.model) {
-                this.model.on("change:chosenMetrics", function() {
-                    me.render();
-                });
-            }
-
             // listen for global status change
-            squid_api.model.status.on('change:status', this.enable, this);
+            squid_api.model.status.on('change:status', this.render, this);
         },
 
         enable: function() {
