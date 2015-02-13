@@ -190,6 +190,7 @@
                          });
                      console.log(analysisJobResults.url());
                      downloadBtn.attr("href",analysisJobResults.url());
+                     downloadBtn.removeClass("disabled");
                  })
                  .fail(function(model, response) {
                      console.error("createAnalysisJob failed");

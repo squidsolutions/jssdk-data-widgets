@@ -318,7 +318,7 @@ function program7(depth0,data) {
   buffer += "> csv \r\n			<div style=\"display: inline-block;\">\r\n				<label>Compression: </label> <input type=\"checkbox\" name=\"compression\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> gzip\r\n			</div>\r\n		</div>\r\n		<hr>\r\n		<div>\r\n			<a id=\"download\">Click here to download your data</a>\r\n			<span id=\"downloading\" class=\"hidden\">Downloading, please wait &nbsp;<i class='fa fa-spinner fa-spin'></i></span>\r\n		</div>\r\n		";
+  buffer += "> gzip\r\n			</div>\r\n		</div>\r\n		<hr>\r\n		<div>\r\n			<a id=\"download\" class=\"btn btn-default\">Download your data</a>\r\n			<a id=\"downloading\" class=\"btn btn-default disabled hidden\">Downloading &nbsp;<i class='fa fa-spinner fa-spin'></i></a>\r\n		</div>\r\n		";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n	</div>\r\n";
@@ -1936,6 +1936,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                          });
                      console.log(analysisJobResults.url());
                      downloadBtn.attr("href",analysisJobResults.url());
+                     downloadBtn.removeClass("disabled");
                  })
                  .fail(function(model, response) {
                      console.error("createAnalysisJob failed");
