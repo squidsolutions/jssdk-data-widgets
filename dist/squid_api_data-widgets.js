@@ -564,15 +564,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<span style=\"font-size : x-large; padding-right: 10px; position: relative; top: -2px;\">preview</span>\n					</td>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
+  buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<span style=\"font-size : large; padding-right: 5px; position: relative; top: -2px;\">preview</span>\n					</td>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
   if (helper = helpers.direction) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.direction); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + ">\n			    			<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n			        			<span class=\"onoffswitch-inner\"></span>\n			       				 <span class=\"onoffswitch-switch\"></span>\n			    			</label>\n						</div>\n					</td>\n					<td>\n						&nbsp;\n						<span style=\"font-size : x-large; padding-right: 5px; position: relative; top: 3px;\">";
+    + ">\n			    			<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n			        			<span class=\"onoffswitch-inner\"></span>\n			       				 <span class=\"onoffswitch-switch\"></span>\n			    			</label>\n						</div>\n					</td>\n					<td>\n						&nbsp;\n						<span style=\"font-size : large; padding-right: 5px; position: relative; top: 2px;\">";
   if (helper = helpers.limit) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.limit); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</span> <label style=\"position: relative; top: 3px;\">by</label> <select class=\"sq-select form-control\" style=\"display: inline-block; position: relative; bottom: 5px; max-width: 100px;\">\n						";
+    + "</span> <label style=\"position: relative; top: 1px;\">by</label> <select class=\"sq-select form-control\" style=\"display: inline-block; position: relative; bottom: 5px; max-width: 100px;\">\n						";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.chosenMetrics), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n						</select>\n					</td>\n				</tr>\n			</table>\n		</div>\n	";
