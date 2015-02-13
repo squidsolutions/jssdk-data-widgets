@@ -564,15 +564,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<span style=\"font-size : large; padding-right: 8px; position: relative; top: -2px;\">preview</span>\n					</td>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
+  buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<span style=\"font-size : 14px; padding-right: 5px; position: relative; top: 3px;\">preview</span>\n					</td>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
   if (helper = helpers.direction) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.direction); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + ">\n			    			<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n			        			<span class=\"onoffswitch-inner\"></span>\n			       				 <span class=\"onoffswitch-switch\"></span>\n			    			</label>\n						</div>\n					</td>\n					<td>\n						&nbsp;\n						<span style=\"font-size : large; padding-right: 5px; position: relative; top: 2px;\">";
+    + ">\n			    			<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n			        			<span class=\"onoffswitch-inner\"></span>\n			       				 <span class=\"onoffswitch-switch\"></span>\n			    			</label>\n						</div>\n					</td>\n					<td>\n						&nbsp;\n						<span style=\"font-size : 14px; font-weight: bold; padding-right: 5px; position: relative; top: 4px;\">";
   if (helper = helpers.limit) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.limit); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</span> <label style=\"position: relative; top: 1px;\">by</label> <select class=\"sq-select form-control\" style=\"display: inline-block; position: relative; bottom: 5px; max-width: 100px;\">\n						";
+    + "</span> <label style=\"position: relative; top: 4px; font-weight: normal;\">by</label> <select class=\"sq-select form-control\" style=\"display: inline-block; position: relative; bottom: 5px; max-width: 100px;\">\n						";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.chosenMetrics), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n						</select>\n					</td>\n				</tr>\n			</table>\n		</div>\n	";
@@ -2282,8 +2282,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         
         d3Formatter : null,
 
-        displayMetricValue : false,
-
         selectMetric : false,
 
         initialize: function(options) {
@@ -2294,9 +2292,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.template = options.template;
             } else {
                 this.template = template;
-            }
-            if (options.displayMetricValue) {
-                this.displayMetricValue = options.displayMetricValue;
             }
             if (options.selectMetric) {
                 this.selectMetric = options.selectMetric;
@@ -2332,10 +2327,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.model.on("change:selectedMetric", function() {
                     me.render();
                 });
-
-                this.model.get("totalAnalysis").on("change:results", function() {
-                    me.render();
-                });
             }
         },
 
@@ -2368,63 +2359,31 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         render: function() {
 
-            var results;
-            var currentAnalysis = this.model.get("totalAnalysis");
             var chosenMetrics   = this.model.get("chosenMetrics");
             var selectedMetric  = this.model.get("selectedMetric");
             var jsonData        = {"chosenMetrics" : []};
-
-            if (currentAnalysis) {
-                results = currentAnalysis.get("results");
-            }
             
             // iterate through all domains dimensions
             var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+            var domainMetrics = domain.metrics;
 
-            if (results) {
-                for (var idx = 0; idx < results.cols.length; idx++) {
-
-                    for (var cm = 0; cm < chosenMetrics.length; cm++) {
-                        var col = results.cols[idx];
-
-                        if (chosenMetrics[cm] === col.id) {
-                            // get the total for the metric
-                            totalValue = results.rows[0].v[idx];
-                            if (col.dataType == "NUMBER") {
-                                totalValue = this.format(totalValue);
-                            }
-
-                            var selected, attrSelected;
-
-                            if (selectedMetric === col.id) {
-                                selected     = "ui-selected";
-                                attrSelected = "true";
-                            } else {
-                                selected     = "";
-                                attrSelected = "";
-                            }
-
-                             // add to the list
-                            var option = {
-                                "name" : col.name,
-                                "value" : col.id,
-                                "selected" : selected,
-                                "attrSelected" : attrSelected,
-                                "displayMetricValue" : this.displayMetricValue,
-                                "selectMetric" : this.selectMetric,
-                                "total" : {
-                                    "value" : totalValue,
-                                    "unit" : null
-                                }
-                            };
-                            jsonData.chosenMetrics.push(option);
-                        }
-                    }
+            for (var dMetrics = 0; dMetrics < domainMetrics.length; dMetrics++) {
+                for (var cMetrics = 0; cMetrics < chosenMetrics.length; cMetrics++) {
+                    if (domainMetrics[dMetrics].id.metricId === chosenMetrics[cMetrics]) {
+                        // add to the list
+                        var option = {
+                            "name" : domainMetrics[dMetrics].name,
+                            "value" : chosenMetrics[cMetrics],
+                            "selectMetric" : this.selectMetric,
+                        };
+                        jsonData.chosenMetrics.push(option);
+                    }   
                 }
-                var html = this.template(jsonData);
-                this.$el.html(html);
-                this.$el.show();
             }
+
+            var html = this.template(jsonData);
+            this.$el.html(html);
+            this.$el.show();
 
             return this;
         }

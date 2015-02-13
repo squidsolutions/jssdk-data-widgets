@@ -10,8 +10,6 @@
         
         d3Formatter : null,
 
-        displayMetricValue : false,
-
         selectMetric : false,
 
         initialize: function(options) {
@@ -22,9 +20,6 @@
                 this.template = options.template;
             } else {
                 this.template = template;
-            }
-            if (options.displayMetricValue) {
-                this.displayMetricValue = options.displayMetricValue;
             }
             if (options.selectMetric) {
                 this.selectMetric = options.selectMetric;
@@ -60,10 +55,6 @@
                 this.model.on("change:selectedMetric", function() {
                     me.render();
                 });
-
-                this.model.get("totalAnalysis").on("change:results", function() {
-                    me.render();
-                });
             }
         },
 
@@ -96,63 +87,31 @@
 
         render: function() {
 
-            var results;
-            var currentAnalysis = this.model.get("totalAnalysis");
             var chosenMetrics   = this.model.get("chosenMetrics");
             var selectedMetric  = this.model.get("selectedMetric");
             var jsonData        = {"chosenMetrics" : []};
-
-            if (currentAnalysis) {
-                results = currentAnalysis.get("results");
-            }
             
             // iterate through all domains dimensions
             var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+            var domainMetrics = domain.metrics;
 
-            if (results) {
-                for (var idx = 0; idx < results.cols.length; idx++) {
-
-                    for (var cm = 0; cm < chosenMetrics.length; cm++) {
-                        var col = results.cols[idx];
-
-                        if (chosenMetrics[cm] === col.id) {
-                            // get the total for the metric
-                            totalValue = results.rows[0].v[idx];
-                            if (col.dataType == "NUMBER") {
-                                totalValue = this.format(totalValue);
-                            }
-
-                            var selected, attrSelected;
-
-                            if (selectedMetric === col.id) {
-                                selected     = "ui-selected";
-                                attrSelected = "true";
-                            } else {
-                                selected     = "";
-                                attrSelected = "";
-                            }
-
-                             // add to the list
-                            var option = {
-                                "name" : col.name,
-                                "value" : col.id,
-                                "selected" : selected,
-                                "attrSelected" : attrSelected,
-                                "displayMetricValue" : this.displayMetricValue,
-                                "selectMetric" : this.selectMetric,
-                                "total" : {
-                                    "value" : totalValue,
-                                    "unit" : null
-                                }
-                            };
-                            jsonData.chosenMetrics.push(option);
-                        }
-                    }
+            for (var dMetrics = 0; dMetrics < domainMetrics.length; dMetrics++) {
+                for (var cMetrics = 0; cMetrics < chosenMetrics.length; cMetrics++) {
+                    if (domainMetrics[dMetrics].id.metricId === chosenMetrics[cMetrics]) {
+                        // add to the list
+                        var option = {
+                            "name" : domainMetrics[dMetrics].name,
+                            "value" : chosenMetrics[cMetrics],
+                            "selectMetric" : this.selectMetric,
+                        };
+                        jsonData.chosenMetrics.push(option);
+                    }   
                 }
-                var html = this.template(jsonData);
-                this.$el.html(html);
-                this.$el.show();
             }
+
+            var html = this.template(jsonData);
+            this.$el.html(html);
+            this.$el.show();
 
             return this;
         }
