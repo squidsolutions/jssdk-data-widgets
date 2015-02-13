@@ -110,7 +110,7 @@
                     // Done
                     squid_api.model.status.pullTask(pollAnalysis);
                     me.downloadStatus = 0;
-                        $(me.renderStore).find("#download").html("Proceed with Export");
+                        $(me.renderStore).find("#download").html("Start Export");
                         $(me.renderStore).find("#download").removeClass("btn-link");
                         $(me.renderStore).find("#download").addClass("btn-default");
                 });
@@ -165,7 +165,7 @@
                 this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-chevron-up'></span></button>");
                 $(this.renderStore).find("#download").html("Start Export");
             } else {
-                this.$el.find("#download").html("Proceed with Export");
+                this.$el.find("#download").html("Start Export");
             }
             
             // apply cURL panel state

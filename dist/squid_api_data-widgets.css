@@ -158,7 +158,9 @@ div.dataTables_paginate ul.pagination li.disabled {
     text-align: center;
 }
 .squid-api-data-widgets-orderby-widget .onoffswitch {
-    position: relative; width: 90px;
+    position: relative; 
+    width: 90px;
+    top: 5px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
 }
 .squid-api-data-widgets-orderby-widget .onoffswitch-checkbox {
@@ -179,12 +181,12 @@ div.dataTables_paginate ul.pagination li.disabled {
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 .squid-api-data-widgets-orderby-widget .onoffswitch-inner:before {
-    content: "TOP";
+    content: "top";
     padding-left: 10px;
     background-color: #707070; color: #FFFFFF;
 }
 .squid-api-data-widgets-orderby-widget .onoffswitch-inner:after {
-    content: "LAST";
+    content: "last";
     padding-right: 10px;
     background-color: #FFFFFF; color: #999999;
     text-align: right;
