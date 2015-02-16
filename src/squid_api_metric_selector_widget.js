@@ -26,7 +26,8 @@
                 this.metricIndex = options.metricIndex;
             }
 
-            this.model.on("change", function() {
+            // listen for filters change as we use them to filter out boolean dimensions
+            squid_api.model.filters.on("change", function() {
                 me.render();
             });
 
