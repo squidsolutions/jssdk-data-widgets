@@ -24,8 +24,15 @@
 
         noDataMessage : "No data available in table",
 
+        reactiveState : false,
+
+        reactiveMessage : null,
+
+        domain : null,
+
         initialize : function(options) {
             this.mainModel = options.mainModel;
+            var me = this;
 
             if (this.model) {
                 this.listenTo(this.model, 'change', this.render);
@@ -58,6 +65,13 @@
             if (options.noDataMessage) {
                 this.noDataMessage = options.noDataMessage;
             }
+            if (options.reactiveState) {
+                this.reactiveState = options.reactiveState;
+                this.reactiveStateEvents();
+            }
+            if (options.reactiveMessage) {
+                this.reactiveMessage = options.reactiveMessage;
+            }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
             }
@@ -66,7 +80,6 @@
             } else {
                 // default number formatter
                 if (this.d3Formatter) {
-                    var me = this;
                     this.format = function(f){
                         if (isNaN(f)) {
                             return f;
@@ -172,8 +185,78 @@
             this.addMetricClasses();
         },
 
+        reactiveStateEvents : function() {
+            if (this.mainModel) {
+                if (! this.mainModel.get("refreshButtonPressed")) {
+                    this.mainModel.on("change:chosenDimensions", this.render, this);
+                    this.mainModel.on("change:chosenMetrics", this.render, this);
+                    this.mainModel.on("change:selectedMetric", this.render, this);
+                    this.mainModel.on("change:orderByDirection", this.render, this);
+                    squid_api.model.filters.on("change:selection", this.render, this);
+                }
+            }
+        },
+
+        getNamesFromDomain : function(model, item) {
+            var namesArray;
+            var obj;
+            if (model === "dimension") {    
+                var domainDimensions = this.domain.dimensions;
+                namesArray = [];
+                for (i=0; i<domainDimensions.length; i++) {
+                    obj = {};
+                    for (ix=0; ix<item.length; ix++) {
+                        if (item[ix] === domainDimensions[i].oid) {
+                            obj.id = item[ix];
+                            obj.name = domainDimensions[i].name;
+                            namesArray.push(obj);
+                        }
+                    }
+                }
+                return namesArray;
+            } else if (model === "metric") {
+                var domainMetrics = this.domain.metrics;
+                namesArray = [];
+                for (i=0; i<domainMetrics.length; i++) {
+                    obj = {};
+                    for (ix=0; ix<item.length; ix++) {
+                        if (item[ix] === domainMetrics[i].oid) {
+                            obj.id = item[ix];
+                            obj.name = domainMetrics[i].name;
+                            namesArray.push(obj);
+                        }
+                    }
+                }
+                return namesArray;
+            }
+        },
+
+        printChosenItems : function() {
+            var chosenDimensions = this.mainModel.get("chosenDimensions");
+            var chosenMetrics = this.mainModel.get("chosenMetrics");
+            var dimensions = this.getNamesFromDomain("dimension", chosenDimensions);
+            var metrics = this.getNamesFromDomain("metric", chosenMetrics);
+
+            this.$el.find("thead tr").html();
+            if (this.mainModel.get("analysisRefreshNeeded")) {
+                for (i=0; i<dimensions.length; i++) {
+                    this.$el.find("thead tr").append("<th data-content=" + dimensions[i].id + ">" + dimensions[i].name + "</th>");
+                }
+                for (i=0; i<metrics.length; i++) {
+                    this.$el.find("thead tr").append("<th data-content=" + metrics[i].id + ">" + metrics[i].name + "</th>");
+                }
+                this.$el.find(".squid-api-data-widgets-data-table").addClass("setHeaders");
+                if (this.model.get("status") == "RUNNING") {
+                    this.$el.find("tbody").html("<div class='reactiveMessage'></div>");
+                }
+            }
+        },
+
         render : function() {
             var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
+            if (! this.domain) {
+                this.domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+            }
 
             var me = this;
 
@@ -183,30 +266,43 @@
             if (!model.dimensions || !model.metrics) {
                 dataAvailable = false;
             }
+            if (this.model.get("status") == "RUNNING" && this.reactiveState) {
 
-            this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
-
-            // display
-            this.display();
+            } else {
+                this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
+            }
             
+            if (this.reactiveState) {
+                this.$el.find(".reactiveMessage").hide();
+                this.$el.find(".reactiveMessage").fadeIn();
+                this.printChosenItems();
+                this.$el.find(".squid-api-data-widgets-data-table").addClass("setHeaders");
+                this.$el.find("tbody").html("<div class='reactiveMessage'><span>" + this.reactiveMessage + "</span></div>");
+            } else {
+                this.display();
+            }
+               
             if (!this.model.isDone()) {
-                this.$el.find(".squid-api-data-widgets-data-table").removeClass("blur");
+                this.$el.find(".squid-api-data-widgets-data-table").removeClass("notdone");
                 // running
                 if (this.model.get("status") == "RUNNING") {
                     $(".sq-loading").show();
-                    this.$el.find(".dataTables_wrapper").addClass("blur");
+                    this.$el.find(".dataTables_wrapper").addClass("running");
                 } else {
                     $(".sq-loading").hide();
-                    this.$el.find(".dataTables_wrapper").addClass("blur");
+                    this.$el.find(".dataTables_wrapper").removeClass("done");
                 }
             } else if (this.model.get("error")) {
                 // error
                 $(".sq-loading").hide();
             } else {
+                if (this.reactiveState && ! this.mainModel.get("analysisRefreshNeeded")) {
+                    this.display();
+                    this.$el.find(".squid-api-data-widgets-data-table").removeClass("setHeaders");
+                }
                 $(".sq-loading").hide();
+                this.selectColumn();
             }
-
-            this.selectColumn();
 
             this.addMetricClasses();
 
