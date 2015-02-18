@@ -200,7 +200,7 @@
         getNamesFromDomain : function(model, item) {
             var namesArray;
             var obj;
-            if (model === "dimension") {    
+            if (model === "dimension") {
                 var domainDimensions = this.domain.dimensions;
                 namesArray = [];
                 for (i=0; i<domainDimensions.length; i++) {
@@ -275,7 +275,9 @@
             if (this.reactiveState) {
                 this.$el.find(".reactiveMessage").hide();
                 this.$el.find(".reactiveMessage").fadeIn();
-                this.printChosenItems();
+                if (this.domain) {
+                    this.printChosenItems();
+                }
                 this.$el.find(".squid-api-data-widgets-data-table").addClass("setHeaders");
                 this.$el.find("tbody").html("<div class='reactiveMessage'><span>" + this.reactiveMessage + "</span></div>");
             } else {
