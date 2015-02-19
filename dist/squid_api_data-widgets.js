@@ -1096,13 +1096,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         reactiveStateEvents : function() {
             if (this.mainModel) {
-                if (! this.mainModel.get("refreshButtonPressed")) {
-                    this.mainModel.on("change:chosenDimensions", this.render, this);
-                    this.mainModel.on("change:chosenMetrics", this.render, this);
-                    this.mainModel.on("change:selectedMetric", this.render, this);
-                    this.mainModel.on("change:orderByDirection", this.render, this);
-                    squid_api.model.filters.on("change:selection", this.render, this);
-                }
+                this.mainModel.on("change:chosenDimensions", this.render, this);
+                this.mainModel.on("change:chosenMetrics", this.render, this);
+                this.mainModel.on("change:selectedMetric", this.render, this);
+                this.mainModel.on("change:orderByDirection", this.render, this);
+                api.model.filters.on('change', this.render, this);
             }
         },
 
