@@ -937,6 +937,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         reactiveMessage : null,
 
+        headerBadges : false,
+
         domain : null,
 
         initialize : function(options) {
@@ -980,6 +982,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.reactiveMessage) {
                 this.reactiveMessage = options.reactiveMessage;
+            }
+            if (options.headerBadges) {
+                this.headerBadges = options.headerBadges;
             }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
@@ -1082,10 +1087,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             for (i=0; i<tableHeaders.length; i++) { 
                 if (this.mainModel.get("selectedMetric") == $(tableHeaders[i]).attr("data-content")) {
                     $(tableHeaders[i]).addClass("filtered-by");
-                    if (me.mainModel.get("orderByDirection") === "DESC") {
-                        $(tableHeaders[i]).append("<span class='badge'>Top</span>");
-                    } else {
-                        $(tableHeaders[i]).append("<span class='badge'>Bottom</span>");
+                    if (this.headerBadges) {
+                        if (me.mainModel.get("orderByDirection") === "DESC") {
+                            $(tableHeaders[i]).append("<span class='badge'>Top</span>");
+                        } else {
+                            $(tableHeaders[i]).append("<span class='badge'>Last</span>");
+                        }
                     }
                 }
             }
