@@ -368,13 +368,30 @@
                 
                 // build the html datatable
                 this.dataTableInsert(data);
+
+                // match orderBy column with default sorting
+                var columnToSelect = this.mainModel.get("selectedMetric");
+                var columnOrderDirection = this.mainModel.get("orderByDirection");
+                // for data table compatibility we need to format the string
+                columnOrderDirection = columnOrderDirection.toLowerCase();
+                // cycle through each header element to order automatically
+                var tableHeaders = this.$el.find("thead th");
+                var columnToOrder = 0;
+
+                for (i=0; i<tableHeaders.length; i++) {
+                    if ($(tableHeaders[i]).attr("data-content") === columnToSelect) {
+                        columnToOrder = i;
+                    }
+                }
+
                 // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable({
                     "lengthChange": false,
-                    "searching": me.searching,
-                    "paging" : me.paging,
-                    "ordering":  me.ordering,
+                    "searching": this.searching,
+                    "paging" : this.paging,
+                    "ordering":  this.ordering,
                     "fnDrawCallback" : this.addMetricClasses,
+                    "order": [[ columnToOrder, columnOrderDirection ]],
                 });
             }
         }

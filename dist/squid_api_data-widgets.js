@@ -564,7 +564,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<span style=\"font-size : 14px; padding-right: 5px; position: relative; top: 3px;\">preview</span>\n					</td>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
+  buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<span style=\"font-size : 14px; padding-right: 5px; position: relative; top: 3px;\">Preview</span>\n					</td>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
   if (helper = helpers.direction) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.direction); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -1277,13 +1277,28 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 
                 // build the html datatable
                 this.dataTableInsert(data);
+
+                // match orderBy column with default sorting
+                var columnToSelect = this.mainModel.get("selectedMetric");
+                var columnOrderDirection = this.mainModel.get("orderByDirection");
+                columnOrderDirection = columnOrderDirection.toLowerCase();
+                var tableHeaders = this.$el.find("thead th");
+                var columnToOrder = 0;
+
+                for (i=0; i<tableHeaders.length; i++) {
+                    if ($(tableHeaders[i]).attr("data-content") === columnToSelect) {
+                        columnToOrder = i;
+                    }
+                }
+
                 // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable({
                     "lengthChange": false,
-                    "searching": me.searching,
-                    "paging" : me.paging,
-                    "ordering":  me.ordering,
+                    "searching": this.searching,
+                    "paging" : this.paging,
+                    "ordering":  this.ordering,
                     "fnDrawCallback" : this.addMetricClasses,
+                    "order": [[ columnToOrder, columnOrderDirection ]],
                 });
             }
         }
