@@ -1089,9 +1089,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
                 }
             }
-
-            // Add remaining Classes
-            this.addMetricClasses();
         },
 
         reactiveStateEvents : function() {
@@ -1213,15 +1210,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.selectColumn();
             }
 
-            this.addMetricClasses();
-
             return this;
         },
 
         addMetricClasses : function() {
             var index = [];
             var me = this;
-            var columnHeaders = this.$el.find("th");
+            var columnHeaders = $(this).find("th");
 
             for (i=0; i<columnHeaders.length; i++) {
                 if ($(columnHeaders[i]).hasClass("NUMBER")) {
@@ -1229,7 +1224,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
 
-            var bodyTr = this.$el.find("tbody tr");
+            var bodyTr = $(this).find("tbody tr");
 
             for (i=0; i<bodyTr.length; i++) {
                 var items = $(bodyTr[i]).find("td");
@@ -1281,6 +1276,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "searching": me.searching,
                     "paging" : me.paging,
                     "ordering":  me.ordering,
+                    "fnDrawCallback" : this.addMetricClasses,
                 });
             }
         }

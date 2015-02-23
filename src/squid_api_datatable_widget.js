@@ -180,9 +180,6 @@
                     }
                 }
             }
-
-            // Add remaining Classes
-            this.addMetricClasses();
         },
 
         reactiveStateEvents : function() {
@@ -304,15 +301,13 @@
                 this.selectColumn();
             }
 
-            this.addMetricClasses();
-
             return this;
         },
 
         addMetricClasses : function() {
             var index = [];
             var me = this;
-            var columnHeaders = this.$el.find("th");
+            var columnHeaders = $(this).find("th");
 
             for (i=0; i<columnHeaders.length; i++) {
                 if ($(columnHeaders[i]).hasClass("NUMBER")) {
@@ -320,7 +315,7 @@
                 }
             }
 
-            var bodyTr = this.$el.find("tbody tr");
+            var bodyTr = $(this).find("tbody tr");
 
             for (i=0; i<bodyTr.length; i++) {
                 var items = $(bodyTr[i]).find("td");
@@ -372,6 +367,7 @@
                     "searching": me.searching,
                     "paging" : me.paging,
                     "ordering":  me.ordering,
+                    "fnDrawCallback" : this.addMetricClasses,
                 });
             }
         }
