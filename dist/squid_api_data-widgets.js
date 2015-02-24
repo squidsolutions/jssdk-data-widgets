@@ -1007,6 +1007,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     };
                 }
             }
+
+            this.beforeRender();
         },
 
         events : ({
@@ -1163,6 +1165,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
         },
 
+        beforeRender: function() {
+            this.$el.html(this.template({'noDataMessage' : this.noDataMessage}));
+        },
+
         render : function() {
             var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
             if (! this.domain) {
@@ -1180,7 +1186,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.model.get("status") == "RUNNING" && this.reactiveState) {
 
             } else {
-                this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
+                if (this.mainModel.get("refreshButtonPressed")) {
+                    this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
+                }
             }
             
             if (this.reactiveState) {
@@ -1281,7 +1289,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // match orderBy column with default sorting
                 var columnToSelect = this.mainModel.get("selectedMetric");
                 var columnOrderDirection = this.mainModel.get("orderByDirection");
+                // for data table compatibility we need to format the string
                 columnOrderDirection = columnOrderDirection.toLowerCase();
+                // cycle through each header element to order automatically
                 var tableHeaders = this.$el.find("thead th");
                 var columnToOrder = 0;
 
@@ -1992,7 +2002,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 );
 
             if (this.displayInAccordion) {
-                this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-chevron-up'></span></button>");
+                this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-download-alt'></span></button>");
             }
             
             // apply cURL panel state

@@ -98,6 +98,8 @@
                     };
                 }
             }
+
+            this.beforeRender();
         },
 
         events : ({
@@ -254,6 +256,10 @@
             }
         },
 
+        beforeRender: function() {
+            this.$el.html(this.template({'noDataMessage' : this.noDataMessage}));
+        },
+
         render : function() {
             var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
             if (! this.domain) {
@@ -271,7 +277,9 @@
             if (this.model.get("status") == "RUNNING" && this.reactiveState) {
 
             } else {
-                this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
+                if (this.mainModel.get("refreshButtonPressed")) {
+                    this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
+                }
             }
             
             if (this.reactiveState) {

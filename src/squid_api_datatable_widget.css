@@ -7,6 +7,10 @@ div.dataTables_paginate ul.pagination li.disabled {
 	cursor: pointer;
 }
 
+.dataTables_wrapper {
+	overflow: hidden;
+}
+
 .dataTable .NUMBER {
     text-align: right;
 }
