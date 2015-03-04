@@ -1476,6 +1476,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         }
                     }
                 });
+            } else {
+                this.$el.find("select").on("change", function() {
+                    var dimension = $(this).val();
+                    me.model.set({"selectedDimension": dimension});
+                });
             }
 
             // Remove Button Title Tag
