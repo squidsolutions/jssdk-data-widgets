@@ -26,6 +26,10 @@ div.dataTables_paginate ul.pagination li.disabled {
 	cursor: pointer;
 }
 
+.dataTables_wrapper {
+	overflow: hidden;
+}
+
 .dataTable .NUMBER {
     text-align: right;
 }
@@ -71,6 +75,7 @@ div.dataTables_paginate ul.pagination li.disabled {
 
 .squid-api-data-widgets-data-table thead th {
 	min-width: 150px;
+	border-left: 1px solid #e0e0e0;
 }
 
 .squid-api-data-widgets-data-table.setDimensions {

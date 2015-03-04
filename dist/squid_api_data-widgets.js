@@ -564,7 +564,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<span style=\"font-size : 14px; padding-right: 5px; position: relative; top: 3px;\">preview</span>\n					</td>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
+  buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<span style=\"font-size : 14px; padding-right: 5px; position: relative; top: 3px;\">Preview</span>\n					</td>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
   if (helper = helpers.direction) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.direction); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -937,6 +937,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         reactiveMessage : null,
 
+        headerBadges : false,
+
         domain : null,
 
         initialize : function(options) {
@@ -981,6 +983,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.reactiveMessage) {
                 this.reactiveMessage = options.reactiveMessage;
             }
+            if (options.headerBadges) {
+                this.headerBadges = options.headerBadges;
+            }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
             }
@@ -1002,6 +1007,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     };
                 }
             }
+
+            this.beforeRender();
         },
 
         events : ({
@@ -1082,16 +1089,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             for (i=0; i<tableHeaders.length; i++) { 
                 if (this.mainModel.get("selectedMetric") == $(tableHeaders[i]).attr("data-content")) {
                     $(tableHeaders[i]).addClass("filtered-by");
-                    if (me.mainModel.get("orderByDirection") === "DESC") {
-                        $(tableHeaders[i]).append("<span class='badge'>Top</span>");
-                    } else {
-                        $(tableHeaders[i]).append("<span class='badge'>Bottom</span>");
+                    if (this.headerBadges) {
+                        if (me.mainModel.get("orderByDirection") === "DESC") {
+                            $(tableHeaders[i]).append("<span class='badge'>Top</span>");
+                        } else {
+                            $(tableHeaders[i]).append("<span class='badge'>Last</span>");
+                        }
                     }
                 }
             }
-
-            // Add remaining Classes
-            this.addMetricClasses();
         },
 
         reactiveStateEvents : function() {
@@ -1159,6 +1165,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
         },
 
+        beforeRender: function() {
+            this.$el.html(this.template({'noDataMessage' : this.noDataMessage}));
+        },
+
         render : function() {
             var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
             if (! this.domain) {
@@ -1176,7 +1186,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.model.get("status") == "RUNNING" && this.reactiveState) {
 
             } else {
-                this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
+                if (this.mainModel.get("refreshButtonPressed")) {
+                    this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
+                }
             }
             
             if (this.reactiveState) {
@@ -1213,15 +1225,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.selectColumn();
             }
 
-            this.addMetricClasses();
-
             return this;
         },
 
         addMetricClasses : function() {
             var index = [];
             var me = this;
-            var columnHeaders = this.$el.find("th");
+            var columnHeaders = $(this).find("th");
 
             for (i=0; i<columnHeaders.length; i++) {
                 if ($(columnHeaders[i]).hasClass("NUMBER")) {
@@ -1229,7 +1239,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
 
-            var bodyTr = this.$el.find("tbody tr");
+            var bodyTr = $(this).find("tbody tr");
 
             for (i=0; i<bodyTr.length; i++) {
                 var items = $(bodyTr[i]).find("td");
@@ -1275,12 +1285,30 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 
                 // build the html datatable
                 this.dataTableInsert(data);
+
+                // match orderBy column with default sorting
+                var columnToSelect = this.mainModel.get("selectedMetric");
+                var columnOrderDirection = this.mainModel.get("orderByDirection");
+                // for data table compatibility we need to format the string
+                columnOrderDirection = columnOrderDirection.toLowerCase();
+                // cycle through each header element to order automatically
+                var tableHeaders = this.$el.find("thead th");
+                var columnToOrder = 0;
+
+                for (i=0; i<tableHeaders.length; i++) {
+                    if ($(tableHeaders[i]).attr("data-content") === columnToSelect) {
+                        columnToOrder = i;
+                    }
+                }
+
                 // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable({
                     "lengthChange": false,
-                    "searching": me.searching,
-                    "paging" : me.paging,
-                    "ordering":  me.ordering,
+                    "searching": this.searching,
+                    "paging" : this.paging,
+                    "ordering":  this.ordering,
+                    "fnDrawCallback" : this.addMetricClasses,
+                    "order": [[ columnToOrder, columnOrderDirection ]],
                 });
             }
         }
@@ -1440,6 +1468,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             me.model.set({"chosenDimensions": chosenModel});
                         }
                     }
+                });
+            } else {
+                this.$el.find("select").on("change", function() {
+                    var dimension = $(this).val();
+                    me.model.set({"selectedDimension": dimension});
                 });
             }
 
@@ -1973,7 +2006,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 );
 
             if (this.displayInAccordion) {
-                this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-chevron-up'></span></button>");
+                this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-download-alt'></span></button>");
             }
             
             // apply cURL panel state

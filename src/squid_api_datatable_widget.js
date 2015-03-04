@@ -28,6 +28,8 @@
 
         reactiveMessage : null,
 
+        headerBadges : false,
+
         domain : null,
 
         initialize : function(options) {
@@ -72,6 +74,9 @@
             if (options.reactiveMessage) {
                 this.reactiveMessage = options.reactiveMessage;
             }
+            if (options.headerBadges) {
+                this.headerBadges = options.headerBadges;
+            }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
             }
@@ -93,6 +98,8 @@
                     };
                 }
             }
+
+            this.beforeRender();
         },
 
         events : ({
@@ -173,16 +180,15 @@
             for (i=0; i<tableHeaders.length; i++) { 
                 if (this.mainModel.get("selectedMetric") == $(tableHeaders[i]).attr("data-content")) {
                     $(tableHeaders[i]).addClass("filtered-by");
-                    if (me.mainModel.get("orderByDirection") === "DESC") {
-                        $(tableHeaders[i]).append("<span class='badge'>Top</span>");
-                    } else {
-                        $(tableHeaders[i]).append("<span class='badge'>Bottom</span>");
+                    if (this.headerBadges) {
+                        if (me.mainModel.get("orderByDirection") === "DESC") {
+                            $(tableHeaders[i]).append("<span class='badge'>Top</span>");
+                        } else {
+                            $(tableHeaders[i]).append("<span class='badge'>Last</span>");
+                        }
                     }
                 }
             }
-
-            // Add remaining Classes
-            this.addMetricClasses();
         },
 
         reactiveStateEvents : function() {
@@ -250,6 +256,10 @@
             }
         },
 
+        beforeRender: function() {
+            this.$el.html(this.template({'noDataMessage' : this.noDataMessage}));
+        },
+
         render : function() {
             var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
             if (! this.domain) {
@@ -267,7 +277,9 @@
             if (this.model.get("status") == "RUNNING" && this.reactiveState) {
 
             } else {
-                this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
+                if (this.mainModel.get("refreshButtonPressed")) {
+                    this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
+                }
             }
             
             if (this.reactiveState) {
@@ -304,15 +316,13 @@
                 this.selectColumn();
             }
 
-            this.addMetricClasses();
-
             return this;
         },
 
         addMetricClasses : function() {
             var index = [];
             var me = this;
-            var columnHeaders = this.$el.find("th");
+            var columnHeaders = $(this).find("th");
 
             for (i=0; i<columnHeaders.length; i++) {
                 if ($(columnHeaders[i]).hasClass("NUMBER")) {
@@ -320,7 +330,7 @@
                 }
             }
 
-            var bodyTr = this.$el.find("tbody tr");
+            var bodyTr = $(this).find("tbody tr");
 
             for (i=0; i<bodyTr.length; i++) {
                 var items = $(bodyTr[i]).find("td");
@@ -366,12 +376,30 @@
                 
                 // build the html datatable
                 this.dataTableInsert(data);
+
+                // match orderBy column with default sorting
+                var columnToSelect = this.mainModel.get("selectedMetric");
+                var columnOrderDirection = this.mainModel.get("orderByDirection");
+                // for data table compatibility we need to format the string
+                columnOrderDirection = columnOrderDirection.toLowerCase();
+                // cycle through each header element to order automatically
+                var tableHeaders = this.$el.find("thead th");
+                var columnToOrder = 0;
+
+                for (i=0; i<tableHeaders.length; i++) {
+                    if ($(tableHeaders[i]).attr("data-content") === columnToSelect) {
+                        columnToOrder = i;
+                    }
+                }
+
                 // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable({
                     "lengthChange": false,
-                    "searching": me.searching,
-                    "paging" : me.paging,
-                    "ordering":  me.ordering,
+                    "searching": this.searching,
+                    "paging" : this.paging,
+                    "ordering":  this.ordering,
+                    "fnDrawCallback" : this.addMetricClasses,
+                    "order": [[ columnToOrder, columnOrderDirection ]],
                 });
             }
         }

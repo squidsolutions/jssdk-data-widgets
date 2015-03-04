@@ -150,6 +150,11 @@
                         }
                     }
                 });
+            } else {
+                this.$el.find("select").on("change", function() {
+                    var dimension = $(this).val();
+                    me.model.set({"selectedDimension": dimension});
+                });
             }
 
             // Remove Button Title Tag
