@@ -1298,6 +1298,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         template : null,
         dimensionIdList : null,
         dimensionIndex: null,
+        filters: null,
 
         initialize: function(options) {
             var me = this;
@@ -1307,6 +1308,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.template = options.template;
             } else {
                 this.template = template;
+            }
+            
+            if (options.filters) {
+                this.filters = options.filters;
+            } else {
+                this.filters = squid_api.model.filters;
             }
 
             if (options.dimensionIdList) {
@@ -1363,56 +1370,42 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             
             var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
             
-            // iterate through all domains dimensions
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
-            if (domain) {
-                if (domain.dimensions) {
+            // iterate through all filter facets
+            var selection = this.filters.get("selection");
+            if (selection) {
+                var facets = selection.facets;
+                if (facets) {
                     var dimensions = [];
-                    var dims = domain.dimensions;
-                    for (var i=0; i<dims.length; i++){
-                        var dim = dims[i];
+                    var dims = facets;
+                    for (var i=0; i<facets.length; i++){
+                        var facet = facets[i];
                         // do not display boolean dimensions
                         // this is a workaround as the API should return a dimension type
                         var isBoolean = false;
-                        var filters = squid_api.model.filters;
-                        if (filters ) {
-                            var sel = filters.get("selection");
-                            if (sel) {
-                                var facets = sel.facets;
-                                var fi = 0;
-                                while ((fi < facets.length) && (!isBoolean)) {
-                                    var facet = facets[fi];
-                                    fi++;
-                                    if (facet.dimension.oid == dim.oid) {
-                                        if ((facet.items.length == 1) && (facet.items[0].value == "true")) {
-                                            isBoolean = true; 
-                                        }
-                                    }
-                                }
-                            }
+                        if ((facet.items.length == 1) && (facet.items[0].value == "true")) {
+                            isBoolean = true; 
                         }
                         
                         if (!isBoolean) {
                             if (this.dimensionIdList) {
                                 // insert and sort
-                                var idx = this.dimensionIdList.indexOf(dim.oid);
+                                var idx = this.dimensionIdList.indexOf(facet.dimension.oid);
                                 if (idx >= 0) {
-                                    dimensions[idx] = dim;
+                                    dimensions[idx] = facet;
                                 }
                             } else {
                                 // default unordered behavior
-                                dimensions.push(dim);
+                                dimensions.push(facet);
                             }
                         }
                     }
                     
                     for (var dimIdx=0; dimIdx<dimensions.length; dimIdx++) {
-                        var dimension = dimensions[dimIdx];
+                        var facet1 = dimensions[dimIdx];
                         // check if selected
-                        var selected = this.isChosen(dimension);
-                        
+                        var selected = this.isChosen(facet1);
                         // add to the list
-                        var option = {"label" : dimension.name, "value" : dimension.oid, "selected" : selected};
+                        var option = {"label" : facet1.dimension.name, "value" : facet1.id, "selected" : selected};
                         jsonData.options.push(option);
                     }
                 }
@@ -1490,6 +1483,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     var View = Backbone.View.extend({
         template : null,
         selectDimension: false,
+        filters : null,
 
         initialize: function(options) {
             var me = this;
@@ -1499,6 +1493,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.template = options.template;
             } else {
                 this.template = template;
+            }
+            
+            if (options.filters) {
+                this.filters = options.filters;
+            } else {
+                this.filters = squid_api.model.filters;
             }
 
             if (options.selectDimension) {
@@ -1558,25 +1558,24 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var jsonData = {"chosenDimensions" : []};
             var html;
             
-            // iterate through all domains dimensions
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
-
-            if (domain) {
-                if (domain.dimensions) {
-                    var dimensions = [];
-                    var dims = domain.dimensions;
+            // iterate through all filter facets
+            var selection = this.filters.get("selection");
+            if (selection) {
+                var facets = selection.facets;
+                if (facets) {
+                    var chosenFacets = [];
                     for (var dc=0; dc<chosenDimensions.length; dc++) {
-                        for (var d=0; d<dims.length; d++){
-                            var dim = dims[d];
-                            if (chosenDimensions[dc] == dims[d].oid) {
+                        for (var d=0; d<facets.length; d++){
+                            var facet = facets[d];
+                            if (chosenDimensions[dc] == facet.id) {
                                 var item = {};
-                                item.id = dims[d].oid;
-                                item.value = dims[d].name;
-                                dimensions.push(item);
+                                item.id = facet.id;
+                                item.value = facet.dimension.name;
+                                chosenFacets.push(item);
                             }
                         } 
                     }
-                    jsonData.chosenDimensions = dimensions;
+                    jsonData.chosenDimensions = chosenFacets;
                 }
             } else {
                 html = this.template({"noChosenDimensions" : true});
