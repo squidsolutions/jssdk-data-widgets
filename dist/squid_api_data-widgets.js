@@ -955,6 +955,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             } else {
                 this.template = squid_api.template.squid_api_datatable_widget;
             }
+            if (options.filters) {
+                this.filters = options.filters;
+            } else {
+                this.filters = squid_api.model.filters;
+            }
             if (options.maxRowsPerPage) {
                 this.maxRowsPerPage = options.maxRowsPerPage;
             }
@@ -1113,29 +1118,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         getNamesFromDomain : function(model, item) {
             var namesArray;
             var obj;
-            if (model === "dimension") {
-                var domainDimensions = this.domain.dimensions;
-                namesArray = [];
-                for (i=0; i<domainDimensions.length; i++) {
-                    obj = {};
-                    for (ix=0; ix<item.length; ix++) {
-                        if (item[ix] === domainDimensions[i].oid) {
-                            obj.id = item[ix];
-                            obj.name = domainDimensions[i].name;
-                            namesArray.push(obj);
-                        }
-                    }
-                }
-                return namesArray;
-            } else if (model === "metric") {
+            if (model === "metric") {
                 var domainMetrics = this.domain.metrics;
                 namesArray = [];
-                for (i=0; i<domainMetrics.length; i++) {
+                for (var ix0=0; ix0<domainMetrics.length; ix0++) {
                     obj = {};
-                    for (ix=0; ix<item.length; ix++) {
-                        if (item[ix] === domainMetrics[i].oid) {
-                            obj.id = item[ix];
-                            obj.name = domainMetrics[i].name;
+                    for (var ix1=0; ix1<item.length; ix1++) {
+                        if (item[ix1] === domainMetrics[ix0].oid) {
+                            obj.id = item[ix1];
+                            obj.name = domainMetrics[ix0].name;
                             namesArray.push(obj);
                         }
                     }
@@ -1147,13 +1138,34 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         printChosenItems : function() {
             var chosenDimensions = this.mainModel.get("chosenDimensions");
             var chosenMetrics = this.mainModel.get("chosenMetrics");
-            var dimensions = this.getNamesFromDomain("dimension", chosenDimensions);
-            var metrics = this.getNamesFromDomain("metric", chosenMetrics);
+            // var dimensions = chosenDimensions;
+            // Get Dimension Names
+            var dimensions = [];
 
+            var selection = this.filters.get("selection");
+            if (selection) {
+                var facets = selection.facets;
+                if (facets) {
+                    for (i=0; i<chosenDimensions.length; i++) {
+                        for (ix=0; ix<facets.length; ix++) {
+                            if (chosenDimensions[i] === facets[ix].id) {
+                                var obj = {};
+                                obj.id = facets[ix].dimension.id.dimensionId;
+                                obj.name = facets[ix].dimension.name;
+                                dimensions.push(obj);
+                            }
+                        }
+                    }
+                }
+            }
+
+            var metrics = this.getNamesFromDomain("metric", chosenMetrics);
             this.$el.find("thead tr").html();
             if (this.mainModel.get("analysisRefreshNeeded")) {
-                for (i=0; i<dimensions.length; i++) {
-                    this.$el.find("thead tr").append("<th data-content=" + dimensions[i].id + ">" + dimensions[i].name + "</th>");
+                if (dimensions) {
+                    for (i=0; i<dimensions.length; i++) {
+                        this.$el.find("thead tr").append("<th data-content=" + dimensions[i].id + ">" + dimensions[i].name + "</th>");
+                    }
                 }
                 for (i=0; i<metrics.length; i++) {
                     this.$el.find("thead tr").append("<th data-content=" + metrics[i].id + ">" + metrics[i].name + "</th>");
