@@ -1193,12 +1193,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             
             if (this.reactiveState) {
                 this.$el.find(".reactiveMessage").hide();
-                this.$el.find(".reactiveMessage").fadeIn();
+                this.$el.find(".reactiveMessage").show();
                 if (this.domain) {
                     this.printChosenItems();
                 }
-                this.$el.find(".squid-api-data-widgets-data-table").addClass("setHeaders");
-                this.$el.find("tbody").html("<div class='reactiveMessage'><span>" + this.reactiveMessage + "</span></div>");
+                if (this.mainModel.get("analysisRefreshNeeded")) {
+                    this.$el.find(".squid-api-data-widgets-data-table").addClass("setHeaders");
+                    this.$el.find("tbody").html("<div class='reactiveMessage'><span>" + this.reactiveMessage + "</span></div>");
+                }
             } else {
                 this.display();
             }
