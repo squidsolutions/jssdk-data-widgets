@@ -116,7 +116,7 @@
             if (isMultiple) {
                 selector.multiselect({
                     buttonText: function(options, select) {
-                        return 'Metrics <span class="caret"></span>';
+                        return 'Metrics';
                     },
                 });
             }
