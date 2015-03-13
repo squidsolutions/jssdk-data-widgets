@@ -114,6 +114,12 @@
                         // check if selected
                         var selected = this.isChosen(facet1);
                         // add to the list
+                        var name;
+                        if (facet1.name) {
+                            name = facet1.name;
+                        } else {
+                            name = facet1.dimension.name;
+                        }
                         var option = {"label" : facet1.dimension.name, "value" : facet1.id, "selected" : selected};
                         jsonData.options.push(option);
                     }

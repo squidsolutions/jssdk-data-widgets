@@ -242,7 +242,11 @@
                             if (chosenDimensions[i] === facets[ix].id) {
                                 var obj = {};
                                 obj.id = facets[ix].dimension.id.dimensionId;
-                                obj.name = facets[ix].dimension.name;
+                                if (facets[ix].name) {
+                                    obj.name = facets[ix].name;
+                                } else {
+                                    obj.name = facets[ix].dimension.name;
+                                }
                                 dimensions.push(obj);
                             }
                         }

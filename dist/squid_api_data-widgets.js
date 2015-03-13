@@ -1151,7 +1151,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             if (chosenDimensions[i] === facets[ix].id) {
                                 var obj = {};
                                 obj.id = facets[ix].dimension.id.dimensionId;
-                                obj.name = facets[ix].dimension.name;
+                                if (facets[ix].name) {
+                                    obj.name = facets[ix].name;
+                                } else {
+                                    obj.name = facets[ix].dimension.name;
+                                }
                                 dimensions.push(obj);
                             }
                         }
@@ -1447,6 +1451,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         // check if selected
                         var selected = this.isChosen(facet1);
                         // add to the list
+                        var name;
+                        if (facet1.name) {
+                            name = facet1.name;
+                        } else {
+                            name = facet1.dimension.name;
+                        }
                         var option = {"label" : facet1.dimension.name, "value" : facet1.id, "selected" : selected};
                         jsonData.options.push(option);
                     }
@@ -1617,7 +1627,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             if (chosenDimensions[dc] == facet.id) {
                                 var item = {};
                                 item.id = facet.id;
-                                item.value = facet.dimension.name;
+                                if (facet.name) {
+                                    item.value = facet.name;
+                                } else {
+                                    item.value = facet.dimension.name;
+                                }
                                 chosenFacets.push(item);
                             }
                         } 

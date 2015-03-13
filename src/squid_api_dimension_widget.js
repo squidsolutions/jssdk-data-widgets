@@ -93,7 +93,11 @@
                             if (chosenDimensions[dc] == facet.id) {
                                 var item = {};
                                 item.id = facet.id;
-                                item.value = facet.dimension.name;
+                                if (facet.name) {
+                                    item.value = facet.name;
+                                } else {
+                                    item.value = facet.dimension.name;
+                                }
                                 chosenFacets.push(item);
                             }
                         } 
