@@ -2065,9 +2065,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                  "domains": analysis.get("domains"),
                  "dimensions" : analysis.get("dimensions"),
                  "metrics" : analysis.get("metrics"),
-                 "orderBy": analysis.get("orderBy")
+                 "orderBy": analysis.get("orderBy"),
+                 "autoRun": false
                  });
-             downloadAnalysis.addParameter("timeout",null);
              squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
                  .done(function(model, response) {
                      me.downloadStatus = 2;
