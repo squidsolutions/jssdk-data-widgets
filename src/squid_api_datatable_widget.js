@@ -241,7 +241,7 @@
                         for (ix=0; ix<facets.length; ix++) {
                             if (chosenDimensions[i] === facets[ix].id) {
                                 var obj = {};
-                                obj.id = facets[ix].dimension.id.dimensionId;
+                                obj.id = facets[ix].id;
                                 if (facets[ix].name) {
                                     obj.name = facets[ix].name;
                                 } else {
@@ -287,7 +287,7 @@
             var model = this.model.toJSON();
             var dataAvailable = true;
 
-            if (!model.dimensions || !model.metrics) {
+            if (!model.dimensions || !model.metrics || !model.facets) {
                 dataAvailable = false;
             }
             if (this.model.get("status") == "RUNNING" && this.reactiveState) {

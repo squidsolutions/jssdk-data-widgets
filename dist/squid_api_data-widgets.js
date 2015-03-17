@@ -1150,7 +1150,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         for (ix=0; ix<facets.length; ix++) {
                             if (chosenDimensions[i] === facets[ix].id) {
                                 var obj = {};
-                                obj.id = facets[ix].dimension.id.dimensionId;
+                                obj.id = facets[ix].id;
                                 if (facets[ix].name) {
                                     obj.name = facets[ix].name;
                                 } else {
@@ -1196,7 +1196,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var model = this.model.toJSON();
             var dataAvailable = true;
 
-            if (!model.dimensions || !model.metrics) {
+            if (!model.dimensions || !model.metrics || !model.facets) {
                 dataAvailable = false;
             }
             if (this.model.get("status") == "RUNNING" && this.reactiveState) {
@@ -2013,6 +2013,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 },
                 "domains": analysis.get("domains"),
                 "dimensions" : analysis.get("dimensions"),
+                "facets" : analysis.get("facets"),
                 "metrics" : analysis.get("metrics"),
                 "selection": analysis.get("selection"),
                 "orderBy": analysis.get("orderBy")

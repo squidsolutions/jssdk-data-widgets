@@ -99,6 +99,7 @@
                 },
                 "domains": analysis.get("domains"),
                 "dimensions" : analysis.get("dimensions"),
+                "facets" : analysis.get("facets"),
                 "metrics" : analysis.get("metrics"),
                 "selection": analysis.get("selection"),
                 "orderBy": analysis.get("orderBy")
