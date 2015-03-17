@@ -278,7 +278,7 @@
 
         render : function() {
             var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
-            if (! this.domain) {
+            if (!this.domain) {
                 this.domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
             }
 
@@ -287,12 +287,10 @@
             var model = this.model.toJSON();
             var dataAvailable = true;
 
-            if (!model.dimensions || !model.metrics || !model.facets) {
+            if (!model.dimensions && !model.metrics && !model.facets) {
                 dataAvailable = false;
             }
-            if (this.model.get("status") == "RUNNING" && this.reactiveState) {
-
-            } else {
+            if ((this.model.get("status") != "RUNNING") || this.reactiveState) {
                 if (this.mainModel.get("refreshButtonPressed")) {
                     this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
                 }
