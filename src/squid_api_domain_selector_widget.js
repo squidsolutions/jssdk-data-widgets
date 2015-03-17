@@ -51,7 +51,7 @@
 
         render: function() {
             var domain, domains, jsonData = {"selAvailable" : true, "options" : [{"label" : "Select Domain", "value" : "", "selected" : false}]};
-
+            var hasSelection = false;
             // get the domains from the project;
             domains = this.model.get("domains");
             if (domains) {
@@ -60,6 +60,7 @@
                     var selected = false;
                     if (domain.oid == squid_api.domainId) {
                         selected = true;
+                        hasSelection = true;
                     }
 
                     var displayed = true;
@@ -79,6 +80,11 @@
                         jsonData.options.push(option);
                     }
                 }
+            }
+            
+            if (!hasSelection) {
+                // select first option
+                jsonData.options[0].selected = true;
             }
 
             var html = this.template(jsonData);
