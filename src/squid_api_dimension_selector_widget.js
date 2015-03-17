@@ -120,7 +120,7 @@
                         } else {
                             name = facet1.dimension.name;
                         }
-                        var option = {"label" : facet1.dimension.name, "value" : facet1.id, "selected" : selected};
+                        var option = {"label" : name, "value" : facet1.id, "selected" : selected};
                         jsonData.options.push(option);
                     }
                 }
