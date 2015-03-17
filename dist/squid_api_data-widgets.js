@@ -1187,7 +1187,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         render : function() {
             var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
-            if (! this.domain) {
+            if (!this.domain) {
                 this.domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
             }
 
@@ -1196,12 +1196,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var model = this.model.toJSON();
             var dataAvailable = true;
 
-            if (!model.dimensions || !model.metrics || !model.facets) {
+            if (!model.dimensions && !model.metrics && !model.facets) {
                 dataAvailable = false;
             }
-            if (this.model.get("status") == "RUNNING" && this.reactiveState) {
-
-            } else {
+            if ((this.model.get("status") != "RUNNING") || this.reactiveState) {
                 if (this.mainModel.get("refreshButtonPressed")) {
                     this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
                 }
@@ -1867,7 +1865,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         render: function() {
             var domain, domains, jsonData = {"selAvailable" : true, "options" : [{"label" : "Select Domain", "value" : "", "selected" : false}]};
-
+            var hasSelection = false;
             // get the domains from the project;
             domains = this.model.get("domains");
             if (domains) {
@@ -1876,6 +1874,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     var selected = false;
                     if (domain.oid == squid_api.domainId) {
                         selected = true;
+                        hasSelection = true;
                     }
 
                     var displayed = true;
@@ -1895,6 +1894,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         jsonData.options.push(option);
                     }
                 }
+            }
+            
+            if (!hasSelection) {
+                // select first option
+                jsonData.options[0].selected = true;
             }
 
             var html = this.template(jsonData);
