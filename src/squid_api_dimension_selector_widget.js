@@ -32,8 +32,8 @@
                 this.dimensionIndex = options.dimensionIndex;
             }
 
-            // listen for filters change as we use them to filter out boolean dimensions
-            squid_api.model.filters.on("change", function() {
+            // listen for selection change as we use it to filter out boolean dimensions
+            this.filters.on("change:selection", function() {
                 me.render();
             });
             
@@ -169,19 +169,19 @@
             return this;
         },
         
-        isChosen : function(dim) {
+        isChosen : function(facet) {
             var selected = false;
 
             var dimensions = this.model.get("chosenDimensions");
 
             if (dimensions) {
                 if (this.dimensionIndex !== null) {
-                    if (dim.oid == dimensions[this.dimensionIndex]) {
+                    if (facet.id == dimensions[this.dimensionIndex]) {
                         selected = true;
                     }
                 } else {
                     for (var j=0; j<dimensions.length; j++) {
-                        if (dim.oid == dimensions[j]) {
+                        if (facet.id == dimensions[j]) {
                             selected = true;
                         }
                     }

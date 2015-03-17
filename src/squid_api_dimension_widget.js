@@ -27,6 +27,11 @@
             if (options.selectDimension) {
                 this.selectDimension = options.selectDimension;
             }
+            
+            // listen for selection change as we use it
+            this.filters.on("change:selection", function() {
+                me.render();
+            });
 
             this.model.on("change:chosenDimensions", function() {
                 me.render();
