@@ -2088,6 +2088,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                  },
                  "domains": analysis.get("domains"),
                  "dimensions" : analysis.get("dimensions"),
+                 "facets" : analysis.get("facets"),
                  "metrics" : analysis.get("metrics"),
                  "orderBy": analysis.get("orderBy"),
                  "autoRun": false
