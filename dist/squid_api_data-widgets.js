@@ -504,19 +504,34 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 function program1(depth0,data) {
   
+  
+  return "\n	<div class=\"information\">No Metrics have been chosen</div>\n";
+  }
+
+function program3(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n    ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.chosenMetrics), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n";
+  return buffer;
+  }
+function program4(depth0,data) {
+  
   var buffer = "", stack1;
   buffer += "\n    	";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selectMetric), {hash:{},inverse:self.program(4, program4, data),fn:self.program(2, program2, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selectMetric), {hash:{},inverse:self.program(7, program7, data),fn:self.program(5, program5, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n        	<div class=\"name\">"
     + escapeExpression(((stack1 = (depth0 && depth0.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "</div>\n        	";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayMetricValue), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayMetricValue), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n        </li>\n    ";
   return buffer;
   }
-function program2(depth0,data) {
+function program5(depth0,data) {
   
   var buffer = "", stack1;
   buffer += "\n    		<li class=\"item "
@@ -529,7 +544,7 @@ function program2(depth0,data) {
   return buffer;
   }
 
-function program4(depth0,data) {
+function program7(depth0,data) {
   
   var buffer = "", stack1;
   buffer += "\n    		<li class=\"item\" data-selected=\""
@@ -540,7 +555,7 @@ function program4(depth0,data) {
   return buffer;
   }
 
-function program6(depth0,data) {
+function program9(depth0,data) {
   
   var buffer = "", stack1;
   buffer += "\n        		<div class=\"value\">"
@@ -549,8 +564,8 @@ function program6(depth0,data) {
   return buffer;
   }
 
-  buffer += "<ul class=\"squid-api-data-widgets-metric-widget\">\n    ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.chosenMetrics), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  buffer += "<ul class=\"squid-api-data-widgets-metric-widget\">\n";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.noChosenMetrics), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n</ul>";
   return buffer;
@@ -2559,7 +2574,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }   
                 }
             }
-
+            
+            if (jsonData.chosenMetrics.length === 0) {
+                jsonData.noChosenMetrics = true;
+            }
             var html = this.template(jsonData);
             this.$el.html(html);
             this.$el.show();

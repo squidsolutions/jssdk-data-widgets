@@ -108,7 +108,10 @@
                     }   
                 }
             }
-
+            
+            if (jsonData.chosenMetrics.length === 0) {
+                jsonData.noChosenMetrics = true;
+            }
             var html = this.template(jsonData);
             this.$el.html(html);
             this.$el.show();

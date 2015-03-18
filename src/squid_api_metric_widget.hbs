@@ -1,4 +1,7 @@
 <ul class="squid-api-data-widgets-metric-widget">
+{{#if noChosenMetrics}}
+	<div class="information">No Metrics have been chosen</div>
+{{else}}
     {{#each chosenMetrics}}
     	{{#if this.selectMetric}}
     		<li class="item {{this.selected}}" data-selected="{{this.attrSelected}}" data-content="{{this.value}}">
@@ -11,4 +14,5 @@
         	{{/if}}
         </li>
     {{/each}}
+{{/if}}
 </ul>
