@@ -79,7 +79,7 @@
             var metrics = this.getDomainMetrics();
             var chosenMetrics = this.model.get("chosenMetrics");
             var metricList = [];
-            if (metrics) {
+            if (metrics && chosenMetrics) {
                 for (var idx=0; idx<metrics.length; idx++) {
                     var metric = metrics[idx];
                     // Match with chosen

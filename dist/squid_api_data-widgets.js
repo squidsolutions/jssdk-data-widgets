@@ -1130,23 +1130,25 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
         },
 
-        getNamesFromDomain : function(model, item) {
-            var namesArray;
-            var obj;
-            if (model === "metric") {
-                var domainMetrics = this.domain.metrics;
-                namesArray = [];
-                for (var ix0=0; ix0<domainMetrics.length; ix0++) {
-                    obj = {};
-                    for (var ix1=0; ix1<item.length; ix1++) {
-                        if (item[ix1] === domainMetrics[ix0].oid) {
-                            obj.id = item[ix1];
-                            obj.name = domainMetrics[ix0].name;
-                            namesArray.push(obj);
+        getNamesFromDomain : function(model, metrics) {
+            if (metrics) {
+                var namesArray;
+                var obj;
+                if (model === "metric") {
+                    var domainMetrics = this.domain.metrics;
+                    namesArray = [];
+                    for (var ix0=0; ix0<domainMetrics.length; ix0++) {
+                        obj = {};
+                        for (var ix1=0; ix1<metrics.length; ix1++) {
+                            if (metrics[ix1] === domainMetrics[ix0].oid) {
+                                obj.id = metrics[ix1];
+                                obj.name = domainMetrics[ix0].name;
+                                namesArray.push(obj);
+                            }
                         }
                     }
+                    return namesArray;
                 }
-                return namesArray;
             }
         },
 
@@ -1186,8 +1188,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         this.$el.find("thead tr").append("<th data-content=" + dimensions[i].id + ">" + dimensions[i].name + "</th>");
                     }
                 }
-                for (i=0; i<metrics.length; i++) {
-                    this.$el.find("thead tr").append("<th data-content=" + metrics[i].id + ">" + metrics[i].name + "</th>");
+                if (metrics) {
+                    for (i=0; i<metrics.length; i++) {
+                        this.$el.find("thead tr").append("<th data-content=" + metrics[i].id + ">" + metrics[i].name + "</th>");
+                    }
                 }
                 this.$el.find(".squid-api-data-widgets-data-table").addClass("setHeaders");
                 if (this.model.get("status") == "RUNNING") {
@@ -2670,7 +2674,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var metrics = this.getDomainMetrics();
             var chosenMetrics = this.model.get("chosenMetrics");
             var metricList = [];
-            if (metrics) {
+            if (metrics && chosenMetrics) {
                 for (var idx=0; idx<metrics.length; idx++) {
                     var metric = metrics[idx];
                     // Match with chosen
