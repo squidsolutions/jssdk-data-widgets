@@ -127,6 +127,13 @@
 
             if (this.displayInAccordion) {
                 this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-download-alt'></span></button>");
+                var facets = analysis.get("facets");
+                var metrics = analysis.get("metrics");
+                if ((!facets || facets.length === 0) && (!metrics || metrics.length === 0)) {
+                    $("button.btn-open-export-panel").prop('disabled', true);
+                } else {
+                    $("button.btn-open-export-panel").prop('disabled', false);
+                }
             }
             
             // apply cURL panel state
