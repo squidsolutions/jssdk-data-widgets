@@ -1182,7 +1182,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var metrics = this.getNamesFromDomain("metric", chosenMetrics);
             this.$el.find("thead tr").html();
-            if (this.mainModel.get("analysisRefreshNeeded")) {
+            if (this.mainModel.get("analysisRefreshNeeded") && this.model.get("status") !== "RUNNING") {
                 if (dimensions) {
                     for (i=0; i<dimensions.length; i++) {
                         this.$el.find("thead tr").append("<th data-content=" + dimensions[i].id + ">" + dimensions[i].name + "</th>");
@@ -1218,7 +1218,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (!model.dimensions && !model.metrics && !model.facets) {
                 dataAvailable = false;
             }
-            if ((this.model.get("status") != "RUNNING") || this.reactiveState) {
+            if ((this.model.get("status") !== "RUNNING") && this.reactiveState) {
                 if (this.mainModel.get("refreshButtonPressed")) {
                     this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
                 }
