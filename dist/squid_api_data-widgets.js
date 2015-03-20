@@ -1445,7 +1445,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         // do not display boolean dimensions
                         // this is a workaround as the API should return a dimension type
                         var isBoolean = false;
-                        if ((facet.items.length == 1) && (facet.items[0].value == "true")) {
+                        if ((facet.dimension.type == "SEGMENTS") || (facet.items.length == 1) && (facet.items[0].value == "true")) {
                             isBoolean = true; 
                         }
                         
