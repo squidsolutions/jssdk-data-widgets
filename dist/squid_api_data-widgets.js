@@ -125,9 +125,9 @@ function program3(depth0,data) {
 function program4(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\n        <li class=\"item\" data-content="
+  buffer += "\n        <li class=\"item\" data-content=\""
     + escapeExpression(((stack1 = (depth0 && depth0.id)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "><i class=\"fa fa-ellipsis-v\"></i>"
+    + "\"><i class=\"fa fa-ellipsis-v\"></i>"
     + escapeExpression(((stack1 = (depth0 && depth0.value)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "</li>\n    ";
   return buffer;
