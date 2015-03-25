@@ -1511,10 +1511,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
                 });
             } else {
+                var selectedDimension = this.model.get("selectedDimension");
+                
                 this.$el.find("select").on("change", function() {
                     var dimension = $(this).val();
                     me.model.set({"selectedDimension": dimension});
                 });
+
+                if (selectedDimension) {
+                    this.$el.find("select").val(selectedDimension);
+                }
             }
 
             // Remove Button Title Tag
