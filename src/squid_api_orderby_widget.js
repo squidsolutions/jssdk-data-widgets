@@ -5,14 +5,13 @@
     View = Backbone.View.extend( {
 
         template : null,
-        
         format : null,
 
         initialize : function(options) {
             if (this.model) {
                 this.model.on('change', this.render, this);
             }
-
+            
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -40,7 +39,7 @@
 
         events: {
             "change": function(event) {
-                if (event.target.checked !== undefined) {
+                if (event.target.checked !== undefined || event.target.type !== "checkbox") {
                     if (event.target.checked) {
                         this.model.set({"orderByDirection" : "DESC"});
                     } else {
@@ -74,14 +73,16 @@
             var limit = null;
             if (this.model.get("tableAnalysis")) {
                 limit = this.model.get("tableAnalysis").get("limit");
+            } else {
+                limit = this.model.get("limit");
             }
 
             var metrics = this.getDomainMetrics();
             var chosenMetrics = this.model.get("chosenMetrics");
             var metricList = [];
             if (metrics && chosenMetrics) {
-                for (var idx=0; idx<metrics.length; idx++) {
-                    var metric = metrics[idx];
+                for (var id=0; id<metrics.length; id++) {
+                    var metric = metrics[id];
                     // Match with chosen
                     for (var match=0; match<chosenMetrics.length; match++) {
                         if (metric.oid === chosenMetrics[match]) {
@@ -89,6 +90,12 @@
                             metricList.push(option);
                         }
                     }
+                }
+            } else {
+                for (var idx=0; idx<metrics.length; idx++) {
+                    var metric1 = metrics[idx];
+                    var option1 = {"label" : metric1.name, "value" : metric1.oid};
+                    metricList.push(option1);
                 }
             }
 

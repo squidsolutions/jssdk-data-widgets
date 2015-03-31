@@ -579,7 +579,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<span style=\"font-size : 14px; padding-right: 5px; position: relative; top: 3px;\">Preview</span>\n					</td>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
+  buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<span class=\"preview\" style=\"font-size : 14px; padding-right: 5px; position: relative; top: 3px;\">Preview</span>\n					</td>\n					<td>\n						<div class=\"onoffswitch\">\n			    			<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
   if (helper = helpers.direction) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.direction); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -2613,13 +2613,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     View = Backbone.View.extend( {
 
         template : null,
-        
         format : null,
 
         initialize : function(options) {
-            if (this.model) {
-                this.model.on('change', this.render, this);
-            }
+            this.model.on('change', this.render, this);
 
             // setup options
             if (options.template) {
@@ -2648,7 +2645,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         events: {
             "change": function(event) {
-                if (event.target.checked !== undefined) {
+                if (event.target.checked !== undefined || event.target.type !== "checkbox") {
                     if (event.target.checked) {
                         this.model.set({"orderByDirection" : "DESC"});
                     } else {
@@ -2682,14 +2679,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var limit = null;
             if (this.model.get("tableAnalysis")) {
                 limit = this.model.get("tableAnalysis").get("limit");
+            } else {
+                limit = this.model.get("limit");
             }
 
             var metrics = this.getDomainMetrics();
             var chosenMetrics = this.model.get("chosenMetrics");
             var metricList = [];
             if (metrics && chosenMetrics) {
-                for (var idx=0; idx<metrics.length; idx++) {
-                    var metric = metrics[idx];
+                for (var id=0; id<metrics.length; id++) {
+                    var metric = metrics[id];
                     // Match with chosen
                     for (var match=0; match<chosenMetrics.length; match++) {
                         if (metric.oid === chosenMetrics[match]) {
@@ -2697,6 +2696,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             metricList.push(option);
                         }
                     }
+                }
+            } else {
+                for (var idx=0; idx<metrics.length; idx++) {
+                    var metric1 = metrics[idx];
+                    var option1 = {"label" : metric1.name, "value" : metric1.oid};
+                    metricList.push(option1);
                 }
             }
 
