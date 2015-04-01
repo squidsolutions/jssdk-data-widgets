@@ -7,13 +7,18 @@
 						<span class="preview" style="font-size : 14px; padding-right: 5px; position: relative; top: 3px;">Preview</span>
 					</td>
 					<td>
-						<div class="onoffswitch">
-			    			<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" {{direction}}>
-			    			<label class="onoffswitch-label" for="myonoffswitch">
-			        			<span class="onoffswitch-inner"></span>
-			       				 <span class="onoffswitch-switch"></span>
-			    			</label>
-						</div>
+						{{#if removeOrderDirection}}
+							<span class="orderby-direction" style="top: 3px; position: relative; font-weight: bold; font-size: 14px;">{{orderByDirectionDisplay}}<span>
+						
+						{{else}}
+							<div class="onoffswitch">
+			    				<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" {{direction}}>
+			    				<label class="onoffswitch-label" for="myonoffswitch">
+			        				<span class="onoffswitch-inner"></span>
+			       				 	<span class="onoffswitch-switch"></span>
+			    				</label>
+							</div>
+						{{/if}}
 					</td>
 					<td>
 						&nbsp;

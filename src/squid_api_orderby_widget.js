@@ -6,10 +6,18 @@
 
         template : null,
         format : null,
+        removeOrderDirection: false,
+        orderByDirectionDisplay: null,
 
         initialize : function(options) {
             if (this.model) {
                 this.model.on('change', this.render, this);
+            }
+            if (options.removeOrderDirection) {
+                this.removeOrderDirection = options.removeOrderDirection;
+            }
+            if (options.orderByDirectionDisplay) {
+                this.orderByDirectionDisplay = options.orderByDirectionDisplay;
             }
             
             // setup options
@@ -96,7 +104,7 @@
                 }
             }
 
-            var jsonData = {"direction" : checked, "limit" : limit, "chosenMetrics" : metricList};
+            var jsonData = {"direction" : checked, "limit" : limit, "chosenMetrics" : metricList, "orderByDirectionDisplay" : this.orderByDirectionDisplay, "removeOrderDirection" : this.removeOrderDirection};
 
             var html = this.template(jsonData);
             this.$el.html(html);
