@@ -2616,8 +2616,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         format : null,
 
         initialize : function(options) {
-            this.model.on('change', this.render, this);
-
+            if (this.model) {
+                this.model.on('change', this.render, this);
+            }
+            
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -2645,15 +2647,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         events: {
             "change": function(event) {
-                if (event.target.checked !== undefined || event.target.type !== "checkbox") {
+                if (event.target.checked !== undefined || event.target.type === "checkbox") {
                     if (event.target.checked) {
                         this.model.set({"orderByDirection" : "DESC"});
                     } else {
                         this.model.set({"orderByDirection" : "ASC"});
                     }
-                } else {
-                    var limit = parseInt($(event.target).val());
-                    this.model.set({"limit" : limit});
                 }
             }
         },

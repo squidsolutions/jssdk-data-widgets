@@ -39,15 +39,12 @@
 
         events: {
             "change": function(event) {
-                if (event.target.checked !== undefined || event.target.type !== "checkbox") {
+                if (event.target.checked !== undefined || event.target.type === "checkbox") {
                     if (event.target.checked) {
                         this.model.set({"orderByDirection" : "DESC"});
                     } else {
                         this.model.set({"orderByDirection" : "ASC"});
                     }
-                } else {
-                    var limit = parseInt($(event.target).val());
-                    this.model.set({"limit" : limit});
                 }
             }
         },
