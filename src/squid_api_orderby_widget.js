@@ -8,6 +8,7 @@
         format : null,
         removeOrderDirection: false,
         orderByDirectionDisplay: null,
+        metricList: null,
 
         initialize : function(options) {
             if (this.model) {
@@ -18,6 +19,9 @@
             }
             if (options.orderByDirectionDisplay) {
                 this.orderByDirectionDisplay = options.orderByDirectionDisplay;
+            }
+            if (options.metricList) {
+                this.metricList = options.metricList;
             }
             
             // setup options
@@ -85,7 +89,19 @@
             var metrics = this.getDomainMetrics();
             var chosenMetrics = this.model.get("chosenMetrics");
             var metricList = [];
-            if (metrics && chosenMetrics) {
+
+            if (this.metricList) {
+                var appMetrics = this.metricList;
+                for (var idx=0; idx<metrics.length; idx++) {
+                    for (ix=0; ix<appMetrics.length; ix++) {
+                        var metric1 = metrics[idx];
+                        if (appMetrics[ix] === metric1.oid) {
+                            var option1 = {"label" : metric1.name, "value" : metric1.oid};
+                            metricList.push(option1);
+                        }
+                    }
+                }
+            } else if (metrics && chosenMetrics) {
                 for (var id=0; id<metrics.length; id++) {
                     var metric = metrics[id];
                     // Match with chosen
@@ -95,12 +111,6 @@
                             metricList.push(option);
                         }
                     }
-                }
-            } else {
-                for (var idx=0; idx<metrics.length; idx++) {
-                    var metric1 = metrics[idx];
-                    var option1 = {"label" : metric1.name, "value" : metric1.oid};
-                    metricList.push(option1);
                 }
             }
 
