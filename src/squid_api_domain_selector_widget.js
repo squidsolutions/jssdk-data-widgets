@@ -21,16 +21,21 @@
                 this.displayAllDomains = options.displayAllDomains;
             }
 
-            // init the domains
-            this.model = squid_api.model.project;
-            this.model.on("change", this.process, this);
+            squid_api.model.project.on("change", this.process, this);
+            this.model.on("change:domain", this.render, this);
         },
 
         events: {
             "change .sq-select": function(event) {
                 var selectedOid = event.target.value;
                 // update the current domain
-                squid_api.setDomainId(selectedOid);
+                var domain = this.model.get("domain");
+                if (!domain) {
+                    domain = {"projectId" : squid_api.model.project.get("oid"),
+                            "domainId" : null}
+                }
+                domain.domainId = selectedOid;
+                this.model.set("domain", domain);
             }
         },
         

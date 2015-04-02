@@ -1160,7 +1160,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var dimensions = [];
 
             var selection = this.filters.get("selection");
-            if (selection) {
+            if (selection && chosenDimensions) {
                 var facets = selection.facets;
                 if (facets) {
                     for (i=0; i<chosenDimensions.length; i++) {
@@ -1639,7 +1639,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             
             // iterate through all filter facets
             var selection = this.filters.get("selection");
-            if (selection) {
+            if (chosenDimensions && selection) {
                 var facets = selection.facets;
                 if (facets) {
                     var chosenFacets = [];

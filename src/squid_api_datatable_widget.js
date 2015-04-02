@@ -236,7 +236,7 @@
             var dimensions = [];
 
             var selection = this.filters.get("selection");
-            if (selection) {
+            if (selection && chosenDimensions) {
                 var facets = selection.facets;
                 if (facets) {
                     for (i=0; i<chosenDimensions.length; i++) {
