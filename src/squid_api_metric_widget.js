@@ -47,15 +47,21 @@
                 }
             }
             
-            if (this.model) {
-                this.model.on("change:chosenMetrics", function() {
-                    me.render();
-                });
+            squid_api.model.project.on("change:domains", function() {
+                me.render();
+            });
+            
+            this.model.on("change:domain", function() {
+                me.render();
+            });
+            
+            this.model.on("change:chosenMetrics", function() {
+                me.render();
+            });
 
-                this.model.on("change:selectedMetric", function() {
-                    me.render();
-                });
-            }
+            this.model.on("change:selectedMetric", function() {
+                me.render();
+            });
         },
 
         setModel: function(model) {
@@ -86,36 +92,32 @@
         },
 
         render: function() {
-
-            var chosenMetrics   = this.model.get("chosenMetrics");
-            var selectedMetric  = this.model.get("selectedMetric");
-            var jsonData        = {"chosenMetrics" : []};
-            
-            // iterate through all domains dimensions
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
-            var domainMetrics = domain.metrics;
-
-            for (var dMetrics = 0; dMetrics < domainMetrics.length; dMetrics++) {
-                for (var cMetrics = 0; cMetrics < chosenMetrics.length; cMetrics++) {
-                    if (domainMetrics[dMetrics].id.metricId === chosenMetrics[cMetrics]) {
-                        // add to the list
-                        var option = {
-                            "name" : domainMetrics[dMetrics].name,
-                            "value" : chosenMetrics[cMetrics],
-                            "selectMetric" : this.selectMetric,
-                        };
-                        jsonData.chosenMetrics.push(option);
-                    }   
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"));
+            var jsonData = {"chosenMetrics" : []};
+            var chosenMetrics = this.model.get("chosenMetrics");
+            if (domain && chosenMetrics) {
+                var domainMetrics = domain.metrics;
+                for (var dMetrics = 0; dMetrics < domainMetrics.length; dMetrics++) {
+                    for (var cMetrics = 0; cMetrics < chosenMetrics.length; cMetrics++) {
+                        if (domainMetrics[dMetrics].id.metricId === chosenMetrics[cMetrics]) {
+                            // add to the list
+                            var option = {
+                                "name" : domainMetrics[dMetrics].name,
+                                "value" : chosenMetrics[cMetrics],
+                                "selectMetric" : this.selectMetric,
+                            };
+                            jsonData.chosenMetrics.push(option);
+                        }   
+                    }
                 }
             }
-            
             if (jsonData.chosenMetrics.length === 0) {
                 jsonData.noChosenMetrics = true;
             }
             var html = this.template(jsonData);
             this.$el.html(html);
             this.$el.show();
-
+            
             return this;
         }
     });

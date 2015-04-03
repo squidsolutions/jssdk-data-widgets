@@ -167,42 +167,44 @@
              // prepare download link
              this.downloadStatus = 1;
              var downloadBtn = $(me.renderStore).find("#download");
-             // Before analysis job creation
              downloadBtn.addClass("disabled");
-             var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
-             downloadAnalysis.set({
-                "id": {
-                     "projectId": analysis.get("id").projectId,
-                     "analysisJobId": null
-                 },
-                 "domains": analysis.get("domains"),
-                 "dimensions" : analysis.get("dimensions"),
-                 "facets" : analysis.get("facets"),
-                 "metrics" : analysis.get("metrics"),
-                 "orderBy": analysis.get("orderBy"),
-                 "autoRun": false
-                 });
-             squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                 .done(function(model, response) {
-                     me.downloadStatus = 2;
-                     me.currentJobId = downloadAnalysis.get("id");
-                     // create download link
-                     var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                     analysisJobResults.addParameter("format",me.format);
-                     if (me.compression) {
-                         analysisJobResults.addParameter("compression","gzip");
-                     }
-                     analysisJobResults.set({
-                             "id": me.currentJobId,
-                             "oid": downloadAnalysis.get("oid")
-                         });
-                     console.log("download url : "+analysisJobResults.url());
-                     downloadBtn.attr("href",analysisJobResults.url());
-                     downloadBtn.removeClass("disabled");
-                 })
-                 .fail(function(model, response) {
-                     console.error("createAnalysisJob failed");
-                 });
+             
+             if (analysis.get("id").projectId) {
+                 var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                 downloadAnalysis.set({
+                    "id": {
+                         "projectId": analysis.get("id").projectId,
+                         "analysisJobId": null
+                     },
+                     "domains": analysis.get("domains"),
+                     "dimensions" : analysis.get("dimensions"),
+                     "facets" : analysis.get("facets"),
+                     "metrics" : analysis.get("metrics"),
+                     "orderBy": analysis.get("orderBy"),
+                     "autoRun": false
+                     });
+                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
+                     .done(function(model, response) {
+                         me.downloadStatus = 2;
+                         me.currentJobId = downloadAnalysis.get("id");
+                         // create download link
+                         var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
+                         analysisJobResults.addParameter("format",me.format);
+                         if (me.compression) {
+                             analysisJobResults.addParameter("compression","gzip");
+                         }
+                         analysisJobResults.set({
+                                 "id": me.currentJobId,
+                                 "oid": downloadAnalysis.get("oid")
+                             });
+                         console.log("download url : "+analysisJobResults.url());
+                         downloadBtn.attr("href",analysisJobResults.url());
+                         downloadBtn.removeClass("disabled");
+                     })
+                     .fail(function(model, response) {
+                         console.error("createAnalysisJob failed");
+                     });
+             }
 
             return this;
         }

@@ -139,6 +139,9 @@
                     },
                     onChange: function(option, selected, index) {
                         var chosenModel = _.clone(me.model.get("chosenDimensions"));
+                        if (!chosenModel) {
+                            chosenModel = [];
+                        }
                         var currentItem = option.attr("value");
 
                         if (selected) {

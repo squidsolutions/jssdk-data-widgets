@@ -937,6 +937,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         d3Formatter : null,
 
         mainModel : null,
+        
+        config : null,
 
         selectMetricHeader : false,
 
@@ -957,8 +959,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         domain : null,
 
         initialize : function(options) {
-            this.mainModel = options.mainModel;
             var me = this;
+            
+            this.mainModel = options.mainModel;
+            this.config = options.config;
+            if (this.config) {
+                this.listenTo(this.config, 'change', this.render);
+            }
 
             if (this.model) {
                 this.listenTo(this.model, 'change', this.render);
@@ -977,9 +984,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.maxRowsPerPage) {
                 this.maxRowsPerPage = options.maxRowsPerPage;
-            }
-            if (options.selectedMetric) {
-                this.selectedMetric = options.selectedMetric;
             }
             if (options.selectMetricHeader) {
                 this.selectMetricHeader = options.selectMetricHeader;
@@ -1035,7 +1039,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             "click thead th.NUMBER" : function(item) {
                 if (this.selectMetricHeader) {
                     var selectedMetric = $(item.target).attr("data-content");
-                    this.mainModel.set("selectedMetric", selectedMetric);
+                    this.config.set("selectedMetric", selectedMetric);
                 } else {
                     this.$el.off("click", "thead th.NUMBER");
                 }
@@ -1107,10 +1111,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // Loop over each one and match the value
             for (i=0; i<tableHeaders.length; i++) { 
-                if (this.mainModel.get("selectedMetric") == $(tableHeaders[i]).attr("data-content")) {
+                if (this.config.get("selectedMetric") == $(tableHeaders[i]).attr("data-content")) {
                     $(tableHeaders[i]).addClass("filtered-by");
                     if (this.headerBadges) {
-                        if (me.mainModel.get("orderByDirection") === "DESC") {
+                        if (me.config.get("orderByDirection") === "DESC") {
                             $(tableHeaders[i]).append("<span class='badge'>Top</span>");
                         } else {
                             $(tableHeaders[i]).append("<span class='badge'>Last</span>");
@@ -1121,11 +1125,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         reactiveStateEvents : function() {
-            if (this.mainModel) {
-                this.mainModel.on("change:chosenDimensions", this.render, this);
-                this.mainModel.on("change:chosenMetrics", this.render, this);
-                this.mainModel.on("change:selectedMetric", this.render, this);
-                this.mainModel.on("change:orderByDirection", this.render, this);
+            if (this.config) {
+                this.config.on("change:chosenDimensions", this.render, this);
+                this.config.on("change:chosenMetrics", this.render, this);
+                this.config.on("change:selectedMetric", this.render, this);
+                this.config.on("change:orderByDirection", this.render, this);
                 api.model.filters.on('change', this.render, this);
             }
         },
@@ -1153,8 +1157,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         printChosenItems : function() {
-            var chosenDimensions = this.mainModel.get("chosenDimensions");
-            var chosenMetrics = this.mainModel.get("chosenMetrics");
+            var chosenDimensions = this.config.get("chosenDimensions");
+            var chosenMetrics = this.config.get("chosenMetrics");
             // var dimensions = chosenDimensions;
             // Get Dimension Names
             var dimensions = [];
@@ -1322,10 +1326,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.dataTableInsert(data);
 
                 // match orderBy column with default sorting
-                var columnToSelect = this.mainModel.get("selectedMetric");
-                var columnOrderDirection = this.mainModel.get("orderByDirection");
-                // for data table compatibility we need to format the string
-                columnOrderDirection = columnOrderDirection.toLowerCase();
+                var columnToSelect = this.config.get("selectedMetric");
+                var columnOrderDirection = this.config.get("orderByDirection");
+                if (!columnOrderDirection) {
+                    columnOrderDirection = "asc";
+                } else {
+                    // for data table compatibility we need to format the string
+                    columnOrderDirection = columnOrderDirection.toLowerCase();
+                }
+                
                 // cycle through each header element to order automatically
                 var tableHeaders = this.$el.find("thead th");
                 var columnToOrder = 0;
@@ -1335,6 +1344,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         columnToOrder = i;
                     }
                 }
+                
 
                 // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable({
@@ -1493,6 +1503,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     },
                     onChange: function(option, selected, index) {
                         var chosenModel = _.clone(me.model.get("chosenDimensions"));
+                        if (!chosenModel) {
+                            chosenModel = [];
+                        }
                         var currentItem = option.attr("value");
 
                         if (selected) {
@@ -1839,6 +1852,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     var View = Backbone.View.extend({
         template : null,
         displayAllDomains : false,
+        onChangeHandler: null,
 
         initialize: function(options) {
             var me = this;
@@ -1850,48 +1864,41 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.template = template;
             }
             
+            if (options.onChangeHandler) {
+                this.onChangeHandler = options.onChangeHandler;
+            }
+            
             if (typeof options.displayAllDomains !== 'undefined') {
                 this.displayAllDomains = options.displayAllDomains;
             }
 
-            // init the domains
-            this.model = squid_api.model.project;
-            this.model.on("change", this.process, this);
+            squid_api.model.project.on("change", this.process, this);
+            this.model.on("change:domain", this.render, this);
         },
 
         events: {
             "change .sq-select": function(event) {
-                var selectedOid = event.target.value;
-                // update the current domain
-                squid_api.setDomainId(selectedOid);
+                if (this.onChangeHandler) {
+                    this.onChangeHandler.call(this,event);
+                }
             }
         },
         
         process : function() {
-            var domains = this.model.get("domains");
-            if (!squid_api.domainId) {
-                squid_api.model.status.on("change:domain", this.render, this);
-                if (domains && (domains.length == 1)) {
-                    // auto-select the single domain
-                    squid_api.setDomainId(domains[0].oid);
-                } else {
-                    this.render();
-                }
-            } else {
-                this.render();
-            }
+            this.render();
         },
 
         render: function() {
             var domain, domains, jsonData = {"selAvailable" : true, "options" : [{"label" : "Select Domain", "value" : "", "selected" : false}]};
             var hasSelection = false;
+            var selectedDomain = squid_api.model.status.get("state").get("domain");
             // get the domains from the project;
-            domains = this.model.get("domains");
+            domains = squid_api.model.project.get("domains");
             if (domains) {
                 for (var i=0; i<domains.length; i++) {
                     domain = domains[i];
                     var selected = false;
-                    if (domain.oid == squid_api.domainId) {
+                    if (domain.oid == selectedDomain) {
                         selected = true;
                         hasSelection = true;
                     }
@@ -2104,42 +2111,44 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
              // prepare download link
              this.downloadStatus = 1;
              var downloadBtn = $(me.renderStore).find("#download");
-             // Before analysis job creation
              downloadBtn.addClass("disabled");
-             var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
-             downloadAnalysis.set({
-                "id": {
-                     "projectId": analysis.get("id").projectId,
-                     "analysisJobId": null
-                 },
-                 "domains": analysis.get("domains"),
-                 "dimensions" : analysis.get("dimensions"),
-                 "facets" : analysis.get("facets"),
-                 "metrics" : analysis.get("metrics"),
-                 "orderBy": analysis.get("orderBy"),
-                 "autoRun": false
-                 });
-             squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                 .done(function(model, response) {
-                     me.downloadStatus = 2;
-                     me.currentJobId = downloadAnalysis.get("id");
-                     // create download link
-                     var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                     analysisJobResults.addParameter("format",me.format);
-                     if (me.compression) {
-                         analysisJobResults.addParameter("compression","gzip");
-                     }
-                     analysisJobResults.set({
-                             "id": me.currentJobId,
-                             "oid": downloadAnalysis.get("oid")
-                         });
-                     console.log("download url : "+analysisJobResults.url());
-                     downloadBtn.attr("href",analysisJobResults.url());
-                     downloadBtn.removeClass("disabled");
-                 })
-                 .fail(function(model, response) {
-                     console.error("createAnalysisJob failed");
-                 });
+             
+             if (analysis.get("id").projectId) {
+                 var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                 downloadAnalysis.set({
+                    "id": {
+                         "projectId": analysis.get("id").projectId,
+                         "analysisJobId": null
+                     },
+                     "domains": analysis.get("domains"),
+                     "dimensions" : analysis.get("dimensions"),
+                     "facets" : analysis.get("facets"),
+                     "metrics" : analysis.get("metrics"),
+                     "orderBy": analysis.get("orderBy"),
+                     "autoRun": false
+                     });
+                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
+                     .done(function(model, response) {
+                         me.downloadStatus = 2;
+                         me.currentJobId = downloadAnalysis.get("id");
+                         // create download link
+                         var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
+                         analysisJobResults.addParameter("format",me.format);
+                         if (me.compression) {
+                             analysisJobResults.addParameter("compression","gzip");
+                         }
+                         analysisJobResults.set({
+                                 "id": me.currentJobId,
+                                 "oid": downloadAnalysis.get("oid")
+                             });
+                         console.log("download url : "+analysisJobResults.url());
+                         downloadBtn.attr("href",analysisJobResults.url());
+                         downloadBtn.removeClass("disabled");
+                     })
+                     .fail(function(model, response) {
+                         console.error("createAnalysisJob failed");
+                     });
+             }
 
             return this;
         }
@@ -2243,12 +2252,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             // To populate metrics
-            squid_api.model.filters.on("change", function() {
+            squid_api.model.project.on("change:domains", function() {
+                me.render();
+            });
+            
+            this.model.on("change:domain", function() {
                 me.render();
             });
 
             // listen for global status change
-            squid_api.model.status.on('change:status', this.enable, this);
+            squid_api.model.status.on("change:status", this.enable, this);
         },
 
         enable: function() {
@@ -2345,7 +2358,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         
         getDomainMetrics : function() {
             var metrics;
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"));
             if (domain) {
                 metrics = domain.metrics;
             }
@@ -2524,15 +2537,21 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
             
-            if (this.model) {
-                this.model.on("change:chosenMetrics", function() {
-                    me.render();
-                });
+            squid_api.model.project.on("change:domains", function() {
+                me.render();
+            });
+            
+            this.model.on("change:domain", function() {
+                me.render();
+            });
+            
+            this.model.on("change:chosenMetrics", function() {
+                me.render();
+            });
 
-                this.model.on("change:selectedMetric", function() {
-                    me.render();
-                });
-            }
+            this.model.on("change:selectedMetric", function() {
+                me.render();
+            });
         },
 
         setModel: function(model) {
@@ -2563,36 +2582,32 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render: function() {
-
-            var chosenMetrics   = this.model.get("chosenMetrics");
-            var selectedMetric  = this.model.get("selectedMetric");
-            var jsonData        = {"chosenMetrics" : []};
-            
-            // iterate through all domains dimensions
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
-            var domainMetrics = domain.metrics;
-
-            for (var dMetrics = 0; dMetrics < domainMetrics.length; dMetrics++) {
-                for (var cMetrics = 0; cMetrics < chosenMetrics.length; cMetrics++) {
-                    if (domainMetrics[dMetrics].id.metricId === chosenMetrics[cMetrics]) {
-                        // add to the list
-                        var option = {
-                            "name" : domainMetrics[dMetrics].name,
-                            "value" : chosenMetrics[cMetrics],
-                            "selectMetric" : this.selectMetric,
-                        };
-                        jsonData.chosenMetrics.push(option);
-                    }   
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"));
+            var jsonData = {"chosenMetrics" : []};
+            var chosenMetrics = this.model.get("chosenMetrics");
+            if (domain && chosenMetrics) {
+                var domainMetrics = domain.metrics;
+                for (var dMetrics = 0; dMetrics < domainMetrics.length; dMetrics++) {
+                    for (var cMetrics = 0; cMetrics < chosenMetrics.length; cMetrics++) {
+                        if (domainMetrics[dMetrics].id.metricId === chosenMetrics[cMetrics]) {
+                            // add to the list
+                            var option = {
+                                "name" : domainMetrics[dMetrics].name,
+                                "value" : chosenMetrics[cMetrics],
+                                "selectMetric" : this.selectMetric,
+                            };
+                            jsonData.chosenMetrics.push(option);
+                        }   
+                    }
                 }
             }
-            
             if (jsonData.chosenMetrics.length === 0) {
                 jsonData.noChosenMetrics = true;
             }
             var html = this.template(jsonData);
             this.$el.html(html);
             this.$el.show();
-
+            
             return this;
         }
     });
@@ -2614,6 +2629,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.model) {
                 this.model.on('change', this.render, this);
             }
+            
+            // To populate metrics
+            squid_api.model.project.on("change:domains", this.render, this);
 
             // setup options
             if (options.template) {
@@ -2657,7 +2675,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         getDomainMetrics : function() {
             var metrics;
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"));
             if (domain) {
                 metrics = domain.metrics;
             }
@@ -2673,10 +2691,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             } else {
                 checked = "";
             }
-            var limit = null;
-            if (this.model.get("tableAnalysis")) {
-                limit = this.model.get("tableAnalysis").get("limit");
-            }
+            var limit = this.model.get("limit");
 
             var metrics = this.getDomainMetrics();
             var chosenMetrics = this.model.get("chosenMetrics");
@@ -2729,6 +2744,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     var View = Backbone.View.extend({
         template : null,
+        projects : null,
 
         initialize: function(options) {
             var me = this;
@@ -2741,7 +2757,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             // init the projects
-            this.model.on("reset sync", this.process, this);
+            if (options.projects) {
+                this.projects = options.projects;
+                this.projects.on("reset sync", this.render, this);
+            }
+      
+            this.model.on("change:project", this.render, this);
         },
 
         events: {
@@ -2751,54 +2772,42 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 squid_api.setProjectId(selectedOid);
             }
         },
-        
-        process : function() {
-            if (!squid_api.projectId) {
-                squid_api.model.status.on("change:project", this.render, this);
-                if ((this.model.size() == 1)) {
-                    // auto-select the single project
-                    squid_api.setProjectId(this.model.at(0).get("oid"));
-                } else {
-                    this.render();
-                }
-            } else {
-                this.render();
-            }
-        },
 
         render: function() {
-            // display
-
-            var project, jsonData = {"selAvailable" : true, "options" : [{"label" : "Select Project", "value" : "", "selected" : false}]};
-
-            for (var i=0; i<this.model.size(); i++) {
-                project = this.model.at(i);
-                if (project) {
-                    var selected = false;
-                    if (project.get("oid") == squid_api.projectId) {
-                        selected = true;
-                    }
-
-                    var displayed = true;
-
-                    // do not display projects with no domains
-                    if (!project.get("domains")) {
-                        displayed = false;
-                    }
-
-                    if (displayed) {
-                        var option = {"label" : project.get("name"), "value" : project.get("oid"), "selected" : selected};
-                        jsonData.options.push(option);
+            if (this.projects) {
+                // display
+                 
+                var project, jsonData = {"selAvailable" : true, "options" : [{"label" : "Select Project", "value" : "", "selected" : false}]};
+    
+                for (var i=0; i<this.projects.size(); i++) {
+                    project = this.projects.at(i);
+                    if (project) {
+                        var selected = false;
+                        if (project.get("oid") == this.model.get("project")) {
+                            selected = true;
+                        }
+    
+                        var displayed = true;
+    
+                        // do not display projects with no domains
+                        if (!project.get("domains")) {
+                            displayed = false;
+                        }
+    
+                        if (displayed) {
+                            var option = {"label" : project.get("name"), "value" : project.get("oid"), "selected" : selected};
+                            jsonData.options.push(option);
+                        }
                     }
                 }
+    
+                var html = this.template(jsonData);
+                this.$el.html(html);
+                this.$el.show();
+    
+                // Initialize plugin
+                this.$el.find("select");
             }
-
-            var html = this.template(jsonData);
-            this.$el.html(html);
-            this.$el.show();
-
-            // Initialize plugin
-            this.$el.find("select");
 
             return this;
         }
