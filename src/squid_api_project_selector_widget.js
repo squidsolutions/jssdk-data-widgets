@@ -6,6 +6,7 @@
     var View = Backbone.View.extend({
         template : null,
         projects : null,
+        onChangeHandler: null,
 
         initialize: function(options) {
             var me = this;
@@ -15,6 +16,10 @@
                 this.template = options.template;
             } else {
                 this.template = template;
+            }
+            
+            if (options.onChangeHandler) {
+                this.onChangeHandler = options.onChangeHandler;
             }
 
             // init the projects
@@ -28,9 +33,9 @@
 
         events: {
             "change .sq-select": function(event) {
-                var selectedOid = event.target.value;
-                // update the current project
-                squid_api.setProjectId(selectedOid);
+                if (this.onChangeHandler) {
+                    this.onChangeHandler.call(this,event);
+                }            
             }
         },
 

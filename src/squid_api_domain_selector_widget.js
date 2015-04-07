@@ -26,7 +26,7 @@
                 this.displayAllDomains = options.displayAllDomains;
             }
 
-            squid_api.model.project.on("change", this.process, this);
+            squid_api.model.project.on("change:domains", this.process, this);
             this.model.on("change:domain", this.render, this);
         },
 

@@ -1872,7 +1872,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.displayAllDomains = options.displayAllDomains;
             }
 
-            squid_api.model.project.on("change", this.process, this);
+            squid_api.model.project.on("change:domains", this.process, this);
             this.model.on("change:domain", this.render, this);
         },
 
@@ -2745,6 +2745,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     var View = Backbone.View.extend({
         template : null,
         projects : null,
+        onChangeHandler: null,
 
         initialize: function(options) {
             var me = this;
@@ -2754,6 +2755,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.template = options.template;
             } else {
                 this.template = template;
+            }
+            
+            if (options.onChangeHandler) {
+                this.onChangeHandler = options.onChangeHandler;
             }
 
             // init the projects
@@ -2767,9 +2772,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         events: {
             "change .sq-select": function(event) {
-                var selectedOid = event.target.value;
-                // update the current project
-                squid_api.setProjectId(selectedOid);
+                if (this.onChangeHandler) {
+                    this.onChangeHandler.call(this,event);
+                }            
             }
         },
 
