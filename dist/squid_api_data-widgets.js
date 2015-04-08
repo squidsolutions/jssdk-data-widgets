@@ -1887,7 +1887,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         render: function() {
             var domain, domains, jsonData = {"selAvailable" : true, "options" : [{"label" : "Select Domain", "value" : "", "selected" : false}]};
             var hasSelection = false;
-            var selectedDomain = squid_api.model.status.get("state").get("domain");
+            var selectedDomain = squid_api.model.config.get("domain");
             // get the domains from the project;
             domains = squid_api.model.project.get("domains");
             if (domains) {
