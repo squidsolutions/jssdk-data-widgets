@@ -13,6 +13,8 @@
         d3Formatter : null,
 
         mainModel : null,
+        
+        config : null,
 
         selectMetricHeader : false,
 
@@ -33,8 +35,13 @@
         domain : null,
 
         initialize : function(options) {
-            this.mainModel = options.mainModel;
             var me = this;
+            
+            this.mainModel = options.mainModel;
+            this.config = options.config;
+            if (this.config) {
+                this.listenTo(this.config, 'change', this.render);
+            }
 
             if (this.model) {
                 this.listenTo(this.model, 'change', this.render);
@@ -53,9 +60,6 @@
             }
             if (options.maxRowsPerPage) {
                 this.maxRowsPerPage = options.maxRowsPerPage;
-            }
-            if (options.selectedMetric) {
-                this.selectedMetric = options.selectedMetric;
             }
             if (options.selectMetricHeader) {
                 this.selectMetricHeader = options.selectMetricHeader;
@@ -111,7 +115,7 @@
             "click thead th.NUMBER" : function(item) {
                 if (this.selectMetricHeader) {
                     var selectedMetric = $(item.target).attr("data-content");
-                    this.mainModel.set("selectedMetric", selectedMetric);
+                    this.config.set("selectedMetric", selectedMetric);
                 } else {
                     this.$el.off("click", "thead th.NUMBER");
                 }
@@ -183,10 +187,10 @@
 
             // Loop over each one and match the value
             for (i=0; i<tableHeaders.length; i++) { 
-                if (this.mainModel.get("selectedMetric") == $(tableHeaders[i]).attr("data-content")) {
+                if (this.config.get("selectedMetric") == $(tableHeaders[i]).attr("data-content")) {
                     $(tableHeaders[i]).addClass("filtered-by");
                     if (this.headerBadges) {
-                        if (me.mainModel.get("orderByDirection") === "DESC") {
+                        if (me.config.get("orderByDirection") === "DESC") {
                             $(tableHeaders[i]).append("<span class='badge'>Top</span>");
                         } else {
                             $(tableHeaders[i]).append("<span class='badge'>Last</span>");
@@ -197,11 +201,11 @@
         },
 
         reactiveStateEvents : function() {
-            if (this.mainModel) {
-                this.mainModel.on("change:chosenDimensions", this.render, this);
-                this.mainModel.on("change:chosenMetrics", this.render, this);
-                this.mainModel.on("change:selectedMetric", this.render, this);
-                this.mainModel.on("change:orderByDirection", this.render, this);
+            if (this.config) {
+                this.config.on("change:chosenDimensions", this.render, this);
+                this.config.on("change:chosenMetrics", this.render, this);
+                this.config.on("change:selectedMetric", this.render, this);
+                this.config.on("change:orderByDirection", this.render, this);
                 api.model.filters.on('change', this.render, this);
             }
         },
@@ -229,14 +233,14 @@
         },
 
         printChosenItems : function() {
-            var chosenDimensions = this.mainModel.get("chosenDimensions");
-            var chosenMetrics = this.mainModel.get("chosenMetrics");
+            var chosenDimensions = this.config.get("chosenDimensions");
+            var chosenMetrics = this.config.get("chosenMetrics");
             // var dimensions = chosenDimensions;
             // Get Dimension Names
             var dimensions = [];
 
             var selection = this.filters.get("selection");
-            if (selection) {
+            if (selection && chosenDimensions) {
                 var facets = selection.facets;
                 if (facets) {
                     for (i=0; i<chosenDimensions.length; i++) {
@@ -398,10 +402,15 @@
                 this.dataTableInsert(data);
 
                 // match orderBy column with default sorting
-                var columnToSelect = this.mainModel.get("selectedMetric");
-                var columnOrderDirection = this.mainModel.get("orderByDirection");
-                // for data table compatibility we need to format the string
-                columnOrderDirection = columnOrderDirection.toLowerCase();
+                var columnToSelect = this.config.get("selectedMetric");
+                var columnOrderDirection = this.config.get("orderByDirection");
+                if (!columnOrderDirection) {
+                    columnOrderDirection = "asc";
+                } else {
+                    // for data table compatibility we need to format the string
+                    columnOrderDirection = columnOrderDirection.toLowerCase();
+                }
+                
                 // cycle through each header element to order automatically
                 var tableHeaders = this.$el.find("thead th");
                 var columnToOrder = 0;
@@ -411,6 +420,7 @@
                         columnToOrder = i;
                     }
                 }
+                
 
                 // Initiate the Data Table after render
                 this.$el.find(".sq-table").DataTable({

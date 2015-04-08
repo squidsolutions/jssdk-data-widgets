@@ -32,7 +32,7 @@
                 this.dimensionIndex = options.dimensionIndex;
             }
 
-            // listen for selection change as we use it to filter out boolean dimensions
+            // listen for selection change as we use it to get dimensions
             this.filters.on("change:selection", function() {
                 me.render();
             });
@@ -88,13 +88,11 @@
                     var dims = facets;
                     for (var i=0; i<facets.length; i++){
                         var facet = facets[i];
-                        // do not display boolean dimensions
-                        // this is a workaround as the API should return a dimension type
                         var isBoolean = false;
                         if ((facet.dimension.type == "SEGMENTS") || (facet.items.length == 1) && (facet.items[0].value == "true")) {
                             isBoolean = true; 
                         }
-                        
+                        // do not display boolean dimensions
                         if (!isBoolean) {
                             if (this.dimensionIdList) {
                                 // insert and sort
@@ -139,12 +137,13 @@
                     },
                     onChange: function(option, selected, index) {
                         var chosenModel = _.clone(me.model.get("chosenDimensions"));
+                        if (!chosenModel) {
+                            chosenModel = [];
+                        }
                         var currentItem = option.attr("value");
 
                         if (selected) {
                             chosenModel.push(option.attr("value"));
-                            me.model.set({"chosenDimensions": chosenModel});
-                            me.model.set("selectedDimension", currentItem);
                         } else {
                             // If deselected remove item from array
                             for (var i = chosenModel.length; i--;) {
@@ -152,8 +151,8 @@
                                     chosenModel.splice(i, 1);
                                 }
                             }
-                            me.model.set({"chosenDimensions": chosenModel});
                         }
+                        me.model.set("chosenDimensions", chosenModel);
                     }
                 });
             } else {
@@ -161,7 +160,7 @@
                 
                 this.$el.find("select").on("change", function() {
                     var dimension = $(this).val();
-                    me.model.set({"selectedDimension": dimension});
+                    me.model.set("chosenDimensions", [dimension]);
                 });
 
                 if (selectedDimension) {

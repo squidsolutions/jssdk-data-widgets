@@ -88,7 +88,7 @@
             
             // iterate through all filter facets
             var selection = this.filters.get("selection");
-            if (selection) {
+            if (chosenDimensions && selection) {
                 var facets = selection.facets;
                 if (facets) {
                     var chosenFacets = [];

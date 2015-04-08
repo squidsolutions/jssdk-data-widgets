@@ -6,6 +6,7 @@
     var View = Backbone.View.extend({
         template : null,
         displayAllDomains : false,
+        onChangeHandler: null,
 
         initialize: function(options) {
             var me = this;
@@ -17,48 +18,41 @@
                 this.template = template;
             }
             
+            if (options.onChangeHandler) {
+                this.onChangeHandler = options.onChangeHandler;
+            }
+            
             if (typeof options.displayAllDomains !== 'undefined') {
                 this.displayAllDomains = options.displayAllDomains;
             }
 
-            // init the domains
-            this.model = squid_api.model.project;
-            this.model.on("change", this.process, this);
+            squid_api.model.project.on("change:domains", this.process, this);
+            this.model.on("change:domain", this.render, this);
         },
 
         events: {
             "change .sq-select": function(event) {
-                var selectedOid = event.target.value;
-                // update the current domain
-                squid_api.setDomainId(selectedOid);
+                if (this.onChangeHandler) {
+                    this.onChangeHandler.call(this,event);
+                }
             }
         },
         
         process : function() {
-            var domains = this.model.get("domains");
-            if (!squid_api.domainId) {
-                squid_api.model.status.on("change:domain", this.render, this);
-                if (domains && (domains.length == 1)) {
-                    // auto-select the single domain
-                    squid_api.setDomainId(domains[0].oid);
-                } else {
-                    this.render();
-                }
-            } else {
-                this.render();
-            }
+            this.render();
         },
 
         render: function() {
             var domain, domains, jsonData = {"selAvailable" : true, "options" : [{"label" : "Select Domain", "value" : "", "selected" : false}]};
             var hasSelection = false;
+            var selectedDomain = squid_api.model.config.get("domain");
             // get the domains from the project;
-            domains = this.model.get("domains");
+            domains = squid_api.model.project.get("domains");
             if (domains) {
                 for (var i=0; i<domains.length; i++) {
                     domain = domains[i];
                     var selected = false;
-                    if (domain.oid == squid_api.domainId) {
+                    if (domain.oid == selectedDomain) {
                         selected = true;
                         hasSelection = true;
                     }

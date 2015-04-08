@@ -27,12 +27,16 @@
             }
 
             // To populate metrics
-            squid_api.model.filters.on("change", function() {
+            squid_api.model.project.on("change:domains", function() {
+                me.render();
+            });
+            
+            this.model.on("change:domain", function() {
                 me.render();
             });
 
             // listen for global status change
-            squid_api.model.status.on('change:status', this.enable, this);
+            squid_api.model.status.on("change:status", this.enable, this);
         },
 
         enable: function() {
@@ -129,7 +133,7 @@
         
         getDomainMetrics : function() {
             var metrics;
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"));
             if (domain) {
                 metrics = domain.metrics;
             }

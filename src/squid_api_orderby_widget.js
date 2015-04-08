@@ -14,6 +14,7 @@
             if (this.model) {
                 this.model.on('change', this.render, this);
             }
+
             if (options.removeOrderDirection) {
                 this.removeOrderDirection = options.removeOrderDirection;
             }
@@ -24,6 +25,9 @@
                 this.metricList = options.metricList;
             }
             
+            // To populate metrics
+            squid_api.model.project.on("change:domains", this.render, this);
+
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -63,7 +67,7 @@
 
         getDomainMetrics : function() {
             var metrics;
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"));
             if (domain) {
                 metrics = domain.metrics;
             }
@@ -79,12 +83,8 @@
             } else {
                 checked = "";
             }
-            var limit = null;
-            if (this.model.get("tableAnalysis")) {
-                limit = this.model.get("tableAnalysis").get("limit");
-            } else {
-                limit = this.model.get("limit");
-            }
+
+            var limit = this.model.get("limit");
 
             var metrics = this.getDomainMetrics();
             var chosenMetrics = this.model.get("chosenMetrics");
