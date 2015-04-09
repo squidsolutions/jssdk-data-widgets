@@ -187,7 +187,7 @@
 
             // Loop over each one and match the value
             for (i=0; i<tableHeaders.length; i++) { 
-                if (this.config.get("selectedMetric") == $(tableHeaders[i]).attr("data-content")) {
+                if (this.config.get("selectedMetric") === $(tableHeaders[i]).attr("data-content")) {
                     $(tableHeaders[i]).addClass("filtered-by");
                     if (this.headerBadges) {
                         if (me.config.get("orderByDirection") === "DESC") {
@@ -211,23 +211,26 @@
         },
 
         getNamesFromDomain : function(model, metrics) {
-            if (metrics) {
-                var namesArray;
-                var obj;
-                if (model === "metric") {
-                    var domainMetrics = this.domain.metrics;
-                    namesArray = [];
-                    for (var ix0=0; ix0<domainMetrics.length; ix0++) {
-                        obj = {};
-                        for (var ix1=0; ix1<metrics.length; ix1++) {
-                            if (metrics[ix1] === domainMetrics[ix0].oid) {
-                                obj.id = metrics[ix1];
-                                obj.name = domainMetrics[ix0].name;
-                                namesArray.push(obj);
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.config.get("domain"), "Domain");
+            if (domain) {
+                if (metrics) {
+                    var namesArray;
+                    var obj;
+                    if (model === "metric") {
+                        var domainMetrics = domain.metrics;
+                        namesArray = [];
+                        for (var ix0=0; ix0<domainMetrics.length; ix0++) {
+                            obj = {};
+                            for (var ix1=0; ix1<metrics.length; ix1++) {
+                                if (metrics[ix1] === domainMetrics[ix0].oid) {
+                                    obj.id = metrics[ix1];
+                                    obj.name = domainMetrics[ix0].name;
+                                    namesArray.push(obj);
+                                }
                             }
                         }
+                        return namesArray;
                     }
-                    return namesArray;
                 }
             }
         },
@@ -277,6 +280,10 @@
                 if (this.model.get("status") == "RUNNING") {
                     this.$el.find("tbody").html("<div class='reactiveMessage'></div>");
                 }
+
+                if (chosenDimensions.length === 0 && chosenMetrics.length === 0) {
+                    this.$el.find("thead tr").append("<th data-column='empty'>Empty Table</th>");
+                }
             }
         },
 
@@ -307,9 +314,7 @@
             if (this.reactiveState) {
                 this.$el.find(".reactiveMessage").hide();
                 this.$el.find(".reactiveMessage").show();
-                if (this.domain) {
-                    this.printChosenItems();
-                }
+                this.printChosenItems();
                 if (this.mainModel.get("analysisRefreshNeeded")) {
                     this.$el.find(".squid-api-data-widgets-data-table").addClass("setHeaders");
                     this.$el.find("tbody").html("<div class='reactiveMessage'><span>" + this.reactiveMessage + "</span></div>");
