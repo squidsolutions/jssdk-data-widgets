@@ -124,6 +124,16 @@
                 }
             }
 
+            // Alphabetical Sorting
+            jsonData.options.sort(function(a, b) {
+                var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
+                if (labelA < labelB)
+                    return -1;
+                if (labelA > labelB)
+                    return 1;
+                return 0; // no sorting
+            });
+
             var html = this.template(jsonData);
             this.$el.html(html);
             this.$el.show();

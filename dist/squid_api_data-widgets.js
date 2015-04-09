@@ -1227,7 +1227,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
 
                 if (chosenDimensions.length === 0 && chosenMetrics.length === 0) {
-                    this.$el.find("thead tr").append("<th data-column='empty'>empty</th>");
+                    this.$el.find("thead tr").append("<th data-column='empty'>Empty Table</th>");
                 }
             }
         },
@@ -1513,6 +1513,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
                 }
             }
+
+            // Alphabetical Sorting
+            jsonData.options.sort(function(a, b) {
+                var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
+                if (labelA < labelB)
+                    return -1;
+                if (labelA > labelB)
+                    return 1;
+                return 0; // no sorting
+            });
 
             var html = this.template(jsonData);
             this.$el.html(html);
@@ -2363,6 +2373,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     jsonData.options.push(option);
                 }
             }
+
+            // Alphabetical Sorting
+            jsonData.options.sort(function(a, b) {
+                var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
+                if (labelA < labelB)
+                    return -1;
+                if (labelA > labelB)
+                    return 1;
+                return 0; // no sorting
+            });
 
             var html = this.template(jsonData);
             this.$el.html(html);
