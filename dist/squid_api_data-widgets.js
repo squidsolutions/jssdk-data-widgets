@@ -1232,7 +1232,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         render : function() {
             var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
             if (!this.domain) {
-                this.domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+                this.domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId, "Domain");
             }
 
             var me = this;
@@ -2380,8 +2380,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
         
         getDomainMetrics : function() {
-            var metrics;
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"));
+            var metrics = [];
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"), "Domain");
             if (domain) {
                 metrics = domain.metrics;
             }
@@ -2605,7 +2605,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render: function() {
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"));
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"), "Domain");
             var jsonData = {"chosenMetrics" : []};
             var chosenMetrics = this.model.get("chosenMetrics");
             if (domain && chosenMetrics) {
@@ -2706,8 +2706,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         getDomainMetrics : function() {
-            var metrics;
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"));
+            var metrics = [];
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"), "Domain");
             if (domain) {
                 metrics = domain.metrics;
             }

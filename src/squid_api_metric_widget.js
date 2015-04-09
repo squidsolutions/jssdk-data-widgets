@@ -92,7 +92,7 @@
         },
 
         render: function() {
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"));
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"), "Domain");
             var jsonData = {"chosenMetrics" : []};
             var chosenMetrics = this.model.get("chosenMetrics");
             if (domain && chosenMetrics) {

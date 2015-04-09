@@ -287,7 +287,7 @@
         render : function() {
             var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
             if (!this.domain) {
-                this.domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId);
+                this.domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId, "Domain");
             }
 
             var me = this;

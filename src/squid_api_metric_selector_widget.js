@@ -132,8 +132,8 @@
         },
         
         getDomainMetrics : function() {
-            var metrics;
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"));
+            var metrics = [];
+            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"), "Domain");
             if (domain) {
                 metrics = domain.metrics;
             }
