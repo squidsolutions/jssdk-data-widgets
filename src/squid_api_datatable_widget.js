@@ -280,9 +280,10 @@
                 if (this.model.get("status") == "RUNNING") {
                     this.$el.find("tbody").html("<div class='reactiveMessage'></div>");
                 }
-
-                if (chosenDimensions.length === 0 && chosenMetrics.length === 0) {
-                    this.$el.find("thead tr").append("<th data-column='empty'>Empty Table</th>");
+                if (chosenDimensions && chosenMetrics) {
+                    if (chosenDimensions.length === 0 && chosenMetrics.length === 0) {
+                        this.$el.find("thead tr").append("<th data-column='empty'>Empty Table</th>");
+                    }
                 }
             }
         },
