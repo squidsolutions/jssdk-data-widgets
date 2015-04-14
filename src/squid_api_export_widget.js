@@ -92,17 +92,11 @@
                 exportAnalysis.addParameter("compression","gzip");
             }
             exportAnalysis.addParameter("access_token","[access_token]");
-            exportAnalysis.set({
-               "id": {
+            exportAnalysis.set(analysis.attributes);
+            exportAnalysis.set(
+               "id", {
                     "projectId": analysis.get("id").projectId,
                     "analysisJobId": null
-                },
-                "domains": analysis.get("domains"),
-                "dimensions" : analysis.get("dimensions"),
-                "facets" : analysis.get("facets"),
-                "metrics" : analysis.get("metrics"),
-                "selection": analysis.get("selection"),
-                "orderBy": analysis.get("orderBy")
                 });
 
             // escape all spaces in the json injected into cURL
@@ -171,18 +165,13 @@
              
              if (analysis.get("id").projectId) {
                  var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                 downloadAnalysis.set(analysis.attributes);
                  downloadAnalysis.set({
                     "id": {
                          "projectId": analysis.get("id").projectId,
                          "analysisJobId": null
                      },
-                     "domains": analysis.get("domains"),
-                     "dimensions" : analysis.get("dimensions"),
-                     "facets" : analysis.get("facets"),
-                     "metrics" : analysis.get("metrics"),
-                     "orderBy": analysis.get("orderBy"),
-                     "autoRun": false
-                     });
+                     "autoRun": false});
                  squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
                      .done(function(model, response) {
                          me.downloadStatus = 2;
