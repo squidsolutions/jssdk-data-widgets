@@ -26,6 +26,10 @@ div.dataTables_paginate ul.pagination li.disabled {
 	cursor: pointer;
 }
 
+.dataTable td {
+	white-space:nowrap;
+}	
+
 .dataTables_wrapper {
 	overflow: hidden;
 }
