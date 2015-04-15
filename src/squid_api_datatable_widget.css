@@ -40,6 +40,16 @@ div.dataTables_paginate ul.pagination li.disabled {
 	width: 100%;
 	display: inline-block;
 }
+
+.squid-api-data-widgets-data-table td.new-category {
+	width: 100%;
+  	position: absolute;
+  	left: 16px;
+  	height: 20px;
+  	text-align: left;
+  	font-weight: bold;
+}
+
 .squid-api-data-widgets-data-table.setHeader thead {
 	width:100%;
 	display: inline-block;

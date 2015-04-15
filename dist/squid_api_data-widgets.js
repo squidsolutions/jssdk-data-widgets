@@ -979,6 +979,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         domain : null,
 
+        pageLength : 10,
+
+        reports : false,
+
         initialize : function(options) {
             var me = this;
             
@@ -1030,6 +1034,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.headerBadges) {
                 this.headerBadges = options.headerBadges;
+            }
+            if (options.pageLength) {
+                this.pageLength = options.pageLength;
+            }
+            if (options.reports) {
+                this.reports = options.reports;
+            }
+            if (options.reportCategoryID) {
+                this.reportCategoryID = options.reportCategoryID;
+            }
+            if (options.reportAccountID) {
+                this.reportAccountID = options.reportAccountID;
             }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
@@ -1085,11 +1101,27 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         dataTableInsert : function(data) {
 
             var globalID;
+            var me = this;
 
             if (this.$el.attr("id")) {
                 globalID = "#" + this.$el.attr('id');
             } else {
                 console.log("No ID assigned to DOM element for Data Table");
+            }
+
+            // Store Columns to Manipulate
+            if (this.reports) {
+                var dataCols = data.results.cols;
+                var categoryId = 0;
+                var accountId = 0;
+                for (i=0; i<dataCols.length; i++) {
+                    if (dataCols[i].id == this.reportCategoryID) {
+                        categoryId = i;
+                    }
+                    if (dataCols[i].id == this.reportAccountID) {
+                        accountId = i;
+                    }
+                }
             }
 
             d3.select(globalID + " tbody").selectAll("tr").remove();
@@ -1098,20 +1130,29 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var th = d3.select(globalID + " thead tr").selectAll("th")
                 .data(data.results.cols)
                 .enter().append("th")
-                .text(function(d) {
+                .attr("class", function(d, i) {
+                    if (me.reports) {
+                        if (i === categoryId || i === accountId) {
+                            return "hide " + d.dataType;
+                        } else {
+                            return d.dataType;
+                        }
+                    } else {
+                        return d.dataType;
+                    }
+                })
+                .text(function(d, i) {
                     return d.name;
                 })
                 .attr("data-content", function(d) {
                     return d.id;
-                })
-                .attr("class", function(d) {
-                    return d.dataType;
                 });
 
             // Rows
             var tr = d3.select(globalID + " tbody").selectAll("tr")
                 .data(data.results.rows)
-                .enter().append("tr");
+                .enter()
+                .append("tr");
 
             // Cells
             var td = tr.selectAll("td")
@@ -1119,8 +1160,31 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     return d.v;
                 })
                 .enter().append("td")
-                .text(function(d) {
-                    return d;
+                .attr("class", function(d, i) {
+                    if (me.reports) {
+                        if (i === categoryId || i === accountId) {
+                            return "hide";
+                        }
+                        if (i === accountId + 1 && parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
+                            this.parentNode.className = "new-category";
+                            return "new-category";
+                        }
+                    }
+                })
+                .text(function(d, i) {
+                    if (me.reports) {
+                        if (i === accountId + 1) {
+                            if (parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
+                                return this.parentNode.__data__.v[accountId];
+                            } else {
+                                return d;
+                            }
+                        } else {
+                            return d;
+                        }
+                    } else {
+                        return d;
+                    }
                 });
         },
 
@@ -1381,6 +1445,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "ordering":  this.ordering,
                     "fnDrawCallback" : this.addMetricClasses,
                     "order": [[ columnToOrder, columnOrderDirection ]],
+                    "iDisplayLength" : this.pageLength
                 });
             }
         }
