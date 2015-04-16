@@ -62,7 +62,6 @@ div.dataTables_paginate ul.pagination li.disabled {
 
 .squid-api-data-widgets-data-table td.new-category {
 	width: 100%;
-  	position: absolute;
   	left: 16px;
   	height: 20px;
   	text-align: left;
