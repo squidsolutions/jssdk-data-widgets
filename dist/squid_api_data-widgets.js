@@ -1166,7 +1166,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             return "hide";
                         }
                         if (i === accountId + 1 && parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
-                            this.parentNode.className = "new-category";
+                            this.parentNode.className = "group";
                             return "new-category";
                         }
                     }
