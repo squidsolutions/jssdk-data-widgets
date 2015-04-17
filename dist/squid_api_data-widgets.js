@@ -1445,7 +1445,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "ordering":  this.ordering,
                     "fnDrawCallback" : this.addMetricClasses,
                     "order": [[ columnToOrder, columnOrderDirection ]],
-                    "iDisplayLength" : this.pageLength
+                    "iDisplayLength" : this.pageLength,
+                    "scrollX": true
                 });
             }
         }

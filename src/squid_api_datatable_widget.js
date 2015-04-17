@@ -500,7 +500,8 @@
                     "ordering":  this.ordering,
                     "fnDrawCallback" : this.addMetricClasses,
                     "order": [[ columnToOrder, columnOrderDirection ]],
-                    "iDisplayLength" : this.pageLength
+                    "iDisplayLength" : this.pageLength,
+                    "scrollX": true
                 });
             }
         }
