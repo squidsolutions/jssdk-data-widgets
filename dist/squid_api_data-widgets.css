@@ -18,27 +18,27 @@ rect text {
     margin-left: 10%;
     padding: 30px;
 }
-div.dataTables_paginate ul.pagination li.disabled {
+.squid-api-data-widgets-data-table div.dataTables_paginate ul.pagination li.disabled {
 	display: none;
 }
 
-.dataTable thead th.NUMBER {
+.squid-api-data-widgets-data-table .dataTable thead th.NUMBER {
 	cursor: pointer;
 }
 
-.dataTable td {
+.squid-api-data-widgets-data-table .dataTable td {
 	white-space:nowrap;
 }	
 
-.dataTables_wrapper {
+.squid-api-data-widgets-data-table .dataTables_wrapper {
 	overflow: hidden;
 }
 
-.dataTable .NUMBER {
+.squid-api-data-widgets-data-table .dataTable .NUMBER {
     text-align: right;
 }
 
-.dataTables_wrapper .col-xs-12 {
+.squid-api-data-widgets-data-table .dataTables_wrapper .col-xs-12 {
 	overflow-x: auto;
 }
 
@@ -81,7 +81,7 @@ div.dataTables_paginate ul.pagination li.disabled {
 	display: inline-block;
 }
 
-#app #main .main-container .squid-api-data-widgets-data-table.setHeaders tr {
+.squid-api-data-widgets-data-table.setHeaders tr {
 	width: 100%;
 	overflow-x: scroll;
 }
