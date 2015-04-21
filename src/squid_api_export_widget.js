@@ -52,36 +52,6 @@
             this.render();
         },
         
-        /*
-         * deprecated, this method was used to detect download end, but this behavior only works correctly on Chrome.
-         */
-        download : function(event) {
-            var me = this, analysis = this.model;
-      
-            if  (this.downloadStatus === 2) {
-                // poll job status
-                var downloadBtn = $(me.renderStore).find("#download");
-                downloadBtn.addClass("hidden");
-                $(me.renderStore).find("#downloading").removeClass("hidden");
-                
-                var observer = $.Deferred();
-                var pollAnalysis = new squid_api.model.AnalysisJob();
-                pollAnalysis.set({
-                   "id": {
-                        "projectId": analysis.get("id").projectId,
-                        "analysisJobId": me.currentJobId.analysisJobId,
-                    }});
-                observer.always(function(){
-                    // Done
-                    squid_api.model.status.pullTask(pollAnalysis);
-                    me.downloadStatus = 0;
-                    me.render();
-                });
-                squid_api.model.status.pushTask(pollAnalysis);
-                squid_api.controller.analysisjob.getAnalysisJob(observer, pollAnalysis);
-            }
-        },
-        
         render : function() {
             var me = this, analysis = this.model;
 

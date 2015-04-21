@@ -318,7 +318,7 @@ function program7(depth0,data) {
   buffer += "> csv \r\n			<div style=\"display: inline-block;\">\r\n				<label>Compression: </label> <input type=\"checkbox\" name=\"compression\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> gzip\r\n			</div>\r\n		</div>\r\n		<hr>\r\n		<div>\r\n			<a id=\"download\" class=\"btn btn-default\" target=\"download\">Download your data</a>\r\n			<a id=\"downloading\" class=\"btn btn-default disabled hidden\">Downloading &nbsp;<i class='fa fa-spinner fa-spin'></i></a>\r\n		</div>\r\n		";
+  buffer += "> gzip\r\n			</div>\r\n		</div>\r\n		<hr>\r\n		<div>\r\n			<a id=\"download\" class=\"btn btn-default\" target=\"download\">Download your data</a>\r\n		</div>\r\n		";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n	</div>\r\n";
@@ -2099,36 +2099,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var t = event.target;
             this.compression = (t.checked);
             this.render();
-        },
-        
-        /*
-         * deprecated, this method was used to detect download end, but this behavior only works correctly on Chrome.
-         */
-        download : function(event) {
-            var me = this, analysis = this.model;
-      
-            if  (this.downloadStatus === 2) {
-                // poll job status
-                var downloadBtn = $(me.renderStore).find("#download");
-                downloadBtn.addClass("hidden");
-                $(me.renderStore).find("#downloading").removeClass("hidden");
-                
-                var observer = $.Deferred();
-                var pollAnalysis = new squid_api.model.AnalysisJob();
-                pollAnalysis.set({
-                   "id": {
-                        "projectId": analysis.get("id").projectId,
-                        "analysisJobId": me.currentJobId.analysisJobId,
-                    }});
-                observer.always(function(){
-                    // Done
-                    squid_api.model.status.pullTask(pollAnalysis);
-                    me.downloadStatus = 0;
-                    me.render();
-                });
-                squid_api.model.status.pushTask(pollAnalysis);
-                squid_api.controller.analysisjob.getAnalysisJob(observer, pollAnalysis);
-            }
         },
         
         render : function() {
