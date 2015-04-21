@@ -131,6 +131,11 @@ rect text {
 	box-shadow: 4px 12px 18px -14px;
 }
 
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover, .dataTables_wrapper .dataTables_paginate .paginate_button:active, .dataTables_wrapper .dataTables_paginate .paginate_button:active {
+	background: none;
+	border-color: #fff;
+	box-shadow: none;
+}
 #origin .dropdownDisabled {
 	top: 0px;
 	height: 100%;
