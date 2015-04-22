@@ -97,8 +97,8 @@
             var chosenMetrics = this.model.get("chosenMetrics");
             if (domain && chosenMetrics) {
                 var domainMetrics = domain.metrics;
-                for (var dMetrics = 0; dMetrics < domainMetrics.length; dMetrics++) {
-                    for (var cMetrics = 0; cMetrics < chosenMetrics.length; cMetrics++) {
+                for (var cMetrics = 0; cMetrics < chosenMetrics.length; cMetrics++) {
+                    for (var dMetrics = 0; dMetrics < domainMetrics.length; dMetrics++) {
                         if (domainMetrics[dMetrics].id.metricId === chosenMetrics[cMetrics]) {
                             // add to the list
                             var option = {
@@ -107,7 +107,7 @@
                                 "selectMetric" : this.selectMetric,
                             };
                             jsonData.chosenMetrics.push(option);
-                        }   
+                        }
                     }
                 }
             }
