@@ -13,30 +13,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 this["squid_api"]["template"]["squid_api_datatable_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, functionType="function", self=this;
-
-function program1(depth0,data) {
   
-  
-  return "\r\n    <table class=\"sq-table squid-api-data-widgets-data-table\">\r\n		<thead>\r\n			<tr></tr>\r\n		</thead>\r\n		<tbody></tbody>\r\n	</table>\r\n";
-  }
 
-function program3(depth0,data) {
-  
-  var buffer = "", stack1, helper;
-  buffer += "\r\n	<div class=\"noDataInTable\">\r\n    	";
-  if (helper = helpers.noDataMessage) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.noDataMessage); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n    </div>\r\n";
-  return buffer;
-  }
 
-  buffer += "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.dataAvailable), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n\r\n\r\n";
-  return buffer;
+  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n\r\n<table class=\"sq-table squid-api-data-widgets-data-table\">\r\n<thead>\r\n	<tr></tr>\r\n</thead>\r\n<tbody></tbody>\r\n</table>\r\n<div id=\"pagination\"></div>\r\n\r\n\r\n";
   });
 
 this["squid_api"]["template"]["squid_api_dimension_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -956,8 +936,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         format : null,
         
         d3Formatter : null,
-
-        mainModel : null,
         
         config : null,
 
@@ -973,27 +951,25 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         reactiveState : false,
 
-        reactiveMessage : null,
-
         headerBadges : false,
-
-        domain : null,
 
         pageLength : 10,
 
         reports : false,
+        
+        paginationView : null,
 
         initialize : function(options) {
             var me = this;
             
-            this.mainModel = options.mainModel;
+            // config is used for orderBy
             this.config = options.config;
-            if (this.config) {
-                this.listenTo(this.config, 'change', this.render);
-            }
 
             if (this.model) {
-                this.listenTo(this.model, 'change', this.render);
+                this.listenTo(this.model, 'change:status', this.render);
+                this.listenTo(this.model, 'change:facets', this.render);
+                this.listenTo(this.model, 'change:metricList', this.render);
+                this.listenTo(this.model, 'change:orderBy', this.render);
             }
 
             // setup options
@@ -1002,14 +978,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             } else {
                 this.template = squid_api.template.squid_api_datatable_widget;
             }
+            
+            // filters are used to get the Dimensions and Metrics names
             if (options.filters) {
                 this.filters = options.filters;
             } else {
                 this.filters = squid_api.model.filters;
             }
+            
             if (options.maxRowsPerPage) {
                 this.maxRowsPerPage = options.maxRowsPerPage;
             }
+            
             if (options.selectMetricHeader) {
                 this.selectMetricHeader = options.selectMetricHeader;
             }
@@ -1024,13 +1004,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.noDataMessage) {
                 this.noDataMessage = options.noDataMessage;
-            }
-            if (options.reactiveState) {
-                this.reactiveState = options.reactiveState;
-                this.reactiveStateEvents();
-            }
-            if (options.reactiveMessage) {
-                this.reactiveMessage = options.reactiveMessage;
             }
             if (options.headerBadges) {
                 this.headerBadges = options.headerBadges;
@@ -1069,7 +1042,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
 
-            this.beforeRender();
+            this.renderBaseViewPort();
         },
 
         events : ({
@@ -1098,20 +1071,27 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return this;
         },
 
-        dataTableInsert : function(data) {
-
-            var globalID;
+        displayTableHeader : function(selector) {
             var me = this;
-
-            if (this.$el.attr("id")) {
-                globalID = "#" + this.$el.attr('id');
-            } else {
-                console.log("No ID assigned to DOM element for Data Table");
+            var facets = this.model.get("facets");
+            var columns = [];
+            var i=0;
+            var obj;
+            for (i=0; i<facets.length; i++) {
+                obj = squid_api.utils.find(this.filters.get("selection").facets, "id", facets[i].value);
+                obj.dataType = "STRING";
+                columns.push(obj);
+            }
+            var metrics = this.model.get("metricList");
+            for (i=0; i<metrics.length; i++) {
+                obj = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", metrics[i].id.metricId, "Metric");
+                obj.dataType = "NUMBER";
+                columns.push(obj);
             }
 
             // Store Columns to Manipulate
             if (this.reports) {
-                var dataCols = data.results.cols;
+                var dataCols = columns;
                 var categoryId = 0;
                 var accountId = 0;
                 for (i=0; i<dataCols.length; i++) {
@@ -1124,11 +1104,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
 
-            d3.select(globalID + " tbody").selectAll("tr").remove();
-
             // header
-            var th = d3.select(globalID + " thead tr").selectAll("th")
-                .data(data.results.cols)
+            d3.select(selector).select("thead tr").selectAll("th").remove();
+            var th = d3.select(selector).select("thead tr").selectAll("th")
+                .data(columns)
                 .enter().append("th")
                 .attr("class", function(d, i) {
                     if (me.reports) {
@@ -1148,264 +1127,32 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     return d.id;
                 });
 
-            // Rows
-            var tr = d3.select(globalID + " tbody").selectAll("tr")
-                .data(data.results.rows)
-                .enter()
-                .append("tr");
-
-            // Cells
-            var td = tr.selectAll("td")
-                .data(function(d) {
-                    return d.v;
-                })
-                .enter().append("td")
-                .attr("class", function(d, i) {
-                    if (me.reports) {
-                        if (i === categoryId || i === accountId) {
-                            return "hide";
-                        }
-                        if (i === accountId + 1 && parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
-                            this.parentNode.className = "group";
-                            return "new-category";
-                        }
-                    }
-                })
-                .text(function(d, i) {
-                    if (me.reports) {
-                        if (i === accountId + 1) {
-                            if (parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
-                                return this.parentNode.__data__.v[accountId];
-                            } else {
-                                return d;
-                            }
-                        } else {
-                            return d;
-                        }
-                    } else {
-                        return d;
-                    }
-                });
-        },
-
-        selectColumn : function() {
-            var me = this;
-
-            // Get Table Headers
-            var tableHeaders = this.$el.find("table th");
-
-            // Loop over each one and match the value
-            for (i=0; i<tableHeaders.length; i++) { 
-                if (this.config.get("selectedMetric") === $(tableHeaders[i]).attr("data-content")) {
-                    $(tableHeaders[i]).addClass("filtered-by");
-                    if (this.headerBadges) {
-                        if (me.config.get("orderByDirection") === "DESC") {
-                            $(tableHeaders[i]).append("<span class='badge'>Top</span>");
-                        } else {
-                            $(tableHeaders[i]).append("<span class='badge'>Last</span>");
-                        }
-                    }
-                }
-            }
-        },
-
-        reactiveStateEvents : function() {
-            if (this.config) {
-                this.config.on("change:chosenDimensions", this.render, this);
-                this.config.on("change:chosenMetrics", this.render, this);
-                this.config.on("change:selectedMetric", this.render, this);
-                this.config.on("change:orderByDirection", this.render, this);
-                api.model.filters.on('change', this.render, this);
-            }
-        },
-
-        getNamesFromDomain : function(model, metrics) {
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.config.get("domain"), "Domain");
-            if (domain) {
-                if (metrics) {
-                    var namesArray;
-                    var obj;
-                    if (model === "metric") {
-                        var domainMetrics = domain.metrics;
-                        namesArray = [];
-                        for (var ix0=0; ix0<domainMetrics.length; ix0++) {
-                            obj = {};
-                            for (var ix1=0; ix1<metrics.length; ix1++) {
-                                if (metrics[ix1] === domainMetrics[ix0].oid) {
-                                    obj.id = metrics[ix1];
-                                    obj.name = domainMetrics[ix0].name;
-                                    namesArray.push(obj);
-                                }
-                            }
-                        }
-                        return namesArray;
-                    }
-                }
-            }
-        },
-
-        printChosenItems : function() {
-            var chosenDimensions = this.config.get("chosenDimensions");
-            var chosenMetrics = this.config.get("chosenMetrics");
-            // var dimensions = chosenDimensions;
-            // Get Dimension Names
-            var dimensions = [];
-
-            var selection = this.filters.get("selection");
-            if (selection && chosenDimensions) {
-                var facets = selection.facets;
-                if (facets) {
-                    for (i=0; i<chosenDimensions.length; i++) {
-                        for (ix=0; ix<facets.length; ix++) {
-                            if (chosenDimensions[i] === facets[ix].id) {
-                                var obj = {};
-                                obj.id = facets[ix].id;
-                                if (facets[ix].name) {
-                                    obj.name = facets[ix].name;
-                                } else {
-                                    obj.name = facets[ix].dimension.name;
-                                }
-                                dimensions.push(obj);
-                            }
-                        }
-                    }
-                }
-            }
-
-            var metrics = this.getNamesFromDomain("metric", chosenMetrics);
-            this.$el.find("thead tr").html();
-            if (this.mainModel.get("analysisRefreshNeeded") && this.model.get("status") !== "RUNNING") {
-                if (dimensions) {
-                    for (i=0; i<dimensions.length; i++) {
-                        this.$el.find("thead tr").append("<th data-content=" + dimensions[i].id + ">" + dimensions[i].name + "</th>");
-                    }
-                }
-                if (metrics) {
-                    for (i=0; i<metrics.length; i++) {
-                        this.$el.find("thead tr").append("<th data-content=" + metrics[i].id + ">" + metrics[i].name + "</th>");
-                    }
-                }
-                this.$el.find(".squid-api-data-widgets-data-table").addClass("setHeaders");
-                if (this.model.get("status") == "RUNNING") {
-                    this.$el.find("tbody").html("<div class='reactiveMessage'></div>");
-                }
-                if (chosenDimensions && chosenMetrics) {
-                    if (chosenDimensions.length === 0 && chosenMetrics.length === 0) {
-                        this.$el.find("thead tr").append("<th data-column='empty'>Empty Table</th>");
-                    }
-                }
-            }
-        },
-
-        beforeRender: function() {
-            this.$el.html(this.template({'noDataMessage' : this.noDataMessage}));
-        },
-
-        render : function() {
-            var jsonData, data, rowIdx, colIdx, row, rows, v, analysis;
-            if (!this.domain) {
-                this.domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", squid_api.domainId, "Domain");
-            }
-
-            var me = this;
-
-            var model = this.model.toJSON();
-            var dataAvailable = true;
-
-            if (!model.dimensions && !model.metrics && !model.facets) {
-                dataAvailable = false;
-            }
-            if ((this.model.get("status") !== "RUNNING") && this.reactiveState) {
-                if (this.mainModel.get("refreshButtonPressed")) {
-                    this.$el.html(this.template({'dataAvailable' : dataAvailable, 'noDataMessage' : this.noDataMessage}));
-                }
-            }
             
-            if (this.reactiveState) {
-                this.$el.find(".reactiveMessage").hide();
-                this.$el.find(".reactiveMessage").show();
-                this.printChosenItems();
-                if (this.mainModel.get("analysisRefreshNeeded")) {
-                    this.$el.find(".squid-api-data-widgets-data-table").addClass("setHeaders");
-                    this.$el.find("tbody").html("<div class='reactiveMessage'><span>" + this.reactiveMessage + "</span></div>");
-                }
-            } else {
-                this.display();
-            }
-               
-            if (!this.model.isDone()) {
-                this.$el.find(".squid-api-data-widgets-data-table").removeClass("notdone");
-                // running
-                if (this.model.get("status") == "RUNNING") {
-                    $(".sq-loading").show();
-                    this.$el.find(".dataTables_wrapper").addClass("running");
-                } else {
-                    $(".sq-loading").hide();
-                    this.$el.find(".dataTables_wrapper").removeClass("done");
-                }
-            } else if (this.model.get("error")) {
-                // error
-                $(".sq-loading").hide();
-            } else {
-                if (this.reactiveState && ! this.mainModel.get("analysisRefreshNeeded")) {
-                    this.display();
-                    this.$el.find(".squid-api-data-widgets-data-table").removeClass("setHeaders");
-                }
-                $(".sq-loading").hide();
-                this.selectColumn();
-            }
-
-            return this;
-        },
-
-        addMetricClasses : function() {
-            var index = [];
-            var me = this;
-            var columnHeaders = $(this).find("th");
-
-            for (i=0; i<columnHeaders.length; i++) {
-                if ($(columnHeaders[i]).hasClass("NUMBER")) {
-                    index.push(i);
-                }
-            }
-
-            var bodyTr = $(this).find("tbody tr");
-
-            for (i=0; i<bodyTr.length; i++) {
-                var items = $(bodyTr[i]).find("td");
-
-                for (i1=0; i1<index.length; i1++) {
-                    for (i2=0; i2<items.length; i2++) {
-                        if (i2 === index[i1]) {
-                            $(items[i2]).addClass("NUMBER");
-                        }
-                    }
-                }
-            }
         },
         
-        display : function() {
-            var analysis = this.model;
+        displayTableContent : function(selector) {
             var me = this;
+            
+            var analysis = this.model;
 
             // in case of a multi-analysis model
             if (analysis.get("analyses")) {
               analysis = analysis.get("analyses")[0];
             }
 
-            var jsonData = analysis.toJSON();
-            if (jsonData.results) {
+            var results = analysis.get("results");
+            
+            if (results) {
                 // apply paging and number formatting
-                data = {};
-                data.done = this.model.isDone();
-                data.results = {"cols" : jsonData.results.cols, "rows" : []};
-                rows = jsonData.results.rows;
+                var data = {};
+                data.results = {"cols" : results.cols, "rows" : []};
+                rows = results.rows;
                 for (rowIdx = 0; (rowIdx<rows.length && rowIdx<this.maxRowsPerPage); rowIdx++) {
                     row = rows[rowIdx];
                     newRow = {v:[]};
-                    for (colIdx = 0; colIdx<jsonData.results.cols.length; colIdx++) {
+                    for (colIdx = 0; colIdx<results.cols.length; colIdx++) {
                         v = row.v[colIdx];
-                        if (jsonData.results.cols[colIdx].dataType == "NUMBER") {
+                        if (results.cols[colIdx].dataType == "NUMBER") {
                             v = this.format(v);
                         }
                         newRow.v.push(v);
@@ -1413,43 +1160,91 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     data.results.rows.push(newRow);
                 }
                 
-                // build the html datatable
-                this.dataTableInsert(data);
+                // Rows
+                d3.select(selector).select("tbody").selectAll("tr").remove();
+                var tr = d3.select(selector).select("tbody").selectAll("tr")
+                    .data(data.results.rows)
+                    .enter()
+                    .append("tr");
 
-                // match orderBy column with default sorting
-                var columnToSelect = this.config.get("selectedMetric");
-                var columnOrderDirection = this.config.get("orderByDirection");
-                if (!columnOrderDirection) {
-                    columnOrderDirection = "asc";
-                } else {
-                    // for data table compatibility we need to format the string
-                    columnOrderDirection = columnOrderDirection.toLowerCase();
-                }
-                
-                // cycle through each header element to order automatically
-                var tableHeaders = this.$el.find("thead th");
-                var columnToOrder = 0;
-
-                for (i=0; i<tableHeaders.length; i++) {
-                    if ($(tableHeaders[i]).attr("data-content") === columnToSelect) {
-                        columnToOrder = i;
-                    }
-                }
-                
-
-                // Initiate the Data Table after render
-                this.$el.find(".sq-table").DataTable({
-                    "lengthChange": false,
-                    "searching": this.searching,
-                    "paging" : this.paging,
-                    "ordering":  this.ordering,
-                    "fnDrawCallback" : this.addMetricClasses,
-                    "order": [[ columnToOrder, columnOrderDirection ]],
-                    "iDisplayLength" : this.pageLength,
-                    "scrollX": true
-                });
+                // Cells
+                var td = tr.selectAll("td")
+                    .data(function(d) {
+                        return d.v;
+                    })
+                    .enter().append("td")
+                    .attr("class", function(d, i) {
+                        if (me.reports) {
+                            if (i === categoryId || i === accountId) {
+                                return "hide";
+                            }
+                            if (i === accountId + 1 && parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
+                                this.parentNode.className = "group";
+                                return "new-category";
+                            }
+                        }
+                    })
+                    .text(function(d, i) {
+                        if (me.reports) {
+                            if (i === accountId + 1) {
+                                if (parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
+                                    return this.parentNode.__data__.v[accountId];
+                                } else {
+                                    return d;
+                                }
+                            } else {
+                                return d;
+                            }
+                        } else {
+                            return d;
+                        }
+                    });
             }
+        },
+        
+        renderBaseViewPort : function() {
+            this.$el.html(this.template());
+            if (this.paging) {
+                this.paginationView = new squid_api.view.PaginationView( {
+                    model : this.model,
+                    config : this.config,
+                    el : this.$el.find("#pagination")
+                });
+                this.paginationView.render();
+            }
+        },
+
+        render : function() {
+            var me = this;
+            var selector = "#"+this.el.id+" .sq-table";
+            if (this.model.get("facets") && this.filters.get("selection")) {
+                // display table header
+                this.displayTableHeader(selector);
+            }
+            
+            if (this.model.get("status") === "DONE") {
+                // display results
+                this.displayTableContent(selector);
+                this.paginationView.render();
+                this.$el.find("#pagination").show();
+                this.$el.find(".sq-loading").hide();
+            }
+    
+            if (this.model.get("status") === "RUNNING") {
+                // computing in progress
+                this.$el.find(".sq-loading").show();
+            }
+            
+            if (this.model.get("status") === "PENDING") {
+                // refresh needed
+                d3.select(selector).select("tbody").selectAll("tr").remove();
+                this.$el.find("#pagination").hide();
+                this.$el.find(".sq-loading").hide();
+            }
+
+            return this;
         }
+        
     });
 
     return View;
