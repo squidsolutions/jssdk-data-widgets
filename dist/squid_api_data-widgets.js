@@ -16,7 +16,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n\r\n<table class=\"sq-table squid-api-data-widgets-data-table\">\r\n<thead>\r\n	<tr></tr>\r\n</thead>\r\n<tbody></tbody>\r\n</table>\r\n<div id=\"stale\">\r\n	<div class=\"reactiveMessage\"><span><i class=\"fa fa-table\"></i><br>Click refresh to update</span></div>\r\n</div>\r\n<div id=\"pagination\"></div>\r\n\r\n\r\n";
+  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n\r\n<table class=\"sq-table squid-api-data-widgets-data-table\">\r\n<thead>\r\n	<tr></tr>\r\n</thead>\r\n<tbody></tbody>\r\n</table>\r\n<div id=\"stale\">\r\n	<div class=\"reactiveMessage\"><span><i class=\"fa fa-table\"></i><br>Click refresh to update</span></div>\r\n</div>\r\n<div id=\"total\">\r\nShowing <span id=\"count-entries\"></span> of <span id=\"total-entries\"></span> entries\r\n</div>\r\n<div id=\"pagination\"></div>\r\n\r\n\r\n";
   });
 
 this["squid_api"]["template"]["squid_api_dimension_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -952,10 +952,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         reactiveState : false,
 
         headerBadges : false,
-
-        pageLength : 10,
-
-        reports : false,
         
         paginationView : null,
 
@@ -1007,12 +1003,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.headerBadges) {
                 this.headerBadges = options.headerBadges;
-            }
-            if (options.pageLength) {
-                this.pageLength = options.pageLength;
-            }
-            if (options.reports) {
-                this.reports = options.reports;
             }
             if (options.reportCategoryID) {
                 this.reportCategoryID = options.reportCategoryID;
@@ -1073,34 +1063,59 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         displayTableHeader : function(selector) {
             var me = this;
-            var facets = this.model.get("facets");
-            var columns = [];
-            var i=0;
-            var obj;
-            for (i=0; i<facets.length; i++) {
-                obj = squid_api.utils.find(this.filters.get("selection").facets, "id", facets[i].value);
-                obj.dataType = "STRING";
-                columns.push(obj);
+            var columns;
+            
+            var analysis = this.model;
+            // in case of a multi-analysis model
+            if (analysis.get("analyses")) {
+              analysis = analysis.get("analyses")[0];
             }
-            var metrics = this.model.get("metricList");
-            for (i=0; i<metrics.length; i++) {
-                obj = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", metrics[i].id.metricId, "Metric");
-                obj.dataType = "NUMBER";
-                columns.push(obj);
-            }
-
-            // Store Columns to Manipulate
-            if (this.reports) {
-                var dataCols = columns;
-                var categoryId = 0;
-                var accountId = 0;
-                for (i=0; i<dataCols.length; i++) {
-                    if (dataCols[i].id == this.reportCategoryID) {
-                        categoryId = i;
+            var results = analysis.get("results");
+            var categoryId;
+            var accountId;
+            if (results) {         
+                // use results columns
+                columns = results.cols;
+                
+                if (this.reportCategoryID) {
+                    // Store Columns to Manipulate
+                    categoryId = 0;
+                    accountId = 0;
+                    for (i=0; i<columns.length; i++) {
+                        if (columns[i].id == this.reportCategoryID) {
+                            categoryId = i;
+                        }
+                        if (columns[i].id == this.reportAccountID) {
+                            accountId = i;
+                        }
                     }
-                    if (dataCols[i].id == this.reportAccountID) {
-                        accountId = i;
+                }
+            } else {
+                // use analysis columns
+                var facets = this.model.get("facets");
+                columns = [];
+                var i=0;
+                var obj;
+                for (i=0; i<facets.length; i++) {
+                    obj = squid_api.utils.find(this.filters.get("selection").facets, "id", facets[i].value);
+                    obj.dataType = "STRING";
+                    columns.push(obj);
+                }
+                var metrics = this.model.get("metricList");
+                var metric;
+                for (i=0; i<metrics.length; i++) {
+                    metric = metrics[i];
+                    if (metrics[i].id) {
+                        obj = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", metrics[i].id.metricId, "Metric");
+                        obj.dataType = "NUMBER";
+                    } else {
+                        obj = {
+                                "id" : null,
+                                "name" : metrics[i].name,
+                                "dataType" : "NUMBER"
+                        };
                     }
+                    columns.push(obj);
                 }
             }
 
@@ -1110,12 +1125,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 .data(columns)
                 .enter().append("th")
                 .attr("class", function(d, i) {
-                    if (me.reports) {
-                        if (i === categoryId || i === accountId) {
-                            return "hide " + d.dataType;
-                        } else {
-                            return d.dataType;
-                        }
+                    if (i === categoryId || i === accountId) {
+                        return "hide " + d.dataType;
                     } else {
                         return d.dataType;
                     }
@@ -1138,12 +1149,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var me = this;
             
             var analysis = this.model;
-
             // in case of a multi-analysis model
             if (analysis.get("analyses")) {
               analysis = analysis.get("analyses")[0];
             }
-
             var results = analysis.get("results");
             
             if (results) {
@@ -1164,6 +1173,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     data.results.rows.push(newRow);
                 }
                 
+                // Store Columns to Manipulate
+                var categoryId = null;
+                var accountId = null;
+                if (this.reportCategoryID) {
+                    var dataCols = results.cols;
+                    categoryId = 0;
+                    accountId = 0;
+                    for (i=0; i<dataCols.length; i++) {
+                        if (dataCols[i].id == this.reportCategoryID) {
+                            categoryId = i;
+                        }
+                        if (dataCols[i].id == this.reportAccountID) {
+                            accountId = i;
+                        }
+                    }
+                }
+                
                 // Rows
                 d3.select(selector).select("tbody").selectAll("tr").remove();
                 var tr = d3.select(selector).select("tbody").selectAll("tr")
@@ -1178,7 +1204,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     })
                     .enter().append("td")
                     .attr("class", function(d, i) {
-                        if (me.reports) {
+                        if (this.reportCategoryID) {
                             if (i === categoryId || i === accountId) {
                                 return "hide";
                             }
@@ -1189,13 +1215,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         }
                     })
                     .text(function(d, i) {
-                        if (me.reports) {
-                            if (i === accountId + 1) {
-                                if (parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
-                                    return this.parentNode.__data__.v[accountId];
-                                } else {
-                                    return d;
-                                }
+                        if ((this.reportCategoryID) && (i === accountId + 1)) {
+                            if (parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
+                                return this.parentNode.__data__.v[accountId];
                             } else {
                                 return d;
                             }
@@ -1203,22 +1225,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             return d;
                         }
                     });
+                
+                // display total
+                this.$el.find("#count-entries").html(""+data.results.rows.length);
+                this.$el.find("#total-entries").html(""+results.totalSize);
             }
         },
         
         renderBaseViewPort : function() {
             this.$el.html(this.template());
             if (this.paging) {
-                /*
-                var config = new Backbone.Model({
-                    startIndex : this.config.get("startIndex"),
-                    pageLength : this.config.get("pageLength"),
-                    maxResults : this.config.get("maxResults")
-                });
-                config.on("change:startIndex", function() {
-                    this.config.set("startIndex", config.get("startIndex"));
-                });
-                */
                 this.paginationView = new squid_api.view.PaginationView( {
                     model : this.model,
                     config : this.config,
@@ -1241,6 +1257,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.displayTableContent(selector);
                 this.paginationView.render();
                 this.$el.find("#pagination").show();
+                this.$el.find("#total").show();
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").hide();
             }
@@ -1255,6 +1272,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // refresh needed
                 d3.select(selector).select("tbody").selectAll("tr").remove();
                 this.$el.find("#pagination").hide();
+                this.$el.find("#total").hide();
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").show();
             }
