@@ -1,5 +1,6 @@
 /* Don't display disabled elements */
-.squid-api-data-widgets-data-table div.dataTables_paginate ul.pagination li.disabled {
+.squid-api-data-widgets-data-table div.dataTables_paginate ul.pagination li.disabled
+	{
 	display: none;
 }
 
@@ -8,15 +9,15 @@
 }
 
 .squid-api-data-widgets-data-table .dataTable td {
-	white-space:nowrap;
-}	
+	white-space: nowrap;
+}
 
 .squid-api-data-widgets-data-table .dataTables_wrapper {
 	overflow: hidden;
 }
 
 .squid-api-data-widgets-data-table .dataTable .NUMBER {
-    text-align: right;
+	text-align: right;
 }
 
 .squid-api-data-widgets-data-table .dataTables_wrapper .col-xs-12 {
@@ -43,16 +44,17 @@
 
 .squid-api-data-widgets-data-table td.new-category {
 	width: 100%;
-  	left: 16px;
-  	height: 20px;
-  	text-align: left;
-  	font-weight: bold;
+	left: 16px;
+	height: 20px;
+	text-align: left;
+	font-weight: bold;
 }
 
 .squid-api-data-widgets-data-table.setHeader thead {
-	width:100%;
+	width: 100%;
 	display: inline-block;
 }
+
 .squid-api-data-widgets-data-table.setHeader thead tr {
 	width: 100%;
 	display: inline-block;
@@ -112,8 +114,144 @@
 	box-shadow: 4px 12px 18px -14px;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover, .dataTables_wrapper .dataTables_paginate .paginate_button:active, .dataTables_wrapper .dataTables_paginate .paginate_button:active {
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover,.dataTables_wrapper .dataTables_paginate .paginate_button:active,.dataTables_wrapper .dataTables_paginate .paginate_button:active
+	{
 	background: none;
 	border-color: #fff;
 	box-shadow: none;
+}
+
+/*
+Pagination
+*/
+
+.pagination
+	{
+	margin: 8px 0 21px 16px;
+	position: relative;
+	display: inline-block;
+}
+
+.pagination ul
+	{
+	display: inline-block;
+	padding: 0;
+	margin: 0;
+	color: #fff;
+	word-spacing: -.5px;
+	background: #d6dbdf;
+	border-radius: 4px;
+}
+
+.pagination li
+	{
+	display: inline-block;
+	margin-right: -3px;
+	word-spacing: normal;
+	vertical-align: middle;
+}
+
+.pagination li.active a,.pagination li.active span
+	{
+	color: #fff;
+	background-color: #3498db;
+	border-color: #dfe2e5;
+}
+
+.pagination li.active.previous a,.pagination li.active.previous span
+	{
+	margin: 0;
+}
+
+.pagination li.active.previous a,.pagination li.active.previous span,.pagination li.active.previous a:hover,.pagination li.active.previous span:hover,.pagination li.active.previous a:focus,.pagination li.active.previous span:focus,.pagination li.active.next a,.pagination li.active.next span,.pagination li.active.next a:hover,.pagination li.active.next span:hover,.pagination li.active.next a:focus,.pagination li.active.next span:focus
+	{
+	color: #fff;
+	background-color: #3498db;
+}
+
+.pagination li:first-child a,.pagination li:first-child span
+	{
+	border-left: none;
+	border-radius: 4px 0 0 4px;
+}
+
+.pagination li:first-child.previous+li a,.pagination li:first-child.previous+li span
+	{
+	border-left-width: 0;
+}
+
+.pagination li:last-child
+	{
+	margin-right: 0;
+}
+
+.pagination li:last-child a,.pagination li:last-child span,.pagination li:last-child a:hover,.pagination li:last-child span:hover,.pagination li:last-child a:focus,.pagination li:last-child span:focus
+	{
+	border-radius: 0 4px 4px 0;
+}
+
+.pagination li.previous a,.pagination li.previous span,.pagination li.next a,.pagination li.next span
+	{
+	min-width: auto;
+	font-size: 16px;
+	background-color: transparent;
+	border-right: 2px solid #e4e7ea;
+}
+
+.pagination li.next a,.pagination li.next span
+	{
+	border-right: none;
+}
+
+.pagination li.disabled a,.pagination li.disabled span
+	{
+	color: #fff;
+	cursor: not-allowed;
+	background-color: rgba(255, 255, 255, 0.3);
+	border-right-color: #dfe2e5;
+}
+
+.pagination li.disabled a:hover,.pagination li.disabled span:hover,.pagination li.disabled span:focus,.pagination li.disabled a:active,.pagination li.disabled span:active
+	{
+	color: #fff;
+	background-color: rgba(255, 255, 255, 0.4);
+}
+
+.pagination li a,.pagination li span
+	{
+	display: inline-block;
+	min-width: 30px;
+	height: 30px;
+	padding: 6px 5px;
+	font-size: 14px;
+	line-height: 16px;
+	color: #fff;
+	text-align: center;
+	background: transparent;
+	border: none;
+	border-left: 2px solid #e4e7ea;
+	outline: none;
+	-webkit-transition: .25s ease-out;
+	transition: .25s ease-out;
+}
+
+.pagination li a:hover,.pagination li a:focus,.pagination li a:active,.pagination li span:hover,.pagination li span:focus,.pagination li span:active
+	{
+	color: #fff;
+	background-color: #3498db;
+}
+
+.pagination .btn-previous,.pagination .btn-next
+	{
+	padding-right: 23px;
+	padding-left: 23px;
+	margin-right: 8px;
+	font-size: 14px;
+	line-height: 1.429;
+}
+
+.pagination .btn-next
+	{
+	margin-right: 0;
+	margin-left: 8px;
 }

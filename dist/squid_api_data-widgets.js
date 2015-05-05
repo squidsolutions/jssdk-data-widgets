@@ -16,7 +16,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n\r\n<table class=\"sq-table squid-api-data-widgets-data-table\">\r\n<thead>\r\n	<tr></tr>\r\n</thead>\r\n<tbody></tbody>\r\n</table>\r\n<div id=\"pagination\"></div>\r\n\r\n\r\n";
+  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n\r\n<table class=\"sq-table squid-api-data-widgets-data-table\">\r\n<thead>\r\n	<tr></tr>\r\n</thead>\r\n<tbody></tbody>\r\n</table>\r\n<div id=\"stale\">\r\n	<div class=\"reactiveMessage\"><span><i class=\"fa fa-table\"></i><br>Click refresh to update</span></div>\r\n</div>\r\n<div id=\"pagination\"></div>\r\n\r\n\r\n";
   });
 
 this["squid_api"]["template"]["squid_api_dimension_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -1124,7 +1124,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     return d.name;
                 })
                 .attr("data-content", function(d) {
-                    return d.id;
+                    if (d.oid) {
+                        return d.oid;
+                    } else {
+                        return d.id;
+                    }
                 });
 
             
@@ -1205,6 +1209,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         renderBaseViewPort : function() {
             this.$el.html(this.template());
             if (this.paging) {
+                /*
+                var config = new Backbone.Model({
+                    startIndex : this.config.get("startIndex"),
+                    pageLength : this.config.get("pageLength"),
+                    maxResults : this.config.get("maxResults")
+                });
+                config.on("change:startIndex", function() {
+                    this.config.set("startIndex", config.get("startIndex"));
+                });
+                */
                 this.paginationView = new squid_api.view.PaginationView( {
                     model : this.model,
                     config : this.config,
@@ -1228,11 +1242,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.paginationView.render();
                 this.$el.find("#pagination").show();
                 this.$el.find(".sq-loading").hide();
+                this.$el.find("#stale").hide();
             }
     
             if (this.model.get("status") === "RUNNING") {
                 // computing in progress
-                this.$el.find(".sq-loading").show();
+                //this.$el.find(".sq-loading").show();
+                this.$el.find("#stale").hide();
             }
             
             if (this.model.get("status") === "PENDING") {
@@ -1240,6 +1256,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 d3.select(selector).select("tbody").selectAll("tr").remove();
                 this.$el.find("#pagination").hide();
                 this.$el.find(".sq-loading").hide();
+                this.$el.find("#stale").show();
             }
 
             return this;

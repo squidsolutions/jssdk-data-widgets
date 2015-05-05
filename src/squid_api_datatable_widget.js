@@ -199,7 +199,11 @@
                     return d.name;
                 })
                 .attr("data-content", function(d) {
-                    return d.id;
+                    if (d.oid) {
+                        return d.oid;
+                    } else {
+                        return d.id;
+                    }
                 });
 
             
@@ -280,6 +284,16 @@
         renderBaseViewPort : function() {
             this.$el.html(this.template());
             if (this.paging) {
+                /*
+                var config = new Backbone.Model({
+                    startIndex : this.config.get("startIndex"),
+                    pageLength : this.config.get("pageLength"),
+                    maxResults : this.config.get("maxResults")
+                });
+                config.on("change:startIndex", function() {
+                    this.config.set("startIndex", config.get("startIndex"));
+                });
+                */
                 this.paginationView = new squid_api.view.PaginationView( {
                     model : this.model,
                     config : this.config,
@@ -303,11 +317,13 @@
                 this.paginationView.render();
                 this.$el.find("#pagination").show();
                 this.$el.find(".sq-loading").hide();
+                this.$el.find("#stale").hide();
             }
     
             if (this.model.get("status") === "RUNNING") {
                 // computing in progress
-                this.$el.find(".sq-loading").show();
+                //this.$el.find(".sq-loading").show();
+                this.$el.find("#stale").hide();
             }
             
             if (this.model.get("status") === "PENDING") {
@@ -315,6 +331,7 @@
                 d3.select(selector).select("tbody").selectAll("tr").remove();
                 this.$el.find("#pagination").hide();
                 this.$el.find(".sq-loading").hide();
+                this.$el.find("#stale").show();
             }
 
             return this;
