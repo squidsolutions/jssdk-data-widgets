@@ -1208,7 +1208,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     })
                     .enter().append("td")
                     .attr("class", function(d, i) {
-                        if (this.reportCategoryID) {
+                        if (me.reportCategoryID) {
                             if (i === categoryId || i === accountId) {
                                 return "hide";
                             }
@@ -1219,7 +1219,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         }
                     })
                     .text(function(d, i) {
-                        if ((this.reportCategoryID) && (i === accountId + 1)) {
+                        if ((me.reportCategoryID) && (i === accountId + 1)) {
                             if (parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
                                 return this.parentNode.__data__.v[accountId];
                             } else {
