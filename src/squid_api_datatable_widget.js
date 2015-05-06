@@ -167,30 +167,34 @@
                 }
             } else {
                 // use analysis columns
-                var facets = this.model.get("facets");
                 columns = [];
-                var i=0;
+                var i;
                 var obj;
-                for (i=0; i<facets.length; i++) {
-                    obj = squid_api.utils.find(this.filters.get("selection").facets, "id", facets[i].value);
-                    obj.dataType = "STRING";
-                    columns.push(obj);
+                var facets = this.model.get("facets");
+                if (facets) {
+                    for (i=0; i<facets.length; i++) {
+                        obj = squid_api.utils.find(this.filters.get("selection").facets, "id", facets[i].value);
+                        obj.dataType = "STRING";
+                        columns.push(obj);
+                    }
                 }
                 var metrics = this.model.get("metricList");
-                var metric;
-                for (i=0; i<metrics.length; i++) {
-                    metric = metrics[i];
-                    if (metrics[i].id) {
-                        obj = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", metrics[i].id.metricId, "Metric");
-                        obj.dataType = "NUMBER";
-                    } else {
-                        obj = {
-                                "id" : null,
-                                "name" : metrics[i].name,
-                                "dataType" : "NUMBER"
-                        };
+                if (metrics) {
+                    var metric;
+                    for (i=0; i<metrics.length; i++) {
+                        metric = metrics[i];
+                        if (metrics[i].id) {
+                            obj = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", metrics[i].id.metricId, "Metric");
+                            obj.dataType = "NUMBER";
+                        } else {
+                            obj = {
+                                    "id" : null,
+                                    "name" : metrics[i].name,
+                                    "dataType" : "NUMBER"
+                            };
+                        }
+                        columns.push(obj);
                     }
-                    columns.push(obj);
                 }
             }
 
