@@ -32,12 +32,12 @@
 
         setDownloadBtnState : function() {
             // Loop through passed model to see if any false values exist
-            var enabled = this.model.get("enabled") === true;
+            var disabled = this.model.get("enabled") === false;
             var downloadBtn = this.$el.find("#download");
-            if (enabled) {
-                downloadBtn.removeClass("disabled");
-            } else {
+            if (disabled) {
                 downloadBtn.addClass("disabled");
+            } else {
+                downloadBtn.removeClass("disabled");
             }
         },
         
