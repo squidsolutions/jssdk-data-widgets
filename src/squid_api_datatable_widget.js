@@ -289,6 +289,22 @@
                                 // this is a total line
                                 this.parentNode.className = "group";
                                 return "new-category";
+                            } else if (d.length === 0 && parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
+                                // Store Siblings of Current TD (If inserting on a new category row & no value)
+                                var siblings = this.parentNode.childNodes;
+                                for (i=0; i<siblings.length; i++) {
+                                    // Obtain Sibling with new-category class (as this stores our category name)
+                                    if (d3.select(siblings[i]).classed("new-category")) {
+                                        var colSpan = 1;
+                                        if (d3.select(siblings[i]).attr("colspan")) {
+                                            colSpan = parseInt(d3.select(siblings[i]).attr("colspan"));
+                                        }
+                                        // Increment ColSpan Value 
+                                        d3.select(siblings[i]).attr("colspan", colSpan + 1);
+                                    }
+                                }
+                                // Remove Current Node
+                                this.remove();
                             }
                         }
                     })
