@@ -21,6 +21,16 @@ module.exports = function(grunt) {
                         dest : 'dist/squid_api_data-widgets.js',
                     }
                 },
+                sass: {
+                    dist: {
+                        files: {
+                            'dist/squid_api_data-widgets.css': 'src/*.scss'
+                        },
+                        options: {
+                            sourcemap: 'none'
+                        }
+                    }
+                },
                 handlebars : {
                     options : {
                         namespace : 'squid_api.template',
@@ -43,6 +53,7 @@ module.exports = function(grunt) {
                 }
             });
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-handlebars');
     grunt.loadNpmTasks('grunt-contrib-watch');

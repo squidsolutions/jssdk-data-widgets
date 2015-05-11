@@ -16,7 +16,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n\r\n<table class=\"sq-table squid-api-data-widgets-data-table\">\r\n<thead>\r\n	<tr></tr>\r\n</thead>\r\n<tbody></tbody>\r\n</table>\r\n<div id=\"stale\">\r\n	<div class=\"reactiveMessage\"><span><i class=\"fa fa-table\"></i><br>Click refresh to update</span></div>\r\n</div>\r\n<div id=\"total\">\r\nShowing <span id=\"count-entries\"></span> of <span id=\"total-entries\"></span> entries\r\n</div>\r\n<div id=\"pagination\"></div>\r\n\r\n\r\n";
+  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n<div id=\"squid-api-data-widgets-data-table\">\r\n	<table class=\"sq-table\">\r\n		<thead>\r\n			<tr></tr>\r\n		</thead>\r\n		<tbody></tbody>\r\n	</table>\r\n	<div id=\"stale\">\r\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-table\"></i><br>Click refresh to update</span></div>\r\n	</div>\r\n	<div class=\"footer\">\r\n		<div id=\"total\">\r\n			Showing <span id=\"count-entries\"></span> of <span id=\"total-entries\"></span> entries\r\n		</div>\r\n		<div id=\"pagination\"></div>\r\n	</div>\r\n</div>\r\n\r\n\r\n";
   });
 
 this["squid_api"]["template"]["squid_api_dimension_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -1206,7 +1206,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     .data(function(d) {
                         return d.v;
                     })
-                    .enter().append("td")
+                    .enter()
+                    .append("td")
                     .attr("class", function(d, i) {
                         if (me.reportCategoryID) {
                             if (i === categoryId || i === accountId) {
@@ -1215,6 +1216,22 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             if (i === accountId + 1 && parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
                                 this.parentNode.className = "group";
                                 return "new-category";
+                            } else if (d.length === 0 && parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
+                                // Store Siblings of Current TD (If inserting on a new category row & no value)
+                                var siblings = this.parentNode.childNodes;
+                                for (i=0; i<siblings.length; i++) {
+                                    // Obtain Sibling with new-category class (as this stores our category name)
+                                    if (d3.select(siblings[i]).classed("new-category")) {
+                                        var colSpan = 1;
+                                        if (d3.select(siblings[i]).attr("colspan")) {
+                                            colSpan = parseInt(d3.select(siblings[i]).attr("colspan"));
+                                        }
+                                        // Increment ColSpan Value 
+                                        d3.select(siblings[i]).attr("colspan", colSpan + 1);
+                                    }
+                                }
+                                // Remove Current Node
+                                this.remove();
                             }
                         }
                     })
