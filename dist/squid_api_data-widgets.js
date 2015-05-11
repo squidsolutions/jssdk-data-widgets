@@ -954,6 +954,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         headerBadges : false,
         
         paginationView : null,
+        
+        rollupSummaryColumn : null,
 
         initialize : function(options) {
             var me = this;
@@ -1004,12 +1006,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.headerBadges) {
                 this.headerBadges = options.headerBadges;
             }
-            if (options.reportCategoryID) {
-                this.reportCategoryID = options.reportCategoryID;
-            }
-            if (options.reportAccountID) {
-                this.reportAccountID = options.reportAccountID;
-            }
+            this.rollupSummaryColumn = options.rollupSummaryColumn;
+
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
             }
@@ -1071,25 +1069,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
               analysis = analysis.get("analyses")[0];
             }
             var results = analysis.get("results");
-            var categoryId;
-            var accountId;
+            var rollups;
             if (results) {         
                 // use results columns
                 columns = results.cols;
-                
-                if (this.reportCategoryID) {
-                    // Store Columns to Manipulate
-                    categoryId = 0;
-                    accountId = 0;
-                    for (i=0; i<columns.length; i++) {
-                        if (columns[i].id == this.reportCategoryID) {
-                            categoryId = i;
-                        }
-                        if (columns[i].id == this.reportAccountID) {
-                            accountId = i;
-                        }
-                    }
-                }
+             
+                // init rollups
+                rollups = analysis.get("rollups");
             } else {
                 // use analysis columns
                 columns = [];
@@ -1122,6 +1108,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
                 }
             }
+            
+            var rollupColIndex = null;
+            var rollupSummaryIndex = null;
+            if (rollups) {
+                if ((rollups.length>0)) {
+                    rollupColIndex = rollups[0].col + 1;
+                }
+                rollupSummaryIndex = this.rollupSummaryColumn + 1;
+            }
 
             // header
             d3.select(selector).select("thead tr").selectAll("th").remove();
@@ -1129,7 +1124,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 .data(columns)
                 .enter().append("th")
                 .attr("class", function(d, i) {
-                    if (i === categoryId || i === accountId) {
+                    if (rollups && ( (i === 0) || (i === rollupColIndex))) {
+                        // hide grouping column
+                        // TODO use d3 filters instead
                         return "hide " + d.dataType;
                     } else {
                         return d.dataType;
@@ -1145,8 +1142,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         return d.id;
                     }
                 });
-
-            
         },
         
         displayTableContent : function(selector) {
@@ -1158,8 +1153,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
               analysis = analysis.get("analyses")[0];
             }
             var results = analysis.get("results");
-            
+            var rollups;
+                
             if (results) {
+                rollups = analysis.get("rollups");
+                var rollupColIndex = null;
+                var rollupSummaryIndex = null;
+                if (rollups) {
+                    if ((rollups.length>0)) {
+                        rollupColIndex = rollups[0].col + 1;
+                    }
+                    rollupSummaryIndex = this.rollupSummaryColumn + 1;
+                }
                 // apply paging and number formatting
                 var data = {};
                 data.results = {"cols" : results.cols, "rows" : []};
@@ -1177,23 +1182,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     data.results.rows.push(newRow);
                 }
                 
-                // Store Columns to Manipulate
-                var categoryId = null;
-                var accountId = null;
-                if (this.reportCategoryID) {
-                    var dataCols = results.cols;
-                    categoryId = 0;
-                    accountId = 0;
-                    for (i=0; i<dataCols.length; i++) {
-                        if (dataCols[i].id == this.reportCategoryID) {
-                            categoryId = i;
-                        }
-                        if (dataCols[i].id == this.reportAccountID) {
-                            accountId = i;
-                        }
-                    }
-                }
-                
                 // Rows
                 d3.select(selector).select("tbody").selectAll("tr").remove();
                 var tr = d3.select(selector).select("tbody").selectAll("tr")
@@ -1206,28 +1194,45 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     .data(function(d) {
                         return d.v;
                     })
-                    .enter().append("td")
+                    .enter()
+                    .append("td")
                     .attr("class", function(d, i) {
-                        if (me.reportCategoryID) {
-                            if (i === categoryId || i === accountId) {
+                        if (rollups) {
+                            if (i === 0) {
+                                // hide grouping column
                                 return "hide";
-                            }
-                            if (i === accountId + 1 && parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
+                            } else if (i === rollupColIndex) {
+                                // hide rollup column
+                                return "hide";
+                            } else if ((rollupSummaryIndex !== null) && (i === rollupSummaryIndex)) {
+                                if (parseInt(this.parentNode.__data__.v[0]) === 1) {
+                                    // this is a total (grouped) line
+                                    this.parentNode.className = "group";
+                                    return "new-category";
+                                }  
+                            } else if ((i === 1 && parseInt(this.parentNode.__data__.v[0]) === 1)) {
+                                // this is a total line
                                 this.parentNode.className = "group";
                                 return "new-category";
                             }
                         }
                     })
                     .text(function(d, i) {
-                        if ((me.reportCategoryID) && (i === accountId + 1)) {
-                            if (parseInt(this.parentNode.__data__.v[categoryId]) === categoryId + 1) {
-                                return this.parentNode.__data__.v[accountId];
-                            } else {
-                                return d;
+                        var text = d;
+                        if (rollups) {
+                            if ((rollupSummaryIndex !== null) && (i === rollupSummaryIndex)) {
+                                if (parseInt(this.parentNode.__data__.v[0]) === 1) {
+                                    // this is a total (grouped) line
+                                    text = this.parentNode.__data__.v[rollupColIndex];
+                                }
+                            } else if (i === 1){
+                                if (parseInt(this.parentNode.__data__.v[0]) === 1) {
+                                    // this is a total line
+                                    text = "Total for all Journals";
+                                }
                             }
-                        } else {
-                            return d;
                         }
+                        return text;
                     });
                 
                 // display total
