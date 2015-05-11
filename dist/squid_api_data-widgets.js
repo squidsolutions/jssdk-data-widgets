@@ -1236,9 +1236,28 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     });
                 
                 // display total
-                this.$el.find("#count-entries").html(""+data.results.rows.length);
+                this.$el.find("#count-entries").html(""+ data.results.rows.length);
                 this.$el.find("#total-entries").html(""+results.totalSize);
             }
+        },
+
+        categoryColSpan : function(node) {
+            var siblings = node.parentNode.childNodes;
+            var colSpan = 1;
+
+            for (i=0; i<siblings.length; i++) {
+                // Obtain Sibling With Matching Class
+                if (d3.select(siblings[i]).classed("new-category")) {
+                    if (d3.select(siblings[i]).attr("colspan")) {
+                        colSpan = parseInt(d3.select(siblings[i]).attr("colspan"));
+                    }
+                    // Increment ColSpan Value 
+                    d3.select(siblings[i]).attr("colspan", colSpan + 1);
+                }
+            }
+
+            // Remove Node
+            node.remove();
         },
         
         renderBaseViewPort : function() {
