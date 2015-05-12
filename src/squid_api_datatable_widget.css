@@ -12,6 +12,7 @@
   	-webkit-box-shadow: 0 1px 2px #d1d1d1;
   	box-shadow: 0 1px 2px #d1d1d1;
   	overflow-x: auto;
+  	display: inline-block;
   	width: 100%;
 }
 
