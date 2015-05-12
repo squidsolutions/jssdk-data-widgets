@@ -1115,7 +1115,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if ((rollups.length>0)) {
                     rollupColIndex = rollups[0].col + 1;
                 }
-                rollupSummaryIndex = this.rollupSummaryColumn + 1;
+                if (this.rollupSummaryColumn >= 0) {
+                    rollupSummaryIndex = this.rollupSummaryColumn + 1;
+                }
             }
 
             // header
@@ -1124,12 +1126,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 .data(columns)
                 .enter().append("th")
                 .attr("class", function(d, i) {
-                    if (rollups && ( (i === 0) || (i === rollupColIndex))) {
-                        // hide grouping column
-                        // TODO use d3 filters instead
-                        return "hide " + d.dataType;
-                    } else {
-                        return d.dataType;
+                    if (rollups) {  
+                        if (i === 0) {
+                            // hide grouping column
+                            return "hide " + d.dataType;
+                        } else if (( rollupSummaryIndex !== null) && (i === rollupColIndex)) {
+                            // hide rollup column
+                            return "hide " + d.dataType;
+                        } else {
+                            return d.dataType;
+                        }
                     }
                 })
                 .text(function(d, i) {
@@ -1163,7 +1169,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     if ((rollups.length>0)) {
                         rollupColIndex = rollups[0].col + 1;
                     }
-                    rollupSummaryIndex = this.rollupSummaryColumn + 1;
+                    if (this.rollupSummaryColumn >= 0) {
+                        rollupSummaryIndex = this.rollupSummaryColumn + 1;
+                    }
                 }
                 // apply paging and number formatting
                 var data = {};
@@ -1201,7 +1209,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             if (i === 0) {
                                 // hide grouping column
                                 return "hide";
-                            } else if (i === rollupColIndex) {
+                            } else if ((rollupSummaryIndex !== null) && (i === rollupColIndex)) {
                                 // hide rollup column
                                 return "hide";
                             } else if ((rollupSummaryIndex !== null) && (i === rollupSummaryIndex)) {
@@ -1232,7 +1240,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             } else if (i === 1){
                                 if (parseInt(this.parentNode.__data__.v[0]) === 1) {
                                     // this is a total line
-                                    text = "Total for all Journals";
+                                    text = "Total for "+data.results.cols[rollupColIndex].name;
                                 }
                             }
                         }
