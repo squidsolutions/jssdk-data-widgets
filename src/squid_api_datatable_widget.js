@@ -292,9 +292,7 @@
                             }
                             // Detect Group & Empty Value
                             if (this.parentNode.className === "group" && d.length === 0) {
-                                if (d.length === 0) {
-                                    me.categoryColSpan(this);
-                                }
+                                me.categoryColSpan(this);
                             }
                         }
                     })
