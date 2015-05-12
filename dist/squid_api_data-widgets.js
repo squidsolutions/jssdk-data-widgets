@@ -1209,11 +1209,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                     // this is a total (grouped) line
                                     this.parentNode.className = "group";
                                     return "new-category";
-                                }  
+                                }
                             } else if ((i === 1 && parseInt(this.parentNode.__data__.v[0]) === 1)) {
                                 // this is a total line
                                 this.parentNode.className = "group";
                                 return "new-category";
+                            }
+                            // Detect Group & Empty Value
+                            if (this.parentNode.className === "group" && d.length === 0) {
+                                if (d.length === 0) {
+                                    me.categoryColSpan(this);
+                                }
                             }
                         }
                     })
