@@ -941,15 +941,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         selectMetricHeader : false,
 
-        searching : false,
-
         paging : false,
 
         ordering : false,
 
         noDataMessage : "No data available in table",
-
-        reactiveState : false,
 
         headerBadges : false,
         
@@ -990,9 +986,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             
             if (options.selectMetricHeader) {
                 this.selectMetricHeader = options.selectMetricHeader;
-            }
-            if (options.searching) {
-                this.searching = options.searching;
             }
             if (options.paging) {
                 this.paging = options.paging;

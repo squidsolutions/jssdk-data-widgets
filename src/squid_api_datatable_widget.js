@@ -16,15 +16,11 @@
 
         selectMetricHeader : false,
 
-        searching : false,
-
         paging : false,
 
         ordering : false,
 
         noDataMessage : "No data available in table",
-
-        reactiveState : false,
 
         headerBadges : false,
         
@@ -65,9 +61,6 @@
             
             if (options.selectMetricHeader) {
                 this.selectMetricHeader = options.selectMetricHeader;
-            }
-            if (options.searching) {
-                this.searching = options.searching;
             }
             if (options.paging) {
                 this.paging = options.paging;
