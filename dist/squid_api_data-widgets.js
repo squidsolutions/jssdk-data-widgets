@@ -1725,9 +1725,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             
             if (this.model) {
                 this.model.on("change:currentAnalysis", this.render, this);
-                this.model.on("change:selectedDimension", this.render, this);
-                this.model.on("change:timeDimension", this.render, this);
             }
+
+            this.render();
         },
 
         setModel: function(model) {
@@ -1780,14 +1780,21 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // compute the current selected view
             var analysis = this.model.get("currentAnalysis");
             var currentViewName;
-            if (analysis == this.tableView.model) {
-                currentViewName = "tableView";
+
+            if (this.tableView) {
+                if (analysis == this.tableView.model) {
+                    currentViewName = "tableView";
+                }
             }
-            if (analysis == this.barView.model) {
-                currentViewName = "barView";
+            if (this.barView) {
+                if (analysis == this.barView.model) {
+                    currentViewName = "barView";
+                }
             }
-            if (analysis == this.timeView.model) {
-                currentViewName = "timeView";
+            if (this.timeView) {
+                if (analysis == this.timeView.model) {
+                    currentViewName = "timeView";
+                }
             }
 
             // display the view selector
