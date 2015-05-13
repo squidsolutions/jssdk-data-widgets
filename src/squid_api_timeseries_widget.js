@@ -10,6 +10,8 @@
         d3Formatter : null,
         startDate: null,
         endDate: null,
+        colorPalette: null,
+        interpolationRange: null,
 
         initialize : function(options) {
             
@@ -20,6 +22,12 @@
 
             if (options.dataToDisplay) {
                 this.dataToDisplay = options.dataToDisplay;
+            }
+            if (options.colorPalette) {
+                this.colorPalette = options.colorPalette;
+            }
+            if (options.interpolationRange) {
+                this.interpolationRange = options.interpolationRange;
             }
 
             // setup options
@@ -105,7 +113,12 @@
             var serie;
             var currentSerieName = null;
             var serieName = "";
-            var palette = new Rickshaw.Color.Palette({ scheme: 'cool' });
+
+            var palette = new Rickshaw.Color.Palette();
+
+            if (this.colorPalette) {
+                palette.scheme = this.colorPalette;
+            }
             
             // Start of Data Manipulation
             var manipTimeStart = new Date();
@@ -150,7 +163,12 @@
             var updatedData = [];
 
             // Calculate the difference in days between the start / end date
-            var dateDifference = moment(this.endDate).diff(currentDate, 'days') + 1;
+            var dateDifference;
+            if (this.interpolationRange) {
+                dateDifference = moment(this.endDate).diff(currentDate, this.interpolationRange) + 1;
+            } else {
+                dateDifference = moment(this.endDate).diff(currentDate, 'days') + 1;
+            }
 
             /*
                 Hashmaps with date as object key values / include a default y value of 0
