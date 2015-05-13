@@ -420,6 +420,10 @@ Pagination
 	text-anchor: inherit !important; 
 }
 
+.squid-api-data-widgets-timeseries-widget #legend_container {
+	margin-bottom: 20px;
+}
+
 .squid-api-data-widgets-timeseries-widget #slider {
 	border-radius: 4px;
 	border: 1px solid #ddd;

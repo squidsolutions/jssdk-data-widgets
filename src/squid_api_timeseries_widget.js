@@ -303,11 +303,6 @@
                         }
                     });
 
-                    var legend = new Rickshaw.Graph.Legend( {
-                        graph: graph,
-                        element: document.getElementById('legend')
-                    });
-
                     var xAxis = new Rickshaw.Graph.Axis.Time( {
                         graph: graph
                     });
