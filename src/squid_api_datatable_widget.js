@@ -372,7 +372,7 @@
     
             if (this.model.get("status") === "RUNNING") {
                 // computing in progress
-                //this.$el.find(".sq-loading").show();
+                this.$el.find(".sq-loading").show();
                 this.$el.find("#stale").hide();
             }
             
