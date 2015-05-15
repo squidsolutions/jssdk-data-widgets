@@ -231,21 +231,23 @@
 
         render : function() {
             var me = this;
-            // Print Template
-            this.$el.html(this.template());
-
-            if (this.model.get("status") === "PENDING") {
+            var status = this.model.get("status");
+            
+            if (status == "PENDING" || status == "DONE") {
+                this.$el.html(this.template());
+            }
+            if (status === "PENDING") {
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").show();
             }
-            if (this.model.get("status") === "RUNNING") {
+            if (status === "RUNNING") {
                 // refresh needed
                 this.$el.find(".sq-loading").show();
             }
-            if (this.model.get("status") === "DONE") {
+            if (status === "DONE") {
                 this.$el.find("#stale").hide();
-
                 var data = this.getData();
+
                 if (data.done) {
                     this.$el.find(".sq-loading").hide();
 
@@ -268,6 +270,7 @@
                     // Time Series [Series Data]
                     var series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows);
                     var metricName = data.results.cols[dateColumnIndex+1].name;
+
                     if (series.length>0 && (series[0].data.length>0)) {
 
                         var tempWidth = this.$el.width();
@@ -315,8 +318,6 @@
 
                         yAxis.render();
                         xAxis.render();
-
-
                     } else {
                         this.$el.html("<div class='bad-data'>No Series data to View</span>");
                     }

@@ -3123,21 +3123,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         render : function() {
             var me = this;
-            // Print Template
-            this.$el.html(this.template());
+            var status = this.model.get("status");
 
-            if (this.model.get("status") === "PENDING") {
+            if (status == "PENDING" || status == "DONE") {
+                this.$el.html(this.template());
+            }
+            if (status === "PENDING") {
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").show();
             }
-            if (this.model.get("status") === "RUNNING") {
+            if (status === "RUNNING") {
                 // refresh needed
                 this.$el.find(".sq-loading").show();
             }
-            if (this.model.get("status") === "DONE") {
+            if (status === "DONE") {
                 this.$el.find("#stale").hide();
-
                 var data = this.getData();
+
                 if (data.done) {
                     this.$el.find(".sq-loading").hide();
 
