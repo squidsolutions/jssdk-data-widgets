@@ -1239,6 +1239,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         }
                         return text;
                     });
+
+                if (this.$el.find("thead th").length > 10) {
+                    this.$el.find("table").addClass("many-columns");
+                } else {
+                    this.$el.find("table").removeClass("many-columns");
+                }
                 
                 // display total
                 this.$el.find("#count-entries").html(""+ results.startIndex + " - " + (results.startIndex + data.results.rows.length));
@@ -3124,7 +3130,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         render : function() {
             var me = this;
             var status = this.model.get("status");
-
+            
             if (status == "PENDING" || status == "DONE") {
                 this.$el.html(this.template());
             }
@@ -3162,6 +3168,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     // Time Series [Series Data]
                     var series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows);
                     var metricName = data.results.cols[dateColumnIndex+1].name;
+
                     if (series.length>0 && (series[0].data.length>0)) {
 
                         var tempWidth = this.$el.width();
@@ -3209,8 +3216,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                         yAxis.render();
                         xAxis.render();
-
-
                     } else {
                         this.$el.html("<div class='bad-data'>No Series data to View</span>");
                     }

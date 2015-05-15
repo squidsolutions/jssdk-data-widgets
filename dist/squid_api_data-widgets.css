@@ -18,6 +18,11 @@ rect text {
     margin-left: 10%;
     padding: 30px;
 }
+#squid-api-data-widgets-data-table table.many-columns {
+	display: inherit;
+	table-layout: inherit;
+}
+
 #squid-api-data-widgets-data-table table {
 	color: #666;
   	background: #eaebec;
@@ -28,8 +33,8 @@ rect text {
   	-webkit-box-shadow: 0 1px 2px #d1d1d1;
   	box-shadow: 0 1px 2px #d1d1d1;
   	overflow-x: auto;
-  	display: inline-block;
   	width: 100%;
+  	table-layout: fixed;
 }
 
 #squid-api-data-widgets-data-table table td {
@@ -56,7 +61,7 @@ rect text {
 
 #squid-api-data-widgets-data-table table thead th {
 	border-left: 1px solid #e0e0e0;
-	min-width: 100px;
+	padding: 0px 10px 0px 10px;
 	border-top: 1px solid #e0e0e0;
   	border-bottom: 1px solid #e0e0e0;
   	text-align: center;
@@ -70,8 +75,6 @@ rect text {
 	border: 1px solid #d1d1d1;
 	font-size: 18px;
 	text-align: center;
-	position: absolute;
-	top: 45px;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
