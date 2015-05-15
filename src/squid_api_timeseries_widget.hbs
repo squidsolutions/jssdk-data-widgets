@@ -1,4 +1,4 @@
-<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>
+<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 2;'>
 	<div class="spinner">
 	<div class="rect5"></div>
 	<div class="rect4"></div>
@@ -12,6 +12,9 @@
 	</div>
 </div>
 <div id="chart_container" class="squid-api-data-widgets-timeseries-widget">
+	<div id="stale">
+		<div class="reactiveMessage"><span><i class="fa fa-line-chart"></i><br>Click refresh to update</span></div>
+	</div>
 	<div id="chart"></div>
 	<div id="legend_container">
 		<div id="smoother" title="Smoothing"></div>

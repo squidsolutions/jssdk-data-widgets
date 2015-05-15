@@ -676,7 +676,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 1;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\" class=\"squid-api-data-widgets-timeseries-widget\">\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	<div id=\"slider\"></div>\n</div>\n";
+  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 2;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\" class=\"squid-api-data-widgets-timeseries-widget\">\n	<div id=\"stale\">\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-line-chart\"></i><br>Click refresh to update</span></div>\n	</div>\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	<div id=\"slider\"></div>\n</div>\n";
   });
 (function (root, factory) {
     root.squid_api.view.BarChartView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_barchart_widget);
@@ -2908,7 +2908,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         initialize : function(options) {
             
             if (this.model) {
-                this.listenTo(this.model, 'change:status', this.update);
+                this.listenTo(this.model, 'change:status', this.render);
                 this.listenTo(this.model, 'change:error', this.render);
             }
 
@@ -2980,23 +2980,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.stopListening();
             $(window).off("resize");
             return this;
-        },
-
-        update : function() {
-
-            if (!this.model.isDone()) {
-                // running
-                if (this.model.get("status") == "RUNNING") {
-                    $(".sq-loading").show();
-                } else {
-                    $(".sq-loading").hide();
-                }
-            } else if (this.model.get("error")) {
-                // error
-                $(".sq-loading").hide();
-            }
-
-            this.render();
         },
 
         seriesDataValues : function(dateIndex, metricIndex, modelData) {
@@ -3139,86 +3122,99 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render : function() {
-
             var me = this;
+            // Print Template
+            this.$el.html(this.template());
 
-            var data = this.getData();
+            if (this.model.get("status") === "PENDING") {
+                this.$el.find(".sq-loading").hide();
+                this.$el.find("#stale").show();
+            }
+            if (this.model.get("status") === "RUNNING") {
+                // refresh needed
+                this.$el.find(".sq-loading").show();
+            }
+            if (this.model.get("status") === "DONE") {
+                this.$el.find("#stale").hide();
 
-            if (data.done) {           
-                // Temp Fix for correct resizing
-                this.$el.css("width", "100%");
-                // Print Template
-                this.$el.html(this.template());
-                // Store Start and end Dates
-                var lastFacet = data.selection.facets.length - 1;
-                if (data.selection.facets[lastFacet]) {
-                    this.startDate = data.selection.facets[lastFacet].selectedItems[0].lowerBound;
-                    this.endDate = data.selection.facets[lastFacet].selectedItems[0].upperBound;
-                }
-                
-                var dateColumnIndex=0;
-                
-                while (data.results.cols[dateColumnIndex].dataType != "DATE") {
-                    dateColumnIndex++;
-                }
+                var data = this.getData();
+                if (data.done) {
+                    this.$el.find(".sq-loading").hide();
 
-                // Time Series [Series Data]
-                var series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows);
-                var metricName = data.results.cols[dateColumnIndex+1].name;
-                if (series.length>0 && (series[0].data.length>0)) {
+                    // Temp Fix for correct resizing
+                    this.$el.css("width", "100%");
+                    // Store Start and end Dates
 
-                    var tempWidth = this.$el.width();
+                    var lastFacet = data.selection.facets.length - 1;
+                    if (data.selection.facets[lastFacet]) {
+                        this.startDate = data.selection.facets[lastFacet].selectedItems[0].lowerBound;
+                        this.endDate = data.selection.facets[lastFacet].selectedItems[0].upperBound;
+                    }
+                    
+                    var dateColumnIndex=0;
+                    
+                    while (data.results.cols[dateColumnIndex].dataType != "DATE") {
+                        dateColumnIndex++;
+                    }
 
-                    // Time Series Chart
-                    var graph = new Rickshaw.Graph({
-                        element: document.getElementById("chart"),
-                        width: tempWidth,
-                        height: 400,
-                        renderer: 'line',
-                        interpolation: 'linear',
-                        series: series
-                    });
+                    // Time Series [Series Data]
+                    var series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows);
+                    var metricName = data.results.cols[dateColumnIndex+1].name;
+                    if (series.length>0 && (series[0].data.length>0)) {
 
-                    graph.render();
+                        var tempWidth = this.$el.width();
 
-                    var hoverDetail = new Rickshaw.Graph.HoverDetail( {
-                        graph: graph,
-                        xFormatter: function(x) { return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD');},
-                        yFormatter: function(y) { return Math.floor(y); },
-                        formatter: function(series, x, y) {
-                            var content = "";
-                            if (series.name) {
-                                content = series.name + ": ";
+                        // Time Series Chart
+                        var graph = new Rickshaw.Graph({
+                            element: document.getElementById("chart"),
+                            width: tempWidth,
+                            height: 400,
+                            renderer: 'line',
+                            interpolation: 'linear',
+                            series: series
+                        });
+
+                        graph.render();
+
+                        var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+                            graph: graph,
+                            xFormatter: function(x) { return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD');},
+                            yFormatter: function(y) { return Math.floor(y); },
+                            formatter: function(series, x, y) {
+                                var content = "";
+                                if (series.name) {
+                                    content = series.name + ": ";
+                                }
+                                content += me.format(y) + " " + metricName;
+                                return content;
                             }
-                            content += me.format(y) + " " + metricName;
-                            return content;
-                        }
-                    });
+                        });
 
-                    var xAxis = new Rickshaw.Graph.Axis.Time( {
-                        graph: graph
-                    });
+                        var xAxis = new Rickshaw.Graph.Axis.Time( {
+                            graph: graph
+                        });
 
-                    var yAxis = new Rickshaw.Graph.Axis.Y( {
-                        graph: graph
-                    });
+                        var yAxis = new Rickshaw.Graph.Axis.Y( {
+                            graph: graph
+                        });
 
-                    var slider = new Rickshaw.Graph.RangeSlider({
-                        graph: graph,
-                        element: document.querySelector('#slider')
-                    });
+                        var slider = new Rickshaw.Graph.RangeSlider({
+                            graph: graph,
+                            element: document.querySelector('#slider')
+                        });
 
-                    var offsetForm = document.getElementById('offset_form');
+                        var offsetForm = document.getElementById('offset_form');
 
-                    yAxis.render();
-                    xAxis.render();
+                        yAxis.render();
+                        xAxis.render();
 
 
-                } else {
-                    this.$el.html("<div class='bad-data'>No Series data to View</span>");
+                    } else {
+                        this.$el.html("<div class='bad-data'>No Series data to View</span>");
+                    }
+
+                    return this;
                 }
-                $(".sq-loading").hide();
-                return this;
             }
         }
     });
