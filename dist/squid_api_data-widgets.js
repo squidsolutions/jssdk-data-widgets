@@ -1141,6 +1141,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         return d.id;
                     }
                 });
+
+            // add class if more than 10 columns
+            if (this.$el.find("thead th").length > 10) {
+                this.$el.find("table").addClass("many-columns");
+            } else {
+                this.$el.find("table").removeClass("many-columns");
+            }
         },
         
         displayTableContent : function(selector) {
@@ -1239,12 +1246,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         }
                         return text;
                     });
-
-                if (this.$el.find("thead th").length > 10) {
-                    this.$el.find("table").addClass("many-columns");
-                } else {
-                    this.$el.find("table").removeClass("many-columns");
-                }
                 
                 // display total
                 this.$el.find("#count-entries").html(""+ results.startIndex + " - " + (results.startIndex + data.results.rows.length));
