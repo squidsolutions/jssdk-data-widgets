@@ -12,13 +12,10 @@
         endDate: null,
         colorPalette: null,
         interpolationRange: null,
+        yearSwitcherView: null,
+        yearAnalysis: null,
 
         initialize : function(options) {
-            
-            if (this.model) {
-                this.listenTo(this.model, 'change:status', this.render);
-                this.listenTo(this.model, 'change:error', this.render);
-            }
 
             if (options.dataToDisplay) {
                 this.dataToDisplay = options.dataToDisplay;
@@ -28,6 +25,15 @@
             }
             if (options.interpolationRange) {
                 this.interpolationRange = options.interpolationRange;
+            }
+            if (options.yearSwitcherView) {
+                this.yearSwitcherView = options.yearSwitcherView;
+            }
+            if (options.yearAnalysis) {
+                this.yearAnalysis = options.yearAnalysis;
+            }
+            if (options.mainModel) {
+                this.mainModel = options.mainModel;
             }
 
             // setup options
@@ -58,6 +64,17 @@
                         return f;
                     };
                 }
+            }
+
+            if (this.model) {
+                this.listenTo(this.model, 'change:status', this.render);
+                this.listenTo(this.model, 'change:error', this.render);
+            }
+            if (this.mainModel) {
+                this.mainModel.on("change:yearByYear", this.render, this);
+            }
+            if (this.yearAnalysis) {
+                this.listenTo(this.yearAnalysis, 'change:status', this.render);
             }
 
             // Resize
@@ -91,6 +108,12 @@
         },
 
         seriesDataValues : function(dateIndex, metricIndex, modelData) {
+            var yearByYear = false;
+
+            if (this.mainModel.get("yearByYear") === true) {
+                yearByYear = true;
+            }
+
             var series = [];
             var value, date;
             var serie;
@@ -105,22 +128,37 @@
             
             // Start of Data Manipulation
             var manipTimeStart = new Date();
+            var currentYear;
 
             // Store Serie Values from data
             for (var i=0; (i<modelData.length); i++) {
+                var yearChange = false;
+
                 value = modelData[i].v;
+
+                if (yearByYear) {
+                    if (moment(value[dateIndex]).year() !== currentYear) {
+                        yearChange = true;
+                        currentYear = moment(value[dateIndex]).year();
+                    }
+                }
+
                 date = moment.utc(value[dateIndex]);
                 
                 // Obtain the correct name based on index
                 if (dateIndex>0) {
                     serieName = value[dateIndex-1];
                 }
-                if ((currentSerieName === null) || (serieName != currentSerieName)) {
+                if ((currentSerieName === null) || (serieName != currentSerieName) || yearChange === true) {
                     currentSerieName = serieName;
                     // create a new serie
                     serie = {};
                     serie.color = palette.color();
-                    serie.name = currentSerieName;
+                    if (yearChange) {
+                        serie.name = moment(value[dateIndex]).year();
+                    } else {
+                        serie.name = currentSerieName;
+                    }
                     serie.data = [];
                     series.push(serie);
                 }
@@ -157,6 +195,7 @@
                 Hashmaps with date as object key values / include a default y value of 0
                 Add a value for each day
             */
+
             while (currentDate.diff(this.endDate, 'days') <= 0) {
                 newSerie[currentDate.format("YYYY-MM-DD")] = { y : 0 };
                 currentDate = currentDate.add(1, 'days');
@@ -167,7 +206,7 @@
                 var existingSerie = series[serieIdx].data;
 
                 // Check if there is a difference between numbers of days / serie values
-                if (series[serieIdx].data.length !== dateDifference) {
+                if (series[serieIdx].data.length !== dateDifference && yearByYear === false) {
 
                     // Fill in the values from existing serie
                     for (i=0; i<existingSerie.length; i++) {
@@ -192,7 +231,12 @@
                     
                     // Convert API date into UNIX + Sort if no manipulation occurs
                     for (i=0; i<existingSerie.length; i++) {
-                        existingSerie[i].x = moment.utc(existingSerie[i].x).unix();
+                        if (yearByYear) {
+                            var modifiedSerie = "2014" + existingSerie[i].x.substring(4);
+                            existingSerie[i].x = moment.utc(modifiedSerie).unix();
+                        } else {
+                            existingSerie[i].x = moment.utc(existingSerie[i].x).unix();
+                        }
                     }
 
                     series[serieIdx].data = this.sortDateValues(series[serieIdx].data);
@@ -216,11 +260,14 @@
 
         getData: function() {
             var data, analysis;
-
-            analysis = this.model;
-            // Use the first analyses array
-            if (analysis.get("analyses")) {
-                analysis = analysis.get("analyses")[0];
+            
+            // See if Year By Year is Selected
+            if (this.mainModel && this.mainModel.get("yearByYear")) {
+                if (this.yearAnalysis) {
+                    analysis = this.yearAnalysis;
+                }
+            } else {
+                analysis = this.model;
             }
 
             data = analysis.toJSON();
@@ -248,7 +295,7 @@
                 this.$el.find("#stale").hide();
                 var data = this.getData();
 
-                if (data.done) {
+                if (data.done && data.results) {
                     this.$el.find(".sq-loading").hide();
 
                     // Temp Fix for correct resizing
@@ -301,6 +348,11 @@
                             }
                         });
 
+                        var legend = new Rickshaw.Graph.Legend( {
+                            graph: graph,
+                            element: document.getElementById('legend')
+                        });
+
                         var xAxis = new Rickshaw.Graph.Axis.Time( {
                             graph: graph
                         });
@@ -320,6 +372,11 @@
                         xAxis.render();
                     } else {
                         this.$el.html("<div class='bad-data'>No Series data to View</span>");
+                    }
+
+                    if (this.yearSwitcherView){
+                        this.yearSwitcherView.setElement(this.$el.find("#yearswitcher"));
+                        this.yearSwitcherView.render();
                     }
 
                     return this;

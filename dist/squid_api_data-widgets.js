@@ -676,7 +676,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 2;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\" class=\"squid-api-data-widgets-timeseries-widget\">\n	<div id=\"stale\">\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-line-chart\"></i><br>Click refresh to update</span></div>\n	</div>\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	<div id=\"slider\"></div>\n</div>\n";
+  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 2;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\" class=\"squid-api-data-widgets-timeseries-widget\">\n	<div id=\"yearswitcher\"></div>\n	<div id=\"stale\">\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-line-chart\"></i><br>Click refresh to update</span></div>\n	</div>\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	<div id=\"slider\"></div>\n</div>\n";
   });
 (function (root, factory) {
     root.squid_api.view.BarChartView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_barchart_widget);
@@ -2911,13 +2911,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         endDate: null,
         colorPalette: null,
         interpolationRange: null,
+        yearSwitcherView: null,
+        yearAnalysis: null,
 
         initialize : function(options) {
-            
-            if (this.model) {
-                this.listenTo(this.model, 'change:status', this.render);
-                this.listenTo(this.model, 'change:error', this.render);
-            }
 
             if (options.dataToDisplay) {
                 this.dataToDisplay = options.dataToDisplay;
@@ -2927,6 +2924,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.interpolationRange) {
                 this.interpolationRange = options.interpolationRange;
+            }
+            if (options.yearSwitcherView) {
+                this.yearSwitcherView = options.yearSwitcherView;
+            }
+            if (options.yearAnalysis) {
+                this.yearAnalysis = options.yearAnalysis;
+            }
+            if (options.mainModel) {
+                this.mainModel = options.mainModel;
             }
 
             // setup options
@@ -2957,6 +2963,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         return f;
                     };
                 }
+            }
+
+            if (this.model) {
+                this.listenTo(this.model, 'change:status', this.render);
+                this.listenTo(this.model, 'change:error', this.render);
+            }
+            if (this.mainModel) {
+                this.mainModel.on("change:yearByYear", this.render, this);
+            }
+            if (this.yearAnalysis) {
+                this.listenTo(this.yearAnalysis, 'change:status', this.render);
             }
 
             // Resize
@@ -2990,6 +3007,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         seriesDataValues : function(dateIndex, metricIndex, modelData) {
+            var yearByYear = false;
+
+            if (this.mainModel.get("yearByYear") === true) {
+                yearByYear = true;
+            }
+
             var series = [];
             var value, date;
             var serie;
@@ -3004,22 +3027,37 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             
             // Start of Data Manipulation
             var manipTimeStart = new Date();
+            var currentYear;
 
             // Store Serie Values from data
             for (var i=0; (i<modelData.length); i++) {
+                var yearChange = false;
+
                 value = modelData[i].v;
+
+                if (yearByYear) {
+                    if (moment(value[dateIndex]).year() !== currentYear) {
+                        yearChange = true;
+                        currentYear = moment(value[dateIndex]).year();
+                    }
+                }
+
                 date = moment.utc(value[dateIndex]);
                 
                 // Obtain the correct name based on index
                 if (dateIndex>0) {
                     serieName = value[dateIndex-1];
                 }
-                if ((currentSerieName === null) || (serieName != currentSerieName)) {
+                if ((currentSerieName === null) || (serieName != currentSerieName) || yearChange === true) {
                     currentSerieName = serieName;
                     // create a new serie
                     serie = {};
                     serie.color = palette.color();
-                    serie.name = currentSerieName;
+                    if (yearChange) {
+                        serie.name = moment(value[dateIndex]).year();
+                    } else {
+                        serie.name = currentSerieName;
+                    }
                     serie.data = [];
                     series.push(serie);
                 }
@@ -3056,6 +3094,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 Hashmaps with date as object key values / include a default y value of 0
                 Add a value for each day
             */
+
             while (currentDate.diff(this.endDate, 'days') <= 0) {
                 newSerie[currentDate.format("YYYY-MM-DD")] = { y : 0 };
                 currentDate = currentDate.add(1, 'days');
@@ -3066,7 +3105,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var existingSerie = series[serieIdx].data;
 
                 // Check if there is a difference between numbers of days / serie values
-                if (series[serieIdx].data.length !== dateDifference) {
+                if (series[serieIdx].data.length !== dateDifference && yearByYear === false) {
 
                     // Fill in the values from existing serie
                     for (i=0; i<existingSerie.length; i++) {
@@ -3091,7 +3130,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     
                     // Convert API date into UNIX + Sort if no manipulation occurs
                     for (i=0; i<existingSerie.length; i++) {
-                        existingSerie[i].x = moment.utc(existingSerie[i].x).unix();
+                        if (yearByYear) {
+                            var modifiedSerie = "2014" + existingSerie[i].x.substring(4);
+                            existingSerie[i].x = moment.utc(modifiedSerie).unix();
+                        } else {
+                            existingSerie[i].x = moment.utc(existingSerie[i].x).unix();
+                        }
                     }
 
                     series[serieIdx].data = this.sortDateValues(series[serieIdx].data);
@@ -3115,11 +3159,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         getData: function() {
             var data, analysis;
-
-            analysis = this.model;
-            // Use the first analyses array
-            if (analysis.get("analyses")) {
-                analysis = analysis.get("analyses")[0];
+            
+            // See if Year By Year is Selected
+            if (this.mainModel && this.mainModel.get("yearByYear")) {
+                if (this.yearAnalysis) {
+                    analysis = this.yearAnalysis;
+                }
+            } else {
+                analysis = this.model;
             }
 
             data = analysis.toJSON();
@@ -3147,7 +3194,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.$el.find("#stale").hide();
                 var data = this.getData();
 
-                if (data.done) {
+                if (data.done && data.results) {
                     this.$el.find(".sq-loading").hide();
 
                     // Temp Fix for correct resizing
@@ -3200,6 +3247,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             }
                         });
 
+                        var legend = new Rickshaw.Graph.Legend( {
+                            graph: graph,
+                            element: document.getElementById('legend')
+                        });
+
                         var xAxis = new Rickshaw.Graph.Axis.Time( {
                             graph: graph
                         });
@@ -3219,6 +3271,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         xAxis.render();
                     } else {
                         this.$el.html("<div class='bad-data'>No Series data to View</span>");
+                    }
+
+                    if (this.yearSwitcherView){
+                        this.yearSwitcherView.setElement(this.$el.find("#yearswitcher"));
+                        this.yearSwitcherView.render();
                     }
 
                     return this;
