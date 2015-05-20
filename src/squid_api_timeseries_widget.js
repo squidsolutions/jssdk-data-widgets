@@ -321,6 +321,7 @@
                         var hoverDetail = new Rickshaw.Graph.HoverDetail( {
                             graph: graph,
                             formatter: function(series, x, y) {
+                                var formatter = d3.format(",.f"); 
                                 var date;
                                 if (config.get("YearOverYear")) {
                                     date = '<span class="date">' + series.name + "-" + moment(new Date(x * 1000)).format("MM-DD") + '</span>';
@@ -328,8 +329,8 @@
                                     date = '<span class="date">' + moment(new Date(x * 1000)).format("YYYY-MM-DD") + '</span>';
                                 }
                                 var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
-                                var content = swatch + parseInt(y) + " " + metricName + '<br>' + date;
-                                
+                                var content = swatch + formatter(parseInt(y)) + " " + metricName + '<br>' + date;
+
                                 return content;
                             }
                         });
