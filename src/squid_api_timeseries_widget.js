@@ -13,7 +13,6 @@
         colorPalette: null,
         interpolationRange: null,
         yearSwitcherView: null,
-        yearAnalysis: null,
 
         initialize : function(options) {
 
@@ -32,17 +31,11 @@
             if (options.yearAnalysis) {
                 this.yearAnalysis = options.yearAnalysis;
             }
-            if (options.mainModel) {
-                this.mainModel = options.mainModel;
-            }
-
-            // setup options
             if (options.template) {
                 this.template = options.template;
             } else {
                 this.template = squid_api.template.squid_api_timeseries_widget;
             }
-
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
             }
@@ -69,12 +62,6 @@
             if (this.model) {
                 this.listenTo(this.model, 'change:status', this.render);
                 this.listenTo(this.model, 'change:error', this.render);
-            }
-            if (this.mainModel) {
-                this.mainModel.on("change:yearByYear", this.render, this);
-            }
-            if (this.yearAnalysis) {
-                this.listenTo(this.yearAnalysis, 'change:status', this.render);
             }
 
             // Resize
@@ -107,13 +94,7 @@
             return this;
         },
 
-        seriesDataValues : function(dateIndex, metricIndex, modelData) {
-            var yearByYear = false;
-
-            if (this.mainModel.get("yearByYear") === true) {
-                yearByYear = true;
-            }
-
+        seriesDataValues : function(dateIndex, metricIndex, modelRows, modelCols) {
             var series = [];
             var value, date;
             var serie;
@@ -131,12 +112,12 @@
             var currentYear;
 
             // Store Serie Values from data
-            for (var i=0; (i<modelData.length); i++) {
+            for (var i=0; (i<modelRows.length); i++) {
                 var yearChange = false;
 
-                value = modelData[i].v;
+                value = modelRows[i].v;
 
-                if (yearByYear) {
+                if (this.YearOverYear) {
                     if (moment(value[dateIndex]).year() !== currentYear) {
                         yearChange = true;
                         currentYear = moment(value[dateIndex]).year();
@@ -157,7 +138,7 @@
                     if (yearChange) {
                         serie.name = moment(value[dateIndex]).year();
                     } else {
-                        serie.name = currentSerieName;
+                        serie.name = modelCols[metricIndex].name;
                     }
                     serie.data = [];
                     series.push(serie);
@@ -206,7 +187,7 @@
                 var existingSerie = series[serieIdx].data;
 
                 // Check if there is a difference between numbers of days / serie values
-                if (series[serieIdx].data.length !== dateDifference && yearByYear === false) {
+                if (series[serieIdx].data.length !== dateDifference && this.YearOverYear === false) {
 
                     // Fill in the values from existing serie
                     for (i=0; i<existingSerie.length; i++) {
@@ -231,7 +212,7 @@
                     
                     // Convert API date into UNIX + Sort if no manipulation occurs
                     for (i=0; i<existingSerie.length; i++) {
-                        if (yearByYear) {
+                        if (this.YearOverYear) {
                             var modifiedSerie = "2014" + existingSerie[i].x.substring(4);
                             existingSerie[i].x = moment.utc(modifiedSerie).unix();
                         } else {
@@ -261,13 +242,15 @@
         getData: function() {
             var data, analysis;
             
-            // See if Year By Year is Selected
-            if (this.mainModel && this.mainModel.get("yearByYear")) {
-                if (this.yearAnalysis) {
-                    analysis = this.yearAnalysis;
+            // Support Mutli / Single Analysis Jobs 
+            if (this.model.get("analyses")) {
+                if (this.YearOverYear) {
+                    analysis = this.model.get("analyses")[1];
+                } else {
+                    analysis = this.model.get("analyses")[0];
                 }
             } else {
-                analysis = this.model;
+                 analysis = this.model;
             }
 
             data = analysis.toJSON();
@@ -279,20 +262,21 @@
         render : function() {
             var me = this;
             var status = this.model.get("status");
+            this.YearOverYear = config.get("YearOverYear");
             
-            if (status == "PENDING" || status == "DONE") {
-                this.$el.html(this.template());
-            }
             if (status === "PENDING") {
+                this.$el.html(this.template());
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").show();
             }
             if (status === "RUNNING") {
-                // refresh needed
                 this.$el.find(".sq-loading").show();
             }
             if (status === "DONE") {
+                this.$el.html(this.template());
                 this.$el.find("#stale").hide();
+                this.$el.find(".sq-loading").hide();
+
                 var data = this.getData();
 
                 if (data.done && data.results) {
@@ -315,7 +299,7 @@
                     }
 
                     // Time Series [Series Data]
-                    var series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows);
+                    var series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows, data.results.cols);
                     var metricName = data.results.cols[dateColumnIndex+1].name;
 
                     if (series.length>0 && (series[0].data.length>0)) {
@@ -336,14 +320,16 @@
 
                         var hoverDetail = new Rickshaw.Graph.HoverDetail( {
                             graph: graph,
-                            xFormatter: function(x) { return "Date: " + moment.utc(x, 'X').format('YYYY-MM-DD');},
-                            yFormatter: function(y) { return Math.floor(y); },
                             formatter: function(series, x, y) {
-                                var content = "";
-                                if (series.name) {
-                                    content = series.name + ": ";
+                                var date;
+                                if (config.get("YearOverYear")) {
+                                    date = '<span class="date">' + series.name + "-" + moment(new Date(x * 1000)).format("MM-DD") + '</span>';
+                                } else {
+                                    date = '<span class="date">' + moment(new Date(x * 1000)).format("YYYY-MM-DD") + '</span>';
                                 }
-                                content += me.format(y) + " " + metricName;
+                                var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
+                                var content = swatch + parseInt(y) + " " + metricName + '<br>' + date;
+                                
                                 return content;
                             }
                         });
@@ -373,14 +359,11 @@
                     } else {
                         this.$el.html("<div class='bad-data'>No Series data to View</span>");
                     }
-
-                    if (this.yearSwitcherView){
-                        this.yearSwitcherView.setElement(this.$el.find("#yearswitcher"));
-                        this.yearSwitcherView.render();
-                    }
-
-                    return this;
                 }
+            }
+            if (this.yearSwitcherView){
+                this.yearSwitcherView.setElement(this.$el.find("#yearswitcher"));
+                this.yearSwitcherView.render();
             }
         }
     });
