@@ -676,7 +676,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 2;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\" class=\"squid-api-data-widgets-timeseries-widget\">\n	<div id=\"yearswitcher\"></div>\n	<div id=\"stale\">\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-line-chart\"></i><br>Click refresh to update</span></div>\n	</div>\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	<div id=\"slider\"></div>\n</div>\n";
+  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 2;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\" class=\"squid-api-data-widgets-timeseries-widget\">\n	<div id=\"yearswitcher\"></div>\n	<div id=\"metricselector\"></div>\n	<div id=\"stale\">\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-line-chart\"></i><br>Click refresh to update</span></div>\n	</div>\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	<div id=\"slider\"></div>\n</div>\n";
   });
 (function (root, factory) {
     root.squid_api.view.BarChartView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_barchart_widget);
@@ -2912,6 +2912,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         colorPalette: null,
         interpolationRange: null,
         yearSwitcherView: null,
+        metricSelectorView: null,
 
         initialize : function(options) {
 
@@ -2929,6 +2930,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.yearAnalysis) {
                 this.yearAnalysis = options.yearAnalysis;
+            }
+            if (options.metricSelectorView) {
+                this.metricSelectorView = options.metricSelectorView;
             }
             if (options.template) {
                 this.template = options.template;
@@ -3033,11 +3037,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     currentSerieName = serieName;
                     // create a new serie
                     serie = {};
-                    serie.color = palette.color();
                     if (yearChange) {
                         serie.name = moment(value[dateIndex]).year();
                     } else {
                         serie.name = modelCols[metricIndex].name;
+                        serie.color = palette.color();
                     }
                     serie.data = [];
                     series.push(serie);
@@ -3054,6 +3058,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     serie.data.push(object);
                 } else {
                     console.debug("Invalid date : "+value[dateIndex]);
+                }
+            }
+
+            // Inverse Array to obtain Correct Colour
+            if (this.YearOverYear) {
+                series = series.reverse();
+                for (i=0; i<series.length; i++) {
+                    series[i].color = palette.color();
                 }
             }
 
@@ -3212,6 +3224,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             height: 400,
                             renderer: 'line',
                             interpolation: 'linear',
+                            strokeWidth: 3,
                             series: series
                         });
 
@@ -3264,6 +3277,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.yearSwitcherView){
                 this.yearSwitcherView.setElement(this.$el.find("#yearswitcher"));
                 this.yearSwitcherView.render();
+            }
+            if (this.metricSelectorView){
+                this.metricSelectorView.setElement(this.$el.find("#metricselector"));
+                this.metricSelectorView.render();
             }
         }
     });

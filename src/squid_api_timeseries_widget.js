@@ -13,6 +13,7 @@
         colorPalette: null,
         interpolationRange: null,
         yearSwitcherView: null,
+        metricSelectorView: null,
 
         initialize : function(options) {
 
@@ -30,6 +31,9 @@
             }
             if (options.yearAnalysis) {
                 this.yearAnalysis = options.yearAnalysis;
+            }
+            if (options.metricSelectorView) {
+                this.metricSelectorView = options.metricSelectorView;
             }
             if (options.template) {
                 this.template = options.template;
@@ -134,11 +138,11 @@
                     currentSerieName = serieName;
                     // create a new serie
                     serie = {};
-                    serie.color = palette.color();
                     if (yearChange) {
                         serie.name = moment(value[dateIndex]).year();
                     } else {
                         serie.name = modelCols[metricIndex].name;
+                        serie.color = palette.color();
                     }
                     serie.data = [];
                     series.push(serie);
@@ -155,6 +159,14 @@
                     serie.data.push(object);
                 } else {
                     console.debug("Invalid date : "+value[dateIndex]);
+                }
+            }
+
+            // Inverse Array to obtain Correct Colour
+            if (this.YearOverYear) {
+                series = series.reverse();
+                for (i=0; i<series.length; i++) {
+                    series[i].color = palette.color();
                 }
             }
 
@@ -313,6 +325,7 @@
                             height: 400,
                             renderer: 'line',
                             interpolation: 'linear',
+                            strokeWidth: 3,
                             series: series
                         });
 
@@ -365,6 +378,10 @@
             if (this.yearSwitcherView){
                 this.yearSwitcherView.setElement(this.$el.find("#yearswitcher"));
                 this.yearSwitcherView.render();
+            }
+            if (this.metricSelectorView){
+                this.metricSelectorView.setElement(this.$el.find("#metricselector"));
+                this.metricSelectorView.render();
             }
         }
     });
