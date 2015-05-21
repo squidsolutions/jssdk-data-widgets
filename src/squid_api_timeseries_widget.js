@@ -13,6 +13,7 @@
         colorPalette: null,
         interpolationRange: null,
         yearSwitcherView: null,
+        metricSelectorView: null,
 
         initialize : function(options) {
 
@@ -30,6 +31,9 @@
             }
             if (options.yearAnalysis) {
                 this.yearAnalysis = options.yearAnalysis;
+            }
+            if (options.metricSelectorView) {
+                this.metricSelectorView = options.metricSelectorView;
             }
             if (options.template) {
                 this.template = options.template;
@@ -374,6 +378,10 @@
             if (this.yearSwitcherView){
                 this.yearSwitcherView.setElement(this.$el.find("#yearswitcher"));
                 this.yearSwitcherView.render();
+            }
+            if (this.metricSelectorView){
+                this.metricSelectorView.setElement(this.$el.find("#metricselector"));
+                this.metricSelectorView.render();
             }
         }
     });
