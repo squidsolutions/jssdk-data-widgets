@@ -134,11 +134,11 @@
                     currentSerieName = serieName;
                     // create a new serie
                     serie = {};
-                    serie.color = palette.color();
                     if (yearChange) {
                         serie.name = moment(value[dateIndex]).year();
                     } else {
                         serie.name = modelCols[metricIndex].name;
+                        serie.color = palette.color();
                     }
                     serie.data = [];
                     series.push(serie);
@@ -155,6 +155,14 @@
                     serie.data.push(object);
                 } else {
                     console.debug("Invalid date : "+value[dateIndex]);
+                }
+            }
+
+            // Inverse Array to obtain Correct Colour
+            if (this.YearOverYear) {
+                series = series.reverse();
+                for (i=0; i<series.length; i++) {
+                    series[i].color = palette.color();
                 }
             }
 
@@ -313,6 +321,7 @@
                             height: 400,
                             renderer: 'line',
                             interpolation: 'linear',
+                            strokeWidth: 3,
                             series: series
                         });
 
