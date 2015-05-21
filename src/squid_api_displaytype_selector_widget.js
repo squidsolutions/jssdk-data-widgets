@@ -27,7 +27,7 @@
             this.timeView = options.timeView;
             
             if (this.model) {
-                this.model.on("change:currentAnalysis", this.render, this);
+                this.model.on("change", this.render, this);
             }
 
             this.render();
