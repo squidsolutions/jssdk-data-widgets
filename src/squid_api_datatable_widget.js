@@ -14,8 +14,6 @@
         
         config : null,
 
-        selectMetricHeader : false,
-
         paging : false,
 
         ordering : false,
@@ -58,10 +56,6 @@
             if (options.maxRowsPerPage) {
                 this.maxRowsPerPage = options.maxRowsPerPage;
             }
-            
-            if (options.selectMetricHeader) {
-                this.selectMetricHeader = options.selectMetricHeader;
-            }
             if (options.paging) {
                 this.paging = options.paging;
             }
@@ -102,12 +96,18 @@
         },
 
         events : ({
-            "click thead th.NUMBER" : function(item) {
-                if (this.selectMetricHeader) {
-                    var selectedMetric = $(item.target).attr("data-content");
-                    this.config.set("selectedMetric", selectedMetric);
-                } else {
-                    this.$el.off("click", "thead th.NUMBER");
+            "click thead th" : function(item) {
+                if (this.ordering) {
+                    var orderByDirection = "ASC";
+                    var orderId = $(item.currentTarget).attr("data-id");
+                    if ($(item.currentTarget).hasClass("ASC")) {
+                        orderByDirection = "DESC";
+                    } else {
+                        orderByDirection = "ASC";
+                    }
+                    this.$el.find(".sort-direction").remove();
+                    this.config.set("orderByDirection", orderByDirection);
+                    this.config.set("orderByColumn", orderId);
                 }
             }
         }),
@@ -176,6 +176,17 @@
                     }
                 }
             }
+
+            // Add OrderBy Attribute
+            var orderBy = this.model.get("orderBy");
+            for (col=0; col<columns.length; col++) {
+                for (ix=0; ix<orderBy.length; ix++) {
+                    if (col == orderBy[ix].col) {
+                        columns[col].orderDirection = orderBy[ix].direction;
+                        break;
+                    }
+                }
+            }
             
             var rollupColIndex = null;
             var rollupSummaryIndex = null;
@@ -194,20 +205,31 @@
                 .data(columns)
                 .enter().append("th")
                 .attr("class", function(d, i) {
-                    if (rollups) {  
+                    if (rollups) {
+                        var str = "";
                         if (i === 0) {
                             // hide grouping column
-                            return "hide " + d.dataType;
+                            str = str + "hide " + d.dataType;
                         } else if (( rollupSummaryIndex !== null) && (i === rollupColIndex)) {
                             // hide rollup column
-                            return "hide " + d.dataType;
+                            str = str + "hide " + d.dataType;
                         } else {
-                            return d.dataType;
+                            str = str + d.dataType;
                         }
+                        if (d.orderDirection) {
+                            str = str + " " + d.orderDirection;
+                        }
+                        return str;
                     }
                 })
-                .text(function(d, i) {
-                    return d.name;
+                .html(function(d, i) {
+                    var str = d.name;
+                    if (d.orderDirection === "ASC") {
+                        str = str + " " + "<span class='sort-direction'>&#xffea;</span>";
+                    } else if (d.orderDirection === "DESC") {
+                        str = str + " " + "<span class='sort-direction'>&#xffec;</span>";
+                    }
+                    return str;
                 })
                 .attr("data-content", function(d) {
                     if (d.oid) {
@@ -215,6 +237,9 @@
                     } else {
                         return d.id;
                     }
+                })
+                .attr("data-id", function(d, i) {
+                    return i;
                 });
 
             // add class if more than 10 columns
@@ -375,12 +400,14 @@
                 this.$el.find("#total").show();
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").hide();
+                this.$el.find(".sort-direction").show();
             }
     
             if (this.model.get("status") === "RUNNING") {
                 // computing in progress
                 this.$el.find(".sq-loading").show();
                 this.$el.find("#stale").hide();
+                this.$el.find(".sort-direction").show();
             }
             
             if (this.model.get("status") === "PENDING") {

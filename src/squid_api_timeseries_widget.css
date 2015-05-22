@@ -103,3 +103,7 @@
 .squid-api-data-widgets-timeseries-widget .rickshaw_graph .detail .date { 
 	color: #a0a0a0 
 }
+
+.squid-api-data-widgets-timeseries-widget #chart {
+	min-height: 400px;
+}
