@@ -10,9 +10,9 @@ A collection of data (from AnalysisJobs) visualization and manipulation widgets.
   * template : a custom Handlebars template
   * maxRowsPerPage : limits the number of rows displayed (default is 10000)
   * format : a formatter function for metrics (default is `d3.format(",.f");`)
-  * selectMetricHeader : setting to true will allow metric's to be selected directly from the header of the column header
-  * searching : if set to true, this allow the data table to be searchable
   * paging : if set to true this will activate pagination on the data table
+  * ordering : if set to true this will allow the user to click on the table headers to set analysis OrderBy
+  * ignoreColumns : specify with an integer, the number of columns to ignore from the left when setting the orderBy for the analysis
 
 ## DomainSelector
 *Renders the domains of the API's current project as an INPUT.  Selects and modifies the API's current domain if selection changes*

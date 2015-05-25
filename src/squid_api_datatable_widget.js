@@ -26,6 +26,8 @@
         
         rollupSummaryColumn : null,
 
+        ignoreColumns : null,
+
         initialize : function(options) {
             var me = this;
             
@@ -68,6 +70,9 @@
             if (options.headerBadges) {
                 this.headerBadges = options.headerBadges;
             }
+            if (options.ignoreColumns) {
+                this.ignoreColumns = options.ignoreColumns;
+            }
             this.rollupSummaryColumn = options.rollupSummaryColumn;
 
             if (d3) {
@@ -99,7 +104,10 @@
             "click thead th" : function(item) {
                 if (this.ordering) {
                     var orderByDirection = "ASC";
-                    var orderId = $(item.currentTarget).attr("data-id");
+                    var orderId = parseInt($(item.currentTarget).attr("data-id"));
+                    if (this.ignoreColumns) {
+                        orderId = orderId - this.ignoreColumns;
+                    }
                     if ($(item.currentTarget).hasClass("ASC")) {
                         orderByDirection = "DESC";
                     } else {
@@ -182,7 +190,11 @@
             for (col=0; col<columns.length; col++) {
                 for (ix=0; ix<orderBy.length; ix++) {
                     if (col == orderBy[ix].col) {
-                        columns[col].orderDirection = orderBy[ix].direction;
+                        if (this.ignoreColumns) {
+                            columns[col + this.ignoreColumns].orderDirection = orderBy[ix].direction;
+                        } else {
+                            columns[col].orderDirection = orderBy[ix].direction;
+                        }
                         break;
                     }
                 }
@@ -198,7 +210,7 @@
                     rollupSummaryIndex = this.rollupSummaryColumn + 1;
                 }
             }
-
+            me = this;
             // header
             d3.select(selector).select("thead tr").selectAll("th").remove();
             var th = d3.select(selector).select("thead tr").selectAll("th")
