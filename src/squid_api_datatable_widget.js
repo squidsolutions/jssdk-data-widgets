@@ -105,17 +105,21 @@
                 if (this.ordering) {
                     var orderByDirection = "ASC";
                     var orderId = parseInt($(item.currentTarget).attr("data-id"));
+                    this.$el.find(".sort-direction").remove();
+
                     if (this.ignoreColumns) {
                         orderId = orderId - this.ignoreColumns;
                     }
-                    if ($(item.currentTarget).hasClass("ASC")) {
-                        orderByDirection = "DESC";
+                    if (orderId === this.config.get("orderByColumn")) {
+                        if ($(item.currentTarget).hasClass("ASC")) {
+                            orderByDirection = "DESC";
+                        } else {
+                            orderByDirection = "ASC";
+                        }
+                        this.config.set("orderByDirection", orderByDirection);
                     } else {
-                        orderByDirection = "ASC";
+                        this.config.set("orderByColumn", orderId);
                     }
-                    this.$el.find(".sort-direction").remove();
-                    this.config.set("orderByDirection", orderByDirection);
-                    this.config.set("orderByColumn", orderId);
                 }
             }
         }),
