@@ -2941,7 +2941,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                  })
                  .fail(function(model, response) {
                      console.error("createAnalysisJob failed");
-                     this.setDownloadBtnState();
+                     me.setDownloadBtnState();
                  });
             }
 
