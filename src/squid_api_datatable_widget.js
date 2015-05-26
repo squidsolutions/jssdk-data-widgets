@@ -138,6 +138,7 @@
         displayTableHeader : function(selector) {
             var me = this;
             var columns;
+            var invalidSelection = false;
             
             var analysis = this.model;
             // in case of a multi-analysis model
@@ -161,8 +162,14 @@
                 if (facets) {
                     for (i=0; i<facets.length; i++) {
                         obj = squid_api.utils.find(this.filters.get("selection").facets, "id", facets[i].value);
-                        obj.dataType = "STRING";
-                        columns.push(obj);
+                        if (obj) {
+                            obj.dataType = "STRING";
+                            columns.push(obj);
+                        } else {
+                            // impossible to get column data from selection
+                            invalidSelection = true;
+                        }
+                        
                     }
                 }
                 var metrics = this.model.get("metricList");
@@ -172,7 +179,12 @@
                         metric = metrics[i];
                         if (metrics[i].id) {
                             obj = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", metrics[i].id.metricId, "Metric");
-                            obj.dataType = "NUMBER";
+                            if (obj) {
+                                obj.dataType = "NUMBER";
+                            } else {
+                                // impossible to get column data from selection
+                                invalidSelection = true;
+                            }
                         } else {
                             obj = {
                                     "id" : null,
@@ -213,53 +225,57 @@
             me = this;
             // header
             d3.select(selector).select("thead tr").selectAll("th").remove();
-            var th = d3.select(selector).select("thead tr").selectAll("th")
-                .data(columns)
-                .enter().append("th")
-                .attr("class", function(d, i) {
-                    if (rollups) {
-                        var str = "";
-                        if (i === 0) {
-                            // hide grouping column
-                            str = str + "hide " + d.dataType;
-                        } else if (( rollupSummaryIndex !== null) && (i === rollupColIndex)) {
-                            // hide rollup column
-                            str = str + "hide " + d.dataType;
-                        } else {
-                            str = str + d.dataType;
+            
+            if (!invalidSelection) {
+                var th = d3.select(selector).select("thead tr").selectAll("th")
+                    .data(columns)
+                    .enter().append("th")
+                    .attr("class", function(d, i) {
+                        if (rollups) {
+                            var str = "";
+                            if (i === 0) {
+                                // hide grouping column
+                                str = str + "hide " + d.dataType;
+                            } else if (( rollupSummaryIndex !== null) && (i === rollupColIndex)) {
+                                // hide rollup column
+                                str = str + "hide " + d.dataType;
+                            } else {
+                                str = str + d.dataType;
+                            }
+                            if (d.orderDirection) {
+                                str = str + " " + d.orderDirection;
+                            }
+                            return str;
                         }
-                        if (d.orderDirection) {
-                            str = str + " " + d.orderDirection;
+                    })
+                    .html(function(d, i) {
+                        var str = d.name;
+                        if (d.orderDirection === "ASC") {
+                            str = str + " " + "<span class='sort-direction'>&#xffea;</span>";
+                        } else if (d.orderDirection === "DESC") {
+                            str = str + " " + "<span class='sort-direction'>&#xffec;</span>";
                         }
                         return str;
-                    }
-                })
-                .html(function(d, i) {
-                    var str = d.name;
-                    if (d.orderDirection === "ASC") {
-                        str = str + " " + "<span class='sort-direction'>&#xffea;</span>";
-                    } else if (d.orderDirection === "DESC") {
-                        str = str + " " + "<span class='sort-direction'>&#xffec;</span>";
-                    }
-                    return str;
-                })
-                .attr("data-content", function(d) {
-                    if (d.oid) {
-                        return d.oid;
-                    } else {
-                        return d.id;
-                    }
-                })
-                .attr("data-id", function(d, i) {
-                    return i;
-                });
-
-            // add class if more than 10 columns
-            if (this.$el.find("thead th").length > 10) {
-                this.$el.find("table").addClass("many-columns");
-            } else {
-                this.$el.find("table").removeClass("many-columns");
+                    })
+                    .attr("data-content", function(d) {
+                        if (d.oid) {
+                            return d.oid;
+                        } else {
+                            return d.id;
+                        }
+                    })
+                    .attr("data-id", function(d, i) {
+                        return i;
+                    });
+                
+                // add class if more than 10 columns
+                if (this.$el.find("thead th").length > 10) {
+                    this.$el.find("table").addClass("many-columns");
+                } else {
+                    this.$el.find("table").removeClass("many-columns");
+                }
             }
+            
         },
         
         displayTableContent : function(selector) {
