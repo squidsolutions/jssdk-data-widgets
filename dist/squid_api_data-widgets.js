@@ -1040,9 +1040,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     } else {
                         this.config.set("orderByColumn", orderId);
                     }
-
-                    console.log(orderId);
-                    console.log(orderByDirection);
                 }
             }
         }),
