@@ -1130,9 +1130,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var orderBy = this.model.get("orderBy");
             for (col=0; col<columns.length; col++) {
                 for (ix=0; ix<orderBy.length; ix++) {
-                    if (this.rollups && col == orderBy[ix].col) {
+                    if (this.ordering && this.rollups && col == orderBy[ix].col) {
                         columns[col + 1].orderDirection = orderBy[ix].direction;
-                    } else if (col == orderBy[ix].col) {
+                    } else if (this.ordering && col == orderBy[ix].col) {
                         columns[col].orderDirection = orderBy[ix].direction;
                     }
                     break;
