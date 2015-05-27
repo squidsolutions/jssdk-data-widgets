@@ -157,6 +157,9 @@
              
                 // init rollups
                 rollups = analysis.get("rollups");
+                if (rollups && (rollups.length ===0)) {
+                    rollups = null;
+                }
             } else {
                 // use analysis columns
                 columns = [];
@@ -295,6 +298,10 @@
                 
             if (results) {
                 rollups = analysis.get("rollups");
+                if (rollups && (rollups.length ===0)) {
+                    rollups = null;
+                }
+                
                 var rollupColIndex = null;
                 var rollupSummaryIndex = null;
                 if (rollups) {

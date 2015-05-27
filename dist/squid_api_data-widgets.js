@@ -1082,6 +1082,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
              
                 // init rollups
                 rollups = analysis.get("rollups");
+                if (rollups && (rollups.length ===0)) {
+                    rollups = null;
+                }
             } else {
                 // use analysis columns
                 columns = [];
@@ -1220,6 +1223,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 
             if (results) {
                 rollups = analysis.get("rollups");
+                if (rollups && (rollups.length ===0)) {
+                    rollups = null;
+                }
+                
                 var rollupColIndex = null;
                 var rollupSummaryIndex = null;
                 if (rollups) {
