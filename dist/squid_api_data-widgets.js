@@ -951,7 +951,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         
         rollupSummaryColumn : null,
 
-        ignoreColumns : null,
+        rollups : null,
 
         initialize : function(options) {
             var me = this;
@@ -995,9 +995,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.headerBadges) {
                 this.headerBadges = options.headerBadges;
             }
-            if (options.ignoreColumns) {
-                this.ignoreColumns = options.ignoreColumns;
-            }
             this.rollupSummaryColumn = options.rollupSummaryColumn;
 
             if (d3) {
@@ -1028,19 +1025,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         events : ({
             "click thead th" : function(item) {
                 if (this.ordering) {
-                    var orderByDirection = "ASC";
                     var orderId = parseInt($(item.currentTarget).attr("data-id"));
-                    this.$el.find(".sort-direction").remove();
-
-                    if (this.ignoreColumns) {
-                        orderId = orderId - this.ignoreColumns;
+                    var orderByDirection;
+                    if (this.rollups) {
+                        orderId = orderId - 1;
+                    } 
+                    if ($(item.currentTarget).hasClass("ASC")) {
+                        orderByDirection = "DESC";
+                    } else {
+                        orderByDirection = "ASC";
                     }
                     if (orderId === this.config.get("orderByColumn")) {
-                        if ($(item.currentTarget).hasClass("ASC")) {
-                            orderByDirection = "DESC";
-                        } else {
-                            orderByDirection = "ASC";
-                        }
                         this.config.set("orderByDirection", orderByDirection);
                     } else {
                         this.config.set("orderByColumn", orderId);
@@ -1083,7 +1078,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // init rollups
                 rollups = analysis.get("rollups");
                 if (rollups && (rollups.length ===0)) {
-                    rollups = null;
+                    rollups = this.rollups = null;
+                } else {
+                    this.rollups = true;
                 }
             } else {
                 // use analysis columns
@@ -1133,14 +1130,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var orderBy = this.model.get("orderBy");
             for (col=0; col<columns.length; col++) {
                 for (ix=0; ix<orderBy.length; ix++) {
-                    if (col == orderBy[ix].col) {
-                        if (this.ignoreColumns) {
-                            columns[col + this.ignoreColumns].orderDirection = orderBy[ix].direction;
-                        } else {
-                            columns[col].orderDirection = orderBy[ix].direction;
-                        }
-                        break;
+                    if (this.ordering && this.rollups && col == orderBy[ix].col) {
+                        columns[col + 1].orderDirection = orderBy[ix].direction;
+                    } else if (this.ordering && col == orderBy[ix].col) {
+                        columns[col].orderDirection = orderBy[ix].direction;
                     }
+                    break;
                 }
             }
             
@@ -1163,8 +1158,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     .data(columns)
                     .enter().append("th")
                     .attr("class", function(d, i) {
+                        var str = "";
                         if (rollups) {
-                            var str = "";
                             if (i === 0) {
                                 // hide grouping column
                                 str = str + "hide " + d.dataType;
@@ -1174,11 +1169,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             } else {
                                 str = str + d.dataType;
                             }
-                            if (d.orderDirection) {
-                                str = str + " " + d.orderDirection;
-                            }
-                            return str;
                         }
+                        if (d.orderDirection) {
+                            str = str + " " + d.orderDirection;
+                        }
+                        return str;
                     })
                     .html(function(d, i) {
                         var str = d.name;
@@ -1224,7 +1219,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (results) {
                 rollups = analysis.get("rollups");
                 if (rollups && (rollups.length ===0)) {
-                    rollups = null;
+                    rollups = this.rollups = null;
+                } else {
+                    this.rollups = true;
                 }
                 
                 var rollupColIndex = null;
