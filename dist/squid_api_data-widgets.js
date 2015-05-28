@@ -1498,21 +1498,27 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 dimensions.push(facet);
                             }
                         }
+                        // avoid holes
+                        if (!dimensions[i]) {
+                            dimensions[i] = null;
+                        }
                     }
                     
                     for (var dimIdx=0; dimIdx<dimensions.length; dimIdx++) {
                         var facet1 = dimensions[dimIdx];
-                        // check if selected
-                        var selected = this.isChosen(facet1);
-                        // add to the list
-                        var name;
-                        if (facet1.name) {
-                            name = facet1.name;
-                        } else {
-                            name = facet1.dimension.name;
+                        if (facet1) {
+                            // check if selected
+                            var selected = this.isChosen(facet1);
+                            // add to the list
+                            var name;
+                            if (facet1.name) {
+                                name = facet1.name;
+                            } else {
+                                name = facet1.dimension.name;
+                            }
+                            var option = {"label" : name, "value" : facet1.id, "selected" : selected};
+                            jsonData.options.push(option);
                         }
-                        var option = {"label" : name, "value" : facet1.id, "selected" : selected};
-                        jsonData.options.push(option);
                     }
                 }
             }
