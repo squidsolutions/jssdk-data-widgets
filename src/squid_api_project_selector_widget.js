@@ -7,6 +7,8 @@
         template : null,
         projects : null,
         onChangeHandler: null,
+        projectEditEl: null,
+        dropdownClass: null,
 
         initialize: function(options) {
             var me = this;
@@ -21,6 +23,12 @@
             if (options.onChangeHandler) {
                 this.onChangeHandler = options.onChangeHandler;
             }
+            if (options.projectEditEl) {
+                this.projectEditEl = options.projectEditEl;
+            }
+            if (options.multiSelectView) {
+                this.multiSelectView = options.multiSelectView;
+            }
 
             // init the projects
             if (options.projects) {
@@ -29,14 +37,33 @@
             }
       
             this.model.on("change:project", this.render, this);
+
+            // if project edit element passed, render it's view
+            if (this.projectEditEl) {
+                this.model.on("change:project", this.editProjectViewRender, this);
+                this.editProjectViewRender();
+            }
         },
 
         events: {
             "change .sq-select": function(event) {
                 if (this.onChangeHandler) {
                     this.onChangeHandler.call(this,event);
-                }            
+                }
             }
+        },
+
+        editProjectViewRender: function() {
+            var me = this;
+
+            if (this.projectEditView) {
+                this.projectEditView.remove();
+            }
+            var project = api.model.project;
+            this.projectEditView = new api.view.ModelManagementView({
+                el : $(me.projectEditEl),
+                model : project
+            });
         },
 
         render: function() {
@@ -72,7 +99,9 @@
                 this.$el.show();
     
                 // Initialize plugin
-                this.$el.find("select");
+                if (this.multiSelectView) {
+                    this.$el.find("select").multiselect();
+                }
             }
 
             return this;

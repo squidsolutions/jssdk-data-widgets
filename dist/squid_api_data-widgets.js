@@ -1945,6 +1945,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.onChangeHandler) {
                 this.onChangeHandler = options.onChangeHandler;
             }
+            if (options.multiSelectView) {
+                this.multiSelectView = options.multiSelectView;
+            }
             
             if (typeof options.displayAllDomains !== 'undefined') {
                 this.displayAllDomains = options.displayAllDomains;
@@ -1982,16 +1985,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
 
                     var displayed = true;
-                    
-                    if (!this.displayAllDomains) {
-                        // do not display domains with no dimensions nor metrics
-                        if ((!domain.dimensions) || (domain.dimensions.length === 0)) {
-                            displayed = false;
-                        }
-                        if ((!domain.metrics) || (domain.metrics.length === 0)) {
-                            displayed = false;
-                        }
-                    }
 
                     if (displayed) {
                         var option = {"label" : domain.name, "value" : domain.oid, "selected" : selected};
@@ -2010,7 +2003,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.$el.show();
 
             // Initialize plugin
-            this.$el.find("select");
+            if (this.multiSelectView) {
+                this.$el.find("select").multiselect();
+            }
 
             return this;
         }
@@ -2880,6 +2875,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         template : null,
         projects : null,
         onChangeHandler: null,
+        projectEditEl: null,
+        dropdownClass: null,
 
         initialize: function(options) {
             var me = this;
@@ -2894,6 +2891,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.onChangeHandler) {
                 this.onChangeHandler = options.onChangeHandler;
             }
+            if (options.projectEditEl) {
+                this.projectEditEl = options.projectEditEl;
+            }
+            if (options.multiSelectView) {
+                this.multiSelectView = options.multiSelectView;
+            }
 
             // init the projects
             if (options.projects) {
@@ -2902,14 +2905,33 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
       
             this.model.on("change:project", this.render, this);
+
+            // if project edit element passed, render it's view
+            if (this.projectEditEl) {
+                this.model.on("change:project", this.editProjectViewRender, this);
+                this.editProjectViewRender();
+            }
         },
 
         events: {
             "change .sq-select": function(event) {
                 if (this.onChangeHandler) {
                     this.onChangeHandler.call(this,event);
-                }            
+                }
             }
+        },
+
+        editProjectViewRender: function() {
+            var me = this;
+
+            if (this.projectEditView) {
+                this.projectEditView.remove();
+            }
+            var project = api.model.project;
+            this.projectEditView = new api.view.ModelManagementView({
+                el : $(me.projectEditEl),
+                model : project
+            });
         },
 
         render: function() {
@@ -2945,7 +2967,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.$el.show();
     
                 // Initialize plugin
-                this.$el.find("select");
+                if (this.multiSelectView) {
+                    this.$el.find("select").multiselect();
+                }
             }
 
             return this;

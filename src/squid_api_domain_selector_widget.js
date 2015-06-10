@@ -21,6 +21,9 @@
             if (options.onChangeHandler) {
                 this.onChangeHandler = options.onChangeHandler;
             }
+            if (options.multiSelectView) {
+                this.multiSelectView = options.multiSelectView;
+            }
             
             if (typeof options.displayAllDomains !== 'undefined') {
                 this.displayAllDomains = options.displayAllDomains;
@@ -58,16 +61,6 @@
                     }
 
                     var displayed = true;
-                    
-                    if (!this.displayAllDomains) {
-                        // do not display domains with no dimensions nor metrics
-                        if ((!domain.dimensions) || (domain.dimensions.length === 0)) {
-                            displayed = false;
-                        }
-                        if ((!domain.metrics) || (domain.metrics.length === 0)) {
-                            displayed = false;
-                        }
-                    }
 
                     if (displayed) {
                         var option = {"label" : domain.name, "value" : domain.oid, "selected" : selected};
@@ -86,7 +79,9 @@
             this.$el.show();
 
             // Initialize plugin
-            this.$el.find("select");
+            if (this.multiSelectView) {
+                this.$el.find("select").multiselect();
+            }
 
             return this;
         }
