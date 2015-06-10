@@ -10,42 +10,45 @@
 		</div>
 		<div class="panel-body">
 {{/if}}
-		<button type="button" class="close" data-toggle="collapse"
-			data-target="{{data-target}}" data-clavier="true" aria-hidden="true">
-		</button>
-		<div class="download-formats">
-			<label>Format: </label> 
-			<input type="radio" name="format" value="csv" {{#if formatCSV}}checked{{/if}}> csv 
-			<div style="display: inline-block;">
-				<label>Compression: </label> <input type="checkbox" name="compression" {{#if compression}}checked{{/if}}> gzip
+			<button type="button" class="close" data-toggle="collapse"
+				data-target="{{data-target}}" data-clavier="true" aria-hidden="true">
+			</button>
+			<div class="download-formats">
+				<label>Format: </label> 
+				{{#each formats}}
+				<input type="radio" name="format" value="{{format}}" {{#if selected}}checked{{/if}}> {{format}} 
+				{{/each}}
+				{{#if displayCompression}}
+				<div style="display: inline-block;">
+					<label>Compression: </label> <input type="checkbox" name="compression" {{#if compression}}checked{{/if}}> gzip
+				</div>
+				{{/if }}
 			</div>
-		</div>
-		<hr>
-		<div>
-			<a id="download" class="btn btn-default" target="download">Download your data</a>
-		</div>
-		{{#if data}}
-		<hr>
-		<div>
-			<a id="curlbtn">View</a> admin export panel
-			<div id="curl">
-				<p>Sample code to download the analysis results using curl shell command.</p>
-				<b>1 - get an authentication token</b>
-				<p>replace the 'login' and 'password' fields in the following snippet</p>
-				<pre class="curl">curl '{{apiURL}}/auth-token' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept: */*' -H 'Cache-Control: no-cache' --data 'customerId={{customerId}}&client_id={{clientId}}&redirect_uri={{redirectURI}}&login=<b>[login]</b>&password=<b>[password]</b>'</pre>
-				<b>2 - download the export</b>
-				<p>replace the 'access_token' field in the following snippet by the value of the 'tokenId' field returned by the previous script</p>
-				<pre class="curl">curl '{{{curl}}}' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' --data-binary $'{{data}}' --compressed -o {{curlFileName}}</pre>
-				<b>3 - view the export</b>
-				<p>your analysis results should now be downloaded as</p>
-				<pre class="curl">ls {{curlFileName}}</pre>
+			<div>&nbsp;</div>
+			<div>
+				<a id="download" class="btn btn-default" target="_blank">Download your data</a>
 			</div>
-		</div>
-		{{/if }}
-	</div>
+			{{#if data}}
+			<hr>
+			<div>
+				Need to automate exports? Use the <a id="curlbtn">shell commands</a>.
+				<div id="curl">
+					<p>Sample code to download the analysis results using curl shell command.</p>
+					<b>1 - get an authentication token</b>
+					<p>replace the 'login' and 'password' fields in the following snippet</p>
+					<pre class="curl">curl '{{apiURL}}/auth-token' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept: */*' -H 'Cache-Control: no-cache' --data 'customerId={{customerId}}&client_id={{clientId}}&redirect_uri={{redirectURI}}&login=<b>[login]</b>&password=<b>[password]</b>'</pre>
+					<b>2 - download the export</b>
+					<p>replace the 'access_token' field in the following snippet by the value of the 'tokenId' field returned by the previous script</p>
+					<pre class="curl">curl '{{{curl}}}' -H 'Origin: {{origin}}' -H 'Accept-Encoding: gzip,deflate' -H 'Content-Type: application/json' -H 'Accept: application/json, text/javascript, */*; q=0.01' --data-binary $'{{data}}' --compressed -o {{curlFileName}}</pre>
+					<b>3 - view the export</b>
+					<p>your analysis results should now be downloaded as</p>
+					<pre class="curl">ls {{curlFileName}}</pre>
+				</div>
+			</div>
+			{{/if }}
 {{#if displayInAccordion}}
-</div>
-</div>
+		</div>
+	</div>
 {{/if}}
-
+</div>
 

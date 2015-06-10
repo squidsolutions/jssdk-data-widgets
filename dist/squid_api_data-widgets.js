@@ -228,14 +228,41 @@ function program1(depth0,data) {
 
 function program3(depth0,data) {
   
+  var buffer = "", stack1, helper;
+  buffer += "\r\n				<input type=\"radio\" name=\"format\" value=\"";
+  if (helper = helpers.format) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.format); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "> ";
+  if (helper = helpers.format) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.format); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + " \r\n				";
+  return buffer;
+  }
+function program4(depth0,data) {
+  
   
   return "checked";
   }
 
-function program5(depth0,data) {
+function program6(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\r\n				<div style=\"display: inline-block;\">\r\n					<label>Compression: </label> <input type=\"checkbox\" name=\"compression\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "> gzip\r\n				</div>\r\n				";
+  return buffer;
+  }
+
+function program8(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\r\n		<hr>\r\n		<div>\r\n			<a id=\"curlbtn\">View</a> admin export panel\r\n			<div id=\"curl\">\r\n				<p>Sample code to download the analysis results using curl shell command.</p>\r\n				<b>1 - get an authentication token</b>\r\n				<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n				<pre class=\"curl\">curl '";
+  buffer += "\r\n			<hr>\r\n			<div>\r\n				Need to automate exports? Use the <a id=\"curlbtn\">shell commands</a>.\r\n				<div id=\"curl\">\r\n					<p>Sample code to download the analysis results using curl shell command.</p>\r\n					<b>1 - get an authentication token</b>\r\n					<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n					<pre class=\"curl\">curl '";
   if (helper = helpers.apiURL) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.apiURL); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -255,7 +282,7 @@ function program5(depth0,data) {
   if (helper = helpers.redirectURI) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.redirectURI); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "&login=<b>[login]</b>&password=<b>[password]</b>'</pre>\r\n				<b>2 - download the export</b>\r\n				<p>replace the 'access_token' field in the following snippet by the value of the 'tokenId' field returned by the previous script</p>\r\n				<pre class=\"curl\">curl '";
+    + "&login=<b>[login]</b>&password=<b>[password]</b>'</pre>\r\n					<b>2 - download the export</b>\r\n					<p>replace the 'access_token' field in the following snippet by the value of the 'tokenId' field returned by the previous script</p>\r\n					<pre class=\"curl\">curl '";
   if (helper = helpers.curl) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.curl); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
@@ -271,40 +298,40 @@ function program5(depth0,data) {
   if (helper = helpers.curlFileName) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.curlFileName); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</pre>\r\n				<b>3 - view the export</b>\r\n				<p>your analysis results should now be downloaded as</p>\r\n				<pre class=\"curl\">ls ";
+    + "</pre>\r\n					<b>3 - view the export</b>\r\n					<p>your analysis results should now be downloaded as</p>\r\n					<pre class=\"curl\">ls ";
   if (helper = helpers.curlFileName) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.curlFileName); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</pre>\r\n			</div>\r\n		</div>\r\n		";
+    + "</pre>\r\n				</div>\r\n			</div>\r\n			";
   return buffer;
   }
 
-function program7(depth0,data) {
+function program10(depth0,data) {
   
   
-  return "\r\n</div>\r\n</div>\r\n";
+  return "\r\n		</div>\r\n	</div>\r\n";
   }
 
   buffer += "<div class=\"squid-api-data-widgets-export-widget\">\r\n";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n		<button type=\"button\" class=\"close\" data-toggle=\"collapse\"\r\n			data-target=\"";
+  buffer += "\r\n			<button type=\"button\" class=\"close\" data-toggle=\"collapse\"\r\n				data-target=\"";
   if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n		</button>\r\n		<div class=\"download-formats\">\r\n			<label>Format: </label> \r\n			<input type=\"radio\" name=\"format\" value=\"csv\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.formatCSV), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n			</button>\r\n			<div class=\"download-formats\">\r\n				<label>Format: </label> \r\n				";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.formats), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> csv \r\n			<div style=\"display: inline-block;\">\r\n				<label>Compression: </label> <input type=\"checkbox\" name=\"compression\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  buffer += "\r\n				";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayCompression), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> gzip\r\n			</div>\r\n		</div>\r\n		<hr>\r\n		<div>\r\n			<a id=\"download\" class=\"btn btn-default\" target=\"download\">Download your data</a>\r\n		</div>\r\n		";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  buffer += "\r\n			</div>\r\n			<div>&nbsp;</div>\r\n			<div>\r\n				<a id=\"download\" class=\"btn btn-default\" target=\"_blank\">Download your data</a>\r\n			</div>\r\n			";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n	</div>\r\n";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
+  buffer += "\r\n";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n\r\n\r\n";
+  buffer += "\r\n</div>\r\n\r\n";
   return buffer;
   });
 
@@ -2001,16 +2028,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         template : null,
         renderTo: null,
-        format : "csv",
         compression : true,
         downloadStatus : 0,
         curlCollapsed : true,
         currentJobId : null,
         displayInAccordion : false,
-        renderStore : null,
+        viewPort : null,
+        formats : [{"format" : "csv", "mime-type" : "text/csv", "template" : null}],
+        selectedFormatIndex : 0,
+        templateData : null,
+        displayScripting : true,
+        displayCompression : true,
         
         initialize : function(options) {
-            if (this.model) {
+            if (this.model.get("analysis")) {
+                this.listenTo(this.model.get("analysis"), 'change', this.render);
+                this.listenTo(this.model, 'change:templateData', this.refreshDownloadUrl);
+            } else {
                 this.listenTo(this.model, 'change', this.render);
             }
             // setup options
@@ -2019,15 +2053,25 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             } else {
                 this.template = squid_api.template.squid_api_export_widget;
             }
+            if (options.formats) {
+                this.formats = options.formats;
+            }
             if (options.renderTo) {
                 this.renderTo = options.renderTo;
             }
-            if (options.displayInAccordion) {
-                this.displayInAccordion = options.displayInAccordion;
-                this.renderStore = this.renderTo;
+            if (options.displayInAccordion !== false) {
+                this.displayInAccordion = true;
+                this.viewPort = this.renderTo;
             } else {
-                this.renderStore = this.$el;
+                this.viewPort = this.$el;
             }
+            if (options.displayScripting === false) {
+                this.displayScripting = false;
+            }
+            if (options.displayCompression === false) {
+                this.displayCompression = false;
+            }
+            this.render();
         },
 
         setModel : function(model) {
@@ -2037,53 +2081,69 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         
         clickedFormat : function (event) {
             var t = event.target;
-            this.format = t.value;
-            this.render();
+            this.selectedFormatIndex = null;
+            for (var i=0; i<this.formats.length;i++) {
+                if (this.formats[i].format === t.value) {
+                    this.selectedFormatIndex = i;
+                }
+            }
+            this.refreshDownloadUrl();
         },
         
         clickedCompression : function (event) {
             var t = event.target;
             this.compression = (t.checked);
-            this.render();
+            this.refreshDownloadUrl();
+        },
+
+        refreshDownloadUrl : function() {
+            var me = this;
+            if (me.currentJobId) {
+                // create download link
+                var analysisJobResults;
+                var selectedFormat = this.formats[this.selectedFormatIndex];
+                if (!selectedFormat.template) {
+                    // use getResults method
+                    analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
+                    analysisJobResults.addParameter("format",selectedFormat.format);
+                } else {
+                    // use render method
+                    analysisJobResults = new squid_api.model.ProjectAnalysisJobRender({"format" : selectedFormat.format});
+                    analysisJobResults.setParameter("type", selectedFormat.type);
+                    analysisJobResults.setParameter("timeout", null);
+                    // build the template
+                    var velocityTemplate = selectedFormat.template(me.model.get("templateData"));
+                    analysisJobResults.setParameter("template", base64.encode(velocityTemplate));
+                }
+                if (me.compression) {
+                    analysisJobResults.addParameter("compression","gzip");
+                }
+                analysisJobResults.set({
+                    "id": me.currentJobId,
+                    "oid": me.currentJobId.oid
+                });
+                var downloadBtn = $(me.viewPort).find("#download");
+                downloadBtn.attr("href",analysisJobResults.url());
+                downloadBtn.removeClass("disabled");
+            }
         },
         
         render : function() {
-            var me = this, analysis = this.model;
-
-            // render the curl snippet
-            var exportAnalysis = new squid_api.model.ProjectAnalysisJob();
-            exportAnalysis.addParameter("format",this.format);
-            if (this.compression) {
-                exportAnalysis.addParameter("compression","gzip");
+            var me = this;
+            var analysis = this.model.get("analysis");
+            if (!analysis) {
+                analysis = this.model;
             }
-            exportAnalysis.addParameter("access_token","[access_token]");
-            exportAnalysis.set(analysis.attributes);
-            exportAnalysis.set(
-               "id", {
-                    "projectId": analysis.get("id").projectId,
-                    "analysisJobId": null
-                });
-
-            // escape all spaces in the json injected into cURL
-            var data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
             
-                $(this.renderStore).html(this.template({
-                    "displayInAccordion" : this.displayInAccordion,
-                    "data-target" : this.renderTo,
-                    "formatCSV": (this.format == "csv"),
-                    "formatJSON": (this.format == "json"),
-                    "compression": (this.compression),
-                    "curl": exportAnalysis.url().replace(/\[access_token\]/g, '<b>[access_token]</b>'),
-                    "curlFileName" : "analysis."+((this.format == "csv")?"csv":"")+((this.format == "json")?"json":"")+((this.compression)?".gz":""),
-                    "origin": "https://api.squidsolutions.com",
-                    "data": data,
-                    "customerId" : squid_api.customerId,
-                    "clientId" : squid_api.clientId,
-                    "redirectURI":"https://api.squidsolutions.com",
-                    "apiURL":squid_api.apiURL
-                    })
-                );
-
+            var selectedFormat = this.formats[this.selectedFormatIndex];
+            var formatsDisplay = [];
+            for (var i=0; i<this.formats.length;i++) {
+                formatsDisplay[i] = this.formats[i];
+                if (i === this.selectedFormatIndex) {
+                    formatsDisplay[i].selected = true;
+                }
+            }
+            
             if (this.displayInAccordion) {
                 this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-download-alt'></span></button>");
                 var facets = analysis.get("facets");
@@ -2094,71 +2154,103 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     $("button.btn-open-export-panel").prop('disabled', false);
                 }
             }
+
+            var data, curl, curlFileName;
+            if (me.displayScripting !== false) {
+                // render the curl snippet
+                var exportAnalysis = new squid_api.model.ProjectAnalysisJob();
+                exportAnalysis.addParameter("format", this.formats[this.selectedFormatIndex].format);
+                if (this.compression) {
+                    exportAnalysis.addParameter("compression","gzip");
+                }
+                exportAnalysis.addParameter("access_token","[access_token]");
+                exportAnalysis.set(analysis.attributes);
+                exportAnalysis.set(
+                   "id", {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": null
+                    });
+    
+                // escape all spaces in the json injected into cURL
+                data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
+                curlFileName = "analysis";
+                if (selectedFormat.format) {
+                    curlFileName += "."+selectedFormat.format;
+                }
+                if (this.compression) {
+                    curlFileName += ".gz";
+                }
+                curl = exportAnalysis.url().replace(/\[access_token\]/g, '<b>[access_token]</b>');
+            }
+            
+            $(this.viewPort).html(this.template({
+                "displayInAccordion" : this.displayInAccordion,
+                "data-target" : this.renderTo,
+                "formats": formatsDisplay,
+                "displayCompression" : this.displayCompression,
+                "compression": (this.compression),
+                "curl": curl,
+                "curlFileName" : curlFileName,
+                "origin": "https://api.squidsolutions.com",
+                "data": data,
+                "customerId" : squid_api.customerId,
+                "clientId" : squid_api.clientId,
+                "redirectURI":"https://api.squidsolutions.com",
+                "apiURL":squid_api.apiURL
+                })
+            );
+            
+            // prepare download link
+            this.downloadStatus = 1;
+            var downloadBtn = $(me.viewPort).find("#download");
+            downloadBtn.addClass("disabled");
+
+            if (analysis.get("id").projectId) {
+                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                downloadAnalysis.set(analysis.attributes);
+                downloadAnalysis.set({
+                    "id": {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": null
+                    },
+                    "autoRun": false});
+                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
+                .done(function(model, response) {
+                    me.downloadStatus = 2;
+                    me.currentJobId = downloadAnalysis.get("id");
+                    me.refreshDownloadUrl();
+                })
+                .fail(function(model, response) {
+                    console.error("createAnalysisJob failed");
+                });
+            }
             
             // apply cURL panel state
             if (me.curlCollapsed) {
-                $(this.renderStore).find('#curl').hide();
+                $(this.viewPort).find('#curl').hide();
             } else {
-                $(this.renderStore).find('#curl').show();
+                $(this.viewPort).find('#curl').show();
             }
             
             // Click Handlers
-            $(this.renderStore).find("#curlbtn").click(function() {
+            $(this.viewPort).find("#curlbtn").click(function() {
                 me.curlCollapsed = !me.curlCollapsed;
                 if (me.curlCollapsed) {
-                    $(me.renderStore).find('#curl').fadeOut();      
+                    $(me.viewPort).find('#curl').fadeOut();      
                 } else {
-                    $(me.renderStore).find('#curl').fadeIn();
+                    $(me.viewPort).find('#curl').fadeIn();
                 }
             });
-            
+
             // register click handlers    
-             $(this.renderStore).find('[name="format"]').click(
-                function(event) {
-                    me.clickedFormat(event);
-                });
-             $(this.renderStore).find('[name="compression"]')
-                .click(function(event) {
-                    me.clickedCompression(event);
-                });
-             
-             
-             // prepare download link
-             this.downloadStatus = 1;
-             var downloadBtn = $(me.renderStore).find("#download");
-             downloadBtn.addClass("disabled");
-             
-             if (analysis.get("id").projectId) {
-                 var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
-                 downloadAnalysis.set(analysis.attributes);
-                 downloadAnalysis.set({
-                    "id": {
-                         "projectId": analysis.get("id").projectId,
-                         "analysisJobId": null
-                     },
-                     "autoRun": false});
-                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                     .done(function(model, response) {
-                         me.downloadStatus = 2;
-                         me.currentJobId = downloadAnalysis.get("id");
-                         // create download link
-                         var analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                         analysisJobResults.addParameter("format",me.format);
-                         if (me.compression) {
-                             analysisJobResults.addParameter("compression","gzip");
-                         }
-                         analysisJobResults.set({
-                                 "id": me.currentJobId,
-                                 "oid": downloadAnalysis.get("oid")
-                             });
-                         console.log("download url : "+analysisJobResults.url());
-                         downloadBtn.attr("href",analysisJobResults.url());
-                         downloadBtn.removeClass("disabled");
-                     })
-                     .fail(function(model, response) {
-                         console.error("createAnalysisJob failed");
-                     });
-             }
+            $(this.viewPort).find('[name="format"]').click(
+                    function(event) {
+                        me.clickedFormat(event);
+                    });
+            $(this.viewPort).find('[name="compression"]')
+            .click(function(event) {
+                me.clickedCompression(event);
+            });
 
             return this;
         }
