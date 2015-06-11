@@ -2875,7 +2875,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         template : null,
         projects : null,
         onChangeHandler: null,
-        projectEditEl: null,
+        projectManipulateRender: null,
         dropdownClass: null,
         projectAutomaticLogin: null,
 
@@ -2892,8 +2892,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.onChangeHandler) {
                 this.onChangeHandler = options.onChangeHandler;
             }
-            if (options.projectEditEl) {
-                this.projectEditEl = options.projectEditEl;
+            if (options.projectManipulateRender) {
+                this.projectManipulateRender = options.projectManipulateRender;
             }
             if (options.multiSelectView) {
                 this.multiSelectView = options.multiSelectView;
@@ -2911,7 +2911,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.model.on("change:project", this.render, this);
 
             // if project edit element passed, render it's view
-            if (this.projectEditEl) {
+            if (this.projectManipulateRender) {
                 this.model.on("change:project", this.editProjectViewRender, this);
                 this.editProjectViewRender();
             }
@@ -2933,7 +2933,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             var project = api.model.project;
             this.projectEditView = new api.view.ModelManagementView({
-                el : $(me.projectEditEl),
+                el : $(me.projectManipulateRender),
                 model : project,
                 successHandler: function() {
                     if (me.projectAutomaticLogin) {
