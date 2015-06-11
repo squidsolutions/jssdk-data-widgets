@@ -9,6 +9,7 @@
         onChangeHandler: null,
         projectEditEl: null,
         dropdownClass: null,
+        projectAutomaticLogin: null,
 
         initialize: function(options) {
             var me = this;
@@ -28,6 +29,9 @@
             }
             if (options.multiSelectView) {
                 this.multiSelectView = options.multiSelectView;
+            }
+            if (options.projectAutomaticLogin) {
+                this.projectAutomaticLogin = options.projectAutomaticLogin;
             }
 
             // init the projects
@@ -62,7 +66,15 @@
             var project = api.model.project;
             this.projectEditView = new api.view.ModelManagementView({
                 el : $(me.projectEditEl),
-                model : project
+                model : project,
+                successHandler: function() {
+                    if (me.projectAutomaticLogin) {
+                        config.set({
+                            "project" : this.get("id").projectId,
+                            "domain" : null
+                        });
+                    }
+                }
             });
         },
 
