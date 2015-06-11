@@ -33,9 +33,29 @@
             // init the projects
             if (options.projects) {
                 this.projects = options.projects;
-                this.projects.on("reset sync", this.render, this);
+            } else {
+                //init the projects
+                this.projects = new squid_api.model.ProjectCollection();
             }
+            this.projects.addParameter("deepread","1");
+            this.projects.on("reset sync", this.render, this);
+            squid_api.model.login.on('change:login', function(model) {
+                if (model.get("login")) {
+                    // fetch projects
+                    me.projects.fetch({
+                        success : function(model, response) {
+                            console.log(model);
+                        },
+                        error : function(model, response) {
+                            console.log(model);
+                        }
+                    });
+                }
+            });
       
+            if (!this.model) {
+                this.model = squid_api.model.config;
+            }
             this.model.on("change:project", this.render, this);
 
             // if project edit element passed, render it's view
@@ -49,6 +69,13 @@
             "change .sq-select": function(event) {
                 if (this.onChangeHandler) {
                     this.onChangeHandler.call(this,event);
+                } else {
+                    // default behavior
+                    var selectedOid = event.target.value || null;
+                    this.model.set({
+                        "project" : selectedOid,
+                        "domain" : null
+                    });
                 }
             }
         },

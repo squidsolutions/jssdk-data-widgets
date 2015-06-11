@@ -984,7 +984,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var me = this;
             
             // config is used for orderBy
-            this.config = options.config;
+            if (options.config) {
+                this.config = options.config;
+            } else {
+                this.config = squid_api.model.config;
+            }
 
             if (this.model) {
                 this.listenTo(this.model, 'change:status', this.render);
@@ -1155,14 +1159,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // Add OrderBy Attribute
             var orderBy = this.model.get("orderBy");
-            for (col=0; col<columns.length; col++) {
-                for (ix=0; ix<orderBy.length; ix++) {
-                    if (this.ordering && this.rollups && col == orderBy[ix].col) {
-                        columns[col + 1].orderDirection = orderBy[ix].direction;
-                    } else if (this.ordering && col == orderBy[ix].col) {
-                        columns[col].orderDirection = orderBy[ix].direction;
+            if (orderBy) {
+                for (col=0; col<columns.length; col++) {
+                    for (ix=0; ix<orderBy.length; ix++) {
+                        if (this.ordering && this.rollups && col == orderBy[ix].col) {
+                            columns[col + 1].orderDirection = orderBy[ix].direction;
+                        } else if (this.ordering && col == orderBy[ix].col) {
+                            columns[col].orderDirection = orderBy[ix].direction;
+                        }
+                        break;
                     }
-                    break;
                 }
             }
             
@@ -1383,8 +1389,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.model.get("status") === "DONE") {
                 // display results
                 this.displayTableContent(selector);
-                this.paginationView.render();
-                this.$el.find("#pagination").show();
+                if (this.paging) {
+                    this.paginationView.render();
+                    this.$el.find("#pagination").show();
+                }
                 this.$el.find("#total").show();
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").hide();
@@ -1453,6 +1461,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.filters.on("change:selection", function() {
                 me.render();
             });
+            
+            if (!this.model) {
+                this.model = squid_api.model.config;
+            }
             
             // listen for global status change
             squid_api.model.status.on('change:status', this.enable, this);
@@ -1953,14 +1965,30 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.displayAllDomains = options.displayAllDomains;
             }
 
-            squid_api.model.project.on("change:domains", this.process, this);
+            if (!this.model) {
+                this.model = squid_api.model.config;
+            }
             this.model.on("change:domain", this.render, this);
+            
+            // TODO fetch the domains instead of relying on squid_api
+            squid_api.model.project.on("change:domains", this.process, this);
+            
         },
 
         events: {
             "change .sq-select": function(event) {
                 if (this.onChangeHandler) {
                     this.onChangeHandler.call(this,event);
+                } else {
+                    // default behavior
+                    var selectedOid = event.target.value || null;
+                    this.model.set({
+                        "domain" : selectedOid,
+                        "chosenDimensions" : null,
+                        "selectedDimension" : null,
+                        "chosenMetrics" : null,
+                        "selectedMetric" : null
+                    });
                 }
             }
         },
@@ -2353,6 +2381,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 me.render();
             });
             
+            if (!this.model) {
+                this.model = squid_api.model.config;
+            }
             this.model.on("change:domain", function() {
                 me.render();
             });
@@ -2901,9 +2932,29 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // init the projects
             if (options.projects) {
                 this.projects = options.projects;
-                this.projects.on("reset sync", this.render, this);
+            } else {
+                //init the projects
+                this.projects = new squid_api.model.ProjectCollection();
             }
+            this.projects.addParameter("deepread","1");
+            this.projects.on("reset sync", this.render, this);
+            squid_api.model.login.on('change:login', function(model) {
+                if (model.get("login")) {
+                    // fetch projects
+                    me.projects.fetch({
+                        success : function(model, response) {
+                            console.log(model);
+                        },
+                        error : function(model, response) {
+                            console.log(model);
+                        }
+                    });
+                }
+            });
       
+            if (!this.model) {
+                this.model = squid_api.model.config;
+            }
             this.model.on("change:project", this.render, this);
 
             // if project edit element passed, render it's view
@@ -2917,6 +2968,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             "change .sq-select": function(event) {
                 if (this.onChangeHandler) {
                     this.onChangeHandler.call(this,event);
+                } else {
+                    // default behavior
+                    var selectedOid = event.target.value || null;
+                    this.model.set({
+                        "project" : selectedOid,
+                        "domain" : null
+                    });
                 }
             }
         },

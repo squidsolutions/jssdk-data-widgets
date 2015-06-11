@@ -37,6 +37,10 @@
                 me.render();
             });
             
+            if (!this.model) {
+                this.model = squid_api.model.config;
+            }
+            
             // listen for global status change
             squid_api.model.status.on('change:status', this.enable, this);
 

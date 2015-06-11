@@ -29,14 +29,30 @@
                 this.displayAllDomains = options.displayAllDomains;
             }
 
-            squid_api.model.project.on("change:domains", this.process, this);
+            if (!this.model) {
+                this.model = squid_api.model.config;
+            }
             this.model.on("change:domain", this.render, this);
+            
+            // TODO fetch the domains instead of relying on squid_api
+            squid_api.model.project.on("change:domains", this.process, this);
+            
         },
 
         events: {
             "change .sq-select": function(event) {
                 if (this.onChangeHandler) {
                     this.onChangeHandler.call(this,event);
+                } else {
+                    // default behavior
+                    var selectedOid = event.target.value || null;
+                    this.model.set({
+                        "domain" : selectedOid,
+                        "chosenDimensions" : null,
+                        "selectedDimension" : null,
+                        "chosenMetrics" : null,
+                        "selectedMetric" : null
+                    });
                 }
             }
         },

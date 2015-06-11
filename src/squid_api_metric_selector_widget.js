@@ -31,6 +31,9 @@
                 me.render();
             });
             
+            if (!this.model) {
+                this.model = squid_api.model.config;
+            }
             this.model.on("change:domain", function() {
                 me.render();
             });

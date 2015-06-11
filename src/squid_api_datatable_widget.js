@@ -32,7 +32,11 @@
             var me = this;
             
             // config is used for orderBy
-            this.config = options.config;
+            if (options.config) {
+                this.config = options.config;
+            } else {
+                this.config = squid_api.model.config;
+            }
 
             if (this.model) {
                 this.listenTo(this.model, 'change:status', this.render);
@@ -203,14 +207,16 @@
 
             // Add OrderBy Attribute
             var orderBy = this.model.get("orderBy");
-            for (col=0; col<columns.length; col++) {
-                for (ix=0; ix<orderBy.length; ix++) {
-                    if (this.ordering && this.rollups && col == orderBy[ix].col) {
-                        columns[col + 1].orderDirection = orderBy[ix].direction;
-                    } else if (this.ordering && col == orderBy[ix].col) {
-                        columns[col].orderDirection = orderBy[ix].direction;
+            if (orderBy) {
+                for (col=0; col<columns.length; col++) {
+                    for (ix=0; ix<orderBy.length; ix++) {
+                        if (this.ordering && this.rollups && col == orderBy[ix].col) {
+                            columns[col + 1].orderDirection = orderBy[ix].direction;
+                        } else if (this.ordering && col == orderBy[ix].col) {
+                            columns[col].orderDirection = orderBy[ix].direction;
+                        }
+                        break;
                     }
-                    break;
                 }
             }
             
@@ -431,8 +437,10 @@
             if (this.model.get("status") === "DONE") {
                 // display results
                 this.displayTableContent(selector);
-                this.paginationView.render();
-                this.$el.find("#pagination").show();
+                if (this.paging) {
+                    this.paginationView.render();
+                    this.$el.find("#pagination").show();
+                }
                 this.$el.find("#total").show();
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").hide();
