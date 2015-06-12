@@ -706,6 +706,115 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 2;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\" class=\"squid-api-data-widgets-timeseries-widget\">\n	<div id=\"yearswitcher\"></div>\n	<div id=\"metricselector\"></div>\n	<div id=\"stale\">\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-line-chart\"></i><br>Click refresh to update</span></div>\n	</div>\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	<div id=\"slider\"></div>\n</div>\n";
   });
 (function (root, factory) {
+    root.squid_api.controller.AnalysisContoller = factory(root.Backbone, root.squid_api);
+
+}(this, function (Backbone, squid_api, template) {
+
+    var View = Backbone.View.extend({
+        analysis : null,
+        config : null,
+        onChangeHandler : null,
+        
+        initialize: function(options) {
+            
+            var me = this;
+
+            // setup options
+            
+            if (this.model) {
+                this.analysis = this.model;
+            } else {
+                this.analysis = new squid_api.model.AnalysisJob(); 
+            }
+      
+            if (options.config) {
+                this.config = options.config;
+            } else {
+                this.config = squid_api.model.config;
+            }
+            
+            this.onChangeHandler = options.onChangeHandler;
+
+            // controller
+            
+            this.config.on('change:project', function() {
+                me.refreshAnalysis();
+            });
+            
+            this.config.on('change:domain', function() {
+                me.refreshAnalysis();
+            });
+            
+            this.config.on('change:chosenDimensions', function() {
+                me.refreshAnalysis();
+            });
+            
+            this.config.on('change:chosenMetrics', function() {
+                me.refreshAnalysis();
+            });
+            
+            this.config.on('change:limit', function() {
+                me.refreshAnalysis();
+            });
+            
+            this.config.on('change:rollups', function() {
+                me.refreshAnalysis();
+            });
+            
+            this.config.on('change:orderBy', function() {
+                me.refreshAnalysis();
+            });
+        },
+        
+       refreshAnalysis : function(silent) {
+            var changed = false;
+            var a = this.analysis;
+            var config = this.config;
+            if (silent !== false) {
+                silent = true;
+            }
+            
+            a.set({"id": {
+                "projectId" : config.get("project"),
+                "analysisJobId" : a.get("id").analysisJobId
+            }}, {
+                    "silent" : silent
+                });
+            changed = changed || a.hasChanged();
+            a.set({"domains": [{
+                "projectId": config.get("project"),
+                "domainId": config.get("domain")
+            }]}, {
+                    "silent" : silent
+                });
+            changed = changed || a.hasChanged();
+            a.setFacets(config.get("chosenDimensions"), silent);
+            changed = changed || a.hasChanged();
+            a.setMetrics(config.get("chosenMetrics"), silent);
+            changed = changed || a.hasChanged();
+            a.setSelection(config.get("selection"), silent);
+            changed = changed || a.hasChanged();
+            a.set({"limit": config.get("limit")}, {"silent" : silent});
+            changed = changed || a.hasChanged();
+            a.set({"rollups": config.get("rollups")}, {"silent" : silent});
+            changed = changed || a.hasChanged();
+            a.set({"orderBy" : config.get("orderBy")}, {"silent" : silent});
+            changed = changed || a.hasChanged();
+            
+            if (changed === true) {
+                if (this.onChangeHandler) {
+                    this.onChangeHandler.call(this.analysis);
+                } else {
+                    squid_api.compute(this.analysis);
+                }
+            }
+        }
+    });
+
+    return View;
+}));
+
+(function (root, factory) {
     root.squid_api.view.BarChartView = factory(root.Backbone, root.squid_api, squid_api.template.squid_api_barchart_widget);
 
 }(this, function (Backbone, squid_api, template) {
