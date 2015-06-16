@@ -2206,7 +2206,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.displayCompression === false) {
                 this.displayCompression = false;
             }
-            this.render();
         },
 
         setModel : function(model) {
