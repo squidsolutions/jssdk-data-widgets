@@ -3606,7 +3606,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
 
-            var currentDate = moment(this.startDate);
+            var startDate = moment(this.startDate);
 
             // Store new Series Values
             var newSerie = {};
@@ -3615,9 +3615,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // Calculate the difference in days between the start / end date
             var dateDifference;
             if (this.interpolationRange) {
-                dateDifference = moment(this.endDate).diff(currentDate, this.interpolationRange) + 1;
+                dateDifference = moment(this.endDate).utc().endOf('day').diff(startDate.startOf("day"), this.interpolationRange);
             } else {
-                dateDifference = moment(this.endDate).diff(currentDate, 'days') + 1;
+                dateDifference = moment(this.endDate).diff(startDate, 'days');
             }
 
             /*
@@ -3625,9 +3625,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 Add a value for each day
             */
 
-            while (currentDate.diff(this.endDate, 'days') <= 0) {
-                newSerie[currentDate.format("YYYY-MM-DD")] = { y : 0 };
-                currentDate = currentDate.add(1, 'days');
+            while (startDate.diff(this.endDate, 'days') <= 0) {
+                newSerie[startDate.format("YYYY-MM-DD")] = { y : 0 };
+                startDate = startDate.add(1, 'days');
             }
 
             for (serieIdx=0; serieIdx<series.length; serieIdx++) {
