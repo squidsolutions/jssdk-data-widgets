@@ -3673,12 +3673,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                     // Temp Fix for correct resizing
                     this.$el.css("width", "100%");
-                    // Store Start and end Dates
 
-                    var lastFacet = data.selection.facets.length - 1;
-                    if (data.selection.facets[lastFacet]) {
-                        this.startDate = data.selection.facets[lastFacet].selectedItems[0].lowerBound;
-                        this.endDate = data.selection.facets[lastFacet].selectedItems[0].upperBound;
+                    // Store Start and end Dates
+                    var facets = data.selection.facets;
+                    for (i=0; i<facets.length; i++) {
+                        var items = facets[i].selectedItems;
+                        for (ix=0; ix<items.length; ix++) {
+                            if (items[ix].lowerBound && items[ix].upperBound) {
+                                this.startDate = items[ix].lowerBound;
+                                this.endDate = items[ix].upperBound;
+                            }
+                        }
                     }
                     
                     var dateColumnIndex=0;
