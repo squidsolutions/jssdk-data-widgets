@@ -52,11 +52,14 @@
                 if (id) {
                     filters.set("id" , {
                         "projectId" : id.projectId,
-                        "domainId" : config.get("domain"),
                         "facetjobId" : null
                         });
+                    filters.setDomainIds([{
+                        "projectId" : id.projectId,
+                        "domainId" : config.get("domain")
+                    }]);
                 }
-                me.refreshFilters(null);
+                me.initFilters(config);
             });
             
             // check for project change performed
@@ -65,46 +68,102 @@
                 if (id) {
                     filters.set("id" , {
                         "projectId" : config.get("project"),
-                        "domainId" : null,
                         "facetjobId" : null
                         });
+                    filters.setDomainIds(null);
                 }
             });
-            
         },
         
-       refreshFilters : function(selection) {
-            var changed = false;
-            var f = this.filters;
+       initFilters : function(config) {
+           var me = this;
+           var domainId = config.get("domain");
+           var projectId = config.get("project");
            
-            var domainOid = this.config.get("domain");
-            if (domainOid) {
-                f.set({"id": {
-                    "projectId": this.config.get("project")
-                }}, {
-                    "silent" : true
-                });
-                f.setDomainIds([domainOid], true);
-                changed = changed || f.hasChanged();
-            } else {
-                // reset the domains
-                f.setDomainIds(null, true);
-                changed = changed || f.hasChanged();
-            }
-            
-            f.set({"selection": selection}, {
-                "silent" : true
-            });
-            changed = changed || f.hasChanged();
-            
-            if (changed === true) {
-                if (this.onChangeHandler) {
-                    this.onChangeHandler.call(f);
-                } else {
-                    squid_api.controller.facetjob.compute(f);
-                }
-            }
-        }
+           if (projectId && domainId) {
+               var domainPk = {
+                       "projectId" : projectId,
+                       "domainId" : domainId
+               };
+              
+               // launch the default filters computation
+               var filters = new squid_api.model.FiltersJob();
+               filters.set("id", {
+                   "projectId": projectId
+               });
+               filters.set("engineVersion", "2");
+               filters.setDomainIds([domainPk]);
+
+               $.when(api.controller.facetjob.compute(filters, config.get("selection")))
+               .then(function() {
+                   // search for a time facet
+                   var timeFacet;
+                   var sel = filters.get("selection");
+                   if (sel && sel.facets) {
+                       var facets = sel.facets;
+                       for (var i = 0; i < facets.length; i++) {
+                           var facet = facets[i];
+                           if (facet.dimension.type == "CONTINUOUS") {
+                               timeFacet = facet;
+                           }
+                       }
+                   }
+                   if (timeFacet) {
+                       if (timeFacet.done === false) {
+                           console.log("retrieving time facet's members");
+                           $.when(api.controller.facetjob.getFacetMembers(filters, timeFacet.id))
+                           .always(function() {
+                                   console.log("time facet dimension = "+timeFacet.dimension.name);
+                                   me.changed(filters.get("selection"), timeFacet);
+                               });
+                       } else {
+                           me.changed(filters.get("selection"), timeFacet);
+                       }
+                   } else {
+                       console.log("WARN: cannot use any time dimension to use for datepicker");
+                       me.changed(filters.get("selection"), null);
+                   }
+               });
+           }
+       },
+        
+       refreshFilters : function(selection) {
+           var changed = false;
+           var f = this.filters;
+
+           var domainOid = this.config.get("domain");
+           if (domainOid) {
+               f.set({"id": {
+                   "projectId": this.config.get("project")
+               }}, {
+                   "silent" : true
+               });
+               f.setDomainIds([domainOid], true);
+               changed = changed || f.hasChanged();
+           } else {
+               // reset the domains
+               f.setDomainIds(null, true);
+               changed = changed || f.hasChanged();
+           }
+
+           f.set({"selection": selection}, {
+               "silent" : true
+           });
+           changed = changed || f.hasChanged();
+
+           if (changed === true) {
+               this.changed();
+           }
+       },
+       
+       changed : function(selection, timeFacet) {
+           if (this.onChangeHandler) {
+               this.onChangeHandler(selection, timeFacet);
+           } else {
+               squid_api.controller.facetjob.compute(this.filters, selection);
+           }
+       }
+       
     });
 
     return View;
