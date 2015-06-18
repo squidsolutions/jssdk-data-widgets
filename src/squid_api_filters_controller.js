@@ -152,7 +152,7 @@
            changed = changed || f.hasChanged();
 
            if (changed === true) {
-               this.changed();
+               this.changed(selection);
            }
        },
        
