@@ -114,11 +114,7 @@
                     } else {
                         orderByDirection = "ASC";
                     }
-                    if (orderId === this.config.get("orderByColumn")) {
-                        this.config.set("orderByDirection", orderByDirection);
-                    } else {
-                        this.config.set("orderByColumn", orderId);
-                    }
+                    this.config.set("orderBy", [{"col" : orderId, "direction" : orderByDirection}]);
                 }
             }
         }),

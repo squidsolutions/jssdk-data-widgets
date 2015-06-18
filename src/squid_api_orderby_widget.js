@@ -56,10 +56,17 @@
         events: {
             "change": function(event) {
                 if (event.target.checked !== undefined || event.target.type === "checkbox") {
+                    var orderByDirection;
                     if (event.target.checked) {
-                        this.model.set({"orderByDirection" : "DESC"});
+                        orderByDirection = "DESC";
                     } else {
-                        this.model.set({"orderByDirection" : "ASC"});
+                        orderByDirection = "ASC";
+                    }
+                    var orderByList = this.model.get("orderBy");
+                    var orderBy;
+                    if (orderByList) {
+                        orderBy = orderByList[0];
+                        this.model.set("orderBy", [{"col" : orderBy.col, "direction" : orderByDirection}]);
                     }
                 }
             }
@@ -75,13 +82,15 @@
         },
 
         render : function() {
-            var checked;
+            var direction = "";
             var me = this;
-
-            if (this.model.get("orderByDirection") === "DESC") {
-                checked = "checked";
-            } else {
-                checked = "";
+            
+            var orderByList = this.model.get("orderBy");
+            if (orderByList) {
+                var orderBy = this.model.get("orderBy")[0];
+                if (orderBy.direction === "DESC") {
+                    direction = "checked";
+                }
             }
 
             var limit = this.model.get("limit");
@@ -114,7 +123,7 @@
                 }
             }
 
-            var jsonData = {"direction" : checked, "limit" : limit, "chosenMetrics" : metricList, "orderByDirectionDisplay" : this.orderByDirectionDisplay, "removeOrderDirection" : this.removeOrderDirection};
+            var jsonData = {"direction" : direction, "limit" : limit, "chosenMetrics" : metricList, "orderByDirectionDisplay" : this.orderByDirectionDisplay, "removeOrderDirection" : this.removeOrderDirection};
 
             var html = this.template(jsonData);
             this.$el.html(html);
