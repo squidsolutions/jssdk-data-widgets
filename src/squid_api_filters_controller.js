@@ -38,16 +38,17 @@
             
             // check for new filter selection made by user
             this.listenTo(filters, 'change:userSelection', function() {
+                console.log("compute (change:userSelection)");
                 squid_api.controller.facetjob.compute(filters, filters.get("userSelection"));
             });
             
             // update config if filters have changed
             this.listenTo(filters, 'change:selection', function(filters) {
-                me.refreshFilters(filters.get("selection"));    
+                me.config.set("selection", squid_api.utils.buildCleanSelection(filters.get("selection")));  
             });
             
             // check for domain change performed
-            this.listenTo(squid_api.model.config, 'change:domain', function(config) {
+            this.listenTo(this.config, 'change:domain', function(config) {
                 var id = filters.get("id");
                 if (id) {
                     filters.set("id" , {
@@ -63,7 +64,7 @@
             });
             
             // check for project change performed
-            this.listenTo(squid_api.model.config, 'change:project', function(config) {
+            this.listenTo(this.config, 'change:project', function(config) {
                 var id = filters.get("id");
                 if (id) {
                     filters.set("id" , {
@@ -160,6 +161,7 @@
            if (this.onChangeHandler) {
                this.onChangeHandler(selection, timeFacet);
            } else {
+               console.log("compute (facetjob changed)");
                squid_api.controller.facetjob.compute(this.filters, selection);
            }
        }
