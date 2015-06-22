@@ -1919,7 +1919,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     var View = Backbone.View.extend({
 
         template : null,
-
+        config : null,
         tableView : null,
         barView : null,
         timeView : null,
@@ -1928,22 +1928,33 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var me = this;
 
-            // Store template
-            if (options.template) {
-                this.template = options.template;
-            } else {
-                this.template = template;
-            }
-            
-            this.tableView = options.tableView;
-            this.barView = options.barView;
-            this.timeView = options.timeView;
-            
-            if (this.model) {
-                this.model.on("change", this.render, this);
+            if (options) {
+                // setup options
+                if (options.config) {
+                    this.config = options.config;
+                }
+                
+                // Store template
+                if (options.template) {
+                    this.template = options.template;
+                } else {
+                    this.template = template;
+                }
+                
+                this.tableView = options.tableView;
+                this.barView = options.barView;
+                this.timeView = options.timeView;
             }
 
-            this.render();
+            
+            if (this.model) {
+                this.listenTo(this.model,"change", this.render);
+            }
+            
+            if (!this.config) {
+                this.config = squid_api.model.config;
+            }
+            this.listenTo(this.config, "change:selection", this.render);
         },
 
         setModel: function(model) {
@@ -1989,7 +2000,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.addCompatibleView(compatibleViews, "barView");
                 
             }
-            if (this.model.get("timeDimension")) {
+            if (squid_api.controller.facetjob.getTemporalFacet(squid_api.model.config.get("selection"))) {
                 this.addCompatibleView(compatibleViews, "timeView");
             }
             
