@@ -95,7 +95,7 @@
                filters.set("engineVersion", "2");
                filters.setDomainIds([domainPk]);
 
-               $.when(api.controller.facetjob.compute(filters, config.get("selection")))
+               $.when(squid_api.controller.facetjob.compute(filters, config.get("selection")))
                .then(function() {
                    // search for a time facet
                    var timeFacet;
@@ -112,7 +112,7 @@
                    if (timeFacet) {
                        if (timeFacet.done === false) {
                            console.log("retrieving time facet's members");
-                           $.when(api.controller.facetjob.getFacetMembers(filters, timeFacet.id))
+                           $.when(squid_api.controller.facetjob.getFacetMembers(filters, timeFacet.id))
                            .always(function() {
                                    console.log("time facet dimension = "+timeFacet.dimension.name);
                                    me.changed(filters.get("selection"), timeFacet);
