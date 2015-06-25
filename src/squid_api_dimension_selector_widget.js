@@ -114,12 +114,15 @@
                             dimensions[i] = null;
                         }
                     }
-                    
+                    var noneSelected = true;
                     for (var dimIdx=0; dimIdx<dimensions.length; dimIdx++) {
                         var facet1 = dimensions[dimIdx];
                         if (facet1) {
                             // check if selected
                             var selected = this.isChosen(facet1);
+                            if (selected === true) {
+                                noneSelected = false;
+                            }
                             // add to the list
                             var name;
                             if (facet1.name) {
@@ -130,6 +133,9 @@
                             var option = {"label" : name, "value" : facet1.id, "selected" : selected};
                             jsonData.options.push(option);
                         }
+                    }
+                    if (noneSelected === true) {
+                        me.model.set("chosenDimensions", []);
                     }
                 }
             }
