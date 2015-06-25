@@ -2073,30 +2073,30 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var me = this;
 
             // setup options
-            if (options.template) {
-                this.template = options.template;
-            } else {
-                this.template = template;
+            if (options) {
+                if (options.template) {
+                    this.template = options.template;
+                } else {
+                    this.template = template;
+                }
+                
+                if (options.onChangeHandler) {
+                    this.onChangeHandler = options.onChangeHandler;
+                }
+                if (options.multiSelectView) {
+                    this.multiSelectView = options.multiSelectView;
+                }
+                
+                if (typeof options.displayAllDomains !== 'undefined') {
+                    this.displayAllDomains = options.displayAllDomains;
+                }
             }
             
-            if (options.onChangeHandler) {
-                this.onChangeHandler = options.onChangeHandler;
-            }
-            if (options.multiSelectView) {
-                this.multiSelectView = options.multiSelectView;
-            }
-            
-            if (typeof options.displayAllDomains !== 'undefined') {
-                this.displayAllDomains = options.displayAllDomains;
-            }
-
             if (!this.model) {
                 this.model = squid_api.model.config;
             }
             this.model.on("change:domain", this.render, this);
-            
-            // TODO fetch the domains instead of relying on squid_api
-            squid_api.model.project.on("change:domains", this.process, this);
+            this.model.on("change:project", this.render, this);
             
         },
 
@@ -2117,18 +2117,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
         },
-        
-        process : function() {
-            this.render();
-        },
 
         render: function() {
+            var me = this;
             var domain, domains, jsonData = {"selAvailable" : true, "options" : [{"label" : "Select Domain", "value" : "", "selected" : false}]};
             var hasSelection = false;
-            var selectedDomain = squid_api.model.config.get("domain");
+            var selectedDomain = me.model.get("domain");
             // get the domains from the project;
-            domains = squid_api.model.project.get("domains");
-            if (domains) {
+            domains = new squid_api.model.DomainCollection();
+            domains.parentId = {
+                projectId : me.model.get("project")
+            };
+            domains.fetch().then( function(domains) {
                 for (var i=0; i<domains.length; i++) {
                     domain = domains[i];
                     var selected = false;
@@ -2144,21 +2144,21 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         jsonData.options.push(option);
                     }
                 }
-            }
-            
-            if (!hasSelection) {
-                // select first option
-                jsonData.options[0].selected = true;
-            }
+                
+                if (!hasSelection) {
+                    // select first option
+                    jsonData.options[0].selected = true;
+                }
 
-            var html = this.template(jsonData);
-            this.$el.html(html);
-            this.$el.show();
+                var html = me.template(jsonData);
+                me.$el.html(html);
+                me.$el.show();
 
-            // Initialize plugin
-            if (this.multiSelectView) {
-                this.$el.find("select").multiselect();
-            }
+                // Initialize plugin
+                if (me.multiSelectView) {
+                    me.$el.find("select").multiselect();
+                }
+            });
 
             return this;
         }
