@@ -12,37 +12,33 @@
             var me = this;
           
             // setup options
-            if (options.template) {
-                this.template = options.template;
-            } else {
-                this.template = template;
+            if (options) {
+                if (options.template) {
+                    this.template = options.template;
+                } else {
+                    this.template = template;
+                }
+                if (options.metricIdList) {
+                    this.metricIdList = options.metricIdList;
+                }
+                if (options.metricIndex !== null) {
+                    this.metricIndex = options.metricIndex;
+                }
             }
-
-            if (options.metricIdList) {
-                this.metricIdList = options.metricIdList;
-            }
-
-            if (options.metricIndex !== null) {
-                this.metricIndex = options.metricIndex;
-            }
-
-            // To populate metrics
-            squid_api.model.project.on("change:domains", function() {
-                me.render();
-            });
             
+            // setup the models
             if (!this.model) {
                 this.model = squid_api.model.config;
             }
-            this.model.on("change:domain", function() {
-                me.render();
-            });
+
+            // setup the model listeners
+            this.listenTo(this.model,"change:domain", this.render);
 
             // listen for global status change
-            squid_api.model.status.on("change:status", this.enable, this);
+            this.listenTo(squid_api.model.status,"change:status", this.handleStatus);
         },
 
-        enable: function() {
+        handleStatus: function() {
             var select = this.$el.find("select");
             var multiSelectDropdown = this.$el.find(".multiselect-container");
             if (select) {
@@ -92,65 +88,79 @@
         },
 
         render: function() {
-            var isMultiple = true;
-
-            if (this.metricIndex !== null) {
-                isMultiple = false;
-            }
-
-            var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
+            var projectOid = this.model.get("project");
+            var domainOid = this.model.get("domain");
             
-            // iterate through all domains metrics
-            var metrics = this.getDomainMetrics();
-            if (metrics) {
-                for (var idx=0; idx<metrics.length; idx++) {
-                    var metric = metrics[idx];
-                    // check if selected
-                    var selected = this.isChosen(metric);
-                    
-                    // add to the list
-                    var option = {"label" : metric.name, "value" : metric.oid, "selected" : selected};
-                    jsonData.options.push(option);
+            if (projectOid && domainOid) {
+                var me = this, isMultiple = true;
+    
+                if (this.metricIndex !== null) {
+                    isMultiple = false;
                 }
-            }
-
-            // Alphabetical Sorting
-            jsonData.options.sort(function(a, b) {
-                var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
-                if (labelA < labelB)
-                    return -1;
-                if (labelA > labelB)
-                    return 1;
-                return 0; // no sorting
-            });
-
-            var html = this.template(jsonData);
-            this.$el.html(html);
-            this.$el.show();
-
-            // Initialize plugin
-            var selector = this.$el.find("select");
-            if (isMultiple) {
-                selector.multiselect({
-                    buttonText: function(options, select) {
-                        return 'Metrics';
-                    },
+    
+                var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
+                
+                // iterate through all domains metrics
+                this.getMetrics(projectOid, domainOid).then(function(metrics) {
+                    if (metrics.length > 0) {
+                        var noneSelected = true;
+                        for (var idx=0; idx<metrics.length; idx++) {
+                            var metric = metrics[idx];
+                            // check if selected
+                            var selected = me.isChosen(metric);
+                            if (selected === true) {
+                                noneSelected = false;
+                            }
+                            
+                            // add to the list
+                            var option = {"label" : metric.name, "value" : metric.oid, "selected" : selected};
+                            jsonData.options.push(option);
+                        }
+                        
+                        if (noneSelected === true) {
+                            me.model.set("chosenMetrics", []);
+                        }
+        
+                        // Alphabetical Sorting
+                        jsonData.options.sort(function(a, b) {
+                            var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
+                            if (labelA < labelB)
+                                return -1;
+                            if (labelA > labelB)
+                                return 1;
+                            return 0; // no sorting
+                        });
+                    }
+    
+                    var html = me.template(jsonData);
+                    me.$el.html(html);
+                    me.$el.show();
+        
+                    // Initialize plugin
+                    var selector = me.$el.find("select");
+                    if (isMultiple) {
+                        selector.multiselect({
+                            buttonText: function(options, select) {
+                                return 'Metrics';
+                            },
+                        });
+                    }
+        
+                    // Remove Button Title Tag
+                    me.$el.find("button").removeAttr('title');
                 });
             }
-
-            // Remove Button Title Tag
-            this.$el.find("button").removeAttr('title');
 
             return this;
         },
         
-        getDomainMetrics : function() {
-            var metrics = [];
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"), "Domain");
-            if (domain) {
-                metrics = domain.metrics;
-            }
-            return metrics;
+        getMetrics : function(projectOid, domainOid) {
+            var metrics = new squid_api.model.MetricCollection();
+            metrics.parentId = {
+                projectId : projectOid,
+                domainId : domainOid
+            };
+            return metrics.fetch();
         },
         
         isChosen : function(item) {
