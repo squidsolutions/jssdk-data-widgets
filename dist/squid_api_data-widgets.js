@@ -2993,10 +2993,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.model.on("change:chosenMetrics", function() {
                 me.render();
             });
-
-            this.model.on("change:selectedMetric", function() {
-                me.render();
-            });
         },
 
         setModel: function(model) {
