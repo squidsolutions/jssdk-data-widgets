@@ -90,19 +90,31 @@
             if (this.projectEditView) {
                 this.projectEditView.remove();
             }
-            var project = api.model.project;
-            this.projectEditView = new api.view.ModelManagementView({
-                el : $(me.projectManipulateRender),
-                model : project,
-                successHandler: function() {
-                    if (me.projectAutomaticLogin) {
-                        config.set({
-                            "project" : this.get("id").projectId,
-                            "domain" : null
-                        });
-                    }
+            
+            // get the project;
+            var project = new squid_api.model.ProjectModel();
+            project.id = {
+                projectId : me.model.get("project")
+            };
+            project.fetch().then( function() {
+                if (me.projectEditView) {
+                    me.projectEditView.setModel(project);
+                } else { 
+                    me.projectEditView = new api.view.ModelManagementView({
+                        el : $(me.projectManipulateRender),
+                        model : project,
+                        successHandler: function() {
+                            if (me.projectAutomaticLogin) {
+                                config.set({
+                                    "project" : this.get("id").projectId,
+                                    "domain" : null
+                                });
+                            }
+                        }
+                    });
                 }
             });
+
         },
 
         render: function() {
