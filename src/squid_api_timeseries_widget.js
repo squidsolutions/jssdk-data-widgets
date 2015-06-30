@@ -86,7 +86,7 @@
             this.model = model;
             this.initialize();
         },
-        
+
         /**
          * see : http://stackoverflow.com/questions/10966440/recreating-a-removed-view-in-backbone-js
          */
@@ -110,7 +110,7 @@
             if (this.colorPalette) {
                 palette.scheme = this.colorPalette;
             }
-            
+
             // Start of Data Manipulation
             var manipTimeStart = new Date();
             var currentYear;
@@ -129,7 +129,7 @@
                 }
 
                 date = moment.utc(value[dateIndex]);
-                
+
                 // Obtain the correct name based on index
                 if (dateIndex>0) {
                     serieName = value[dateIndex-1];
@@ -147,7 +147,7 @@
                     serie.data = [];
                     series.push(serie);
                 }
-                
+
                 if (date.isValid()) {
                     var object = {};
                     object.x = moment(date).format("YYYY-MM-DD");
@@ -180,6 +180,11 @@
             var dateDifference;
             if (this.interpolationRange) {
                 dateDifference = moment(this.endDate).utc().endOf('day').diff(startDate.startOf("day"), this.interpolationRange);
+                // detect date difference with returned data set
+                if (series[0].data.length !== dateDifference) {
+                    dateDifference = series[0].data.length;
+                    console.log("interpolation month calculation differs from returned result set");
+                }
             } else {
                 dateDifference = moment(this.endDate).diff(startDate, 'days');
             }
@@ -221,7 +226,6 @@
                     // Update the existing data
                     series[serieIdx].data = updatedArray;
                 } else {
-                    
                     // Convert API date into UNIX + Sort if no manipulation occurs
                     for (i=0; i<existingSerie.length; i++) {
                         if (this.YearOverYear) {
@@ -253,8 +257,8 @@
 
         getData: function() {
             var data, analysis;
-            
-            // Support Mutli / Single Analysis Jobs 
+
+            // Support Mutli / Single Analysis Jobs
             if (this.model.get("analyses")) {
                 if (this.YearOverYear) {
                     analysis = this.model.get("analyses")[1];
@@ -275,7 +279,7 @@
             var me = this;
             var status = this.model.get("status");
             this.YearOverYear = config.get("YearOverYear");
-            
+
             if (status === "PENDING") {
                 this.$el.html(this.template());
                 this.$el.find(".sq-loading").hide();
@@ -308,9 +312,9 @@
                             }
                         }
                     }
-                    
+
                     var dateColumnIndex=0;
-                    
+
                     while (data.results.cols[dateColumnIndex].dataType != "DATE") {
                         dateColumnIndex++;
                     }
@@ -339,7 +343,7 @@
                         var hoverDetail = new Rickshaw.Graph.HoverDetail( {
                             graph: graph,
                             formatter: function(series, x, y) {
-                                var formatter = d3.format(",.f"); 
+                                var formatter = d3.format(",.f");
                                 var date;
                                 if (config.get("YearOverYear")) {
                                     date = '<span class="date">' + series.name + "-" + moment(new Date(x * 1000)).format("MM-DD") + '</span>';
