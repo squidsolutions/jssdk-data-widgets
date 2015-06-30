@@ -4,11 +4,7 @@
 }(this, function (Backbone, squid_api, template) {
 
     var View = Backbone.View.extend({
-        template : null,
-        
-        format : null,
-        
-        d3Formatter : null,
+        template : template,
 
         selectMetric : false,
 
@@ -16,40 +12,19 @@
             var me = this;
 
             // setup options
-            if (options.template) {
-                this.template = options.template;
-            } else {
-                this.template = template;
-            }
-            if (options.selectMetric) {
-                this.selectMetric = options.selectMetric;
-            }
-
-            if (d3) {
-                this.d3Formatter = d3.format(",.f");
-            }
-            if (options.format) {
-                this.format = options.format;
-            } else {
-                // default number formatter
-                if (this.d3Formatter) {
-                    this.format = function(f){
-                        if (isNaN(f)) {
-                            return f;
-                        } else {
-                            return me.d3Formatter(f);
-                        }
-                    };
-                } else {
-                    this.format = function(f){
-                        return f;
-                    };
+            if (options) {
+                if (options.template) {
+                    this.template = options.template;
+                }
+                if (options.selectMetric) {
+                    this.selectMetric = options.selectMetric;
                 }
             }
             
-            squid_api.model.project.on("change:domains", function() {
-                me.render();
-            });
+            // setup the models
+            if (!this.model) {
+                this.model = squid_api.model.config;
+            }
             
             this.model.on("change:domain", function() {
                 me.render();
@@ -86,33 +61,55 @@
                 }
             }
         },
+        
+        renderMetrics: function(metrics) {
+            var me = this;
+            var jsonData = {"chosenMetrics" : []};
+            for (var i = 0; i < metrics.length; i++) {
+                // add to the list
+                var option = {
+                    "name" : metrics[i].name,
+                    "value" : metrics[i].oid,
+                    "selectMetric" : this.selectMetric,
+                };
+                jsonData.chosenMetrics.push(option);
+            }
+            var html = me.template(jsonData);
+            me.$el.html(html);
+            me.$el.show();
+        },
 
         render: function() {
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"), "Domain");
-            var jsonData = {"chosenMetrics" : []};
+            var me = this;
+            var domainOid = this.model.get("domain");
             var chosenMetrics = this.model.get("chosenMetrics");
-            if (domain && chosenMetrics) {
-                var domainMetrics = domain.metrics;
+            
+            if (domainOid && (chosenMetrics)) {
+                // prepare all promises
+                var metricPromises = [];
                 for (var cMetrics = 0; cMetrics < chosenMetrics.length; cMetrics++) {
-                    for (var dMetrics = 0; dMetrics < domainMetrics.length; dMetrics++) {
-                        if (domainMetrics[dMetrics].id.metricId === chosenMetrics[cMetrics]) {
-                            // add to the list
-                            var option = {
-                                "name" : domainMetrics[dMetrics].name,
-                                "value" : chosenMetrics[cMetrics],
-                                "selectMetric" : this.selectMetric,
-                            };
-                            jsonData.chosenMetrics.push(option);
+                    var metric = new squid_api.model.MetricModel();
+                    metric.set("id", {
+                        "projectId" : this.model.get("project"), 
+                        "domainId" : domainOid,
+                        "metricId" : chosenMetrics[cMetrics]
+                    });
+                    metricPromises.push(metric.fetch());
+                }
+                // render when all metrics have been fetched
+                $.when.apply($, metricPromises).then(function() {
+                    // extract the metricModels from the arguments
+                    var metricModels = [];
+                    if (chosenMetrics.length == 1) {
+                        metricModels.push(arguments[0]);
+                    } else {
+                        for (var i=0; i<chosenMetrics.length; i++) {
+                            metricModels.push(arguments[i][0]);
                         }
                     }
-                }
+                    me.renderMetrics(metricModels);
+                });
             }
-            if (jsonData.chosenMetrics.length === 0) {
-                jsonData.noChosenMetrics = true;
-            }
-            var html = this.template(jsonData);
-            this.$el.html(html);
-            this.$el.show();
             
             return this;
         }
