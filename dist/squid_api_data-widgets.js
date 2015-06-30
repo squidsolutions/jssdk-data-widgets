@@ -2720,17 +2720,25 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         events: {
             "change": function(event) {
                 var oid = this.$el.find("select option:selected");
-                var selected = [];
-
-                for (i = 0; i < oid.length; i++) {
-                    selected.push($(oid[i]).val());
-                }
-
                 // Remove Button Title Tag
                 this.$el.find("button").removeAttr('title');
+                
+                var chosenMetrics = this.model.get("chosenMetrics");
+                var selectedMetrics = [];
+                
+                // build the selection array
+                for (i = 0; i < oid.length; i++) {
+                    var selectedOid = $(oid[i]).val();
+                    selectedMetrics.push(selectedOid);
+                }
+                
+                // check for additions
+                var selectedMetricsNew = [];
+                chosenMetricsNew = _.intersection(_.union(chosenMetrics, selectedMetrics), selectedMetrics);
 
                 // Update
-                this.model.set({"chosenMetrics" : selected});
+                this.model.set({"chosenMetrics" : chosenMetricsNew});
+                
             }
         },
 
