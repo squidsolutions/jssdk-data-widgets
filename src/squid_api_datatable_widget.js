@@ -204,6 +204,7 @@
             var orderBy = this.model.get("orderBy");
             if (orderBy) {
                 for (col=0; col<columns.length; col++) {
+                    columns[col].orderDirection = null;
                     for (ix=0; ix<orderBy.length; ix++) {
                         if (this.ordering && this.rollupSummaryColumn && col == orderBy[ix].col) {
                             columns[col + 1].orderDirection = orderBy[ix].direction;
