@@ -9,9 +9,9 @@
         maxRowsPerPage : 10000,
 
         format : null,
-        
+
         d3Formatter : null,
-        
+
         config : null,
 
         paging : false,
@@ -21,16 +21,16 @@
         noDataMessage : "No data available in table",
 
         headerBadges : false,
-        
+
         paginationView : null,
-        
+
         rollupSummaryColumn : null,
 
         rollups : null,
 
         initialize : function(options) {
             var me = this;
-            
+
             // config is used for orderBy
             if (options.config) {
                 this.config = options.config;
@@ -51,14 +51,14 @@
             } else {
                 this.template = squid_api.template.squid_api_datatable_widget;
             }
-            
+
             // filters are used to get the Dimensions and Metrics names
             if (options.filters) {
                 this.filters = options.filters;
             } else {
                 this.filters = squid_api.model.filters;
             }
-            
+
             if (options.maxRowsPerPage) {
                 this.maxRowsPerPage = options.maxRowsPerPage;
             }
@@ -74,8 +74,9 @@
             if (options.headerBadges) {
                 this.headerBadges = options.headerBadges;
             }
-            this.rollupSummaryColumn = options.rollupSummaryColumn;
-
+            if (options.rollupSummaryColumn) {
+                this.rollupSummaryColumn = options.rollupSummaryColumn;
+            }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
             }
@@ -106,9 +107,9 @@
                 if (this.ordering) {
                     var orderId = parseInt($(item.currentTarget).attr("data-id"));
                     var orderByDirection;
-                    if (this.rollups) {
+                    if (this.rollupSummaryColumn) {
                         orderId = orderId - 1;
-                    } 
+                    }
                     if ($(item.currentTarget).hasClass("ASC")) {
                         orderByDirection = "DESC";
                     } else {
@@ -123,7 +124,7 @@
             this.model = model;
             this.initialize();
         },
-        
+
         /**
          * see : http://stackoverflow.com/questions/10966440/recreating-a-removed-view-in-backbone-js
          */
@@ -138,7 +139,7 @@
             var me = this;
             var columns;
             var invalidSelection = false;
-            
+
             var analysis = this.model;
             // in case of a multi-analysis model
             if (analysis.get("analyses")) {
@@ -146,16 +147,14 @@
             }
             var results = analysis.get("results");
             var rollups;
-            if (results) {         
+            if (results) {
                 // use results columns
                 columns = results.cols;
-             
+
                 // init rollups
                 rollups = analysis.get("rollups");
                 if (rollups && (rollups.length ===0)) {
                     rollups = this.rollups = null;
-                } else {
-                    this.rollups = true;
                 }
             } else {
                 // use analysis columns
@@ -173,7 +172,7 @@
                             // impossible to get column data from selection
                             invalidSelection = true;
                         }
-                        
+
                     }
                 }
                 var metrics = this.model.get("metricList");
@@ -206,7 +205,7 @@
             if (orderBy) {
                 for (col=0; col<columns.length; col++) {
                     for (ix=0; ix<orderBy.length; ix++) {
-                        if (this.ordering && this.rollups && col == orderBy[ix].col) {
+                        if (this.ordering && this.rollupSummaryColumn && col == orderBy[ix].col) {
                             columns[col + 1].orderDirection = orderBy[ix].direction;
                         } else if (this.ordering && col == orderBy[ix].col) {
                             columns[col].orderDirection = orderBy[ix].direction;
@@ -215,7 +214,7 @@
                     }
                 }
             }
-            
+
             var rollupColIndex = null;
             var rollupSummaryIndex = null;
             if (rollups) {
@@ -229,7 +228,7 @@
             me = this;
             // header
             d3.select(selector).select("thead tr").selectAll("th").remove();
-            
+
             if (!invalidSelection) {
                 var th = d3.select(selector).select("thead tr").selectAll("th")
                     .data(columns)
@@ -271,7 +270,7 @@
                     .attr("data-id", function(d, i) {
                         return i;
                     });
-                
+
                 // add class if more than 10 columns
                 if (this.$el.find("thead th").length > 10) {
                     this.$el.find("table").addClass("many-columns");
@@ -279,12 +278,12 @@
                     this.$el.find("table").removeClass("many-columns");
                 }
             }
-            
+
         },
-        
+
         displayTableContent : function(selector) {
             var me = this;
-            
+
             var analysis = this.model;
             // in case of a multi-analysis model
             if (analysis.get("analyses")) {
@@ -292,15 +291,13 @@
             }
             var results = analysis.get("results");
             var rollups;
-                
+
             if (results) {
                 rollups = analysis.get("rollups");
                 if (rollups && (rollups.length ===0)) {
                     rollups = this.rollups = null;
-                } else {
-                    this.rollups = true;
                 }
-                
+
                 var rollupColIndex = null;
                 var rollupSummaryIndex = null;
                 if (rollups) {
@@ -327,7 +324,7 @@
                     }
                     data.results.rows.push(newRow);
                 }
-                
+
                 // Rows
                 d3.select(selector).select("tbody").selectAll("tr").remove();
                 var tr = d3.select(selector).select("tbody").selectAll("tr")
@@ -384,7 +381,7 @@
                         }
                         return text;
                     });
-                
+
                 // display total
                 this.$el.find("#count-entries").html(""+ results.startIndex + " - " + (results.startIndex + data.results.rows.length));
                 this.$el.find("#total-entries").html(""+results.totalSize);
@@ -401,7 +398,7 @@
                     if (d3.select(siblings[i]).attr("colspan")) {
                         colSpan = parseInt(d3.select(siblings[i]).attr("colspan"));
                     }
-                    // Increment ColSpan Value 
+                    // Increment ColSpan Value
                     d3.select(siblings[i]).attr("colspan", colSpan + 1);
                 }
             }
@@ -409,7 +406,7 @@
             // Remove Node
             node.remove();
         },
-        
+
         renderBaseViewPort : function() {
             this.$el.html(this.template());
             if (this.paging) {
@@ -429,7 +426,7 @@
                 // display table header
                 this.displayTableHeader(selector);
             }
-            
+
             if (this.model.get("status") === "DONE") {
                 // display results
                 this.displayTableContent(selector);
@@ -442,14 +439,14 @@
                 this.$el.find("#stale").hide();
                 this.$el.find(".sort-direction").show();
             }
-    
+
             if (this.model.get("status") === "RUNNING") {
                 // computing in progress
                 this.$el.find(".sq-loading").show();
                 this.$el.find("#stale").hide();
                 this.$el.find(".sort-direction").show();
             }
-            
+
             if (this.model.get("status") === "PENDING") {
                 // refresh needed
                 d3.select(selector).select("tbody").selectAll("tr").remove();
@@ -461,7 +458,7 @@
 
             return this;
         }
-        
+
     });
 
     return View;
