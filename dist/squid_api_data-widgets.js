@@ -1171,7 +1171,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (this.ordering) {
                     var orderId = parseInt($(item.currentTarget).attr("data-id"));
                     var orderByDirection;
-                    if (this.rollupSummaryColumn >= 0) {
+                    if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
                         orderId = orderId - 1;
                     }
                     if ($(item.currentTarget).hasClass("ASC")) {
@@ -1264,10 +1264,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
 
+
             // Add OrderBy Attribute
-            var orderBy = this.model.get("orderBy");
             var status = this.model.get("status");
-            // add pending
+            if (config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
+                columns.splice(this.rollupSummaryColumn, 1);
+            }
+            var orderBy = this.model.get("orderBy");
             if (orderBy) {
                 for (col=0; col<columns.length; col++) {
                     columns[col].orderDirection = null;
@@ -1275,10 +1278,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // add orderBy direction
                 for (ix=0; ix<orderBy.length; ix++) {
                     for (col=0; col<columns.length; col++) {
-                        if (this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
-                            if (status == "PENDING" || status == "RUNNING") {
-                                columns[col].orderDirection = orderBy[ix].direction;
-                            } else if (status == "DONE") {
+                        if (config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
+                            if (status !== "DONE") {
+                                columns[col - 1].orderDirection = orderBy[ix].direction;
+                            } else {
                                 columns[col + 1].orderDirection = orderBy[ix].direction;
                             }
                             break;
@@ -1297,7 +1300,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if ((rollups.length>0)) {
                     rollupColIndex = rollups[0].col + 1;
                 }
-                if (this.rollupSummaryColumn >= 0) {
+                if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
                     rollupSummaryIndex = this.rollupSummaryColumn + 1;
                 }
             }
@@ -1380,7 +1383,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     if ((rollups.length>0)) {
                         rollupColIndex = rollups[0].col + 1;
                     }
-                    if (this.rollupSummaryColumn >= 0) {
+                    if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
                         rollupSummaryIndex = this.rollupSummaryColumn + 1;
                     }
                 }
