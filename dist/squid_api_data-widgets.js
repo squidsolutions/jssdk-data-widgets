@@ -1171,7 +1171,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (this.ordering) {
                     var orderId = parseInt($(item.currentTarget).attr("data-id"));
                     var orderByDirection;
-                    if (this.rollupSummaryColumn) {
+                    if (this.rollupSummaryColumn >= 0) {
                         orderId = orderId - 1;
                     }
                     if ($(item.currentTarget).hasClass("ASC")) {
@@ -1266,16 +1266,27 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // Add OrderBy Attribute
             var orderBy = this.model.get("orderBy");
+            var status = this.model.get("status");
+            // add pending
             if (orderBy) {
                 for (col=0; col<columns.length; col++) {
                     columns[col].orderDirection = null;
-                    for (ix=0; ix<orderBy.length; ix++) {
-                        if (this.ordering && this.rollupSummaryColumn && col == orderBy[ix].col) {
-                            columns[col + 1].orderDirection = orderBy[ix].direction;
-                        } else if (this.ordering && col == orderBy[ix].col) {
-                            columns[col].orderDirection = orderBy[ix].direction;
+                }
+                // add orderBy direction
+                for (ix=0; ix<orderBy.length; ix++) {
+                    for (col=0; col<columns.length; col++) {
+                        if (this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
+                            if (status == "PENDING" || status == "RUNNING") {
+                                columns[col].orderDirection = orderBy[ix].direction;
+                            } else if (status == "DONE") {
+                                columns[col + 1].orderDirection = orderBy[ix].direction;
+                            }
+                            break;
                         }
-                        break;
+                        else if (col == orderBy[ix].col) {
+                            columns[col].orderDirection = orderBy[ix].direction;
+                            break;
+                        }
                     }
                 }
             }
