@@ -11,14 +11,14 @@
 
         initialize: function(options) {
             var me = this;
-            
+
             // setup options
             if (options.template) {
                 this.template = options.template;
             } else {
                 this.template = template;
             }
-            
+
             if (options.filters) {
                 this.filters = options.filters;
             } else {
@@ -36,16 +36,16 @@
             this.filters.on("change:selection", function() {
                 me.render();
             });
-            
+
             if (!this.model) {
                 this.model = squid_api.model.config;
             }
-            
+
             // listen for global status change
             squid_api.model.status.on('change:status', this.enable, this);
 
         },
-        
+
         enable: function() {
             var select = this.$el.find("select");
             var multiSelectDropdown = this.$el.find(".multiselect-container");
@@ -80,9 +80,9 @@
             if (this.dimensionIndex !== null) {
                 isMultiple = false;
             }
-            
+
             var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
-            
+
             // iterate through all filter facets
             var selection = this.filters.get("selection");
             if (selection) {
@@ -94,7 +94,7 @@
                         var facet = facets[i];
                         var isBoolean = false;
                         if ((facet.dimension.type == "SEGMENTS") || (facet.items.length == 1) && (facet.items[0].value == "true")) {
-                            isBoolean = true; 
+                            isBoolean = true;
                         }
                         // do not display boolean dimensions
                         if (!isBoolean) {
@@ -130,7 +130,7 @@
                             } else {
                                 name = facet1.dimension.name;
                             }
-                            var option = {"label" : name, "value" : facet1.id, "selected" : selected};
+                            var option = {"label" : name, "value" : facet1.id, "selected" : selected, "error" : dimensions[dimIdx].error};
                             jsonData.options.push(option);
                         }
                     }
@@ -158,6 +158,7 @@
             var selector = this.$el.find("select");
             if (isMultiple) {
                  selector.multiselect({
+                    buttonContainer: '<div class="squid-api-data-widgets-dimension-selector" />',
                     buttonText: function(options, select) {
                         return 'Dimensions';
                     },
@@ -183,7 +184,7 @@
                 });
             } else {
                 var selectedDimension = this.model.get("selectedDimension");
-                
+
                 this.$el.find("select").on("change", function() {
                     var dimension = $(this).val();
                     me.model.set("chosenDimensions", [dimension]);
@@ -199,7 +200,7 @@
 
             return this;
         },
-        
+
         isChosen : function(facet) {
             var selected = false;
 

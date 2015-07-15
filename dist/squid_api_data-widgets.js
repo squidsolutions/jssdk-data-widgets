@@ -27,7 +27,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\r\n    <select class=\"sq-select form-control squid-api-data-widgets-dimension-selector\" ";
+  buffer += "\r\n    <select class=\"sq-select form-control\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.multiple), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\r\n        ";
@@ -52,6 +52,9 @@ function program4(depth0,data) {
     + "\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += " ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.error), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\r\n                ";
   if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
@@ -67,6 +70,12 @@ function program5(depth0,data) {
 
 function program7(depth0,data) {
   
+  
+  return " disabled ";
+  }
+
+function program9(depth0,data) {
+  
   var buffer = "", stack1, helper;
   buffer += "\r\n    <!-- just display filter name -->\r\n    <label class=\"squid-api-data-widgets-dimension-selector\">";
   if (helper = helpers.name) { stack1 = helper.call(depth0, {hash:{},data:data}); }
@@ -76,7 +85,7 @@ function program7(depth0,data) {
   return buffer;
   }
 
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(7, program7, data),fn:self.program(1, program1, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(9, program9, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n";
   return buffer;
@@ -1556,14 +1565,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         initialize: function(options) {
             var me = this;
-            
+
             // setup options
             if (options.template) {
                 this.template = options.template;
             } else {
                 this.template = template;
             }
-            
+
             if (options.filters) {
                 this.filters = options.filters;
             } else {
@@ -1581,16 +1590,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.filters.on("change:selection", function() {
                 me.render();
             });
-            
+
             if (!this.model) {
                 this.model = squid_api.model.config;
             }
-            
+
             // listen for global status change
             squid_api.model.status.on('change:status', this.enable, this);
 
         },
-        
+
         enable: function() {
             var select = this.$el.find("select");
             var multiSelectDropdown = this.$el.find(".multiselect-container");
@@ -1625,9 +1634,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.dimensionIndex !== null) {
                 isMultiple = false;
             }
-            
+
             var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
-            
+
             // iterate through all filter facets
             var selection = this.filters.get("selection");
             if (selection) {
@@ -1639,7 +1648,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         var facet = facets[i];
                         var isBoolean = false;
                         if ((facet.dimension.type == "SEGMENTS") || (facet.items.length == 1) && (facet.items[0].value == "true")) {
-                            isBoolean = true; 
+                            isBoolean = true;
                         }
                         // do not display boolean dimensions
                         if (!isBoolean) {
@@ -1675,7 +1684,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             } else {
                                 name = facet1.dimension.name;
                             }
-                            var option = {"label" : name, "value" : facet1.id, "selected" : selected};
+                            var option = {"label" : name, "value" : facet1.id, "selected" : selected, "error" : dimensions[dimIdx].error};
                             jsonData.options.push(option);
                         }
                     }
@@ -1703,6 +1712,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var selector = this.$el.find("select");
             if (isMultiple) {
                  selector.multiselect({
+                    buttonContainer: '<div class="squid-api-data-widgets-dimension-selector" />',
                     buttonText: function(options, select) {
                         return 'Dimensions';
                     },
@@ -1728,7 +1738,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 });
             } else {
                 var selectedDimension = this.model.get("selectedDimension");
-                
+
                 this.$el.find("select").on("change", function() {
                     var dimension = $(this).val();
                     me.model.set("chosenDimensions", [dimension]);
@@ -1744,7 +1754,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             return this;
         },
-        
+
         isChosen : function(facet) {
             var selected = false;
 

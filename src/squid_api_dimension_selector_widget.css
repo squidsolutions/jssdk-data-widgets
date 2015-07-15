@@ -7,3 +7,7 @@
 	opacity: 0.5;
 	background: #ffffff;
 }
+
+.squid-api-data-widgets-dimension-selector ul li.disabled {
+	text-decoration: line-through;
+}
