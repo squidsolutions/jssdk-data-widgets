@@ -219,6 +219,29 @@ function program5(depth0,data) {
   return buffer;
   });
 
+this["squid_api"]["template"]["squid_api_export_scheduler_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\r\n		<tr>\r\n		<td>";
+  if (helper = helpers.id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</td>\r\n		</tr>\r\n	";
+  return buffer;
+  }
+
+  buffer += "<div>\r\n\r\n	<label>Jobs</label>\r\n	<table>\r\n	";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.jobs), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n	</table>\r\n				\r\n</div>\r\n\r\n";
+  return buffer;
+  });
+
 this["squid_api"]["template"]["squid_api_export_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -2190,6 +2213,74 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     return View;
 }));
 
+(function (root, factory) {
+    root.squid_api.view.DataExportScheduler = factory(root.Backbone, root.squid_api);
+}(this, function (Backbone, squid_api) {
+
+    View = Backbone.View.extend( {
+        template : null,
+        exportJobModel : null,
+        exportJobCollection : null,
+        schedulerApiUri : null,
+        exportJobs : null,
+        
+        initialize : function(options) {
+            // setup options
+            if (options) {
+                if (options.template) {
+                    this.template = options.template;
+                } else {
+                    this.template = squid_api.template.squid_api_export_scheduler_widget;
+                }
+                if (options.schedulerApiUri) {
+                    this.schedulerApiUri = options.schedulerApiUri;
+                }
+            }
+            
+            exportJobModel = Backbone.Model.extend({
+                urlRoot : this.schedulerApiUri,
+                url: function() {
+                    var url = this.urlRoot + "/jobs/" + this.get("id");
+                    url = url + "?access_token=" + squid_api.model.login.get("accessToken");
+                    return url;
+                }
+            });
+            
+            exportJobCollection = Backbone.Collection.extend({
+                model: exportJobModel,
+                urlRoot : this.schedulerApiUri,
+                url: function() {
+                    var url = this.urlRoot + "/jobs/";
+                    url = url + "?access_token=" + squid_api.model.login.get("accessToken");
+                    return url;
+                }
+            });
+
+            exportJobs = new exportJobCollection();
+            
+
+            // listeners
+            this.listenTo(squid_api.model.login, "change:accessToken", this.fetchAndRender);
+            this.listenTo(exportJobs, "reset change remove sync", this.render);
+            
+        },
+        
+        fetchAndRender : function() {
+            exportJobs.fetch();
+        },
+        
+        render : function() {
+            var jsonData = {"jobs" : exportJobs};
+            this.html = this.template(jsonData);
+            this.$el.html(this.html);
+        }
+    
+    
+    
+    });
+    
+    return View;
+}));
 (function (root, factory) {
     root.squid_api.view.DataExport = factory(root.Backbone, root.squid_api);
 }(this, function (Backbone, squid_api) {
