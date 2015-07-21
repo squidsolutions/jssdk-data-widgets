@@ -181,9 +181,11 @@
             if (this.interpolationRange) {
                 dateDifference = moment(this.endDate).utc().endOf('day').diff(startDate.startOf("day"), this.interpolationRange);
                 // detect date difference with returned data set
-                if (series[0].data.length !== dateDifference) {
-                    dateDifference = series[0].data.length;
-                    console.log("interpolation month calculation differs from returned result set");
+                if (series.length > 0) {
+                    if (series[0].data.length !== dateDifference) {
+                        dateDifference = series[0].data.length;
+                        console.log("interpolation month calculation differs from returned result set");
+                    }
                 }
             } else {
                 dateDifference = moment(this.endDate).diff(startDate, 'days');
