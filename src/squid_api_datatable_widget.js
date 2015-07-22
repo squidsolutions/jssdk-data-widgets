@@ -204,7 +204,7 @@
             // Add OrderBy Attribute
             var status = this.model.get("status");
             if (config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
-                columns.splice(this.rollupSummaryColumn, 1);
+                columns.splice(config.get("rollups")[0].col, 1);
             }
             var orderBy = this.model.get("orderBy");
             if (orderBy) {
