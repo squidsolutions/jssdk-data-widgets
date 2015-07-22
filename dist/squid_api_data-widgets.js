@@ -1310,7 +1310,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // add orderBy direction
                 for (ix=0; ix<orderBy.length; ix++) {
                     for (col=0; col<columns.length; col++) {
-                        if (config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
+                        if (this.ordering && config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
                             if (status !== "DONE") {
                                 columns[col - 1].orderDirection = orderBy[ix].direction;
                             } else {
@@ -1318,7 +1318,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             }
                             break;
                         }
-                        else if (col == orderBy[ix].col) {
+                        else if (this.ordering && col == orderBy[ix].col) {
                             columns[col].orderDirection = orderBy[ix].direction;
                             break;
                         }
