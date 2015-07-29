@@ -28,6 +28,8 @@
 
         rollups : null,
 
+        staleMessage : "Click refresh to update",
+
         initialize : function(options) {
             var me = this;
 
@@ -76,6 +78,9 @@
             }
             if (options.rollupSummaryColumn) {
                 this.rollupSummaryColumn = options.rollupSummaryColumn;
+            }
+            if (options.staleMessage) {
+                this.staleMessage = options.staleMessage;
             }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
@@ -423,7 +428,7 @@
         },
 
         renderBaseViewPort : function() {
-            this.$el.html(this.template());
+            this.$el.html(this.template({"staleMessage" : this.staleMessage}));
             if (this.paging) {
                 this.paginationView = new squid_api.view.PaginationView( {
                     model : this.model,

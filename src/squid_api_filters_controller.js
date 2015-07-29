@@ -7,19 +7,19 @@
         filters : null,
         config : null,
         onChangeHandler : null,
-        
+
         initialize: function(options) {
-            
+
             var me = this;
 
             // setup options
-            
+
             if (this.model) {
                 this.filters = this.model;
             } else {
                 this.filters = squid_api.model.filters;
             }
-      
+
             if (options) {
                 // setup options
                 if (options.config) {
@@ -27,26 +27,26 @@
                 }
                 this.onChangeHandler = options.onChangeHandler;
             }
-            
+
             if (!this.config) {
                 this.config = squid_api.model.config;
             }
-            
+
             // controller
-            
+
             var filters = this.filters;
-            
+
             // check for new filter selection made by user
             this.listenTo(filters, 'change:userSelection', function() {
                 console.log("compute (change:userSelection)");
                 squid_api.controller.facetjob.compute(filters, filters.get("userSelection"));
             });
-            
+
             // update config if filters have changed
             this.listenTo(filters, 'change:selection', function(filters) {
-                me.config.set("selection", squid_api.utils.buildCleanSelection(filters.get("selection")));  
+                me.config.set("selection", squid_api.utils.buildCleanSelection(filters.get("selection")));
             });
-            
+
             // check for domain change performed
             this.listenTo(this.config, 'change:domain', function(config) {
                 var id = filters.get("id");
@@ -62,7 +62,7 @@
                 }
                 me.initFilters(config);
             });
-            
+
             // check for project change performed
             this.listenTo(this.config, 'change:project', function(config) {
                 var id = filters.get("id");
@@ -75,18 +75,18 @@
                 }
             });
         },
-        
+
        initFilters : function(config) {
            var me = this;
            var domainId = config.get("domain");
            var projectId = config.get("project");
-           
+
            if (projectId && domainId) {
                var domainPk = {
                        "projectId" : projectId,
                        "domainId" : domainId
                };
-              
+
                // launch the default filters computation
                var filters = new squid_api.model.FiltersJob();
                filters.set("id", {
@@ -127,7 +127,7 @@
                });
            }
        },
-        
+
        refreshFilters : function(selection) {
            var changed = false;
            var f = this.filters;
@@ -156,7 +156,7 @@
                this.changed(selection);
            }
        },
-       
+
        changed : function(selection, timeFacet) {
            if (this.onChangeHandler) {
                this.onChangeHandler(selection, timeFacet);
@@ -165,7 +165,7 @@
                squid_api.controller.facetjob.compute(this.filters, selection);
            }
        }
-       
+
     });
 
     return View;

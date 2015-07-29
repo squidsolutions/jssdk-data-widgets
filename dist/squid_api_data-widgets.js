@@ -13,10 +13,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 this["squid_api"]["template"]["squid_api_datatable_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  
+  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  return "<div class='sq-loading' style='display: none; position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n<div id=\"squid-api-data-widgets-data-table\">\r\n	<table class=\"sq-table\">\r\n		<thead>\r\n			<tr></tr>\r\n		</thead>\r\n		<tbody></tbody>\r\n	</table>\r\n	<div id=\"stale\">\r\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-table\"></i><br>Click refresh to update</span></div>\r\n	</div>\r\n	<div class=\"footer\">\r\n		<div id=\"total\">\r\n			Showing <span id=\"count-entries\"></span> of <span id=\"total-entries\"></span> entries\r\n		</div>\r\n		<div id=\"pagination\"></div>\r\n	</div>\r\n</div>\r\n\r\n\r\n";
+  buffer += "<div class='sq-loading' style='display: none; position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n<div id=\"squid-api-data-widgets-data-table\">\r\n	<table class=\"sq-table\">\r\n		<thead>\r\n			<tr></tr>\r\n		</thead>\r\n		<tbody></tbody>\r\n	</table>\r\n	<div id=\"stale\">\r\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-table\"></i><br>\r\n			";
+  if (helper = helpers.staleMessage) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.staleMessage); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\r\n		</span></div>\r\n	</div>\r\n	<div class=\"footer\">\r\n		<div id=\"total\">\r\n			Showing <span id=\"count-entries\"></span> of <span id=\"total-entries\"></span> entries\r\n		</div>\r\n		<div id=\"pagination\"></div>\r\n	</div>\r\n</div>\r\n";
+  return buffer;
   });
 
 this["squid_api"]["template"]["squid_api_dimension_selector_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -1124,6 +1129,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         rollups : null,
 
+        staleMessage : "Click refresh to update",
+
         initialize : function(options) {
             var me = this;
 
@@ -1172,6 +1179,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.rollupSummaryColumn) {
                 this.rollupSummaryColumn = options.rollupSummaryColumn;
+            }
+            if (options.staleMessage) {
+                this.staleMessage = options.staleMessage;
             }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
@@ -1519,7 +1529,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         renderBaseViewPort : function() {
-            this.$el.html(this.template());
+            this.$el.html(this.template({"staleMessage" : this.staleMessage}));
             if (this.paging) {
                 this.paginationView = new squid_api.view.PaginationView( {
                     model : this.model,
@@ -2528,19 +2538,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         filters : null,
         config : null,
         onChangeHandler : null,
-        
+
         initialize: function(options) {
-            
+
             var me = this;
 
             // setup options
-            
+
             if (this.model) {
                 this.filters = this.model;
             } else {
                 this.filters = squid_api.model.filters;
             }
-      
+
             if (options) {
                 // setup options
                 if (options.config) {
@@ -2548,26 +2558,26 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 this.onChangeHandler = options.onChangeHandler;
             }
-            
+
             if (!this.config) {
                 this.config = squid_api.model.config;
             }
-            
+
             // controller
-            
+
             var filters = this.filters;
-            
+
             // check for new filter selection made by user
             this.listenTo(filters, 'change:userSelection', function() {
                 console.log("compute (change:userSelection)");
                 squid_api.controller.facetjob.compute(filters, filters.get("userSelection"));
             });
-            
+
             // update config if filters have changed
             this.listenTo(filters, 'change:selection', function(filters) {
-                me.config.set("selection", squid_api.utils.buildCleanSelection(filters.get("selection")));  
+                me.config.set("selection", squid_api.utils.buildCleanSelection(filters.get("selection")));
             });
-            
+
             // check for domain change performed
             this.listenTo(this.config, 'change:domain', function(config) {
                 var id = filters.get("id");
@@ -2583,7 +2593,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 me.initFilters(config);
             });
-            
+
             // check for project change performed
             this.listenTo(this.config, 'change:project', function(config) {
                 var id = filters.get("id");
@@ -2596,18 +2606,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             });
         },
-        
+
        initFilters : function(config) {
            var me = this;
            var domainId = config.get("domain");
            var projectId = config.get("project");
-           
+
            if (projectId && domainId) {
                var domainPk = {
                        "projectId" : projectId,
                        "domainId" : domainId
                };
-              
+
                // launch the default filters computation
                var filters = new squid_api.model.FiltersJob();
                filters.set("id", {
@@ -2648,7 +2658,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                });
            }
        },
-        
+
        refreshFilters : function(selection) {
            var changed = false;
            var f = this.filters;
@@ -2677,7 +2687,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                this.changed(selection);
            }
        },
-       
+
        changed : function(selection, timeFacet) {
            if (this.onChangeHandler) {
                this.onChangeHandler(selection, timeFacet);
@@ -2686,7 +2696,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                squid_api.controller.facetjob.compute(this.filters, selection);
            }
        }
-       
+
     });
 
     return View;
