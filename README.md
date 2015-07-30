@@ -13,6 +13,7 @@ A collection of data (from AnalysisJobs) visualization and manipulation widgets.
   * paging : if set to true this will activate pagination on the data table
   * ordering : if set to true this will allow the user to click on the table headers to set analysis OrderBy
   * ignoreColumns : specify with an integer, the number of columns to ignore from the left when setting the orderBy for the analysis
+  * staleMessage : "Message to be displayed when the analysis is in a pending state"
 
 ## DomainSelector
 *Renders the domains of the API's current project as an INPUT.  Selects and modifies the API's current domain if selection changes*
@@ -50,7 +51,7 @@ A collection of data (from AnalysisJobs) visualization and manipulation widgets.
 * options :
   * template : a custom Handlebars template
   * displayInAccordion : if set to true, this provides a button to click which opens the export panel in an accordion
-  
+
 ## MetricSelectorView
 *Renders the metrics of an analysis as an INPUT.  Select and modifies the analysis metrics if selection changes.*
 * model : an Analysis
@@ -65,8 +66,8 @@ A collection of data (from AnalysisJobs) visualization and manipulation widgets.
 * options :
   * template : a custom Handlebars template
   * displayMetricValue : if set to true, will display the value of the metric when shown
-  * selectMetric : if set to true will allow the metric to be selected and update the model 'selectedMetric' 
-  
+  * selectMetric : if set to true will allow the metric to be selected and update the model 'selectedMetric'
+
 ## MetricTotalView
 *Renders a total number for each metric*
 * model : an Analysis which computes the total for each metric
@@ -94,6 +95,4 @@ A collection of data (from AnalysisJobs) visualization and manipulation widgets.
 * options :
   * template : a custom Handlebars template
   * format : a formatter function for number values (default is `d3.format(",.f");`)
-
-
-
+  * staleMessage : "Message to be displayed when the analysis is in a pending state"
