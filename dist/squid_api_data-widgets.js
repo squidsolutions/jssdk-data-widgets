@@ -737,10 +737,15 @@ function program5(depth0,data) {
 this["squid_api"]["template"]["squid_api_timeseries_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  
+  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  return "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 2;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\" class=\"squid-api-data-widgets-timeseries-widget\">\n	<div id=\"yearswitcher\"></div>\n	<div id=\"metricselector\"></div>\n	<div id=\"stale\">\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-line-chart\"></i><br>Click refresh to update</span></div>\n	</div>\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	<div id=\"slider\"></div>\n</div>\n";
+  buffer += "<div class='sq-loading' style='position:absolute; width:100%; top:40%; z-index: 2;'>\n	<div class=\"spinner\">\n	<div class=\"rect5\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect1\"></div>\n	<div class=\"rect2\"></div>\n	<div class=\"rect3\"></div>\n	<div class=\"rect4\"></div>\n	<div class=\"rect5\"></div>\n	</div>\n</div>\n<div id=\"chart_container\" class=\"squid-api-data-widgets-timeseries-widget\">\n	<div id=\"yearswitcher\"></div>\n	<div id=\"metricselector\"></div>\n	<div id=\"stale\">\n		<div class=\"reactiveMessage\">\n			<span><i class=\"fa fa-line-chart\"></i>\n			<br>";
+  if (helper = helpers.staleMessage) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.staleMessage); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</span>\n		</div>\n	</div>\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	<div id=\"slider\"></div>\n</div>\n";
+  return buffer;
   });
 (function (root, factory) {
     root.squid_api.controller.AnalysisContoller = factory(root.Backbone, root.squid_api);
@@ -3620,6 +3625,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         interpolationRange: null,
         yearSwitcherView: null,
         metricSelectorView: null,
+        staleMessage : "Click refresh to update",
 
         initialize : function(options) {
 
@@ -3640,6 +3646,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.metricSelectorView) {
                 this.metricSelectorView = options.metricSelectorView;
+            }
+            if (options.staleMessage) {
+                this.staleMessage = options.staleMessage;
             }
             if (options.template) {
                 this.template = options.template;
@@ -3889,7 +3898,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.YearOverYear = config.get("YearOverYear");
 
             if (status === "PENDING") {
-                this.$el.html(this.template());
+                this.$el.html(this.template({"staleMessage" : this.staleMessage}));
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").show();
             }

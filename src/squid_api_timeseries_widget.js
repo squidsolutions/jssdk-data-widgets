@@ -14,6 +14,7 @@
         interpolationRange: null,
         yearSwitcherView: null,
         metricSelectorView: null,
+        staleMessage : "Click refresh to update",
 
         initialize : function(options) {
 
@@ -34,6 +35,9 @@
             }
             if (options.metricSelectorView) {
                 this.metricSelectorView = options.metricSelectorView;
+            }
+            if (options.staleMessage) {
+                this.staleMessage = options.staleMessage;
             }
             if (options.template) {
                 this.template = options.template;
@@ -283,7 +287,7 @@
             this.YearOverYear = config.get("YearOverYear");
 
             if (status === "PENDING") {
-                this.$el.html(this.template());
+                this.$el.html(this.template({"staleMessage" : this.staleMessage}));
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").show();
             }
