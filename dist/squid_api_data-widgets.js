@@ -611,7 +611,7 @@ function program9(depth0,data) {
   buffer += "<ul class=\"squid-api-data-widgets-metric-widget\">\n";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.noChosenMetrics), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</ul>";
+  buffer += "\n</ul>\n";
   return buffer;
   });
 
@@ -3091,16 +3091,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.selectMetric = options.selectMetric;
                 }
             }
-            
+
             // setup the models
             if (!this.model) {
                 this.model = squid_api.model.config;
             }
-            
+
             this.model.on("change:domain", function() {
                 me.render();
             });
-            
+
             this.model.on("change:chosenMetrics", function() {
                 me.render();
             });
@@ -3126,16 +3126,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     $(item.currentTarget).attr("data-selected", true);
 
                     var selectedItem = $(item.currentTarget).attr("data-content");
-                
+
                     // Update
                     this.model.set({"selectedMetric" : selectedItem});
                 }
             }
         },
-        
+
         renderMetrics: function(metrics) {
             var me = this;
-            var jsonData = {"chosenMetrics" : []};
+            var jsonData = {"chosenMetrics" : [], "noChosenMetrics" : true};
             for (var i = 0; i < metrics.length; i++) {
                 // add to the list
                 var option = {
@@ -3144,6 +3144,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "selectMetric" : this.selectMetric,
                 };
                 jsonData.chosenMetrics.push(option);
+            }
+            if (jsonData.chosenMetrics.length > 0) {
+                jsonData.noChosenMetrics = false;
             }
             var html = me.template(jsonData);
             me.$el.html(html);
@@ -3154,14 +3157,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var me = this;
             var domainOid = this.model.get("domain");
             var chosenMetrics = this.model.get("chosenMetrics");
-            
+
             if (domainOid && (chosenMetrics)) {
                 // prepare all promises
                 var metricPromises = [];
                 for (var cMetrics = 0; cMetrics < chosenMetrics.length; cMetrics++) {
                     var metric = new squid_api.model.MetricModel();
                     metric.set("id", {
-                        "projectId" : this.model.get("project"), 
+                        "projectId" : this.model.get("project"),
                         "domainId" : domainOid,
                         "metricId" : chosenMetrics[cMetrics]
                     });
@@ -3181,7 +3184,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     me.renderMetrics(metricModels);
                 });
             }
-            
+
             return this;
         }
     });
