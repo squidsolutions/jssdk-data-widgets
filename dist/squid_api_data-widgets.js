@@ -1250,6 +1250,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var me = this;
             var columns;
             var invalidSelection = false;
+            var status = this.model.get("status");
 
             var analysis = this.model;
             // in case of a multi-analysis model
@@ -1309,14 +1310,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         columns.push(obj);
                     }
                 }
+                if (config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
+                    columns.splice(config.get("rollups")[0].col, 1);
+                }
             }
 
 
             // Add OrderBy Attribute
-            var status = this.model.get("status");
-            if (config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
-                columns.splice(config.get("rollups")[0].col, 1);
-            }
             var orderBy = this.model.get("orderBy");
             if (orderBy) {
                 for (col=0; col<columns.length; col++) {
