@@ -232,7 +232,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\n            <tr>\n                <td>";
+  buffer += "\n            <tr class=\"job-item\" data-attr=";
+  if (helper = helpers._id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0._id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + ">\n                <td>";
   if (helper = helpers._id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0._id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -242,11 +246,11 @@ function program1(depth0,data) {
   buffer += escapeExpression(stack1)
     + "</td>\n                <td>"
     + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.format)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</td>\n            </tr>\n        ";
+    + "</td>\n                <td><button class=\"edit-job\">edit</button></td>\n                <td><button class=\"delete-job\">delete</button></td>\n            </tr>\n        ";
   return buffer;
   }
 
-  buffer += "<div class=\"squid-api-export-scheduler-index-view\">\n    <table>\n        <tr>\n            <td>Report ID</td>\n            <td>Next Execution Day</td>\n            <td>Format</td>\n        </tr>\n        ";
+  buffer += "<div class=\"squid-api-export-scheduler-index-view\">\n    <button class=\"btn btn-default create-job\">create job</button>\n    <table>\n        <tr>\n            <td>Report ID</td>\n            <td>Next Execution Day</td>\n            <td>Format</td>\n        </tr>\n        ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.jobs), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n    </table>\n</div>\n";
@@ -2307,15 +2311,85 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             exportJobs.fetch();
         },
 
-        index: function() {
-            var jsonData = {"jobs": []};
-            for (i=0; i<exportJobs.models.length; i++) {
-                jsonData.jobs.push(exportJobs.models[i].toJSON());
-            }
-            var indexView = this.indexView(jsonData);
+        renderIndex: function() {
+            var me = this;
+            var indexView = Backbone.View.extend({
+                model: exportJobs,
+                initialize: function() {
+                    this.template = squid_api.template.squid_api_export_scheduler_index_view;
+                    this.render();
+                },
+                events: {
+                    "click .create-job": function() {
+                        me.renderForm();
+                    },
+                    "click .edit-job": function(event) {
+                        var id = $(event.target).parents(".job-item").attr("data-attr");
+                        me.renderForm(id);
+                    },
+                    "click .delete-job": function(event) {
+                        // TODO
+                    }
+                },
+                render: function() {
+                    var jsonData = {"jobs": []};
+                    for (i=0; i<this.model.models.length; i++) {
+                        jsonData.jobs.push(this.model.models[i].toJSON());
+                    }
+                    this.$el.html(this.template(jsonData));
+                    return this;
+                }
+            });
             this.indexModal = new Backbone.BootstrapModal({
-                content: indexView,
+                content: new indexView(),
                 title: "Jobs"
+            });
+        },
+
+        getSchema: function() {
+            var dfd = $.Deferred();
+            $.ajax({
+                url: this.schedulerApiUri + "/Schema/?access_token=" + squid_api.model.login.get("accessToken"),
+            }).done(function( schema ) {
+                dfd.resolve(schema);
+            });
+            return dfd.promise();
+        },
+
+        renderForm: function(id) {
+            this.getSchema().then(function(schema) {
+                var me = this;
+                if (id) {
+                    model = exportJobs.where({"_id" : id})[0];
+                } else {
+                    model = new exportJobModel();
+                }
+
+                // modify schema for BackBone form
+                for (var x in schema) {
+                    schema[x].editorClass = "form-control";
+                }
+
+                this.formContent = new Backbone.Form({
+                    schema: schema,
+                    model: model
+                }).render();
+                var formView = Backbone.View.extend({
+                    initialize: function() {
+                        this.render();
+                    },
+                    events: {
+
+                    },
+                    render: function() {
+                        this.$el.html(me.formContent.el);
+                        return this;
+                    }
+                });
+                var formModal = new Backbone.BootstrapModal({
+                    content: new formView(),
+                    title: "Jobs Form"
+                }).open();
             });
         },
 
@@ -2325,7 +2399,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.$el.html(html);
 
             // index view
-            this.index();
+            this.renderIndex();
         }
     });
 

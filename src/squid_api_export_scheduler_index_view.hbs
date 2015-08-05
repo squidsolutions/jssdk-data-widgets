@@ -1,4 +1,5 @@
 <div class="squid-api-export-scheduler-index-view">
+    <button class="btn btn-default create-job">create job</button>
     <table>
         <tr>
             <td>Report ID</td>
@@ -6,10 +7,12 @@
             <td>Format</td>
         </tr>
         {{#each jobs}}
-            <tr>
+            <tr class="job-item" data-attr={{_id}}>
                 <td>{{_id}}</td>
                 <td>{{nextExecutionDate}}</td>
                 <td>{{report.format}}</td>
+                <td><button class="edit-job">edit</button></td>
+                <td><button class="delete-job">delete</button></td>
             </tr>
         {{/each}}
     </table>

@@ -62,15 +62,85 @@
             exportJobs.fetch();
         },
 
-        index: function() {
-            var jsonData = {"jobs": []};
-            for (i=0; i<exportJobs.models.length; i++) {
-                jsonData.jobs.push(exportJobs.models[i].toJSON());
-            }
-            var indexView = this.indexView(jsonData);
+        renderIndex: function() {
+            var me = this;
+            var indexView = Backbone.View.extend({
+                model: exportJobs,
+                initialize: function() {
+                    this.template = squid_api.template.squid_api_export_scheduler_index_view;
+                    this.render();
+                },
+                events: {
+                    "click .create-job": function() {
+                        me.renderForm();
+                    },
+                    "click .edit-job": function(event) {
+                        var id = $(event.target).parents(".job-item").attr("data-attr");
+                        me.renderForm(id);
+                    },
+                    "click .delete-job": function(event) {
+                        // TODO
+                    }
+                },
+                render: function() {
+                    var jsonData = {"jobs": []};
+                    for (i=0; i<this.model.models.length; i++) {
+                        jsonData.jobs.push(this.model.models[i].toJSON());
+                    }
+                    this.$el.html(this.template(jsonData));
+                    return this;
+                }
+            });
             this.indexModal = new Backbone.BootstrapModal({
-                content: indexView,
+                content: new indexView(),
                 title: "Jobs"
+            });
+        },
+
+        getSchema: function() {
+            var dfd = $.Deferred();
+            $.ajax({
+                url: this.schedulerApiUri + "/Schema/?access_token=" + squid_api.model.login.get("accessToken"),
+            }).done(function( schema ) {
+                dfd.resolve(schema);
+            });
+            return dfd.promise();
+        },
+
+        renderForm: function(id) {
+            this.getSchema().then(function(schema) {
+                var me = this;
+                if (id) {
+                    model = exportJobs.where({"_id" : id})[0];
+                } else {
+                    model = new exportJobModel();
+                }
+
+                // modify schema for BackBone form
+                for (var x in schema) {
+                    schema[x].editorClass = "form-control";
+                }
+
+                this.formContent = new Backbone.Form({
+                    schema: schema,
+                    model: model
+                }).render();
+                var formView = Backbone.View.extend({
+                    initialize: function() {
+                        this.render();
+                    },
+                    events: {
+
+                    },
+                    render: function() {
+                        this.$el.html(me.formContent.el);
+                        return this;
+                    }
+                });
+                var formModal = new Backbone.BootstrapModal({
+                    content: new formView(),
+                    title: "Jobs Form"
+                }).open();
             });
         },
 
@@ -80,7 +150,7 @@
             this.$el.html(html);
 
             // index view
-            this.index();
+            this.renderIndex();
         }
     });
 
