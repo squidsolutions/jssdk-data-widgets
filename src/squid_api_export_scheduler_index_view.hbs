@@ -1,0 +1,16 @@
+<div class="squid-api-export-scheduler-index-view">
+    <table>
+        <tr>
+            <td>Report ID</td>
+            <td>Next Execution Day</td>
+            <td>Format</td>
+        </tr>
+        {{#each jobs}}
+            <tr>
+                <td>{{_id}}</td>
+                <td>{{nextExecutionDate}}</td>
+                <td>{{report.format}}</td>
+            </tr>
+        {{/each}}
+    </table>
+</div>

@@ -4,11 +4,12 @@
 
     View = Backbone.View.extend( {
         template : null,
+        indexView : null,
         exportJobModel : null,
         exportJobCollection : null,
         schedulerApiUri : null,
         exportJobs : null,
-        
+
         initialize : function(options) {
             // setup options
             if (options) {
@@ -21,7 +22,9 @@
                     this.schedulerApiUri = options.schedulerApiUri;
                 }
             }
-            
+
+            this.indexView = squid_api.template.squid_api_export_scheduler_index_view;
+
             exportJobModel = Backbone.Model.extend({
                 urlRoot : this.schedulerApiUri,
                 url: function() {
@@ -30,7 +33,7 @@
                     return url;
                 }
             });
-            
+
             exportJobCollection = Backbone.Collection.extend({
                 model: exportJobModel,
                 urlRoot : this.schedulerApiUri,
@@ -42,27 +45,44 @@
             });
 
             exportJobs = new exportJobCollection();
-            
 
             // listeners
             this.listenTo(squid_api.model.login, "change:accessToken", this.fetchAndRender);
             this.listenTo(exportJobs, "reset change remove sync", this.render);
-            
+
         },
-        
+
+        events: {
+            "click button": function() {
+                this.indexModal.open();
+            }
+        },
+
         fetchAndRender : function() {
             exportJobs.fetch();
         },
-        
+
+        index: function() {
+            var jsonData = {"jobs": []};
+            for (i=0; i<exportJobs.models.length; i++) {
+                jsonData.jobs.push(exportJobs.models[i].toJSON());
+            }
+            var indexView = this.indexView(jsonData);
+            this.indexModal = new Backbone.BootstrapModal({
+                content: indexView,
+                title: "Jobs"
+            });
+        },
+
         render : function() {
-            var jsonData = {"jobs" : exportJobs};
-            this.html = this.template(jsonData);
-            this.$el.html(this.html);
+            // static view
+            var html = this.template();
+            this.$el.html(html);
+
+            // index view
+            this.index();
         }
-    
-    
-    
     });
-    
+
     return View;
 }));
