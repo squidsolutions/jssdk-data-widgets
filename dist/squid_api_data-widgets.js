@@ -2279,14 +2279,24 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.indexView = squid_api.template.squid_api_export_scheduler_index_view;
 
             exportJobModel = Backbone.Model.extend({
-                urlRoot : this.schedulerApiUri,
-                //idAttribute: "_id",
+                urlRoot : this.schedulerApiUri + "/jobs",
                 idAttribute: "_id",
                 url: function() {
-                    var url = this.urlRoot + "/jobs/" /*id*/;
+                  var base =
+                    _.result(this, 'urlRoot') ||
+                    _.result(this.collection, 'url') ||
+                    urlError();
+                    if (this.isNew()) return base+"?access_token=" + squid_api.model.login.get("accessToken");
+                    var id = this.get(this.idAttribute);
+                    return base.replace(/[^\/]$/, '$&/') + encodeURIComponent(id)+"?access_token=" + squid_api.model.login.get("accessToken");
+                }
+
+                /*url: function() {
+                    var url = this.urlRoot + "/jobs/"+this.get("id");
                     url = url + "?access_token=" + squid_api.model.login.get("accessToken");
                     return url;
-                }//,
+                }*///,
+
 
                 /*initialize: function () {
                         this.url = function () {
@@ -2345,7 +2355,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "click .delete-job": function(event) {
                         // TODO this.model.delete();
                         var id = $(event.target).parents(".job-item").attr("data-attr");
-                        exportJobs.remove(id);
+                        var mmm = exportJobs.get(id);
+                        mmm.destroy();
+                        exportJobs.remove(mmm);
                     }
                 },
                 render: function() {
@@ -2418,12 +2430,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                   var values = me.formContent.getValue();
                   if(id){
                     // EDIT aka PUT /jobs/:id
-                    exportJobs.add(values);
+                    var m = exportJobs.get(id);
+                    m.set(values);
+                    m.save();
                     alert("Job updated");
 
                   } else{
                     // CREATE aka POST /jobs/
-                    exportJobs.create(values);
+                    var mm = new exportJobModel(values);
+                    mm.save();
+                    exportJobs.add(mm);
                     alert("Job created");
                   }
 
