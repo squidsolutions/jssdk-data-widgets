@@ -5,12 +5,14 @@
             <td>Report ID</td>
             <td>Next Execution Day</td>
             <td>Format</td>
+            <td>Email</td>
         </tr>
         {{#each jobs}}
             <tr class="job-item" data-attr={{_id}}>
                 <td>{{_id}}</td>
                 <td>{{nextExecutionDate}}</td>
                 <td>{{report.format}}</td>
+                <td>{{emails}}</td>
                 <td><button class="edit-job">edit</button></td>
                 <td><button class="delete-job">delete</button></td>
             </tr>

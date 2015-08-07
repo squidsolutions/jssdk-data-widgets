@@ -27,11 +27,22 @@
 
             exportJobModel = Backbone.Model.extend({
                 urlRoot : this.schedulerApiUri,
+                //idAttribute: "_id",
+                idAttribute: "_id",
                 url: function() {
-                    var url = this.urlRoot + "/jobs/" + this.get("id");
+                    var url = this.urlRoot + "/jobs/" /*id*/;
                     url = url + "?access_token=" + squid_api.model.login.get("accessToken");
                     return url;
-                }
+                }//,
+
+                /*initialize: function () {
+                        this.url = function () {
+                            var urll = this.urlRoot + "/jobs/";/*+ this.get("id");*/
+              /*              urll = urll + "?access_token=" + squid_api.model.login.get("accessToken");
+                            return urll;
+                        };
+                }*/
+
             });
 
             exportJobCollection = Backbone.Collection.extend({
@@ -79,7 +90,9 @@
                         me.renderForm(id);
                     },
                     "click .delete-job": function(event) {
-                        // TODO
+                        // TODO this.model.delete();
+                        var id = $(event.target).parents(".job-item").attr("data-attr");
+                        exportJobs.remove(id);
                     }
                 },
                 render: function() {
@@ -119,12 +132,16 @@
                 // modify schema for BackBone form
                 for (var x in schema) {
                     schema[x].editorClass = "form-control";
+                    /*if(x=="emails"){
+                      schema[x].validators = ['required', 'email'];
+                    }*/
                 }
 
                 this.formContent = new Backbone.Form({
                     schema: schema,
                     model: model
                 }).render();
+
                 var formView = Backbone.View.extend({
                     initialize: function() {
                         this.render();
@@ -141,6 +158,32 @@
                     content: new formView(),
                     title: "Jobs Form"
                 }).open();
+
+
+                formModal.on('ok', function (event) {
+                  // the form is used in create and edit mode.
+                  var values = me.formContent.getValue();
+                  if(id){
+                    // EDIT aka PUT /jobs/:id
+                    exportJobs.add(values);
+                    alert("Job updated");
+
+                  } else{
+                    // CREATE aka POST /jobs/
+                    exportJobs.create(values);
+                    alert("Job created");
+                  }
+
+                  //if (!isValid) formModal.preventClose();
+                  //formModal.content.saveForm();
+                  //me.formContent.model.set(JSON.stringify(values));
+                  //me.formContent.model.save();
+                  //me.exportJobModel.fetch({data: JSON.stringify(values), type='POST'});
+                  /*for (var val in values){
+                    alert(val);
+                  }*/
+                });
+
             });
         },
 
