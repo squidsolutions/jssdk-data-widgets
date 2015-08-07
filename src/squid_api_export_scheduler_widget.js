@@ -59,14 +59,12 @@
 
             // listeners
             this.listenTo(squid_api.model.login, "change:accessToken", this.fetchAndRender);
-            this.listenTo(exportJobs, "reset change remove sync", this.render);
 
+            this.render();
         },
 
         events: {
-            "click button": function() {
-                this.indexModal.open();
-            }
+            "click button" : "renderIndex"
         },
 
         fetchAndRender : function() {
@@ -79,6 +77,7 @@
                 model: exportJobs,
                 initialize: function() {
                     this.template = squid_api.template.squid_api_export_scheduler_index_view;
+                    this.listenTo(exportJobs, "reset change remove sync", this.render);
                     this.render();
                 },
                 events: {
@@ -107,7 +106,7 @@
             this.indexModal = new Backbone.BootstrapModal({
                 content: new indexView(),
                 title: "Jobs"
-            });
+            }).open();
         },
 
         getSchema: function() {
@@ -191,9 +190,6 @@
             // static view
             var html = this.template();
             this.$el.html(html);
-
-            // index view
-            this.renderIndex();
         }
     });
 
