@@ -2422,50 +2422,29 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 
                 formModal.on('ok', function (event) {
-                  // the form is used in create and edit mode.
-                  var values = me.formContent.getValue();
+                        // the form is used in create and edit mode.
+                        var values = me.formContent.getValue();
 
-                  // manipulate data
-                  values.customerId = squid_api.model.customer.get("id");
-                  values.userId = squid_api.model.login.get("userId");
+                        // manipulate data
+                        values.customerId = squid_api.model.customer.get("id");
+                        values.userId = squid_api.model.login.get("userId");
 
-                  if (id) {
-                    // EDIT aka PUT /jobs/:id
-<<<<<<< HEAD
-                    var m = exportJobs.get(id);
-                    m.set(values);
-                    m.save();
-                    //alert("Job updated");
+                        if (id) {
+                          // EDIT aka PUT /jobs/:id
+                          var job = exportJobs.get(id);
+                          job.set(values);
+                          job.save();
 
-                  } else{
-                    // CREATE aka POST /jobs/
-                    var mm = new exportJobModel(values);
-                    mm.save();
-                    exportJobs.add(mm);
-                    //alert("Job created");
-=======
-                    var job = exportJobs.get(id);
-                    job.set(values);
-                    job.save();
+                        } else{
+                          // CREATE aka POST /jobs/
+                          var newJob = new exportJobModel(values);
+                          newJob.save();
+                          exportJobs.add(newJob);
+                        }
+                      });
 
-                  } else{
-                    // CREATE aka POST /jobs/
-                    var newJob = new exportJobModel(values);
-                    newJob.save();
-                    exportJobs.add(newJob);
->>>>>>> 6378e2c9715d8360f5a46e6048757066cbe9b2f0
-                  }
-
-                  //TODO validation
-                  //if (!isValid) formModal.preventClose();
-                  //formModal.content.saveForm();
-                  /*for (var val in values){
-                    alert(val);
-                  }*/
-                });
-
-            });
-        },
+                  });
+              },
 
         render : function() {
             // static view

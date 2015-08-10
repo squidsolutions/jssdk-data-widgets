@@ -169,27 +169,29 @@
 
 
                 formModal.on('ok', function (event) {
-                  // the form is used in create and edit mode.
-                  var values = me.formContent.getValue();
+                        // the form is used in create and edit mode.
+                        var values = me.formContent.getValue();
 
-                  // manipulate data
-                  values.customerId = squid_api.model.customer.get("id");
-                  values.userId = squid_api.model.login.get("userId");
+                        // manipulate data
+                        values.customerId = squid_api.model.customer.get("id");
+                        values.userId = squid_api.model.login.get("userId");
 
-                  if (id) {
-                    var job = exportJobs.get(id);
-                    job.set(values);
-                    job.save();
+                        if (id) {
+                          // EDIT aka PUT /jobs/:id
+                          var job = exportJobs.get(id);
+                          job.set(values);
+                          job.save();
 
-                  } else{
-                    var newJob = new exportJobModel(values);
-                    newJob.save();
-                    exportJobs.add(newJob);
+                        } else{
+                          // CREATE aka POST /jobs/
+                          var newJob = new exportJobModel(values);
+                          newJob.save();
+                          exportJobs.add(newJob);
+                        }
+                      });
 
-                });
-
-            });
-        },
+                  });
+              },
 
         render : function() {
             // static view
