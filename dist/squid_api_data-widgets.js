@@ -250,7 +250,7 @@ function program1(depth0,data) {
   if (helper = helpers.emails) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.emails); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</td>\n                <td><button class=\"edit-job\">edit</button></td>\n                <td><button class=\"delete-job\">delete</button></td>\n            </tr>\n        ";
+    + "</td>\n                <td><button class=\"run-job\">run</button></td>\n                <td><button class=\"edit-job\">edit</button></td>\n                <td><button class=\"delete-job\">delete</button></td>\n            </tr>\n        ";
   return buffer;
   }
 
@@ -2290,22 +2290,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     var id = this.get(this.idAttribute);
                     return base.replace(/[^\/]$/, '$&/') + encodeURIComponent(id)+"?access_token=" + squid_api.model.login.get("accessToken");
                 }
-
-                /*url: function() {
-                    var url = this.urlRoot + "/jobs/"+this.get("id");
-                    url = url + "?access_token=" + squid_api.model.login.get("accessToken");
-                    return url;
-                }*///,
-
-
-                /*initialize: function () {
-                        this.url = function () {
-                            var urll = this.urlRoot + "/jobs/";/*+ this.get("id");*/
-              /*              urll = urll + "?access_token=" + squid_api.model.login.get("accessToken");
-                            return urll;
-                        };
-                }*/
-
             });
 
             exportJobCollection = Backbone.Collection.extend({
@@ -2322,7 +2306,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // listeners
             this.listenTo(squid_api.model.login, "change:accessToken", this.fetchAndRender);
-
             this.render();
         },
 
@@ -2350,6 +2333,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "click .edit-job": function(event) {
                         var id = $(event.target).parents(".job-item").attr("data-attr");
                         me.renderForm(id);
+                    },
+                    "click .run-job": function(event) {
+                        var id = $(event.target).parents(".job-item").attr("data-attr");
+                        var url = me.schedulerApiUri + "/jobs/" + id + "?run=1&access_token=" + squid_api.model.login.get("accessToken");
+                        $.ajax({
+                            method: "GET",
+                            url: url,
+                        });
                     },
                     "click .delete-job": function(event) {
                         // TODO this.model.delete();

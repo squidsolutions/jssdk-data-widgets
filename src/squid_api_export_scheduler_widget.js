@@ -37,22 +37,6 @@
                     var id = this.get(this.idAttribute);
                     return base.replace(/[^\/]$/, '$&/') + encodeURIComponent(id)+"?access_token=" + squid_api.model.login.get("accessToken");
                 }
-
-                /*url: function() {
-                    var url = this.urlRoot + "/jobs/"+this.get("id");
-                    url = url + "?access_token=" + squid_api.model.login.get("accessToken");
-                    return url;
-                }*///,
-
-
-                /*initialize: function () {
-                        this.url = function () {
-                            var urll = this.urlRoot + "/jobs/";/*+ this.get("id");*/
-              /*              urll = urll + "?access_token=" + squid_api.model.login.get("accessToken");
-                            return urll;
-                        };
-                }*/
-
             });
 
             exportJobCollection = Backbone.Collection.extend({
@@ -69,7 +53,6 @@
 
             // listeners
             this.listenTo(squid_api.model.login, "change:accessToken", this.fetchAndRender);
-
             this.render();
         },
 
@@ -97,6 +80,14 @@
                     "click .edit-job": function(event) {
                         var id = $(event.target).parents(".job-item").attr("data-attr");
                         me.renderForm(id);
+                    },
+                    "click .run-job": function(event) {
+                        var id = $(event.target).parents(".job-item").attr("data-attr");
+                        var url = me.schedulerApiUri + "/jobs/" + id + "?run=1&access_token=" + squid_api.model.login.get("accessToken");
+                        $.ajax({
+                            method: "GET",
+                            url: url,
+                        });
                     },
                     "click .delete-job": function(event) {
                         // TODO this.model.delete();
