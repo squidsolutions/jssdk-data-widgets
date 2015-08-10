@@ -185,8 +185,21 @@
                   } else{
                     // CREATE aka POST /jobs/
                     var newJob = new exportJobModel(values);
-                    newJob.save();
-                    exportJobs.add(newJob);
+                    newJob.save({}, {
+                        success: function(model) {
+                            var msg = "";
+                            if (model.get("errors")) {
+                                var errors = model.get("errors");
+                                for (var x in errors) {
+                                    msg = msg + errors[x].message + "<br />";
+                                }
+                            } else {
+                                exportJobs.add(model);
+                                msg = msg + "job successfully saved";
+                            }
+                            squid_api.model.status.set("message", msg);
+                        }
+                    });
                   }
 
                   //if (!isValid) formModal.preventClose();
