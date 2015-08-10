@@ -175,6 +175,7 @@
                         // manipulate data
                         values.customerId = squid_api.model.customer.get("id");
                         values.userId = squid_api.model.login.get("userId");
+                        values.shortcutId = squid_api.model.config.get("report");
 
                         if (id) {
                           // EDIT aka PUT /jobs/:id
@@ -187,6 +188,7 @@
                           var newJob = new exportJobModel(values);
                           newJob.save();
                           exportJobs.add(newJob);
+                          alert(values.shortcutId);
                         }
                       });
 
