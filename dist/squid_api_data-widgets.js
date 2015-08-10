@@ -2423,21 +2423,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     var m = exportJobs.get(id);
                     m.set(values);
                     m.save();
-                    alert("Job updated");
+                    //alert("Job updated");
 
                   } else{
                     // CREATE aka POST /jobs/
                     var mm = new exportJobModel(values);
                     mm.save();
                     exportJobs.add(mm);
-                    alert("Job created");
+                    //alert("Job created");
                   }
 
+                  //TODO validation
                   //if (!isValid) formModal.preventClose();
                   //formModal.content.saveForm();
-                  //me.formContent.model.set(JSON.stringify(values));
-                  //me.formContent.model.save();
-                  //me.exportJobModel.fetch({data: JSON.stringify(values), type='POST'});
                   /*for (var val in values){
                     alert(val);
                   }*/
