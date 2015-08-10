@@ -90,11 +90,17 @@
                         });
                     },
                     "click .delete-job": function(event) {
-                        // TODO this.model.delete();
                         var id = $(event.target).parents(".job-item").attr("data-attr");
-                        var mmm = exportJobs.get(id);
-                        mmm.destroy();
-                        exportJobs.remove(mmm);
+                        var job = exportJobs.get(id);
+                        job.destroy({
+                            success: function() {
+                                squid_api.model.status.set("message", "job successfully deleted");
+                            },
+                            error: function() {
+
+                            }
+                        });
+                        exportJobs.remove(job);
                     }
                 },
                 render: function() {
@@ -165,27 +171,21 @@
                 formModal.on('ok', function (event) {
                   // the form is used in create and edit mode.
                   var values = me.formContent.getValue();
-                  if(id){
-                    // EDIT aka PUT /jobs/:id
-                    var m = exportJobs.get(id);
-                    m.set(values);
-                    m.save();
-                    //alert("Job updated");
+
+                  // manipulate data
+                  values.customerId = squid_api.model.customer.get("id");
+                  values.userId = squid_api.model.login.get("userId");
+
+                  if (id) {
+                    var job = exportJobs.get(id);
+                    job.set(values);
+                    job.save();
 
                   } else{
-                    // CREATE aka POST /jobs/
-                    var mm = new exportJobModel(values);
-                    mm.save();
-                    exportJobs.add(mm);
-                    //alert("Job created");
-                  }
+                    var newJob = new exportJobModel(values);
+                    newJob.save();
+                    exportJobs.add(newJob);
 
-                  //TODO validation
-                  //if (!isValid) formModal.preventClose();
-                  //formModal.content.saveForm();
-                  /*for (var val in values){
-                    alert(val);
-                  }*/
                 });
 
             });
