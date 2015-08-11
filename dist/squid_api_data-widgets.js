@@ -2262,8 +2262,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         exportJobCollection : null,
         schedulerApiUri : null,
         exportJobs : null,
+        hiddenFields : null,
 
         initialize : function(options) {
+            widget = this;
+
             // setup options
             if (options) {
                 if (options.template) {
@@ -2273,6 +2276,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 if (options.schedulerApiUri) {
                     this.schedulerApiUri = options.schedulerApiUri;
+                }
+                if (options.hiddenFields) {
+                    this.hiddenFields = options.hiddenFields;
                 }
             }
 
@@ -2328,11 +2334,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 },
                 events: {
                     "click .create-job": function() {
-                        me.renderForm();
+                        widget.renderForm();
                     },
                     "click .edit-job": function(event) {
                         var id = $(event.target).parents(".job-item").attr("data-attr");
-                        me.renderForm(id);
+                        widget.renderForm(id);
                     },
                     "click .run-job": function(event) {
                         var id = $(event.target).parents(".job-item").attr("data-attr");
@@ -2378,23 +2384,31 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         renderForm: function(id) {
-            this.getSchema().then(function(schema) {
-                var me = this;
+            this.getSchema().then(function(data) {
                 if (id) {
                     model = exportJobs.where({"_id" : id})[0];
                 } else {
                     model = new exportJobModel();
                 }
 
-                // modify schema for BackBone form
-                for (var x in schema) {
-                    schema[x].editorClass = "form-control";
-                    /*if(x=="emails"){
-                      schema[x].validators = ['required', 'email'];
-                    }*/
-                }
+                // construct schema ignoring hidden fields
+                var schema = {};
+                for (var x in data) {
+                    if (widget.hiddenFields.indexOf(x) == -1) {
+                        schema[x] = {};
+                        schema[x].editorClass = "form-control";
+                        if (data[x].instance == "Date") {
+                           schema[x].type = "Date";
+                        } else if (data[x].instance == "Array") {
+                           schema[x].type = "List";
+                           schema[x].itemType = "Text";
+                        } else {
+                           schema[x].type = "Text";
+                        }
+                    }
+               }
 
-                this.formContent = new Backbone.Form({
+                widget.formContent = new Backbone.Form({
                     schema: schema,
                     model: model
                 });
@@ -2404,7 +2418,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         this.render();
                     },
                     render: function() {
-                        this.$el.html(me.formContent.render().el);
+                        this.$el.html(widget.formContent.render().el);
                         return this;
                     }
                 });
@@ -2416,7 +2430,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                 formModal.on('ok', function (event) {
                         // the form is used in create and edit mode.
-                        var values = me.formContent.getValue();
+                        var values = widget.formContent.getValue();
 
                         // manipulate data
                         values.customerId = squid_api.model.customer.get("id");
