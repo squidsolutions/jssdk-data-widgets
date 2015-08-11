@@ -2372,13 +2372,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         getSchema: function() {
-            var dfd = $.Deferred();
-            $.ajax({
+            return $.ajax({
                 url: this.schedulerApiUri + "/Schema/?access_token=" + squid_api.model.login.get("accessToken"),
-            }).done(function( schema ) {
-                dfd.resolve(schema);
             });
-            return dfd.promise();
         },
 
         renderForm: function(id) {
@@ -2401,17 +2397,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.formContent = new Backbone.Form({
                     schema: schema,
                     model: model
-                }).render();
+                });
 
                 var formView = Backbone.View.extend({
                     initialize: function() {
                         this.render();
                     },
-                    events: {
-
-                    },
                     render: function() {
-                        this.$el.html(me.formContent.el);
+                        this.$el.html(me.formContent.render().el);
                         return this;
                     }
                 });
