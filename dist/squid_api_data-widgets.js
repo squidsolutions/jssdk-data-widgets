@@ -250,7 +250,7 @@ function program1(depth0,data) {
   if (helper = helpers.emails) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.emails); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</td>\n                <td><button class=\"run-job\">run</button></td>\n                <td><button class=\"edit-job\">edit</button></td>\n                <td><button class=\"delete-job\">delete</button></td>\n            </tr>\n        ";
+    + "</td>\n                <td><button class=\"job-action run-job\">run</button></td>\n                <td><button class=\"job-action edit-job\">edit</button></td>\n                <td><button class=\"job-action delete-job\">delete</button></td>\n            </tr>\n        ";
   return buffer;
   }
 
