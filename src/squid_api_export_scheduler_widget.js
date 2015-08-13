@@ -115,6 +115,10 @@
                         jsonData.jobs.push(this.model.models[i].toJSON());
                     }
                     this.$el.html(this.template(jsonData));
+
+                    this.$el.find(".table").DataTable({
+                        paging: false
+                    });
                     return this;
                 }
             });
@@ -173,7 +177,6 @@
                     content: new formView(),
                     title: "Jobs Form"
                 }).open();
-
 
                 formModal.on('ok', function (event) {
                         // the form is used in create and edit mode.

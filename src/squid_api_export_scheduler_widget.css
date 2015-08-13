@@ -1,8 +1,27 @@
 .squid-api-export-scheduler-index-view button.create-job {
     float: right;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
-.squid-api-export-scheduler-index-view table {
+.squid-api-export-scheduler-index-view table.dataTable thead th, .squid-api-export-scheduler-index-view table.dataTable tfoot th {
+    font-weight: normal;
     text-align: center;
+}
+
+.squid-api-export-scheduler-index-view table td {
+    max-width: 220px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.squid-api-export-scheduler-index-view table.dataTable.no-footer {
+    border-bottom: 1px solid #dedcde;
+}
+
+.squid-api-export-scheduler-index-view .dataTables_info {
+    display: none;
+}
+
+.squid-api-export-scheduler-index-view table.dataTable thead th, .squid-api-export-scheduler-index-view table.dataTable thead td {
+    border-bottom: 1px solid #c8c8c8;
 }

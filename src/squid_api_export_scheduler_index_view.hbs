@@ -1,25 +1,31 @@
 <div class="squid-api-export-scheduler-index-view table-responsive">
     <button class="btn btn-default create-job">create job</button>
     <table class="table table-bordered table-striped table-hover">
-        <tr>
-            <td>Report Type</td>
-            <td>Report Format</td>
-            <td>Delivery Frequency</td>
-            <td>Next Delivery</td>
-            <td>Delivered to</td>
-            <td colspan="3">Actions</td>
-        </tr>
-        {{#each jobs}}
-            <tr class="job-item" data-attr={{_id}}>
-                <td>{{report.period.type}}</td>
-                <td>{{report.format}}</td>
-                <td>Every {{scheduling.frequencyDay}} Day(s)</td>
-                <td>{{nextExecutionDate}}</td>
-                <td>{{emails}}</td>
-                <td><button class="btn btn-secondary run-job">run</button></td>
-                <td><button class="btn btn-secondary edit-job">edit</button></td>
-                <td><button class="btn btn-secondary delete-job">delete</button></td>
+        <thead>
+            <tr>
+                <th>Report Type</th>
+                <th>Report Format</th>
+                <th>Delivery Frequency</th>
+                <th>Next Delivery</th>
+                <th>Delivered to</th>
+                <th>Run Now</th>
+                <th>Edit</th>
+                <th>Delete</th>
             </tr>
-        {{/each}}
+        </thead>
+        <tbody>
+            {{#each jobs}}
+                <tr class="job-item" data-attr={{_id}}>
+                    <td>{{report.period.type}}</td>
+                    <td>{{report.format}}</td>
+                    <td>Every {{scheduling.frequencyDay}} Day(s)</td>
+                    <td>{{nextExecutionDate}}</td>
+                    <td>{{emails}}</td>
+                    <td><button class="btn btn-secondary run-job"><i class="fa fa-refresh"></i></button></td>
+                    <td><button class="btn btn-secondary edit-job"><i class="fa fa-pencil-square-o"></i></button></td>
+                    <td><button class="btn btn-secondary delete-job"><i class="fa fa-trash-o"></i></button></td>
+                </tr>
+            {{/each}}
+        </tbody>
     </table>
 </div>
