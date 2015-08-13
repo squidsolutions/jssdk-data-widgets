@@ -1,21 +1,24 @@
-<div class="squid-api-export-scheduler-index-view">
+<div class="squid-api-export-scheduler-index-view table-responsive">
     <button class="btn btn-default create-job">create job</button>
-    <table>
+    <table class="table table-bordered table-striped table-hover">
         <tr>
-            <td>Report ID</td>
-            <td>Next Execution Day</td>
-            <td>Format</td>
-            <td>Email</td>
+            <td>Report Type</td>
+            <td>Report Format</td>
+            <td>Delivery Frequency</td>
+            <td>Next Delivery</td>
+            <td>Delivered to</td>
+            <td colspan="3">Actions</td>
         </tr>
         {{#each jobs}}
             <tr class="job-item" data-attr={{_id}}>
-                <td>{{_id}}</td>
-                <td>{{nextExecutionDate}}</td>
+                <td>{{report.period.type}}</td>
                 <td>{{report.format}}</td>
+                <td>Every {{scheduling.frequencyDay}} Day(s)</td>
+                <td>{{nextExecutionDate}}</td>
                 <td>{{emails}}</td>
-                <td><button class="job-action run-job">run</button></td>
-                <td><button class="job-action edit-job">edit</button></td>
-                <td><button class="job-action delete-job">delete</button></td>
+                <td><button class="btn btn-secondary run-job">run</button></td>
+                <td><button class="btn btn-secondary edit-job">edit</button></td>
+                <td><button class="btn btn-secondary delete-job">delete</button></td>
             </tr>
         {{/each}}
     </table>

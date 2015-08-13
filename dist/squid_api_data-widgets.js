@@ -236,25 +236,25 @@ function program1(depth0,data) {
   if (helper = helpers._id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0._id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + ">\n                <td>";
-  if (helper = helpers._id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0._id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "</td>\n                <td>";
+    + ">\n                <td>"
+    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.period)),stack1 == null || stack1 === false ? stack1 : stack1.type)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</td>\n                <td>"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.format)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</td>\n                <td>Every "
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.scheduling)),stack1 == null || stack1 === false ? stack1 : stack1.frequencyDay)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + " Day(s)</td>\n                <td>";
   if (helper = helpers.nextExecutionDate) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.nextExecutionDate); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</td>\n                <td>"
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.format)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "</td>\n                <td>";
   if (helper = helpers.emails) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.emails); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</td>\n                <td><button class=\"job-action run-job\">run</button></td>\n                <td><button class=\"job-action edit-job\">edit</button></td>\n                <td><button class=\"job-action delete-job\">delete</button></td>\n            </tr>\n        ";
+    + "</td>\n                <td><button class=\"btn btn-secondary run-job\">run</button></td>\n                <td><button class=\"btn btn-secondary edit-job\">edit</button></td>\n                <td><button class=\"btn btn-secondary delete-job\">delete</button></td>\n            </tr>\n        ";
   return buffer;
   }
 
-  buffer += "<div class=\"squid-api-export-scheduler-index-view\">\n    <button class=\"btn btn-default create-job\">create job</button>\n    <table>\n        <tr>\n            <td>Report ID</td>\n            <td>Next Execution Day</td>\n            <td>Format</td>\n            <td>Email</td>\n        </tr>\n        ";
+  buffer += "<div class=\"squid-api-export-scheduler-index-view table-responsive\">\n    <button class=\"btn btn-default create-job\">create job</button>\n    <table class=\"table table-bordered table-striped table-hover\">\n        <tr>\n            <td>Report Type</td>\n            <td>Report Format</td>\n            <td>Delivery Frequency</td>\n            <td>Next Delivery</td>\n            <td>Delivered to</td>\n            <td colspan=\"3\">Actions</td>\n        </tr>\n        ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.jobs), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n    </table>\n</div>\n";
