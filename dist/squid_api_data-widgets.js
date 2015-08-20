@@ -236,7 +236,11 @@ function program1(depth0,data) {
   if (helper = helpers._id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0._id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + ">\n                    <td>"
+    + ">\n                    <td>";
+  if (helper = helpers.reportName) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.reportName); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n                    <td>"
     + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.period)),stack1 == null || stack1 === false ? stack1 : stack1.type)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "</td>\n                    <td>"
     + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.format)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
@@ -254,7 +258,7 @@ function program1(depth0,data) {
   return buffer;
   }
 
-  buffer += "<div class=\"squid-api-export-scheduler-index-view table-responsive\">\n    <button class=\"btn btn-default create-job\">create job</button>\n    <table class=\"table table-bordered table-striped table-hover\">\n        <thead>\n            <tr>\n                <th>Report Type</th>\n                <th>Report Format</th>\n                <th>Delivery Frequency</th>\n                <th>Next Delivery</th>\n                <th>Delivered to</th>\n                <th>Run Now</th>\n                <th>Edit</th>\n                <th>Delete</th>\n            </tr>\n        </thead>\n        <tbody>\n            ";
+  buffer += "<div class=\"squid-api-export-scheduler-index-view table-responsive\">\n    <button class=\"btn btn-default create-job\">create job</button>\n    <table class=\"table table-bordered table-striped table-hover\">\n        <thead>\n            <tr>\n                <th>Report</th>\n                <th>Report Type</th>\n                <th>Report Format</th>\n                <th>Delivery Frequency</th>\n                <th>Next Delivery</th>\n                <th>Delivered to</th>\n                <th>Run Now</th>\n                <th>Edit</th>\n                <th>Delete</th>\n            </tr>\n        </thead>\n        <tbody>\n            ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.jobs), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n        </tbody>\n    </table>\n</div>\n";
@@ -2280,6 +2284,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (options.hiddenFields) {
                     this.hiddenFields = options.hiddenFields;
                 }
+                if (options.reports) {
+                    this.reports = options.reports.get("items");
+                }
             }
 
             this.indexView = squid_api.template.squid_api_export_scheduler_index_view;
@@ -2365,6 +2372,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 render: function() {
                     var jsonData = {"jobs": []};
                     for (i=0; i<this.model.models.length; i++) {
+                        for (ix=0; ix<me.reports.length; ix++) {
+                            if (me.reports[ix].oid == this.model.models[i].get("shortcutId")) {
+                                this.model.models[i].set("reportName", me.reports[ix].name);
+                            }
+                        }
                         jsonData.jobs.push(this.model.models[i].toJSON());
                     }
                     this.$el.html(this.template(jsonData));

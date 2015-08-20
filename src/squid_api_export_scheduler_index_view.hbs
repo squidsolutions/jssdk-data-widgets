@@ -3,6 +3,7 @@
     <table class="table table-bordered table-striped table-hover">
         <thead>
             <tr>
+                <th>Report</th>
                 <th>Report Type</th>
                 <th>Report Format</th>
                 <th>Delivery Frequency</th>
@@ -16,6 +17,7 @@
         <tbody>
             {{#each jobs}}
                 <tr class="job-item" data-attr={{_id}}>
+                    <td>{{reportName}}</td>
                     <td>{{report.period.type}}</td>
                     <td>{{report.format}}</td>
                     <td>Every {{scheduling.frequencyDay}} Day(s)</td>
