@@ -167,7 +167,15 @@
                     modalHeader = model.get("reportName") + " scheduled usage report";
                 } else {
                     model = new exportJobModel();
-                    modalHeader = "new scheduled usage report";
+
+                    var reportId = config.get("report");
+                    var reportName;
+                    for (i=0; i<widget.reports.length; i++) {
+                        if (widget.reports[i].oid == reportId) {
+                            reportName =  widget.reports[i].name;
+                        }
+                    }
+                    modalHeader = "schedule a usage report for " + reportName;
                 }
                 // construct schema ignoring hidden fields
                 var schema = {};
