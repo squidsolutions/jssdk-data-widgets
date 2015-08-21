@@ -80,7 +80,6 @@
                 initialize: function() {
                     this.template = squid_api.template.squid_api_export_scheduler_index_view;
                     this.listenTo(exportJobs, "reset change remove sync", this.render);
-                    this.render();
                 },
                 events: {
                     "click .create-job": function() {
@@ -114,7 +113,7 @@
                 },
                 render: function() {
                     var jsonData = {"jobs": []};
-                    for (i=0; i<this.model.models.length; i++) {
+                    for (var i=0; i<this.model.models.length; i++) {
                         for (ix=0; ix<me.reports.length; ix++) {
                             if (me.reports[ix].oid == this.model.models[i].get("shortcutId")) {
                                 this.model.models[i].set("reportName", me.reports[ix].name);
