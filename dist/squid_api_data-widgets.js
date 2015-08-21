@@ -2267,6 +2267,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         schedulerApiUri : null,
         exportJobs : null,
         hiddenFields : null,
+        widgetAccessible : false,
 
         initialize : function(options) {
             widget = this;
@@ -2319,15 +2320,34 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // listeners
             this.listenTo(squid_api.model.login, "change:accessToken", this.fetchAndRender);
-            this.render();
+            this.listenTo(exportJobs, 'change reset sync', this.render);
         },
 
         events: {
             "click button" : "renderIndex"
         },
 
+        widgetStatus : function(activated) {
+            if (activated) {
+                this.$el.find("button").prop('disabled', false);
+            } else {
+                this.$el.find("button").prop('disabled', true);
+            }
+        },
+
         fetchAndRender : function() {
-            exportJobs.fetch();
+            exportJobs.fetch({
+                success: function(collection, response) {
+                    if (response.statusCode == 401) {
+                        widget.widgetAccessible = false;
+                    } else {
+                        widget.widgetAccessible = true;
+                    }
+                },
+                error: function() {
+                    widget.widgetAccessible = false;
+                }
+            });
         },
 
         renderIndex: function() {
@@ -2483,9 +2503,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render : function() {
-            // static view
             var html = this.template();
             this.$el.html(html);
+
+            // activate / disactivate button
+            if (this.widgetAccessible) {
+                this.$el.find("button").prop("disabled", false);
+            } else {
+                this.$el.find("button").prop("disabled", true);
+            }
         }
     });
 
