@@ -244,9 +244,9 @@ function program1(depth0,data) {
     + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.period)),stack1 == null || stack1 === false ? stack1 : stack1.type)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "</td>\n                    <td>"
     + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.format)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</td>\n                    <td>Every "
+    + "</td>\n                    <td>every "
     + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.scheduling)),stack1 == null || stack1 === false ? stack1 : stack1.frequencyDay)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + " Day(s)</td>\n                    <td>";
+    + " day(s)</td>\n                    <td>";
   if (helper = helpers.nextExecutionDate) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.nextExecutionDate); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -258,7 +258,7 @@ function program1(depth0,data) {
   return buffer;
   }
 
-  buffer += "<div class=\"squid-api-export-scheduler-index-view table-responsive\">\n    <button class=\"btn btn-default create-job\">create job</button>\n    <table class=\"table table-bordered table-striped table-hover\">\n        <thead>\n            <tr>\n                <th>Report</th>\n                <th>Report Type</th>\n                <th>Report Format</th>\n                <th>Delivery Frequency</th>\n                <th>Next Delivery</th>\n                <th>Delivered to</th>\n                <th>Run Now</th>\n                <th>Edit</th>\n                <th>Delete</th>\n            </tr>\n        </thead>\n        <tbody>\n            ";
+  buffer += "<div class=\"squid-api-export-scheduler-index-view table-responsive\">\n    <button class=\"btn btn-default create-job\">create job</button>\n    <table class=\"table table-bordered table-striped table-hover\">\n        <thead>\n            <tr>\n                <th>Report</th>\n                <th>Type</th>\n                <th>Format</th>\n                <th>Frequency</th>\n                <th>Next Delivery</th>\n                <th>Delivered to</th>\n                <th>Run Now</th>\n                <th>Edit</th>\n                <th>Delete</th>\n            </tr>\n        </thead>\n        <tbody>\n            ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.jobs), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n        </tbody>\n    </table>\n</div>\n";
@@ -2327,14 +2327,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             "click button" : "renderIndex"
         },
 
-        widgetStatus : function(activated) {
-            if (activated) {
-                this.$el.find("button").prop('disabled', false);
-            } else {
-                this.$el.find("button").prop('disabled', true);
-            }
-        },
-
         fetchAndRender : function() {
             exportJobs.fetch({
                 success: function(collection, response) {
@@ -2388,6 +2380,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         exportJobs.remove(job);
                     }
                 },
+
                 render: function() {
                     var jsonData = {"jobs": []};
                     for (var i=0; i<this.model.models.length; i++) {
@@ -2396,7 +2389,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 this.model.models[i].set("reportName", me.reports[ix].name);
                             }
                         }
-                        jsonData.jobs.push(this.model.models[i].toJSON());
+                        // format jsonData
+                        var job = this.model.models[i].toJSON();
+                        if (job.nextExecutionDate) {
+                            job.nextExecutionDate = moment(job.nextExecutionDate).format("DD-MM-YYYY");
+                        }
+                        jsonData.jobs.push(job);
                     }
                     this.$el.html(this.template(jsonData));
 
@@ -2408,7 +2406,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             });
             this.indexModal = new Backbone.BootstrapModal({
                 content: new indexView(),
-                title: "Jobs"
+                title: "Scheduled Usage Reports"
             }).open();
         },
 
@@ -2420,12 +2418,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         renderForm: function(id) {
             this.getSchema().then(function(data) {
+                var modalHeader;
                 if (id) {
                     model = exportJobs.where({"_id" : id})[0];
+                    modalHeader = model.get("reportName") + " scheduled usage report";
                 } else {
                     model = new exportJobModel();
+                    modalHeader = "new scheduled usage report";
                 }
-
                 // construct schema ignoring hidden fields
                 var schema = {};
                 for (var x in data) {
@@ -2457,9 +2457,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         return this;
                     }
                 });
+
                 var formModal = new Backbone.BootstrapModal({
                     content: new formView(),
-                    title: "Jobs Form"
+                    title: modalHeader
                 }).open();
 
                 formModal.on('ok', function (event) {

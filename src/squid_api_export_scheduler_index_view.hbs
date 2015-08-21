@@ -4,9 +4,9 @@
         <thead>
             <tr>
                 <th>Report</th>
-                <th>Report Type</th>
-                <th>Report Format</th>
-                <th>Delivery Frequency</th>
+                <th>Type</th>
+                <th>Format</th>
+                <th>Frequency</th>
                 <th>Next Delivery</th>
                 <th>Delivered to</th>
                 <th>Run Now</th>
@@ -20,7 +20,7 @@
                     <td>{{reportName}}</td>
                     <td>{{report.period.type}}</td>
                     <td>{{report.format}}</td>
-                    <td>Every {{scheduling.frequencyDay}} Day(s)</td>
+                    <td>every {{scheduling.frequencyDay}} day(s)</td>
                     <td>{{nextExecutionDate}}</td>
                     <td>{{emails}}</td>
                     <td><button class="btn btn-secondary run-job"><i class="fa fa-refresh"></i></button></td>

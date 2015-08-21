@@ -10,6 +10,10 @@
     text-align: center;
 }
 
+.squid-api-export-scheduler-index-view.table-responsive label, .squid-api-export-scheduler-index-view table.dataTable.no-footer {
+    font-size: 12px;
+}
+
 .squid-api-export-scheduler-index-view table td {
     max-width: 220px;
     text-overflow: ellipsis;
@@ -18,6 +22,20 @@
 
 .squid-api-export-scheduler-index-view table.dataTable.no-footer {
     border-bottom: 1px solid #dedcde;
+    table-layout: fixed;
+}
+
+.squid-api-export-scheduler-index-view table.dataTable.no-footer button {
+    margin-left: 25%;
+    margin-top: 10%;
+}
+
+.squid-api-export-scheduler-index-view table thead tr {
+    white-space: nowrap;
+}
+
+.squid-api-export-scheduler-index-view table tbody tr {
+    word-wrap: break-word;
 }
 
 .squid-api-export-scheduler-index-view .dataTables_info {
@@ -26,6 +44,7 @@
 
 .squid-api-export-scheduler-index-view table.dataTable thead th, .squid-api-export-scheduler-index-view table.dataTable thead td {
     border-bottom: 1px solid #c8c8c8;
+    font-weight: bold;
 }
 
 .squid-api-export-scheduler-index-view .dataTables_wrapper {

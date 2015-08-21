@@ -123,6 +123,7 @@
                         exportJobs.remove(job);
                     }
                 },
+
                 render: function() {
                     var jsonData = {"jobs": []};
                     for (var i=0; i<this.model.models.length; i++) {
@@ -131,7 +132,12 @@
                                 this.model.models[i].set("reportName", me.reports[ix].name);
                             }
                         }
-                        jsonData.jobs.push(this.model.models[i].toJSON());
+                        // format jsonData
+                        var job = this.model.models[i].toJSON();
+                        if (job.nextExecutionDate) {
+                            job.nextExecutionDate = moment(job.nextExecutionDate).format("DD-MM-YYYY");
+                        }
+                        jsonData.jobs.push(job);
                     }
                     this.$el.html(this.template(jsonData));
 
@@ -143,7 +149,7 @@
             });
             this.indexModal = new Backbone.BootstrapModal({
                 content: new indexView(),
-                title: "Jobs"
+                title: "Scheduled Usage Reports"
             }).open();
         },
 
@@ -155,12 +161,14 @@
 
         renderForm: function(id) {
             this.getSchema().then(function(data) {
+                var modalHeader;
                 if (id) {
                     model = exportJobs.where({"_id" : id})[0];
+                    modalHeader = model.get("reportName") + " scheduled usage report";
                 } else {
                     model = new exportJobModel();
+                    modalHeader = "new scheduled usage report";
                 }
-
                 // construct schema ignoring hidden fields
                 var schema = {};
                 for (var x in data) {
@@ -192,9 +200,10 @@
                         return this;
                     }
                 });
+
                 var formModal = new Backbone.BootstrapModal({
                     content: new formView(),
-                    title: "Jobs Form"
+                    title: modalHeader
                 }).open();
 
                 formModal.on('ok', function (event) {
