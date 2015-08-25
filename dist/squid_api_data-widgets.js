@@ -245,7 +245,7 @@ function program1(depth0,data) {
     + "</td>\n                    <td>"
     + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.format)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "</td>\n                    <td>every "
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.scheduling)),stack1 == null || stack1 === false ? stack1 : stack1.frequencyDay)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.scheduling)),stack1 == null || stack1 === false ? stack1 : stack1.frequency)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + " day(s)</td>\n                    <td>";
   if (helper = helpers.nextExecutionDate) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.nextExecutionDate); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
@@ -2292,7 +2292,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             this.indexView = squid_api.template.squid_api_export_scheduler_index_view;
 
-            exportJobModel = Backbone.Model.extend({
+            exportJobModel = Backbone.DeepModel.extend({
                 urlRoot : this.schedulerApiUri + "/jobs",
                 idAttribute: "_id",
                 url: function() {
@@ -2446,7 +2446,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                            schema[x].type = "List";
                            schema[x].itemType = "Text";
                         } else {
-                           schema[x].type = "Text";
+                          if(data[x].enumValues){
+                              schema[x].type = "Select";
+                              schema[x].options = data[x].enumValues;
+                          }else if(data[x].options.enum){
+                              schema[x].type = "Select";
+                              schema[x].options = data[x].options.enum;
+                          }else{
+                            schema[x].type = "Text";
+                         }
                         }
                     }
                }
@@ -2478,34 +2486,62 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         // manipulate data
                         values.customerId = squid_api.model.customer.get("id");
                         values.userId = squid_api.model.login.get("userId");
-                        values.shortcutId = squid_api.model.config.get("report");
 
-                  if (id) {
-                    // EDIT aka PUT /jobs/:id
-                    var job = exportJobs.get(id);
-                    job.set(values);
-                    job.save();
+                        var currentStateId = squid_api.model.state.get("oid");
+                        //Create a shortcut corresponding to the current state.
+                        var shortcutName = "export-scheduler-"+values.customerId;
+                        var shortcutId = "export-scheduler-"+values.customerId;
 
-                  } else{
-                    // CREATE aka POST /jobs/
-                    var newJob = new exportJobModel(values);
-                    newJob.save({}, {
-                        success: function(model) {
-                            var msg = "";
-                            if (model.get("errors")) {
-                                var errors = model.get("errors");
-                                for (var x in errors) {
-                                    msg = msg + errors[x].message + "<br />";
+                        // TODO handle the case when state ins't existing yet
+                        if (currentStateId) {
+                            var shortcutModel = new squid_api.model.ShortcutModel();
+                            var data = {
+                                "id" : {
+                                    "customerId" : values.customerId,
+                                    "shortcutId" : shortcutId
+                                },
+                                "name" : shortcutName,
+                                "stateId" : currentStateId
+                            };
+                            shortcutModel.save(data, {
+                                success : function(model, response, options) {
+
+                                    console.log("Saved shortcut "+shortcutId);
+
+                                },
+                                error : function(model, response, options) {
+                                    squid_api.model.status.set('error', 'Shortcut save failed');
                                 }
-                            } else {
-                                exportJobs.add(model);
-                                msg = msg + "job successfully saved";
-                            }
-                            squid_api.model.status.set("message", msg);
+                            });
                         }
-                    });
-                  }
+                        values.shortcutId = shortcutId;
+                  //if(values.shortcutId){
+                      if (id) {
+                        // EDIT aka PUT /jobs/:id
+                        var job = exportJobs.get(id);
+                        job.set(values);
+                        job.save();
 
+                      } else{
+                        // CREATE aka POST /jobs/
+                        var newJob = new exportJobModel(values);
+                        newJob.save({}, {
+                            success: function(model) {
+                                var msg = "";
+                                if (model.get("errors")) {
+                                    var errors = model.get("errors");
+                                    for (var x in errors) {
+                                        msg = msg + errors[x].message + "<br />";
+                                    }
+                                } else {
+                                    exportJobs.add(model);
+                                    msg = msg + "job successfully saved";
+                                }
+                                squid_api.model.status.set("message", msg);
+                            }
+                        });
+                      }
+                    //}
                 });
 
             });
