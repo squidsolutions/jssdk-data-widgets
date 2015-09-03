@@ -4,3 +4,7 @@
 /node_modules
 /build
 .sass-cache/
+**/*.backup
+/dump
+dump.rdb
+.idea/

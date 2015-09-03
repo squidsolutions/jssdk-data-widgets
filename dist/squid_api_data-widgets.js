@@ -237,11 +237,13 @@ function program1(depth0,data) {
   else { helper = (depth0 && depth0._id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
     + ">\n                    <td>";
-  if (helper = helpers.reportName) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.reportName); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  if (helper = helpers.accountID) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.accountID); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</td>\n                    <td>"
-    + escapeExpression(((stack1 = ((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.period)),stack1 == null || stack1 === false ? stack1 : stack1.type)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</td>\n                    <td>";
+  if (helper = helpers.reportId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.reportId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
     + "</td>\n                    <td>"
     + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.format)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "</td>\n                    <td>every "
@@ -258,7 +260,7 @@ function program1(depth0,data) {
   return buffer;
   }
 
-  buffer += "<div class=\"squid-api-export-scheduler-index-view table-responsive\">\n    <button class=\"btn btn-default create-job\">create job</button>\n    <table class=\"table table-bordered table-striped table-hover\">\n        <thead>\n            <tr>\n                <th>Report</th>\n                <th>Type</th>\n                <th>Format</th>\n                <th>Frequency</th>\n                <th>Next Delivery</th>\n                <th>Delivered to</th>\n                <th>Run Now</th>\n                <th>Edit</th>\n                <th>Delete</th>\n            </tr>\n        </thead>\n        <tbody>\n            ";
+  buffer += "<div class=\"squid-api-export-scheduler-index-view table-responsive\">\n    <button class=\"btn btn-default create-job\">create job</button>\n    <table class=\"table table-bordered table-striped table-hover\">\n        <thead>\n            <tr>\n                <th>Client Account</th>\n                <th>Report type</th>\n                <th>Format</th>\n                <th>Email Frequency</th>\n                <th>Next Delivery</th>\n                <th>Delivered to</th>\n                <th>Run Now</th>\n                <th>Edit</th>\n                <th>Delete</th>\n            </tr>\n        </thead>\n        <tbody>\n            ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.jobs), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n        </tbody>\n    </table>\n</div>\n";
@@ -2440,6 +2442,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     if (widget.hiddenFields.indexOf(x) == -1) {
                         schema[x] = {};
                         schema[x].editorClass = "form-control";
+                        if((typeof data[x].options.title !== 'undefined')){
+                          schema[x].title=data[x].options.title;
+                        }
                         if (data[x].instance == "Date") {
                            schema[x].type = "Date";
                         } else if (data[x].instance == "Array") {
@@ -2489,8 +2494,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                         var currentStateId = squid_api.model.state.get("oid");
                         //Create a shortcut corresponding to the current state.
-                        var shortcutName = "export-scheduler-"+values.customerId;
-                        var shortcutId = "export-scheduler-"+values.customerId;
+                        var shortcutName = "export-scheduler-"+values.customerId+"-"+moment().format('YYYY-MM-DD_hh-mm-ss');
+                        var shortcutId = "export-scheduler-"+values.customerId+"-"+moment().format('YYYY-MM-DD_hh-mm-ss');
 
                         // TODO handle the case when state ins't existing yet
                         if (currentStateId) {
@@ -2513,8 +2518,46 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                     squid_api.model.status.set('error', 'Shortcut save failed');
                                 }
                             });
+                        }else{
+                            var stateModel = new squid_api.model.StateModel();
+                            var stateData = {
+                                "id" : {
+                                    "customerId" : values.customerId,
+                                    "shortcutId" : shortcutId
+                                },
+                                "name" : shortcutName,
+                                "stateId" : currentStateId
+                            };
+                            stateModel.save(data, {
+                                success : function(model, response, options) {
+
+                                    console.log("Saved state "+currentStateId);
+
+                                },
+                                error : function(model, response, options) {
+                                    squid_api.model.status.set('error', 'State for scheduler not saved');
+                                }
+                            });
+
                         }
                         values.shortcutId = shortcutId;
+                        var accountID = 0;
+                        var facets = squid_api.model.state.attributes.config.selection.facets;
+                        for (var i=0;i<facets.length;i++) {
+                            var check = facets[i].id.indexOf("@'shipto_account_name'",facets[i].id.length-"@'shipto_account_name'".length);
+                            if (check!=-1) {
+                                if (facets[i] && facets[i].selectedItems && facets[i].selectedItems.length==1) {
+                                    var selection = facets[i].selectedItems[0];
+                                    //var account = selection.value;
+                                    if (selection.attributes && selection.attributes.ID) {
+                                        accountID = selection.attributes.ID;
+                                    }
+                                }
+                            }
+                        }
+                        values.accountID = accountID;
+
+                        values.reportId = squid_api.model.state.attributes.config.report;
                   //if(values.shortcutId){
                       if (id) {
                         // EDIT aka PUT /jobs/:id
@@ -2531,7 +2574,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 if (model.get("errors")) {
                                     var errors = model.get("errors");
                                     for (var x in errors) {
-                                        msg = msg + errors[x].message + "<br />";
+                                        msg = msg + errors[x].message + "";
                                     }
                                 } else {
                                     exportJobs.add(model);

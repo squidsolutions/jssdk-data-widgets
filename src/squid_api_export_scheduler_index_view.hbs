@@ -3,10 +3,10 @@
     <table class="table table-bordered table-striped table-hover">
         <thead>
             <tr>
-                <th>Report</th>
-                <th>Type</th>
+                <th>Client Account</th>
+                <th>Report type</th>
                 <th>Format</th>
-                <th>Frequency</th>
+                <th>Email Frequency</th>
                 <th>Next Delivery</th>
                 <th>Delivered to</th>
                 <th>Run Now</th>
@@ -17,8 +17,8 @@
         <tbody>
             {{#each jobs}}
                 <tr class="job-item" data-attr={{_id}}>
-                    <td>{{reportName}}</td>
-                    <td>{{report.period.type}}</td>
+                    <td>{{accountID}}</td>
+                    <td>{{reportId}}</td>
                     <td>{{report.format}}</td>
                     <td>every {{scheduling.frequency}} day(s)</td>
                     <td>{{nextExecutionDate}}</td>

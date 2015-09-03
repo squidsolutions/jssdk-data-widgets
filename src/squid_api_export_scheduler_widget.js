@@ -235,8 +235,8 @@
 
                         var currentStateId = squid_api.model.state.get("oid");
                         //Create a shortcut corresponding to the current state.
-                        var shortcutName = "export-scheduler-"+values.customerId;
-                        var shortcutId = "export-scheduler-"+values.customerId;
+                        var shortcutName = "export-scheduler-"+values.customerId+"-"+moment().format('YYYY-MM-DD_hh-mm-ss');
+                        var shortcutId = "export-scheduler-"+values.customerId+"-"+moment().format('YYYY-MM-DD_hh-mm-ss');
 
                         // TODO handle the case when state ins't existing yet
                         if (currentStateId) {
@@ -259,8 +259,46 @@
                                     squid_api.model.status.set('error', 'Shortcut save failed');
                                 }
                             });
+                        }else{
+                            var stateModel = new squid_api.model.StateModel();
+                            var stateData = {
+                                "id" : {
+                                    "customerId" : values.customerId,
+                                    "shortcutId" : shortcutId
+                                },
+                                "name" : shortcutName,
+                                "stateId" : currentStateId
+                            };
+                            stateModel.save(data, {
+                                success : function(model, response, options) {
+
+                                    console.log("Saved state "+currentStateId);
+
+                                },
+                                error : function(model, response, options) {
+                                    squid_api.model.status.set('error', 'State for scheduler not saved');
+                                }
+                            });
+
                         }
                         values.shortcutId = shortcutId;
+                        var accountID = 0;
+                        var facets = squid_api.model.state.attributes.config.selection.facets;
+                        for (var i=0;i<facets.length;i++) {
+                            var check = facets[i].id.indexOf("@'shipto_account_name'",facets[i].id.length-"@'shipto_account_name'".length);
+                            if (check!=-1) {
+                                if (facets[i] && facets[i].selectedItems && facets[i].selectedItems.length==1) {
+                                    var selection = facets[i].selectedItems[0];
+                                    //var account = selection.value;
+                                    if (selection.attributes && selection.attributes.ID) {
+                                        accountID = selection.attributes.ID;
+                                    }
+                                }
+                            }
+                        }
+                        values.accountID = accountID;
+
+                        values.reportId = squid_api.model.state.attributes.config.report;
                   //if(values.shortcutId){
                       if (id) {
                         // EDIT aka PUT /jobs/:id
@@ -277,7 +315,7 @@
                                 if (model.get("errors")) {
                                     var errors = model.get("errors");
                                     for (var x in errors) {
-                                        msg = msg + errors[x].message + "<br />";
+                                        msg = msg + errors[x].message + "";
                                     }
                                 } else {
                                     exportJobs.add(model);
