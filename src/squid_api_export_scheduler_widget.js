@@ -234,54 +234,11 @@
                         values.userId = squid_api.model.login.get("userId");
 
                         var currentStateId = squid_api.model.state.get("oid");
-                        //Create a shortcut corresponding to the current state.
-                        var shortcutName = "export-scheduler-"+values.customerId+"-"+moment().format('YYYY-MM-DD_hh-mm-ss');
-                        var shortcutId = "export-scheduler-"+values.customerId+"-"+moment().format('YYYY-MM-DD_hh-mm-ss');
 
-                        // TODO handle the case when state ins't existing yet
-                        if (currentStateId) {
-                            var shortcutModel = new squid_api.model.ShortcutModel();
-                            var data = {
-                                "id" : {
-                                    "customerId" : values.customerId,
-                                    "shortcutId" : shortcutId
-                                },
-                                "name" : shortcutName,
-                                "stateId" : currentStateId
-                            };
-                            shortcutModel.save(data, {
-                                success : function(model, response, options) {
-
-                                    console.log("Saved shortcut "+shortcutId);
-
-                                },
-                                error : function(model, response, options) {
-                                    squid_api.model.status.set('error', 'Shortcut save failed');
-                                }
-                            });
-                        }else{
-                            var stateModel = new squid_api.model.StateModel();
-                            var stateData = {
-                                "id" : {
-                                    "customerId" : values.customerId,
-                                    "shortcutId" : shortcutId
-                                },
-                                "name" : shortcutName,
-                                "stateId" : currentStateId
-                            };
-                            stateModel.save(data, {
-                                success : function(model, response, options) {
-
-                                    console.log("Saved state "+currentStateId);
-
-                                },
-                                error : function(model, response, options) {
-                                    squid_api.model.status.set('error', 'State for scheduler not saved');
-                                }
-                            });
-
-                        }
-                        values.shortcutId = shortcutId;
+                        squid_api.saveState();
+                        console.log('State for scheduler saved');
+                        values.state = squid_api.model.state;
+ 
                         var accountID = 0;
                         var facets = squid_api.model.state.attributes.config.selection.facets;
                         for (var i=0;i<facets.length;i++) {
