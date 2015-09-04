@@ -233,12 +233,22 @@
                         values.customerId = squid_api.model.customer.get("id");
                         values.userId = squid_api.model.login.get("userId");
 
-                        var currentStateId = squid_api.model.state.get("oid");
+                        // Remove duplicate in emails T264.
+                        var emails = values.emails.reduce(function(accum, current) {
+                                if (accum.indexOf(current) < 0) {
+                                    accum.push(current);
+                                }
+                                return accum;
+                            }, []);
+                        values.emails = emails;
 
+                        // Save the state inside the schedulerjob
+                        var currentStateId = squid_api.model.state.get("oid");
                         squid_api.saveState();
                         console.log('State for scheduler saved');
                         values.state = squid_api.model.state;
- 
+
+                        // Getting the accountID (shared code with PQ Counter)
                         var accountID = 0;
                         var facets = squid_api.model.state.attributes.config.selection.facets;
                         for (var i=0;i<facets.length;i++) {
@@ -256,7 +266,7 @@
                         values.accountID = accountID;
 
                         values.reportId = squid_api.model.state.attributes.config.report;
-                  //if(values.shortcutId){
+
                       if (id) {
                         // EDIT aka PUT /jobs/:id
                         var job = exportJobs.get(id);
@@ -282,7 +292,6 @@
                             }
                         });
                       }
-                    //}
                 });
 
             });
