@@ -248,7 +248,7 @@ function program1(depth0,data) {
     + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.format)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "</td>\n                    <td>every "
     + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.scheduling)),stack1 == null || stack1 === false ? stack1 : stack1.frequency)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + " day(s)</td>\n                    <td>";
+    + " </td>\n                    <td>";
   if (helper = helpers.nextExecutionDate) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.nextExecutionDate); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -2332,10 +2332,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         fetchAndRender: function () {
             exportJobs.fetch({
                 success: function (collection, response) {
-                    if (response.statusCode == 401) {
-                        widget.widgetAccessible = false;
-                    } else {
+                    if (response.statusCode == 200) {
                         widget.widgetAccessible = true;
+                    } else {
+                        widget.widgetAccessible = false;
                     }
                 },
                 error: function () {
@@ -2562,7 +2562,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // activate / disactivate button
             if (this.widgetAccessible) {
-                this.$el.find("button").prop("visibility", 'hidden');
+                this.$el.find("button").prop("visibility", 'visible');
             } else {
                 this.$el.find("button").prop("visibility", 'hidden');
             }

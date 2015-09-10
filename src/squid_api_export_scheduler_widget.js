@@ -73,10 +73,10 @@
         fetchAndRender: function () {
             exportJobs.fetch({
                 success: function (collection, response) {
-                    if (response.statusCode == 401) {
-                        widget.widgetAccessible = false;
-                    } else {
+                    if (response.statusCode == 200) {
                         widget.widgetAccessible = true;
+                    } else {
+                        widget.widgetAccessible = false;
                     }
                 },
                 error: function () {
