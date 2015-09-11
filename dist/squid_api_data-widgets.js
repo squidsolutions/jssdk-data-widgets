@@ -16,7 +16,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  buffer += "<div class='sq-loading' style='display: none; position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n<div id=\"squid-api-data-widgets-data-table\">\r\n	<table class=\"sq-table\">\r\n		<thead>\r\n			<tr></tr>\r\n		</thead>\r\n		<tbody></tbody>\r\n	</table>\r\n	<div id=\"stale\">\r\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-table\"></i><br>\r\n			";
+  buffer += "<div class='sq-loading' style='display: none; position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n<div id=\"squid-api-data-widgets-data-table\">\r\n	<table class=\"sq-table\">\r\n		<thead>\r\n			<tr></tr>\r\n		</thead>\r\n		<tbody></tbody>\r\n	</table>\r\n	<div id=\"error\"></div>\r\n	<div id=\"stale\">\r\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-table\"></i><br>\r\n			";
   if (helper = helpers.staleMessage) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.staleMessage); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -1583,11 +1583,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             if (this.model.get("status") === "DONE") {
-                // display results
-                this.displayTableContent(selector);
-                if (this.paging) {
-                    this.paginationView.render();
-                    this.$el.find("#pagination").show();
+                if (!this.model.get("error")) {
+                    // display results
+                    this.displayTableContent(selector);
+                    if (this.paging) {
+                        this.paginationView.render();
+                        this.$el.find("#pagination").show();
+                    }
+                    this.$el.find("#error").html("");
+                } else {
+                    this.$el.find("#error").html("Error : "+this.model.get("error").message);
                 }
                 this.$el.find("#total").show();
                 this.$el.find(".sq-loading").hide();
@@ -1600,6 +1605,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.$el.find(".sq-loading").show();
                 this.$el.find("#stale").hide();
                 this.$el.find(".sort-direction").show();
+                this.$el.find("#error").html("");
             }
 
             if (this.model.get("status") === "PENDING") {
@@ -1609,6 +1615,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.$el.find("#total").hide();
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").show();
+                this.$el.find("#error").html("");
             }
 
             return this;

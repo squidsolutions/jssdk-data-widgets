@@ -448,11 +448,16 @@
             }
 
             if (this.model.get("status") === "DONE") {
-                // display results
-                this.displayTableContent(selector);
-                if (this.paging) {
-                    this.paginationView.render();
-                    this.$el.find("#pagination").show();
+                if (!this.model.get("error")) {
+                    // display results
+                    this.displayTableContent(selector);
+                    if (this.paging) {
+                        this.paginationView.render();
+                        this.$el.find("#pagination").show();
+                    }
+                    this.$el.find("#error").html("");
+                } else {
+                    this.$el.find("#error").html("Error : "+this.model.get("error").message);
                 }
                 this.$el.find("#total").show();
                 this.$el.find(".sq-loading").hide();
@@ -465,6 +470,7 @@
                 this.$el.find(".sq-loading").show();
                 this.$el.find("#stale").hide();
                 this.$el.find(".sort-direction").show();
+                this.$el.find("#error").html("");
             }
 
             if (this.model.get("status") === "PENDING") {
@@ -474,6 +480,7 @@
                 this.$el.find("#total").hide();
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").show();
+                this.$el.find("#error").html("");
             }
 
             return this;

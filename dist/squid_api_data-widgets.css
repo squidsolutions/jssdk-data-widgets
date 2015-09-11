@@ -103,6 +103,11 @@ rect text {
 	color: #f8f8f8;
 }
 
+#squid-api-data-widgets-data-table #error {
+	font-size: medium;
+	color: red;
+}
+
 #squid-api-data-widgets-data-table .reactiveMessage span {
 	display: inline-block;
 	background: #fff;
