@@ -219,7 +219,7 @@
                 // add orderBy direction
                 for (ix=0; ix<orderBy.length; ix++) {
                     for (col=0; col<columns.length; col++) {
-                        if (this.ordering && config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
+                        if (this.ordering && config.get("rollups") && this.rollupSummaryColumn >= 0 && col === orderBy[ix].col) {
                             if (status !== "DONE") {
                                 columns[col - 1].orderDirection = orderBy[ix].direction;
                             } else {
@@ -227,7 +227,7 @@
                             }
                             break;
                         }
-                        else if (this.ordering && col == orderBy[ix].col) {
+                        else if (this.ordering && col === orderBy[ix].col) {
                             columns[col].orderDirection = orderBy[ix].direction;
                             break;
                         }
@@ -250,7 +250,7 @@
             d3.select(selector).select("thead tr").selectAll("th").remove();
 
             if (!invalidSelection) {
-                var th = d3.select(selector).select("thead tr").selectAll("th")
+                d3.select(selector).select("thead tr").selectAll("th")
                     .data(columns)
                     .enter().append("th")
                     .attr("class", function(d, i) {
@@ -271,7 +271,7 @@
                         }
                         return str;
                     })
-                    .html(function(d, i) {
+                    .html(function(d) {
                         var str = d.name;
                         if (d.orderDirection === "ASC") {
                             str = str + " " + "<span class='sort-direction'>&#xffea;</span>";
@@ -337,7 +337,7 @@
                     newRow = {v:[]};
                     for (colIdx = 0; colIdx<results.cols.length; colIdx++) {
                         v = row.v[colIdx];
-                        if (results.cols[colIdx].dataType == "NUMBER") {
+                        if (results.cols[colIdx].dataType === "NUMBER") {
                             v = this.format(v);
                         }
                         newRow.v.push(v);
@@ -353,7 +353,7 @@
                     .append("tr");
 
                 // Cells
-                var td = tr.selectAll("td")
+                tr.selectAll("td")
                     .data(function(d) {
                         return d.v;
                     })
@@ -440,7 +440,7 @@
         },
 
         render : function() {
-            var me = this;
+
             var selector = "#"+this.el.id+" .sq-table";
             if (this.model.get("facets") && this.filters.get("selection")) {
                 // display table header

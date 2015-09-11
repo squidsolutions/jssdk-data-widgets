@@ -1354,7 +1354,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // add orderBy direction
                 for (ix=0; ix<orderBy.length; ix++) {
                     for (col=0; col<columns.length; col++) {
-                        if (this.ordering && config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
+                        if (this.ordering && config.get("rollups") && this.rollupSummaryColumn >= 0 && col === orderBy[ix].col) {
                             if (status !== "DONE") {
                                 columns[col - 1].orderDirection = orderBy[ix].direction;
                             } else {
@@ -1362,7 +1362,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             }
                             break;
                         }
-                        else if (this.ordering && col == orderBy[ix].col) {
+                        else if (this.ordering && col === orderBy[ix].col) {
                             columns[col].orderDirection = orderBy[ix].direction;
                             break;
                         }
@@ -1385,7 +1385,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             d3.select(selector).select("thead tr").selectAll("th").remove();
 
             if (!invalidSelection) {
-                var th = d3.select(selector).select("thead tr").selectAll("th")
+                d3.select(selector).select("thead tr").selectAll("th")
                     .data(columns)
                     .enter().append("th")
                     .attr("class", function(d, i) {
@@ -1406,7 +1406,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         }
                         return str;
                     })
-                    .html(function(d, i) {
+                    .html(function(d) {
                         var str = d.name;
                         if (d.orderDirection === "ASC") {
                             str = str + " " + "<span class='sort-direction'>&#xffea;</span>";
@@ -1472,7 +1472,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     newRow = {v:[]};
                     for (colIdx = 0; colIdx<results.cols.length; colIdx++) {
                         v = row.v[colIdx];
-                        if (results.cols[colIdx].dataType == "NUMBER") {
+                        if (results.cols[colIdx].dataType === "NUMBER") {
                             v = this.format(v);
                         }
                         newRow.v.push(v);
@@ -1488,7 +1488,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     .append("tr");
 
                 // Cells
-                var td = tr.selectAll("td")
+                tr.selectAll("td")
                     .data(function(d) {
                         return d.v;
                     })
@@ -1575,7 +1575,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render : function() {
-            var me = this;
+
             var selector = "#"+this.el.id+" .sq-table";
             if (this.model.get("facets") && this.filters.get("selection")) {
                 // display table header
