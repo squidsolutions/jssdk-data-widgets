@@ -2464,6 +2464,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
                 }
 
+
+
+
                 widget.formContent = new Backbone.Form({
                     schema: schema,
                     model: model
@@ -2484,6 +2487,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     title: modalHeader
                 }).open();
 
+
+
                 formModal.on('ok', function (event) {
                     // the form is used in create and edit mode.
                     var values = widget.formContent.getValue();
@@ -2491,14 +2496,20 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     // manipulate data
                     values.customerId = squid_api.model.customer.get("id");
                     values.userId = squid_api.model.login.get("userId");
-
-                    // Remove duplicate in emails T264.
-                    var emails = values.emails.reduce(function (accum, current) {
-                        if (accum.indexOf(current) < 0) {
-                            accum.push(current);
+                    var emails = widget.formContent.getValue().emails;
+                    if (emails.length >1) {
+                        emails = widget.formContent.getValue().emails.slice((((widget.formContent.getValue().emails.length - 1) / 2) + 1), widget.formContent.getValue().emails.length);
+                        if (widget.formContent.getValue().emails.lastIndexOf(widget.formContent.getValue().emails[0]) > 0) {
+                            emails = widget.formContent.getValue().emails.slice(widget.formContent.getValue().emails.lastIndexOf(widget.formContent.getValue().emails[0]), widget.formContent.getValue().emails.length);
                         }
-                        return accum;
-                    }, []);
+                        // Remove duplicate in emails T264.
+                        /*var emails = values.emails.reduce(function (accum, current) {
+                         if (accum.indexOf(current) < 0) {
+                         accum.push(current);
+                         }
+                         return accum;
+                         }, []);*/
+                    }
                     values.emails = emails;
 
                     // Save the state inside the schedulerjob
@@ -2529,6 +2540,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     if (id) {
                         // EDIT aka PUT /jobs/:id
                         var job = exportJobs.get(id);
+                        job.attributes.emails = values.emails;
                         job.set(values);
                         job.save();
 
