@@ -237,9 +237,14 @@
                     // manipulate data
                     values.customerId = squid_api.model.customer.get("id");
                     values.userId = squid_api.model.login.get("userId");
-                    var emails = widget.formContent.getValue().emails;
+
+                    var emails = widget.formContent.getValue().emails; //Return an array with [old,values,new,values]
+                    // if length == 1 then new job
+                    // if lenght == 0 then I should keep the last one entered
                     if (emails.length >1) {
+                        // Take the new values assuming no deletion
                         emails = widget.formContent.getValue().emails.slice((((widget.formContent.getValue().emails.length - 1) / 2) + 1), widget.formContent.getValue().emails.length);
+                        // computing the separator old new values using the first old value.
                         if (widget.formContent.getValue().emails.lastIndexOf(widget.formContent.getValue().emails[0]) > 0) {
                             emails = widget.formContent.getValue().emails.slice(widget.formContent.getValue().emails.lastIndexOf(widget.formContent.getValue().emails[0]), widget.formContent.getValue().emails.length);
                         }
@@ -253,30 +258,7 @@
                     }
                     values.emails = emails;
 
-                    // Save the state inside the schedulerjob
-                    var currentStateId = squid_api.model.state.get("oid");
-                    squid_api.saveState();
-                    console.log('State for scheduler saved');
-                    values.state = squid_api.model.state;
 
-                    // Getting the accountID (shared code with PQ Counter)
-                    var accountID = 0;
-                    var facets = squid_api.model.state.attributes.config.selection.facets;
-                    for (var i = 0; i < facets.length; i++) {
-                        var check = facets[i].id.indexOf("@'shipto_account_name'", facets[i].id.length - "@'shipto_account_name'".length);
-                        if (check != -1) {
-                            if (facets[i] && facets[i].selectedItems && facets[i].selectedItems.length == 1) {
-                                var selection = facets[i].selectedItems[0];
-                                //var account = selection.value;
-                                if (selection.attributes && selection.attributes.ID) {
-                                    accountID = selection.attributes.ID;
-                                }
-                            }
-                        }
-                    }
-                    values.accountID = accountID;
-
-                    values.reportId = squid_api.model.state.attributes.config.report;
 
                     if (id) {
                         // EDIT aka PUT /jobs/:id
@@ -287,6 +269,31 @@
 
                     } else {
                         // CREATE aka POST /jobs/
+
+                        // Save the state inside the schedulerjob
+                        var currentStateId = squid_api.model.state.get("oid");
+                        squid_api.saveState();
+                        console.log('State for scheduler saved');
+                        values.state = squid_api.model.state;
+
+                        // Getting the accountID (shared code with PQ Counter)
+                        var accountID = 0;
+                        var facets = squid_api.model.state.attributes.config.selection.facets;
+                        for (var i = 0; i < facets.length; i++) {
+                            var check = facets[i].id.indexOf("@'shipto_account_name'", facets[i].id.length - "@'shipto_account_name'".length);
+                            if (check != -1) {
+                                if (facets[i] && facets[i].selectedItems && facets[i].selectedItems.length == 1) {
+                                    var selection = facets[i].selectedItems[0];
+                                    //var account = selection.value;
+                                    if (selection.attributes && selection.attributes.ID) {
+                                        accountID = selection.attributes.ID;
+                                    }
+                                }
+                            }
+                        }
+                        values.accountID = accountID;
+                        values.reportId = squid_api.model.state.attributes.config.report;
+
                         var newJob = new exportJobModel(values);
                         newJob.save({}, {
                             success: function (model) {
