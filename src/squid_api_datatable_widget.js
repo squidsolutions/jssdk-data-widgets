@@ -143,6 +143,7 @@
         displayTableHeader : function(selector) {
             var me = this;
             var columns;
+            var originalColumns;//unaltered by rollup splice
             var invalidSelection = false;
             var status = this.model.get("status");
 
@@ -162,6 +163,7 @@
                 if (rollups && (rollups.length ===0)) {
                     rollups = this.rollups = null;
                 }
+                originalColumns = columns;
             } else {
                 // use analysis columns
                 columns = [];
@@ -205,7 +207,10 @@
                     }
                 }
                 if (config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
+                    originalColumns = columns.slice();
                     columns.splice(config.get("rollups")[0].col, 1);
+                } else {
+                    originalColumns = columns;
                 }
             }
 
@@ -220,15 +225,11 @@
                 for (ix=0; ix<orderBy.length; ix++) {
                     for (col=0; col<columns.length; col++) {
                         if (this.ordering && config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
-                            if (status !== "DONE") {
-                                columns[col - 1].orderDirection = orderBy[ix].direction;
-                            } else {
-                                columns[col + 1].orderDirection = orderBy[ix].direction;
-                            }
+                            originalColumns[col].orderDirection = orderBy[ix].direction;
                             break;
                         }
                         else if (this.ordering && col == orderBy[ix].col) {
-                            columns[col].orderDirection = orderBy[ix].direction;
+                        	originalColumns[col].orderDirection = orderBy[ix].direction;
                             break;
                         }
                     }
