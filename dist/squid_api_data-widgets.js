@@ -2538,9 +2538,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     } else {
                         // CREATE aka POST /jobs/
 
-                        // Save the state inside the schedulerjob
-                        squid_api.saveState();
-                        console.log('State for scheduler saved');
+                        // TODO use squid_api.model.config instead
                         values.state = squid_api.model.state;
 
                         // Getting the accountID (shared code with PQ Counter)
@@ -2551,7 +2549,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             if (check !== -1) {
                                 if (facets[i] && facets[i].selectedItems && facets[i].selectedItems.length === 1) {
                                     var selection = facets[i].selectedItems[0];
-                                    //var account = selection.value;
                                     if (selection.attributes && selection.attributes.ID) {
                                         accountID = selection.attributes.ID;
                                     }
