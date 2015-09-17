@@ -2275,9 +2275,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
     View = Backbone.View.extend({
         template: null,
-        indexView: null,
-        exportJobModel: null,
-        exportJobCollection: null,
+        IndexView: null,
+        ExportJobModel: null,
+        ExportJobCollection: null,
         schedulerApiUri: null,
         exportJobs: null,
         hiddenFields: null,
@@ -2304,9 +2304,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
 
-            this.indexView = squid_api.template.squid_api_export_scheduler_index_view;
+            this.IndexView = squid_api.template.squid_api_export_scheduler_index_view;
 
-            exportJobModel = Backbone.DeepModel.extend({
+            ExportJobModel = Backbone.DeepModel.extend({
                 urlRoot: this.schedulerApiUri + "/jobs",
                 idAttribute: "_id",
                 url: function () {
@@ -2314,14 +2314,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         _.result(this, 'urlRoot') ||
                         _.result(this.collection, 'url') ||
                         urlError();
-                    if (this.isNew()) return base + "?access_token=" + squid_api.model.login.get("accessToken");
+                    if (this.isNew()) {
+                        return base + "?access_token=" + squid_api.model.login.get("accessToken");
+                    }
                     var id = this.get(this.idAttribute);
                     return base.replace(/[^\/]$/, '$&/') + encodeURIComponent(id) + "?access_token=" + squid_api.model.login.get("accessToken");
                 }
             });
 
-            exportJobCollection = Backbone.Collection.extend({
-                model: exportJobModel,
+            ExportJobCollection = Backbone.Collection.extend({
+                model: ExportJobModel,
                 urlRoot: this.schedulerApiUri,
                 url: function () {
                     var url = this.urlRoot + "/jobs/";
@@ -2330,7 +2332,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             });
 
-            exportJobs = new exportJobCollection();
+            exportJobs = new ExportJobCollection();
 
             // listeners
             this.listenTo(squid_api.model.login, "change:accessToken", this.fetchAndRender);
@@ -2344,7 +2346,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         fetchAndRender: function () {
             exportJobs.fetch({
                 success: function (collection, response) {
-                    if (response.statusCode == 200) {
+                    if (response.statusCode === 200) {
                         widget.widgetAccessible = true;
                     } else {
                         widget.widgetAccessible = false;
@@ -2358,7 +2360,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         renderIndex: function () {
             var me = this;
-            var indexView = Backbone.View.extend({
+            var IndexView = Backbone.View.extend({
                 model: exportJobs,
                 initialize: function () {
                     this.template = squid_api.template.squid_api_export_scheduler_index_view;
@@ -2399,7 +2401,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     var jsonData = {"jobs": []};
                     for (var i = 0; i < this.model.models.length; i++) {
                         for (ix = 0; ix < me.reports.length; ix++) {
-                            if (me.reports[ix].oid == this.model.models[i].get("shortcutId")) {
+                            if (me.reports[ix].oid === this.model.models[i].get("shortcutId")) {
                                 this.model.models[i].set("reportName", me.reports[ix].name);
                             }
                         }
@@ -2419,7 +2421,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             });
             this.indexModal = new Backbone.BootstrapModal({
-                content: new indexView(),
+                content: new IndexView(),
                 title: "Scheduled Usage Reports"
             }).open();
         },
@@ -2437,12 +2439,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     model = exportJobs.where({"_id": id})[0];
                     modalHeader = model.get("reportName") + " scheduled usage report";
                 } else {
-                    model = new exportJobModel();
+                    model = new ExportJobModel();
 
                     var reportId = config.get("report");
                     var reportName;
                     for (i = 0; i < widget.reports.length; i++) {
-                        if (widget.reports[i].oid == reportId) {
+                        if (widget.reports[i].oid === reportId) {
                             reportName = widget.reports[i].name;
                         }
                     }
@@ -2451,15 +2453,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // construct schema ignoring hidden fields
                 var schema = {};
                 for (var x in data) {
-                    if (widget.hiddenFields.indexOf(x) == -1) {
+                    if (widget.hiddenFields.indexOf(x) === -1) {
                         schema[x] = {};
                         schema[x].editorClass = "form-control";
                         if ((typeof data[x].options.title !== 'undefined')) {
                             schema[x].title = data[x].options.title;
                         }
-                        if (data[x].instance == "Date") {
+                        if (data[x].instance === "Date") {
                             schema[x].type = "Date";
-                        } else if (data[x].instance == "Array") {
+                        } else if (data[x].instance === "Array") {
                             schema[x].type = "List";
                             schema[x].itemType = "Text";
                         } else {
@@ -2484,7 +2486,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     model: model
                 });
 
-                var formView = Backbone.View.extend({
+                var FormView = Backbone.View.extend({
                     initialize: function () {
                         this.render();
                     },
@@ -2495,13 +2497,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 });
 
                 var formModal = new Backbone.BootstrapModal({
-                    content: new formView(),
+                    content: new FormView(),
                     title: modalHeader
                 }).open();
 
 
 
-                formModal.on('ok', function (event) {
+                formModal.on('ok', function () {
                     // the form is used in create and edit mode.
                     var values = widget.formContent.getValue();
 
@@ -2541,10 +2543,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     } else {
                         // CREATE aka POST /jobs/
 
-                        // Save the state inside the schedulerjob
-                        var currentStateId = squid_api.model.state.get("oid");
-                        squid_api.saveState();
-                        console.log('State for scheduler saved');
+                        // TODO use squid_api.model.config instead
                         values.state = squid_api.model.state;
 
                         // Getting the accountID (shared code with PQ Counter)
@@ -2552,10 +2551,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         var facets = squid_api.model.state.attributes.config.selection.facets;
                         for (var i = 0; i < facets.length; i++) {
                             var check = facets[i].id.indexOf("@'shipto_account_name'", facets[i].id.length - "@'shipto_account_name'".length);
-                            if (check != -1) {
-                                if (facets[i] && facets[i].selectedItems && facets[i].selectedItems.length == 1) {
+                            if (check !== -1) {
+                                if (facets[i] && facets[i].selectedItems && facets[i].selectedItems.length === 1) {
                                     var selection = facets[i].selectedItems[0];
-                                    //var account = selection.value;
                                     if (selection.attributes && selection.attributes.ID) {
                                         accountID = selection.attributes.ID;
                                     }
@@ -2565,14 +2563,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         values.accountID = accountID;
                         values.reportId = squid_api.model.state.attributes.config.report;
 
-                        var newJob = new exportJobModel(values);
+                        var newJob = new ExportJobModel(values);
                         newJob.save({}, {
                             success: function (model) {
                                 var msg = "";
                                 if (model.get("errors")) {
                                     var errors = model.get("errors");
                                     for (var x in errors) {
-                                        msg = msg + errors[x].message + "";
+                                        if (errors[x].message) {
+                                            msg = msg + errors[x].message + "";
+                                        }
                                     }
                                 } else {
                                     exportJobs.add(model);
