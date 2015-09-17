@@ -1512,6 +1512,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 // this is a total line
                                 this.parentNode.className = "group";
                                 return "new-category";
+                            } else if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode == this.parentNode.parentNode.childNodes[0])) {
+                                // detect total column
+                                this.parentNode.className = "total-column";
                             }
                             // Detect Group & Empty Value
                             if (this.parentNode.className === "group" && d.length === 0) {
@@ -1531,6 +1534,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 if (parseInt(this.parentNode.__data__.v[0]) === 1) {
                                     // this is a total line
                                     text = "Total for "+data.results.cols[rollupColIndex].name;
+                                } else if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode == this.parentNode.parentNode.childNodes[0])) {
+                                    text = "Total";
                                 }
                             }
                         }
