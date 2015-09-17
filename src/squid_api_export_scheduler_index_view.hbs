@@ -1,22 +1,33 @@
-<div class="squid-api-export-scheduler-index-view">
+<div class="squid-api-export-scheduler-index-view table-responsive">
     <button class="btn btn-default create-job">create job</button>
-    <table>
-        <tr>
-            <td>Report ID</td>
-            <td>Next Execution Day</td>
-            <td>Format</td>
-            <td>Email</td>
-        </tr>
-        {{#each jobs}}
-            <tr class="job-item" data-attr={{_id}}>
-                <td>{{_id}}</td>
-                <td>{{nextExecutionDate}}</td>
-                <td>{{report.format}}</td>
-                <td>{{emails}}</td>
-                <td><button class="run-job">run</button></td>
-                <td><button class="edit-job">edit</button></td>
-                <td><button class="delete-job">delete</button></td>
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Client Account</th>
+                <th>Report type</th>
+                <th>Format</th>
+                <th>Email Frequency</th>
+                <th>Next Delivery</th>
+                <th>Delivered to</th>
+                <th>Run Now</th>
+                <th>Edit</th>
+                <th>Delete</th>
             </tr>
-        {{/each}}
+        </thead>
+        <tbody>
+            {{#each jobs}}
+                <tr class="job-item" data-attr={{_id}}>
+                    <td>{{accountID}}</td>
+                    <td>{{reportId}}</td>
+                    <td>{{report.format}}</td>
+                    <td>every {{scheduling.frequency}} </td>
+                    <td>{{nextExecutionDate}}</td>
+                    <td>{{emails}}</td>
+                    <td><button class="btn btn-secondary run-job"><i class="fa fa-refresh"></i></button></td>
+                    <td><button class="btn btn-secondary edit-job"><i class="fa fa-pencil-square-o"></i></button></td>
+                    <td><button class="btn btn-secondary delete-job"><i class="fa fa-trash-o"></i></button></td>
+                </tr>
+            {{/each}}
+        </tbody>
     </table>
 </div>

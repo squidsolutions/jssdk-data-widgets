@@ -251,7 +251,7 @@
             d3.select(selector).select("thead tr").selectAll("th").remove();
 
             if (!invalidSelection) {
-                var th = d3.select(selector).select("thead tr").selectAll("th")
+                d3.select(selector).select("thead tr").selectAll("th")
                     .data(columns)
                     .enter().append("th")
                     .attr("class", function(d, i) {
@@ -272,7 +272,7 @@
                         }
                         return str;
                     })
-                    .html(function(d, i) {
+                    .html(function(d) {
                         var str = d.name;
                         if (d.orderDirection === "ASC") {
                             str = str + " " + "<span class='sort-direction'>&#xffea;</span>";
@@ -338,7 +338,7 @@
                     newRow = {v:[]};
                     for (colIdx = 0; colIdx<results.cols.length; colIdx++) {
                         v = row.v[colIdx];
-                        if (results.cols[colIdx].dataType == "NUMBER") {
+                        if (results.cols[colIdx].dataType === "NUMBER") {
                             v = this.format(v);
                         }
                         newRow.v.push(v);
@@ -354,7 +354,7 @@
                     .append("tr");
 
                 // Cells
-                var td = tr.selectAll("td")
+                tr.selectAll("td")
                     .data(function(d) {
                         return d.v;
                     })
@@ -441,7 +441,7 @@
         },
 
         render : function() {
-            var me = this;
+
             var selector = "#"+this.el.id+" .sq-table";
             if (this.model.get("facets") && this.filters.get("selection")) {
                 // display table header
@@ -449,11 +449,16 @@
             }
 
             if (this.model.get("status") === "DONE") {
-                // display results
-                this.displayTableContent(selector);
-                if (this.paging) {
-                    this.paginationView.render();
-                    this.$el.find("#pagination").show();
+                if (!this.model.get("error")) {
+                    // display results
+                    this.displayTableContent(selector);
+                    if (this.paging) {
+                        this.paginationView.render();
+                        this.$el.find("#pagination").show();
+                    }
+                    this.$el.find("#error").html("");
+                } else {
+                    this.$el.find("#error").html("Error : "+this.model.get("error").message);
                 }
                 this.$el.find("#total").show();
                 this.$el.find(".sq-loading").hide();
@@ -466,6 +471,7 @@
                 this.$el.find(".sq-loading").show();
                 this.$el.find("#stale").hide();
                 this.$el.find(".sort-direction").show();
+                this.$el.find("#error").html("");
             }
 
             if (this.model.get("status") === "PENDING") {
@@ -475,6 +481,7 @@
                 this.$el.find("#total").hide();
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").show();
+                this.$el.find("#error").html("");
             }
 
             return this;
