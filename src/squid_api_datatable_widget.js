@@ -143,6 +143,7 @@
         displayTableHeader : function(selector) {
             var me = this;
             var columns;
+            var originalColumns;//unaltered by rollup splice
             var invalidSelection = false;
             var status = this.model.get("status");
 
@@ -162,6 +163,7 @@
                 if (rollups && (rollups.length ===0)) {
                     rollups = this.rollups = null;
                 }
+                originalColumns = columns;
             } else {
                 // use analysis columns
                 columns = [];
@@ -205,7 +207,10 @@
                     }
                 }
                 if (config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
+                    originalColumns = columns.slice();
                     columns.splice(config.get("rollups")[0].col, 1);
+                } else {
+                    originalColumns = columns;
                 }
             }
 
@@ -219,16 +224,12 @@
                 // add orderBy direction
                 for (ix=0; ix<orderBy.length; ix++) {
                     for (col=0; col<columns.length; col++) {
-                        if (this.ordering && config.get("rollups") && this.rollupSummaryColumn >= 0 && col === orderBy[ix].col) {
-                            if (status !== "DONE") {
-                                columns[col - 1].orderDirection = orderBy[ix].direction;
-                            } else {
-                                columns[col + 1].orderDirection = orderBy[ix].direction;
-                            }
+                        if (this.ordering && config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
+                            originalColumns[col].orderDirection = orderBy[ix].direction;
                             break;
                         }
-                        else if (this.ordering && col === orderBy[ix].col) {
-                            columns[col].orderDirection = orderBy[ix].direction;
+                        else if (this.ordering && col == orderBy[ix].col) {
+                        	originalColumns[col].orderDirection = orderBy[ix].direction;
                             break;
                         }
                     }
@@ -239,7 +240,11 @@
             var rollupSummaryIndex = null;
             if (rollups) {
                 if ((rollups.length>0)) {
-                    rollupColIndex = rollups[0].col + 1;
+                    if (rollups.length>1) {
+                        rollupColIndex = rollups[1].col + 1;
+                    } else {
+                        rollupColIndex = rollups[0].col + 1;
+                    }
                 }
                 if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
                     rollupSummaryIndex = this.rollupSummaryColumn + 1;
@@ -322,7 +327,11 @@
                 var rollupSummaryIndex = null;
                 if (rollups) {
                     if ((rollups.length>0)) {
-                        rollupColIndex = rollups[0].col + 1;
+                        if (rollups.length>1) {
+                            rollupColIndex = rollups[1].col + 1;
+                        } else {
+                            rollupColIndex = rollups[0].col + 1;
+                        }
                     }
                     if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
                         rollupSummaryIndex = this.rollupSummaryColumn + 1;
@@ -338,7 +347,9 @@
                     for (colIdx = 0; colIdx<results.cols.length; colIdx++) {
                         v = row.v[colIdx];
                         if (results.cols[colIdx].dataType === "NUMBER") {
-                            v = this.format(v);
+                            if (v.length > 0) {
+                                v = this.format(v);
+                            }
                         }
                         newRow.v.push(v);
                     }
@@ -377,6 +388,9 @@
                                 // this is a total line
                                 this.parentNode.className = "group";
                                 return "new-category";
+                            } else if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode == this.parentNode.parentNode.childNodes[0])) {
+                                // detect total column
+                                this.parentNode.className = "total-column";
                             }
                             // Detect Group & Empty Value
                             if (this.parentNode.className === "group" && d.length === 0) {
@@ -396,6 +410,11 @@
                                 if (parseInt(this.parentNode.__data__.v[0]) === 1) {
                                     // this is a total line
                                     text = "Total for "+data.results.cols[rollupColIndex].name;
+                                }
+                            }
+                            if (i === 2) {
+                                if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode == this.parentNode.parentNode.childNodes[0])) {
+                                    text = "Total";
                                 }
                             }
                         }
