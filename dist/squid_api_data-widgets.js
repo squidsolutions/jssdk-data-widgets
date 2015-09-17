@@ -1474,7 +1474,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     for (colIdx = 0; colIdx<results.cols.length; colIdx++) {
                         v = row.v[colIdx];
                         if (results.cols[colIdx].dataType === "NUMBER") {
-                            v = this.format(v);
+                            if (v.length > 0) {
+                                v = this.format(v);
+                            }
                         }
                         newRow.v.push(v);
                     }
