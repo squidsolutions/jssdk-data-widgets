@@ -273,7 +273,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"squid-api-export-scheduler-widget\">\r\n	<button class=\"btn btn-default\"><i class=\"fa fa-clock-o\"></i></button>\r\n</div>\r\n";
+  return "<div class=\"squid-api-export-scheduler-widget\">\r\n	<button class=\"btn btn-default\">Schedule <i class=\"fa fa-clock-o\"></i></button>\r\n</div>\r\n";
   });
 
 this["squid_api"]["template"]["squid_api_export_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
