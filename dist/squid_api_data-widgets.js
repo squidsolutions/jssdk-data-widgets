@@ -1247,7 +1247,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (this.ordering) {
                     var orderId = parseInt($(item.currentTarget).attr("data-id"));
                     var orderByDirection;
-                    if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
+                    if (this.config.get("rollups") && this.rollupSummaryColumn >= 0) {
                         orderId = orderId - 1;
                     }
                     if ($(item.currentTarget).hasClass("ASC")) {
@@ -1341,9 +1341,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         columns.push(obj);
                     }
                 }
-                if (config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
+                if (this.config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
                     originalColumns = columns.slice();
-                    columns.splice(config.get("rollups")[0].col, 1);
+                    columns.splice(this.config.get("rollups")[0].col, 1);
                 } else {
                     originalColumns = columns;
                 }
@@ -1359,7 +1359,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 // add orderBy direction
                 for (ix=0; ix<orderBy.length; ix++) {
                     for (col=0; col<columns.length; col++) {
-                        if (this.ordering && config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
+                        if (this.ordering && this.config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
                             originalColumns[col].orderDirection = orderBy[ix].direction;
                             break;
                         }
@@ -1381,7 +1381,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         rollupColIndex = rollups[0].col + 1;
                     }
                 }
-                if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
+                if (this.config.get("rollups") && this.rollupSummaryColumn >= 0) {
                     rollupSummaryIndex = this.rollupSummaryColumn + 1;
                 }
             }
@@ -1468,7 +1468,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             rollupColIndex = rollups[0].col + 1;
                         }
                     }
-                    if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
+                    if (this.config.get("rollups") && this.rollupSummaryColumn >= 0) {
                         rollupSummaryIndex = this.rollupSummaryColumn + 1;
                     }
                 }
@@ -3773,7 +3773,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         model : project,
                         successHandler: function() {
                             if (me.projectAutomaticLogin) {
-                                config.set({
+                                squid_api.model.config.set({
                                     "project" : this.get("id").projectId,
                                     "domain" : null
                                 });
@@ -4219,7 +4219,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         render : function() {
             var me = this;
             var status = this.model.get("status");
-            this.YearOverYear = config.get("YearOverYear");
+            this.YearOverYear = squid_api.model.config.get("YearOverYear");
 
             if (status === "PENDING") {
                 this.$el.html(this.template({"staleMessage" : this.staleMessage}));
@@ -4286,7 +4286,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             formatter: function(series, x, y) {
                                 var formatter = d3.format(",.f");
                                 var date;
-                                if (config.get("YearOverYear")) {
+                                if (squid_api.model.config.get("YearOverYear")) {
                                     date = '<span class="date">' + series.name + "-" + moment(new Date(x * 1000)).format("MM-DD") + '</span>';
                                 } else {
                                     date = '<span class="date">' + moment(new Date(x * 1000)).format("YYYY-MM-DD") + '</span>';

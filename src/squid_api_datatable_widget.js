@@ -112,7 +112,7 @@
                 if (this.ordering) {
                     var orderId = parseInt($(item.currentTarget).attr("data-id"));
                     var orderByDirection;
-                    if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
+                    if (this.config.get("rollups") && this.rollupSummaryColumn >= 0) {
                         orderId = orderId - 1;
                     }
                     if ($(item.currentTarget).hasClass("ASC")) {
@@ -206,9 +206,9 @@
                         columns.push(obj);
                     }
                 }
-                if (config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
+                if (this.config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
                     originalColumns = columns.slice();
-                    columns.splice(config.get("rollups")[0].col, 1);
+                    columns.splice(this.config.get("rollups")[0].col, 1);
                 } else {
                     originalColumns = columns;
                 }
@@ -224,7 +224,7 @@
                 // add orderBy direction
                 for (ix=0; ix<orderBy.length; ix++) {
                     for (col=0; col<columns.length; col++) {
-                        if (this.ordering && config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
+                        if (this.ordering && this.config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
                             originalColumns[col].orderDirection = orderBy[ix].direction;
                             break;
                         }
@@ -246,7 +246,7 @@
                         rollupColIndex = rollups[0].col + 1;
                     }
                 }
-                if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
+                if (this.config.get("rollups") && this.rollupSummaryColumn >= 0) {
                     rollupSummaryIndex = this.rollupSummaryColumn + 1;
                 }
             }
@@ -333,7 +333,7 @@
                             rollupColIndex = rollups[0].col + 1;
                         }
                     }
-                    if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
+                    if (this.config.get("rollups") && this.rollupSummaryColumn >= 0) {
                         rollupSummaryIndex = this.rollupSummaryColumn + 1;
                     }
                 }
