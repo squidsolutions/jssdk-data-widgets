@@ -19,12 +19,13 @@
   ],
   "dependencies": {
     "squid_api": "https://github.com/squidsolutions/jssdk2.git",
-    "bootstrap-multiselect":"https://github.com/davidstutz/bootstrap-multiselect.git",
+    "bootstrap-multiselect":"https://github.com/davidstutz/bootstrap-multiselect.git#0.9.13",
     "handlebars": "~1.3.0",
     "d3" : "3",
-    "rickshaw":"https://github.com/shutterstock/rickshaw.git",
+    "rickshaw":"https://github.com/shutterstock/rickshaw.git#1.5.1",
     "moment":"~2.9.0",
-    "backbone-forms": "https://github.com/powmedia/backbone-forms.git#master",
-    "backbone.bootstrap-modal": "https://github.com/squidsolutions/backbone.bootstrap-modal.git#master"
+    "backbone-forms": "https://github.com/powmedia/backbone-forms.git#24f4e18fcd",
+    "backbone.bootstrap-modal": "https://github.com/squidsolutions/backbone.bootstrap-modal.git#master",
+    "backbone-deep-model" : "https://github.com/squidsolutions/backbone-deep-model.git#master"
   }
 }

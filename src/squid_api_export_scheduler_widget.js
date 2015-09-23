@@ -2,15 +2,19 @@
     root.squid_api.view.DataExportScheduler = factory(root.Backbone, root.squid_api);
 }(this, function (Backbone, squid_api) {
 
-    View = Backbone.View.extend( {
-        template : null,
-        indexView : null,
-        exportJobModel : null,
-        exportJobCollection : null,
-        schedulerApiUri : null,
-        exportJobs : null,
+    View = Backbone.View.extend({
+        template: null,
+        IndexView: null,
+        ExportJobModel: null,
+        ExportJobCollection: null,
+        schedulerApiUri: null,
+        exportJobs: null,
+        hiddenFields: null,
+        widgetAccessible: false,
 
-        initialize : function(options) {
+        initialize: function (options) {
+            widget = this;
+
             // setup options
             if (options) {
                 if (options.template) {
@@ -21,67 +25,85 @@
                 if (options.schedulerApiUri) {
                     this.schedulerApiUri = options.schedulerApiUri;
                 }
+                if (options.hiddenFields) {
+                    this.hiddenFields = options.hiddenFields;
+                }
+                if (options.reports) {
+                    this.reports = options.reports.get("items");
+                }
             }
 
-            this.indexView = squid_api.template.squid_api_export_scheduler_index_view;
+            this.IndexView = squid_api.template.squid_api_export_scheduler_index_view;
 
-            exportJobModel = Backbone.Model.extend({
-                urlRoot : this.schedulerApiUri + "/jobs",
+            ExportJobModel = Backbone.DeepModel.extend({
+                urlRoot: this.schedulerApiUri + "/jobs",
                 idAttribute: "_id",
-                url: function() {
-                  var base =
-                    _.result(this, 'urlRoot') ||
-                    _.result(this.collection, 'url') ||
-                    urlError();
-                    if (this.isNew()) return base+"?access_token=" + squid_api.model.login.get("accessToken");
+                url: function () {
+                    var base =
+                        _.result(this, 'urlRoot') ||
+                        _.result(this.collection, 'url') ||
+                        urlError();
+                    if (this.isNew()) {
+                        return base + "?access_token=" + squid_api.model.login.get("accessToken");
+                    }
                     var id = this.get(this.idAttribute);
-                    return base.replace(/[^\/]$/, '$&/') + encodeURIComponent(id)+"?access_token=" + squid_api.model.login.get("accessToken");
+                    return base.replace(/[^\/]$/, '$&/') + encodeURIComponent(id) + "?access_token=" + squid_api.model.login.get("accessToken");
                 }
             });
 
-            exportJobCollection = Backbone.Collection.extend({
-                model: exportJobModel,
-                urlRoot : this.schedulerApiUri,
-                url: function() {
+            ExportJobCollection = Backbone.Collection.extend({
+                model: ExportJobModel,
+                urlRoot: this.schedulerApiUri,
+                url: function () {
                     var url = this.urlRoot + "/jobs/";
                     url = url + "?access_token=" + squid_api.model.login.get("accessToken");
                     return url;
                 }
             });
 
-            exportJobs = new exportJobCollection();
+            exportJobs = new ExportJobCollection();
 
             // listeners
             this.listenTo(squid_api.model.login, "change:accessToken", this.fetchAndRender);
-            this.render();
+            this.listenTo(exportJobs, 'change reset sync', this.render);
         },
 
         events: {
-            "click button" : "renderIndex"
+            "click button": "renderIndex"
         },
 
-        fetchAndRender : function() {
-            exportJobs.fetch();
+        fetchAndRender: function () {
+            exportJobs.fetch({
+                success: function (collection, response) {
+                    if (response.statusCode === 200) {
+                        widget.widgetAccessible = true;
+                    } else {
+                        widget.widgetAccessible = false;
+                    }
+                },
+                error: function () {
+                    widget.widgetAccessible = false;
+                }
+            });
         },
 
-        renderIndex: function() {
+        renderIndex: function () {
             var me = this;
-            var indexView = Backbone.View.extend({
+            var IndexView = Backbone.View.extend({
                 model: exportJobs,
-                initialize: function() {
+                initialize: function () {
                     this.template = squid_api.template.squid_api_export_scheduler_index_view;
                     this.listenTo(exportJobs, "reset change remove sync", this.render);
-                    this.render();
                 },
                 events: {
-                    "click .create-job": function() {
-                        me.renderForm();
+                    "click .create-job": function () {
+                        widget.renderForm();
                     },
-                    "click .edit-job": function(event) {
+                    "click .edit-job": function (event) {
                         var id = $(event.target).parents(".job-item").attr("data-attr");
-                        me.renderForm(id);
+                        widget.renderForm(id);
                     },
-                    "click .run-job": function(event) {
+                    "click .run-job": function (event) {
                         var id = $(event.target).parents(".job-item").attr("data-attr");
                         var url = me.schedulerApiUri + "/jobs/" + id + "?run=1&access_token=" + squid_api.model.login.get("accessToken");
                         $.ajax({
@@ -89,122 +111,221 @@
                             url: url,
                         });
                     },
-                    "click .delete-job": function(event) {
+                    "click .delete-job": function (event) {
                         var id = $(event.target).parents(".job-item").attr("data-attr");
                         var job = exportJobs.get(id);
                         job.destroy({
-                            success: function() {
+                            success: function () {
                                 squid_api.model.status.set("message", "job successfully deleted");
                             },
-                            error: function() {
+                            error: function () {
 
                             }
                         });
                         exportJobs.remove(job);
                     }
                 },
-                render: function() {
+
+                render: function () {
                     var jsonData = {"jobs": []};
-                    for (i=0; i<this.model.models.length; i++) {
-                        jsonData.jobs.push(this.model.models[i].toJSON());
+                    for (var i = 0; i < this.model.models.length; i++) {
+                        for (ix = 0; ix < me.reports.length; ix++) {
+                            if (me.reports[ix].oid === this.model.models[i].get("shortcutId")) {
+                                this.model.models[i].set("reportName", me.reports[ix].name);
+                            }
+                        }
+                        // format jsonData
+                        var job = this.model.models[i].toJSON();
+                        if (job.nextExecutionDate) {
+                            job.nextExecutionDate = moment(job.nextExecutionDate).format("DD-MM-YYYY");
+                        }
+                        jsonData.jobs.push(job);
                     }
                     this.$el.html(this.template(jsonData));
+
+                    this.$el.find(".table").DataTable({
+                        paging: false
+                    });
                     return this;
                 }
             });
             this.indexModal = new Backbone.BootstrapModal({
-                content: new indexView(),
-                title: "Jobs"
+                content: new IndexView(),
+                title: "Scheduled Usage Reports"
             }).open();
         },
 
-        getSchema: function() {
+        getSchema: function () {
             return $.ajax({
                 url: this.schedulerApiUri + "/Schema/?access_token=" + squid_api.model.login.get("accessToken"),
             });
         },
 
-        renderForm: function(id) {
-            this.getSchema().then(function(schema) {
-                var me = this;
+        renderForm: function (id) {
+            this.getSchema().then(function (data) {
+                var modalHeader;
                 if (id) {
-                    model = exportJobs.where({"_id" : id})[0];
+                    model = exportJobs.where({"_id": id})[0];
+                    modalHeader = model.get("reportName") + " scheduled usage report";
                 } else {
-                    model = new exportJobModel();
+                    model = new ExportJobModel();
+
+                    var reportId = config.get("report");
+                    var reportName;
+                    for (i = 0; i < widget.reports.length; i++) {
+                        if (widget.reports[i].oid === reportId) {
+                            reportName = widget.reports[i].name;
+                        }
+                    }
+                    modalHeader = "schedule a usage report for " + reportName;
+                }
+                // construct schema ignoring hidden fields
+                var schema = {};
+                for (var x in data) {
+                    if (widget.hiddenFields.indexOf(x) === -1) {
+                        schema[x] = {};
+                        schema[x].editorClass = "form-control";
+                        if ((typeof data[x].options.title !== 'undefined')) {
+                            schema[x].title = data[x].options.title;
+                        }
+                        if (data[x].instance === "Date") {
+                            schema[x].type = "Date";
+                        } else if (data[x].instance === "Array") {
+                            schema[x].type = "List";
+                            schema[x].itemType = "Text";
+                        } else {
+                            if (data[x].enumValues) {
+                                schema[x].type = "Select";
+                                schema[x].options = data[x].enumValues;
+                            } else if (data[x].options.enum) {
+                                schema[x].type = "Select";
+                                schema[x].options = data[x].options.enum;
+                            } else {
+                                schema[x].type = "Text";
+                            }
+                        }
+                    }
                 }
 
-                // modify schema for BackBone form
-                for (var x in schema) {
-                    schema[x].editorClass = "form-control";
-                    /*if(x=="emails"){
-                      schema[x].validators = ['required', 'email'];
-                    }*/
-                }
 
-                this.formContent = new Backbone.Form({
+
+
+                widget.formContent = new Backbone.Form({
                     schema: schema,
                     model: model
                 });
 
-                var formView = Backbone.View.extend({
-                    initialize: function() {
+                var FormView = Backbone.View.extend({
+                    initialize: function () {
                         this.render();
                     },
-                    render: function() {
-                        this.$el.html(me.formContent.render().el);
+                    render: function () {
+                        this.$el.html(widget.formContent.render().el);
                         return this;
                     }
                 });
+
                 var formModal = new Backbone.BootstrapModal({
-                    content: new formView(),
-                    title: "Jobs Form"
+                    content: new FormView(),
+                    title: modalHeader
                 }).open();
 
 
-                formModal.on('ok', function (event) {
-                        // the form is used in create and edit mode.
-                        var values = me.formContent.getValue();
 
-                        // manipulate data
-                        values.customerId = squid_api.model.customer.get("id");
-                        values.userId = squid_api.model.login.get("userId");
-                        values.shortcutId = squid_api.model.config.get("report");
+                formModal.on('ok', function () {
+                    // the form is used in create and edit mode.
+                    var values = widget.formContent.getValue();
 
-                  if (id) {
-                    // EDIT aka PUT /jobs/:id
-                    var job = exportJobs.get(id);
-                    job.set(values);
-                    job.save();
+                    // manipulate data
+                    values.customerId = squid_api.model.customer.get("id");
+                    values.userId = squid_api.model.login.get("userId");
 
-                  } else{
-                    // CREATE aka POST /jobs/
-                    var newJob = new exportJobModel(values);
-                    newJob.save({}, {
-                        success: function(model) {
-                            var msg = "";
-                            if (model.get("errors")) {
-                                var errors = model.get("errors");
-                                for (var x in errors) {
-                                    msg = msg + errors[x].message + "<br />";
-                                }
-                            } else {
-                                exportJobs.add(model);
-                                msg = msg + "job successfully saved";
-                            }
-                            squid_api.model.status.set("message", msg);
+                    var emails = widget.formContent.getValue().emails; //Return an array with [old,values,new,values]
+                    // if length == 1 then new job
+                    // if lenght == 0 then I should keep the last one entered
+                    if (emails.length >1) {
+                        // Take the new values assuming no deletion
+                        emails = widget.formContent.getValue().emails.slice((((widget.formContent.getValue().emails.length - 1) / 2) + 1), widget.formContent.getValue().emails.length);
+                        // computing the separator old new values using the first old value.
+                        if (widget.formContent.getValue().emails.lastIndexOf(widget.formContent.getValue().emails[0]) > 0) {
+                            emails = widget.formContent.getValue().emails.slice(widget.formContent.getValue().emails.lastIndexOf(widget.formContent.getValue().emails[0]), widget.formContent.getValue().emails.length);
                         }
-                    });
-                  }
+                        // Remove duplicate in emails T264.
+                        /*var emails = values.emails.reduce(function (accum, current) {
+                         if (accum.indexOf(current) < 0) {
+                         accum.push(current);
+                         }
+                         return accum;
+                         }, []);*/
+                    }
+                    values.emails = emails;
 
+
+
+                    if (id) {
+                        // EDIT aka PUT /jobs/:id
+                        var job = exportJobs.get(id);
+                        job.attributes.emails = values.emails;
+                        job.set(values);
+                        job.save();
+
+                    } else {
+                        // CREATE aka POST /jobs/
+
+                        // TODO use squid_api.model.config instead
+                        values.state = squid_api.model.state;
+
+                        // Getting the accountID (shared code with PQ Counter)
+                        var accountID = 0;
+                        var facets = squid_api.model.state.attributes.config.selection.facets;
+                        for (var i = 0; i < facets.length; i++) {
+                            var check = facets[i].id.indexOf("@'shipto_account_name'", facets[i].id.length - "@'shipto_account_name'".length);
+                            if (check !== -1) {
+                                if (facets[i] && facets[i].selectedItems && facets[i].selectedItems.length === 1) {
+                                    var selection = facets[i].selectedItems[0];
+                                    if (selection.attributes && selection.attributes.ID) {
+                                        accountID = selection.attributes.ID;
+                                    }
+                                }
+                            }
+                        }
+                        values.accountID = accountID;
+                        values.reportId = squid_api.model.state.attributes.config.report;
+
+                        var newJob = new ExportJobModel(values);
+                        newJob.save({}, {
+                            success: function (model) {
+                                var msg = "";
+                                if (model.get("errors")) {
+                                    var errors = model.get("errors");
+                                    for (var x in errors) {
+                                        if (errors[x].message) {
+                                            msg = msg + errors[x].message + "";
+                                        }
+                                    }
+                                } else {
+                                    exportJobs.add(model);
+                                    msg = msg + "job successfully saved";
+                                }
+                                squid_api.model.status.set("message", msg);
+                            }
+                        });
+                    }
                 });
 
             });
         },
 
-        render : function() {
-            // static view
+        render: function () {
             var html = this.template();
             this.$el.html(html);
+
+            // activate / disactivate button
+            if (this.widgetAccessible) {
+                this.$el.find("button").prop("visibility", 'visible');
+            } else {
+                this.$el.find("button").prop("visibility", 'hidden');
+            }
         }
     });
 

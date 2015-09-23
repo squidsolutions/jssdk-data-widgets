@@ -16,7 +16,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  buffer += "<div class='sq-loading' style='display: none; position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n<div id=\"squid-api-data-widgets-data-table\">\r\n	<table class=\"sq-table\">\r\n		<thead>\r\n			<tr></tr>\r\n		</thead>\r\n		<tbody></tbody>\r\n	</table>\r\n	<div id=\"stale\">\r\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-table\"></i><br>\r\n			";
+  buffer += "<div class='sq-loading' style='display: none; position:absolute; width:100%; top:40%; z-index: 1;'>\r\n	<div class=\"spinner\">\r\n	<div class=\"rect5\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect1\"></div>\r\n	<div class=\"rect2\"></div>\r\n	<div class=\"rect3\"></div>\r\n	<div class=\"rect4\"></div>\r\n	<div class=\"rect5\"></div>\r\n	</div>\r\n</div>\r\n<div id=\"squid-api-data-widgets-data-table\">\r\n	<table class=\"sq-table\">\r\n		<thead>\r\n			<tr></tr>\r\n		</thead>\r\n		<tbody></tbody>\r\n	</table>\r\n	<div id=\"error\"></div>\r\n	<div id=\"stale\">\r\n		<div class=\"reactiveMessage\"><span><i class=\"fa fa-table\"></i><br>\r\n			";
   if (helper = helpers.staleMessage) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.staleMessage); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -232,32 +232,38 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\n            <tr class=\"job-item\" data-attr=";
+  buffer += "\n                <tr class=\"job-item\" data-attr=";
   if (helper = helpers._id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0._id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + ">\n                <td>";
-  if (helper = helpers._id) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0._id); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+    + ">\n                    <td>";
+  if (helper = helpers.accountID) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.accountID); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</td>\n                <td>";
+    + "</td>\n                    <td>";
+  if (helper = helpers.reportId) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.reportId); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n                    <td>"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.format)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</td>\n                    <td>every "
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.scheduling)),stack1 == null || stack1 === false ? stack1 : stack1.frequency)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + " </td>\n                    <td>";
   if (helper = helpers.nextExecutionDate) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.nextExecutionDate); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</td>\n                <td>"
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.report)),stack1 == null || stack1 === false ? stack1 : stack1.format)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "</td>\n                <td>";
+    + "</td>\n                    <td>";
   if (helper = helpers.emails) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.emails); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</td>\n                <td><button class=\"run-job\">run</button></td>\n                <td><button class=\"edit-job\">edit</button></td>\n                <td><button class=\"delete-job\">delete</button></td>\n            </tr>\n        ";
+    + "</td>\n                    <td><button class=\"btn btn-secondary run-job\"><i class=\"fa fa-play\"></i></button></td>\n                    <td><button class=\"btn btn-secondary edit-job\"><i class=\"fa fa-pencil-square-o\"></i></button></td>\n                    <td><button class=\"btn btn-secondary delete-job\"><i class=\"fa fa-trash-o\"></i></button></td>\n                </tr>\n            ";
   return buffer;
   }
 
-  buffer += "<div class=\"squid-api-export-scheduler-index-view\">\n    <button class=\"btn btn-default create-job\">create job</button>\n    <table>\n        <tr>\n            <td>Report ID</td>\n            <td>Next Execution Day</td>\n            <td>Format</td>\n            <td>Email</td>\n        </tr>\n        ";
+  buffer += "<div class=\"squid-api-export-scheduler-index-view table-responsive\">\n    <button class=\"btn btn-default create-job\">create job</button>\n    <table class=\"table table-bordered table-striped table-hover\">\n        <thead>\n            <tr>\n                <th>Client Account</th>\n                <th>Report type</th>\n                <th>Format</th>\n                <th>Email Frequency</th>\n                <th>Next Delivery</th>\n                <th>Delivered to</th>\n                <th>Run Now</th>\n                <th>Edit</th>\n                <th>Delete</th>\n            </tr>\n        </thead>\n        <tbody>\n            ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.jobs), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n    </table>\n</div>\n";
+  buffer += "\n        </tbody>\n    </table>\n</div>\n";
   return buffer;
   });
 
@@ -1272,6 +1278,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         displayTableHeader : function(selector) {
             var me = this;
             var columns;
+            var originalColumns;//unaltered by rollup splice
             var invalidSelection = false;
             var status = this.model.get("status");
 
@@ -1291,6 +1298,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (rollups && (rollups.length ===0)) {
                     rollups = this.rollups = null;
                 }
+                originalColumns = columns;
             } else {
                 // use analysis columns
                 columns = [];
@@ -1334,7 +1342,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
                 }
                 if (config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
+                    originalColumns = columns.slice();
                     columns.splice(config.get("rollups")[0].col, 1);
+                } else {
+                    originalColumns = columns;
                 }
             }
 
@@ -1349,15 +1360,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 for (ix=0; ix<orderBy.length; ix++) {
                     for (col=0; col<columns.length; col++) {
                         if (this.ordering && config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
-                            if (status !== "DONE") {
-                                columns[col - 1].orderDirection = orderBy[ix].direction;
-                            } else {
-                                columns[col + 1].orderDirection = orderBy[ix].direction;
-                            }
+                            originalColumns[col].orderDirection = orderBy[ix].direction;
                             break;
                         }
                         else if (this.ordering && col == orderBy[ix].col) {
-                            columns[col].orderDirection = orderBy[ix].direction;
+                        	originalColumns[col].orderDirection = orderBy[ix].direction;
                             break;
                         }
                     }
@@ -1368,7 +1375,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var rollupSummaryIndex = null;
             if (rollups) {
                 if ((rollups.length>0)) {
-                    rollupColIndex = rollups[0].col + 1;
+                    if (rollups.length>1) {
+                        rollupColIndex = rollups[1].col + 1;
+                    } else {
+                        rollupColIndex = rollups[0].col + 1;
+                    }
                 }
                 if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
                     rollupSummaryIndex = this.rollupSummaryColumn + 1;
@@ -1379,7 +1390,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             d3.select(selector).select("thead tr").selectAll("th").remove();
 
             if (!invalidSelection) {
-                var th = d3.select(selector).select("thead tr").selectAll("th")
+                d3.select(selector).select("thead tr").selectAll("th")
                     .data(columns)
                     .enter().append("th")
                     .attr("class", function(d, i) {
@@ -1400,7 +1411,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         }
                         return str;
                     })
-                    .html(function(d, i) {
+                    .html(function(d) {
                         var str = d.name;
                         if (d.orderDirection === "ASC") {
                             str = str + " " + "<span class='sort-direction'>&#xffea;</span>";
@@ -1451,7 +1462,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var rollupSummaryIndex = null;
                 if (rollups) {
                     if ((rollups.length>0)) {
-                        rollupColIndex = rollups[0].col + 1;
+                        if (rollups.length>1) {
+                            rollupColIndex = rollups[1].col + 1;
+                        } else {
+                            rollupColIndex = rollups[0].col + 1;
+                        }
                     }
                     if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
                         rollupSummaryIndex = this.rollupSummaryColumn + 1;
@@ -1466,8 +1481,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     newRow = {v:[]};
                     for (colIdx = 0; colIdx<results.cols.length; colIdx++) {
                         v = row.v[colIdx];
-                        if (results.cols[colIdx].dataType == "NUMBER") {
-                            v = this.format(v);
+                        if (results.cols[colIdx].dataType === "NUMBER") {
+                            if (v.length > 0) {
+                                v = this.format(v);
+                            }
                         }
                         newRow.v.push(v);
                     }
@@ -1482,7 +1499,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     .append("tr");
 
                 // Cells
-                var td = tr.selectAll("td")
+                tr.selectAll("td")
                     .data(function(d) {
                         return d.v;
                     })
@@ -1506,6 +1523,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 // this is a total line
                                 this.parentNode.className = "group";
                                 return "new-category";
+                            } else if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode == this.parentNode.parentNode.childNodes[0])) {
+                                // detect total column
+                                this.parentNode.className = "total-column";
                             }
                             // Detect Group & Empty Value
                             if (this.parentNode.className === "group" && d.length === 0) {
@@ -1525,6 +1545,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 if (parseInt(this.parentNode.__data__.v[0]) === 1) {
                                     // this is a total line
                                     text = "Total for "+data.results.cols[rollupColIndex].name;
+                                }
+                            }
+                            if (i === 2) {
+                                if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode == this.parentNode.parentNode.childNodes[0])) {
+                                    text = "Total";
                                 }
                             }
                         }
@@ -1569,7 +1594,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render : function() {
-            var me = this;
+
             var selector = "#"+this.el.id+" .sq-table";
             if (this.model.get("facets") && this.filters.get("selection")) {
                 // display table header
@@ -1577,11 +1602,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             if (this.model.get("status") === "DONE") {
-                // display results
-                this.displayTableContent(selector);
-                if (this.paging) {
-                    this.paginationView.render();
-                    this.$el.find("#pagination").show();
+                if (!this.model.get("error")) {
+                    // display results
+                    this.displayTableContent(selector);
+                    if (this.paging) {
+                        this.paginationView.render();
+                        this.$el.find("#pagination").show();
+                    }
+                    this.$el.find("#error").html("");
+                } else {
+                    this.$el.find("#error").html("Error : "+this.model.get("error").message);
                 }
                 this.$el.find("#total").show();
                 this.$el.find(".sq-loading").hide();
@@ -1594,6 +1624,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.$el.find(".sq-loading").show();
                 this.$el.find("#stale").hide();
                 this.$el.find(".sort-direction").show();
+                this.$el.find("#error").html("");
             }
 
             if (this.model.get("status") === "PENDING") {
@@ -1603,6 +1634,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.$el.find("#total").hide();
                 this.$el.find(".sq-loading").hide();
                 this.$el.find("#stale").show();
+                this.$el.find("#error").html("");
             }
 
             return this;
@@ -2255,15 +2287,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     root.squid_api.view.DataExportScheduler = factory(root.Backbone, root.squid_api);
 }(this, function (Backbone, squid_api) {
 
-    View = Backbone.View.extend( {
-        template : null,
-        indexView : null,
-        exportJobModel : null,
-        exportJobCollection : null,
-        schedulerApiUri : null,
-        exportJobs : null,
+    View = Backbone.View.extend({
+        template: null,
+        IndexView: null,
+        ExportJobModel: null,
+        ExportJobCollection: null,
+        schedulerApiUri: null,
+        exportJobs: null,
+        hiddenFields: null,
+        widgetAccessible: false,
 
-        initialize : function(options) {
+        initialize: function (options) {
+            widget = this;
+
             // setup options
             if (options) {
                 if (options.template) {
@@ -2274,67 +2310,85 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (options.schedulerApiUri) {
                     this.schedulerApiUri = options.schedulerApiUri;
                 }
+                if (options.hiddenFields) {
+                    this.hiddenFields = options.hiddenFields;
+                }
+                if (options.reports) {
+                    this.reports = options.reports.get("items");
+                }
             }
 
-            this.indexView = squid_api.template.squid_api_export_scheduler_index_view;
+            this.IndexView = squid_api.template.squid_api_export_scheduler_index_view;
 
-            exportJobModel = Backbone.Model.extend({
-                urlRoot : this.schedulerApiUri + "/jobs",
+            ExportJobModel = Backbone.DeepModel.extend({
+                urlRoot: this.schedulerApiUri + "/jobs",
                 idAttribute: "_id",
-                url: function() {
-                  var base =
-                    _.result(this, 'urlRoot') ||
-                    _.result(this.collection, 'url') ||
-                    urlError();
-                    if (this.isNew()) return base+"?access_token=" + squid_api.model.login.get("accessToken");
+                url: function () {
+                    var base =
+                        _.result(this, 'urlRoot') ||
+                        _.result(this.collection, 'url') ||
+                        urlError();
+                    if (this.isNew()) {
+                        return base + "?access_token=" + squid_api.model.login.get("accessToken");
+                    }
                     var id = this.get(this.idAttribute);
-                    return base.replace(/[^\/]$/, '$&/') + encodeURIComponent(id)+"?access_token=" + squid_api.model.login.get("accessToken");
+                    return base.replace(/[^\/]$/, '$&/') + encodeURIComponent(id) + "?access_token=" + squid_api.model.login.get("accessToken");
                 }
             });
 
-            exportJobCollection = Backbone.Collection.extend({
-                model: exportJobModel,
-                urlRoot : this.schedulerApiUri,
-                url: function() {
+            ExportJobCollection = Backbone.Collection.extend({
+                model: ExportJobModel,
+                urlRoot: this.schedulerApiUri,
+                url: function () {
                     var url = this.urlRoot + "/jobs/";
                     url = url + "?access_token=" + squid_api.model.login.get("accessToken");
                     return url;
                 }
             });
 
-            exportJobs = new exportJobCollection();
+            exportJobs = new ExportJobCollection();
 
             // listeners
             this.listenTo(squid_api.model.login, "change:accessToken", this.fetchAndRender);
-            this.render();
+            this.listenTo(exportJobs, 'change reset sync', this.render);
         },
 
         events: {
-            "click button" : "renderIndex"
+            "click button": "renderIndex"
         },
 
-        fetchAndRender : function() {
-            exportJobs.fetch();
+        fetchAndRender: function () {
+            exportJobs.fetch({
+                success: function (collection, response) {
+                    if (response.statusCode === 200) {
+                        widget.widgetAccessible = true;
+                    } else {
+                        widget.widgetAccessible = false;
+                    }
+                },
+                error: function () {
+                    widget.widgetAccessible = false;
+                }
+            });
         },
 
-        renderIndex: function() {
+        renderIndex: function () {
             var me = this;
-            var indexView = Backbone.View.extend({
+            var IndexView = Backbone.View.extend({
                 model: exportJobs,
-                initialize: function() {
+                initialize: function () {
                     this.template = squid_api.template.squid_api_export_scheduler_index_view;
                     this.listenTo(exportJobs, "reset change remove sync", this.render);
-                    this.render();
                 },
                 events: {
-                    "click .create-job": function() {
-                        me.renderForm();
+                    "click .create-job": function () {
+                        widget.renderForm();
                     },
-                    "click .edit-job": function(event) {
+                    "click .edit-job": function (event) {
                         var id = $(event.target).parents(".job-item").attr("data-attr");
-                        me.renderForm(id);
+                        widget.renderForm(id);
                     },
-                    "click .run-job": function(event) {
+                    "click .run-job": function (event) {
                         var id = $(event.target).parents(".job-item").attr("data-attr");
                         var url = me.schedulerApiUri + "/jobs/" + id + "?run=1&access_token=" + squid_api.model.login.get("accessToken");
                         $.ajax({
@@ -2342,122 +2396,221 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             url: url,
                         });
                     },
-                    "click .delete-job": function(event) {
+                    "click .delete-job": function (event) {
                         var id = $(event.target).parents(".job-item").attr("data-attr");
                         var job = exportJobs.get(id);
                         job.destroy({
-                            success: function() {
+                            success: function () {
                                 squid_api.model.status.set("message", "job successfully deleted");
                             },
-                            error: function() {
+                            error: function () {
 
                             }
                         });
                         exportJobs.remove(job);
                     }
                 },
-                render: function() {
+
+                render: function () {
                     var jsonData = {"jobs": []};
-                    for (i=0; i<this.model.models.length; i++) {
-                        jsonData.jobs.push(this.model.models[i].toJSON());
+                    for (var i = 0; i < this.model.models.length; i++) {
+                        for (ix = 0; ix < me.reports.length; ix++) {
+                            if (me.reports[ix].oid === this.model.models[i].get("shortcutId")) {
+                                this.model.models[i].set("reportName", me.reports[ix].name);
+                            }
+                        }
+                        // format jsonData
+                        var job = this.model.models[i].toJSON();
+                        if (job.nextExecutionDate) {
+                            job.nextExecutionDate = moment(job.nextExecutionDate).format("DD-MM-YYYY");
+                        }
+                        jsonData.jobs.push(job);
                     }
                     this.$el.html(this.template(jsonData));
+
+                    this.$el.find(".table").DataTable({
+                        paging: false
+                    });
                     return this;
                 }
             });
             this.indexModal = new Backbone.BootstrapModal({
-                content: new indexView(),
-                title: "Jobs"
+                content: new IndexView(),
+                title: "Scheduled Usage Reports"
             }).open();
         },
 
-        getSchema: function() {
+        getSchema: function () {
             return $.ajax({
                 url: this.schedulerApiUri + "/Schema/?access_token=" + squid_api.model.login.get("accessToken"),
             });
         },
 
-        renderForm: function(id) {
-            this.getSchema().then(function(schema) {
-                var me = this;
+        renderForm: function (id) {
+            this.getSchema().then(function (data) {
+                var modalHeader;
                 if (id) {
-                    model = exportJobs.where({"_id" : id})[0];
+                    model = exportJobs.where({"_id": id})[0];
+                    modalHeader = model.get("reportName") + " scheduled usage report";
                 } else {
-                    model = new exportJobModel();
+                    model = new ExportJobModel();
+
+                    var reportId = config.get("report");
+                    var reportName;
+                    for (i = 0; i < widget.reports.length; i++) {
+                        if (widget.reports[i].oid === reportId) {
+                            reportName = widget.reports[i].name;
+                        }
+                    }
+                    modalHeader = "schedule a usage report for " + reportName;
+                }
+                // construct schema ignoring hidden fields
+                var schema = {};
+                for (var x in data) {
+                    if (widget.hiddenFields.indexOf(x) === -1) {
+                        schema[x] = {};
+                        schema[x].editorClass = "form-control";
+                        if ((typeof data[x].options.title !== 'undefined')) {
+                            schema[x].title = data[x].options.title;
+                        }
+                        if (data[x].instance === "Date") {
+                            schema[x].type = "Date";
+                        } else if (data[x].instance === "Array") {
+                            schema[x].type = "List";
+                            schema[x].itemType = "Text";
+                        } else {
+                            if (data[x].enumValues) {
+                                schema[x].type = "Select";
+                                schema[x].options = data[x].enumValues;
+                            } else if (data[x].options.enum) {
+                                schema[x].type = "Select";
+                                schema[x].options = data[x].options.enum;
+                            } else {
+                                schema[x].type = "Text";
+                            }
+                        }
+                    }
                 }
 
-                // modify schema for BackBone form
-                for (var x in schema) {
-                    schema[x].editorClass = "form-control";
-                    /*if(x=="emails"){
-                      schema[x].validators = ['required', 'email'];
-                    }*/
-                }
 
-                this.formContent = new Backbone.Form({
+
+
+                widget.formContent = new Backbone.Form({
                     schema: schema,
                     model: model
                 });
 
-                var formView = Backbone.View.extend({
-                    initialize: function() {
+                var FormView = Backbone.View.extend({
+                    initialize: function () {
                         this.render();
                     },
-                    render: function() {
-                        this.$el.html(me.formContent.render().el);
+                    render: function () {
+                        this.$el.html(widget.formContent.render().el);
                         return this;
                     }
                 });
+
                 var formModal = new Backbone.BootstrapModal({
-                    content: new formView(),
-                    title: "Jobs Form"
+                    content: new FormView(),
+                    title: modalHeader
                 }).open();
 
 
-                formModal.on('ok', function (event) {
-                        // the form is used in create and edit mode.
-                        var values = me.formContent.getValue();
 
-                        // manipulate data
-                        values.customerId = squid_api.model.customer.get("id");
-                        values.userId = squid_api.model.login.get("userId");
-                        values.shortcutId = squid_api.model.config.get("report");
+                formModal.on('ok', function () {
+                    // the form is used in create and edit mode.
+                    var values = widget.formContent.getValue();
 
-                  if (id) {
-                    // EDIT aka PUT /jobs/:id
-                    var job = exportJobs.get(id);
-                    job.set(values);
-                    job.save();
+                    // manipulate data
+                    values.customerId = squid_api.model.customer.get("id");
+                    values.userId = squid_api.model.login.get("userId");
 
-                  } else{
-                    // CREATE aka POST /jobs/
-                    var newJob = new exportJobModel(values);
-                    newJob.save({}, {
-                        success: function(model) {
-                            var msg = "";
-                            if (model.get("errors")) {
-                                var errors = model.get("errors");
-                                for (var x in errors) {
-                                    msg = msg + errors[x].message + "<br />";
-                                }
-                            } else {
-                                exportJobs.add(model);
-                                msg = msg + "job successfully saved";
-                            }
-                            squid_api.model.status.set("message", msg);
+                    var emails = widget.formContent.getValue().emails; //Return an array with [old,values,new,values]
+                    // if length == 1 then new job
+                    // if lenght == 0 then I should keep the last one entered
+                    if (emails.length >1) {
+                        // Take the new values assuming no deletion
+                        emails = widget.formContent.getValue().emails.slice((((widget.formContent.getValue().emails.length - 1) / 2) + 1), widget.formContent.getValue().emails.length);
+                        // computing the separator old new values using the first old value.
+                        if (widget.formContent.getValue().emails.lastIndexOf(widget.formContent.getValue().emails[0]) > 0) {
+                            emails = widget.formContent.getValue().emails.slice(widget.formContent.getValue().emails.lastIndexOf(widget.formContent.getValue().emails[0]), widget.formContent.getValue().emails.length);
                         }
-                    });
-                  }
+                        // Remove duplicate in emails T264.
+                        /*var emails = values.emails.reduce(function (accum, current) {
+                         if (accum.indexOf(current) < 0) {
+                         accum.push(current);
+                         }
+                         return accum;
+                         }, []);*/
+                    }
+                    values.emails = emails;
 
+
+
+                    if (id) {
+                        // EDIT aka PUT /jobs/:id
+                        var job = exportJobs.get(id);
+                        job.attributes.emails = values.emails;
+                        job.set(values);
+                        job.save();
+
+                    } else {
+                        // CREATE aka POST /jobs/
+
+                        // TODO use squid_api.model.config instead
+                        values.state = squid_api.model.state;
+
+                        // Getting the accountID (shared code with PQ Counter)
+                        var accountID = 0;
+                        var facets = squid_api.model.state.attributes.config.selection.facets;
+                        for (var i = 0; i < facets.length; i++) {
+                            var check = facets[i].id.indexOf("@'shipto_account_name'", facets[i].id.length - "@'shipto_account_name'".length);
+                            if (check !== -1) {
+                                if (facets[i] && facets[i].selectedItems && facets[i].selectedItems.length === 1) {
+                                    var selection = facets[i].selectedItems[0];
+                                    if (selection.attributes && selection.attributes.ID) {
+                                        accountID = selection.attributes.ID;
+                                    }
+                                }
+                            }
+                        }
+                        values.accountID = accountID;
+                        values.reportId = squid_api.model.state.attributes.config.report;
+
+                        var newJob = new ExportJobModel(values);
+                        newJob.save({}, {
+                            success: function (model) {
+                                var msg = "";
+                                if (model.get("errors")) {
+                                    var errors = model.get("errors");
+                                    for (var x in errors) {
+                                        if (errors[x].message) {
+                                            msg = msg + errors[x].message + "";
+                                        }
+                                    }
+                                } else {
+                                    exportJobs.add(model);
+                                    msg = msg + "job successfully saved";
+                                }
+                                squid_api.model.status.set("message", msg);
+                            }
+                        });
+                    }
                 });
 
             });
         },
 
-        render : function() {
-            // static view
+        render: function () {
             var html = this.template();
             this.$el.html(html);
+
+            // activate / disactivate button
+            if (this.widgetAccessible) {
+                this.$el.find("button").prop("visibility", 'visible');
+            } else {
+                this.$el.find("button").prop("visibility", 'hidden');
+            }
         }
     });
 
