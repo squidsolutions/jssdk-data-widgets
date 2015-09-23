@@ -105,7 +105,7 @@
                         model : project,
                         successHandler: function() {
                             if (me.projectAutomaticLogin) {
-                                config.set({
+                                squid_api.model.config.set({
                                     "project" : this.get("id").projectId,
                                     "domain" : null
                                 });

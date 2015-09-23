@@ -284,7 +284,7 @@
         render : function() {
             var me = this;
             var status = this.model.get("status");
-            this.YearOverYear = config.get("YearOverYear");
+            this.YearOverYear = squid_api.model.config.get("YearOverYear");
 
             if (status === "PENDING") {
                 this.$el.html(this.template({"staleMessage" : this.staleMessage}));
@@ -351,7 +351,7 @@
                             formatter: function(series, x, y) {
                                 var formatter = d3.format(",.f");
                                 var date;
-                                if (config.get("YearOverYear")) {
+                                if (squid_api.model.config.get("YearOverYear")) {
                                     date = '<span class="date">' + series.name + "-" + moment(new Date(x * 1000)).format("MM-DD") + '</span>';
                                 } else {
                                     date = '<span class="date">' + moment(new Date(x * 1000)).format("YYYY-MM-DD") + '</span>';
