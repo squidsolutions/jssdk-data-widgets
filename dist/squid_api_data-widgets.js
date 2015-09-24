@@ -463,7 +463,10 @@ function program1(depth0,data) {
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.multiple), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\r\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.empty), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n        ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.program(9, program9, data),fn:self.program(6, program6, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n</select>\r\n";
   return buffer;
@@ -476,28 +479,40 @@ function program2(depth0,data) {
 
 function program4(depth0,data) {
   
+  
+  return "\r\n            <option disabled=\"true\">No metrics available</option>\r\n        ";
+  }
+
+function program6(depth0,data) {
+  
   var buffer = "", stack1, helper;
   buffer += "\r\n            <option value=\"";
   if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
     + "\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\r\n                ";
   if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\r\n        </option>\r\n    ";
+    + "\r\n            </option>\r\n        ";
   return buffer;
   }
-function program5(depth0,data) {
+function program7(depth0,data) {
   
   
   return "selected";
   }
 
-function program7(depth0,data) {
+function program9(depth0,data) {
+  
+  
+  return "\r\n    ";
+  }
+
+function program11(depth0,data) {
   
   var buffer = "", stack1, helper;
   buffer += "\r\n    <!-- just display filter name -->\r\n    <label>";
@@ -508,7 +523,7 @@ function program7(depth0,data) {
   return buffer;
   }
 
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(7, program7, data),fn:self.program(1, program1, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(11, program11, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n";
   return buffer;
@@ -3106,7 +3121,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         initialize: function(options) {
             var me = this;
-          
+
             // setup options
             if (options) {
                 if (options.template) {
@@ -3121,7 +3136,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.metricIndex = options.metricIndex;
                 }
             }
-            
+
             // setup the models
             if (!this.model) {
                 this.model = squid_api.model.config;
@@ -3171,60 +3186,61 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var oid = this.$el.find("select option:selected");
                 // Remove Button Title Tag
                 this.$el.find("button").removeAttr('title');
-                
+
                 var chosenMetrics = this.model.get("chosenMetrics");
                 var selectedMetrics = [];
-                
+
                 // build the selection array
                 for (i = 0; i < oid.length; i++) {
                     var selectedOid = $(oid[i]).val();
                     selectedMetrics.push(selectedOid);
                 }
-                
+
                 // check for additions
                 var selectedMetricsNew = [];
                 chosenMetricsNew = _.intersection(_.union(chosenMetrics, selectedMetrics), selectedMetrics);
 
                 // Update
                 this.model.set({"chosenMetrics" : chosenMetricsNew});
-                
             }
         },
 
         render: function() {
             var projectOid = this.model.get("project");
             var domainOid = this.model.get("domain");
-            
+
             if (projectOid && domainOid) {
                 var me = this, isMultiple = true;
-    
+
                 if (this.metricIndex !== null) {
                     isMultiple = false;
                 }
-    
+
                 var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
-                
+
                 // iterate through all domains metrics
-                this.getMetrics(projectOid, domainOid).then(function(metrics) {
-                    if (metrics.length > 0) {
+                squid_api.utils.getDomainMetrics().then(function(metrics) {
+                    me.metrics = metrics;
+                    if (metrics.models.length > 0) {
                         var noneSelected = true;
-                        for (var idx=0; idx<metrics.length; idx++) {
-                            var metric = metrics[idx];
+                        for (var idx=0; idx<metrics.models.length; idx++) {
+                            var metric = metrics.models[idx];
                             // check if selected
-                            var selected = me.isChosen(metric);
+                            var selected = me.isChosen(metrics.models[idx]);
                             if (selected === true) {
                                 noneSelected = false;
                             }
-                            
+
                             // add to the list
-                            var option = {"label" : metric.name, "value" : metric.oid, "selected" : selected};
+                            var option = {"label" : metric.get("name"), "value" : metric.get("oid"), "selected" : selected};
                             jsonData.options.push(option);
                         }
-                        
+
+
                         if (noneSelected === true) {
                             me.model.set("chosenMetrics", []);
                         }
-        
+
                         // Alphabetical Sorting
                         jsonData.options.sort(function(a, b) {
                             var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
@@ -3235,21 +3251,51 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             return 0; // no sorting
                         });
                     }
-    
+
+                    // check if empty
+                    if (jsonData.options.length === 0) {
+                        jsonData.empty = true;
+                    }
+
                     var html = me.template(jsonData);
                     me.$el.html(html);
                     me.$el.show();
-        
+
                     // Initialize plugin
                     var selector = me.$el.find("select");
                     if (isMultiple) {
                         selector.multiselect({
+                            buttonContainer: '<div class="squid-api-data-widgets-metric-selector-open" />',
                             buttonText: function(options, select) {
                                 return 'Metrics';
                             },
+                            onDropdownShown: function(event) {
+                                // TODO implement parent role check
+                                if (me.metrics.models) {
+                                    if (me.metrics.models[0]) {
+                                        if (me.metrics.models[0].get("_role") == "WRITE" || me.metrics.models[0].get("_role") == "OWNER") {
+                                            me.$el.find("li.configure").remove();
+                                            me.$el.find("li").first().before("<li class='configure'></option>");
+                                            me.$el.find("li").first().off().on("click", function() {
+                                                var metricSelect = new squid_api.view.ColumnsManagementWidget({
+                                                    buttonLabel : "<i class='fa fa-arrows-h'></i>",
+                                                    type : "Metric",
+                                                    collection : me.metrics,
+                                                    model : new squid_api.model.MetricModel(),
+                                                    autoOpen : true,
+                                                    successHandler : function() {
+                                                        var message = me.type + " with name " + this.get("name") + " has been successfully modified";
+                                                        squid_api.model.status.set({'message' : message});
+                                                    }
+                                                });
+                                            })
+                                        }
+                                    }
+                                }
+                            }
                         });
                     }
-        
+
                     // Remove Button Title Tag
                     me.$el.find("button").removeAttr('title');
                 });
@@ -3257,23 +3303,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             return this;
         },
-        
-        getMetrics : function(projectOid, domainOid) {
-            var metrics = new squid_api.model.MetricCollection();
-            metrics.parentId = {
-                projectId : projectOid,
-                domainId : domainOid
-            };
-            return metrics.fetch();
-        },
-        
+
         isChosen : function(item) {
             var selected = false;
             var metrics = this.model.get("chosenMetrics");
 
             if (metrics) {
                 for (var j=0; j<metrics.length; j++) {
-                    if (item.oid == metrics[j]) {
+                    if (item.get("oid") == metrics[j]) {
                         selected = true;
                     }
                 }

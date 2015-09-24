@@ -418,6 +418,28 @@ Pagination
 	opacity: 0.5;
 	background: #ffffff;
 }
+
+.squid-api-data-widgets-metric-selector-open li.configure {
+	font: normal normal normal 19px/1 FontAwesome;
+	position: absolute;
+	top: -29px;
+	border-top-right-radius: 10px;
+	border-top-left-radius: 10px;
+	left: -1px;
+	border: 1px solid #ccc;
+	height: 29px;
+	padding-left: 10px;
+	padding-top: 6px;
+	width: 40px;
+	border-bottom: 0px;
+	min-width: 0px !important;
+	background-color: #fff;
+}
+
+.squid-api-data-widgets-metric-selector-open li.configure:before {
+	content: "\f013";
+}
+
 .squid-api-data-widgets-metric-widget {
     position: relative;
     border-radius: 10px;

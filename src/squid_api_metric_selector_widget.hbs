@@ -1,9 +1,13 @@
 {{#if selAvailable}}
     <select class="sq-select form-control squid-api-data-widgets-metric-selector" {{#if multiple}}multiple{{/if}}>
+        {{#if empty}}
+            <option disabled="true">No metrics available</option>
+        {{/if}}
         {{#each options}}
             <option value="{{value}}" {{#if selected}}selected{{/if}}>
                 {{label}}
-        </option>
+            </option>
+        {{else}}
     {{/each}}
 </select>
 {{else}}
