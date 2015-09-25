@@ -109,60 +109,61 @@
 
                 // iterate through all domains metrics
                 squid_api.utils.getDomainMetrics().then(function(metrics) {
-                    me.metrics = metrics;
-                    if (metrics.models.length > 0) {
-                        var noneSelected = true;
-                        for (var idx=0; idx<metrics.models.length; idx++) {
-                            var metric = metrics.models[idx];
-                            // check if selected
-                            var selected = me.isChosen(metrics.models[idx]);
-                            if (selected === true) {
-                                noneSelected = false;
+                    squid_api.utils.fetchModel("domain").then(function(domain) {
+                        squid_api.utils.fetchModel("project").then(function(project) {
+                            me.metrics = metrics;
+                            if (metrics.models.length > 0) {
+                                var noneSelected = true;
+                                for (var idx=0; idx<metrics.models.length; idx++) {
+                                    var metric = metrics.models[idx];
+
+                                    if (metric.get("dynamic") === false || domain.get("dynamic") === true) {
+                                        // check if selected
+                                        var selected = me.isChosen(metrics.models[idx]);
+                                        if (selected === true) {
+                                            noneSelected = false;
+                                        }
+
+                                        // add to the list
+                                        var option = {"label" : metric.get("name"), "value" : metric.get("oid"), "selected" : selected};
+                                        jsonData.options.push(option);
+                                    }
+                                }
+
+                                if (noneSelected === true) {
+                                    me.model.set("chosenMetrics", []);
+                                }
+
+                                // Alphabetical Sorting
+                                jsonData.options.sort(function(a, b) {
+                                    var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
+                                    if (labelA < labelB)
+                                        return -1;
+                                    if (labelA > labelB)
+                                        return 1;
+                                    return 0; // no sorting
+                                });
                             }
 
-                            // add to the list
-                            var option = {"label" : metric.get("name"), "value" : metric.get("oid"), "selected" : selected};
-                            jsonData.options.push(option);
-                        }
+                            // check if empty
+                            if (jsonData.options.length === 0) {
+                                jsonData.empty = true;
+                            }
 
+                            var html = me.template(jsonData);
+                            me.$el.html(html);
+                            me.$el.show();
 
-                        if (noneSelected === true) {
-                            me.model.set("chosenMetrics", []);
-                        }
-
-                        // Alphabetical Sorting
-                        jsonData.options.sort(function(a, b) {
-                            var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
-                            if (labelA < labelB)
-                                return -1;
-                            if (labelA > labelB)
-                                return 1;
-                            return 0; // no sorting
-                        });
-                    }
-
-                    // check if empty
-                    if (jsonData.options.length === 0) {
-                        jsonData.empty = true;
-                    }
-
-                    var html = me.template(jsonData);
-                    me.$el.html(html);
-                    me.$el.show();
-
-                    // Initialize plugin
-                    var selector = me.$el.find("select");
-                    if (isMultiple) {
-                        selector.multiselect({
-                            buttonContainer: '<div class="squid-api-data-widgets-metric-selector-open" />',
-                            buttonText: function(options, select) {
-                                return 'Metrics';
-                            },
-                            onDropdownShown: function(event) {
-                                // TODO implement parent role check
-                                if (me.metrics.models) {
-                                    if (me.metrics.models[0]) {
-                                        if (me.metrics.models[0].get("_role") == "WRITE" || me.metrics.models[0].get("_role") == "OWNER") {
+                            // Initialize plugin
+                            var selector = me.$el.find("select");
+                            if (isMultiple) {
+                                selector.multiselect({
+                                    buttonContainer: '<div class="squid-api-data-widgets-metric-selector-open" />',
+                                    buttonText: function(options, select) {
+                                        return 'Metrics';
+                                    },
+                                    onDropdownShown: function(event) {
+                                        if (project.get("_role") == "WRITE" || project.get("_role") == "OWNER") {
                                             me.$el.find("li.configure").remove();
                                             me.$el.find("li").first().before("<li class='configure'></option>");
                                             me.$el.find("li").first().off().on("click", function() {
@@ -180,13 +181,13 @@
                                             })
                                         }
                                     }
-                                }
+                                });
                             }
-                        });
-                    }
 
-                    // Remove Button Title Tag
-                    me.$el.find("button").removeAttr('title');
+                            // Remove Button Title Tag
+                            me.$el.find("button").removeAttr('title');
+                        });
+                    });
                 });
             }
 
