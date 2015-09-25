@@ -13,6 +13,7 @@
 }
 
 .squid-api-data-widgets-dimension-selector li.configure {
+	cursor: pointer;
 	font: normal normal normal 19px/1 FontAwesome;
 	position: absolute;
 	top: -29px;
