@@ -88,35 +88,37 @@
             if (selection) {
                 var facets = selection.facets;
                 if (facets) {
-                    var dimensions = [];
+                    this.dimensions = [];
                     var dims = facets;
                     for (var i=0; i<facets.length; i++){
                         var facet = facets[i];
-                        var isBoolean = false;
-                        if ((facet.dimension.type == "SEGMENTS") || (facet.items.length == 1) && (facet.items[0].value == "true")) {
-                            isBoolean = true;
-                        }
-                        // do not display boolean dimensions
-                        if (!isBoolean) {
-                            if (this.dimensionIdList) {
-                                // insert and sort
-                                var idx = this.dimensionIdList.indexOf(facet.dimension.oid);
-                                if (idx >= 0) {
-                                    dimensions[idx] = facet;
-                                }
-                            } else {
-                                // default unordered behavior
-                                dimensions.push(facet);
+                        if (facet.dimension.dynamic === false) {
+                            var isBoolean = false;
+                            if ((facet.dimension.type == "SEGMENTS") || (facet.items.length == 1) && (facet.items[0].value == "true")) {
+                                isBoolean = true;
                             }
-                        }
-                        // avoid holes
-                        if (!dimensions[i]) {
-                            dimensions[i] = null;
+                            // do not display boolean dimensions
+                            if (!isBoolean) {
+                                if (this.dimensionIdList) {
+                                    // insert and sort
+                                    var idx = this.dimensionIdList.indexOf(facet.dimension.oid);
+                                    if (idx >= 0) {
+                                        this.dimensions[idx] = facet;
+                                    }
+                                } else {
+                                    // default unordered behavior
+                                    this.dimensions.push(facet);
+                                }
+                            }
+                            // avoid holes
+                            if (!this.dimensions[i]) {
+                                this.dimensions[i] = null;
+                            }
                         }
                     }
                     var noneSelected = true;
-                    for (var dimIdx=0; dimIdx<dimensions.length; dimIdx++) {
-                        var facet1 = dimensions[dimIdx];
+                    for (var dimIdx=0; dimIdx<this.dimensions.length; dimIdx++) {
+                        var facet1 = this.dimensions[dimIdx];
                         if (facet1) {
                             // check if selected
                             var selected = this.isChosen(facet1);
@@ -130,7 +132,7 @@
                             } else {
                                 name = facet1.dimension.name;
                             }
-                            var option = {"label" : name, "value" : facet1.id, "selected" : selected, "error" : dimensions[dimIdx].error};
+                            var option = {"label" : name, "value" : facet1.id, "selected" : selected, "error" : this.dimensions[dimIdx].error};
                             jsonData.options.push(option);
                         }
                     }
@@ -149,6 +151,11 @@
                     return 1;
                 return 0; // no sorting
             });
+
+            // check if empty
+            if (jsonData.options.length === 0) {
+                jsonData.empty = true;
+            }
 
             var html = this.template(jsonData);
             this.$el.html(html);
@@ -180,6 +187,30 @@
                             }
                         }
                         me.model.set("chosenDimensions", chosenModel);
+                    },
+                    onDropdownShown: function() {
+                        // TODO implement parent role check
+                        if (me.dimensions) {
+                            if (me.dimensions[0]) {
+                                if (me.dimensions[0].dimension._role == "WRITE" || me.dimensions[0].dimension._role == "OWNER") {
+                                    me.$el.find("li.configure").remove();
+                                    me.$el.find("li").first().before("<li class='configure'></option>");
+                                    me.$el.find("li").first().off().on("click", function() {
+                                        var dimensionSelect = new squid_api.view.ColumnsManagementWidget({
+                                            buttonLabel : "<i class='fa fa-arrows-h'></i>",
+                                            type : "Dimension",
+                                            collection :new squid_api.model.DimensionCollection(),
+                                            model : new squid_api.model.DimensionModel(),
+                                            autoOpen : true,
+                                            successHandler : function() {
+                                                var message = me.type + " with name " + this.get("name") + " has been successfully modified";
+                                                squid_api.model.status.set({'message' : message});
+                                            }
+                                        });
+                                    })
+                                }
+                            }
+                        }
                     }
                 });
             } else {

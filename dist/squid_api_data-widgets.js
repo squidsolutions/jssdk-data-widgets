@@ -36,7 +36,10 @@ function program1(depth0,data) {
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.multiple), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\r\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.empty), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n        ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n    </select>\r\n";
   return buffer;
@@ -49,16 +52,22 @@ function program2(depth0,data) {
 
 function program4(depth0,data) {
   
+  
+  return "\r\n            <option disabled=\"true\">No metrics available</option>\r\n        ";
+  }
+
+function program6(depth0,data) {
+  
   var buffer = "", stack1, helper;
   buffer += "\r\n            <option value=\"";
   if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
     + "\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += " ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.error), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.error), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\r\n                ";
   if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
@@ -67,19 +76,19 @@ function program4(depth0,data) {
     + "\r\n            </option>\r\n        ";
   return buffer;
   }
-function program5(depth0,data) {
+function program7(depth0,data) {
   
   
   return "selected";
   }
 
-function program7(depth0,data) {
+function program9(depth0,data) {
   
   
   return " disabled ";
   }
 
-function program9(depth0,data) {
+function program11(depth0,data) {
   
   var buffer = "", stack1, helper;
   buffer += "\r\n    <!-- just display filter name -->\r\n    <label class=\"squid-api-data-widgets-dimension-selector\">";
@@ -90,7 +99,7 @@ function program9(depth0,data) {
   return buffer;
   }
 
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(9, program9, data),fn:self.program(1, program1, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(11, program11, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n";
   return buffer;
@@ -1750,35 +1759,37 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (selection) {
                 var facets = selection.facets;
                 if (facets) {
-                    var dimensions = [];
+                    this.dimensions = [];
                     var dims = facets;
                     for (var i=0; i<facets.length; i++){
                         var facet = facets[i];
-                        var isBoolean = false;
-                        if ((facet.dimension.type == "SEGMENTS") || (facet.items.length == 1) && (facet.items[0].value == "true")) {
-                            isBoolean = true;
-                        }
-                        // do not display boolean dimensions
-                        if (!isBoolean) {
-                            if (this.dimensionIdList) {
-                                // insert and sort
-                                var idx = this.dimensionIdList.indexOf(facet.dimension.oid);
-                                if (idx >= 0) {
-                                    dimensions[idx] = facet;
-                                }
-                            } else {
-                                // default unordered behavior
-                                dimensions.push(facet);
+                        if (facet.dimension.dynamic === false) {
+                            var isBoolean = false;
+                            if ((facet.dimension.type == "SEGMENTS") || (facet.items.length == 1) && (facet.items[0].value == "true")) {
+                                isBoolean = true;
                             }
-                        }
-                        // avoid holes
-                        if (!dimensions[i]) {
-                            dimensions[i] = null;
+                            // do not display boolean dimensions
+                            if (!isBoolean) {
+                                if (this.dimensionIdList) {
+                                    // insert and sort
+                                    var idx = this.dimensionIdList.indexOf(facet.dimension.oid);
+                                    if (idx >= 0) {
+                                        this.dimensions[idx] = facet;
+                                    }
+                                } else {
+                                    // default unordered behavior
+                                    this.dimensions.push(facet);
+                                }
+                            }
+                            // avoid holes
+                            if (!this.dimensions[i]) {
+                                this.dimensions[i] = null;
+                            }
                         }
                     }
                     var noneSelected = true;
-                    for (var dimIdx=0; dimIdx<dimensions.length; dimIdx++) {
-                        var facet1 = dimensions[dimIdx];
+                    for (var dimIdx=0; dimIdx<this.dimensions.length; dimIdx++) {
+                        var facet1 = this.dimensions[dimIdx];
                         if (facet1) {
                             // check if selected
                             var selected = this.isChosen(facet1);
@@ -1792,7 +1803,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             } else {
                                 name = facet1.dimension.name;
                             }
-                            var option = {"label" : name, "value" : facet1.id, "selected" : selected, "error" : dimensions[dimIdx].error};
+                            var option = {"label" : name, "value" : facet1.id, "selected" : selected, "error" : this.dimensions[dimIdx].error};
                             jsonData.options.push(option);
                         }
                     }
@@ -1811,6 +1822,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     return 1;
                 return 0; // no sorting
             });
+
+            // check if empty
+            if (jsonData.options.length === 0) {
+                jsonData.empty = true;
+            }
 
             var html = this.template(jsonData);
             this.$el.html(html);
@@ -1842,6 +1858,30 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             }
                         }
                         me.model.set("chosenDimensions", chosenModel);
+                    },
+                    onDropdownShown: function() {
+                        // TODO implement parent role check
+                        if (me.dimensions) {
+                            if (me.dimensions[0]) {
+                                if (me.dimensions[0].dimension._role == "WRITE" || me.dimensions[0].dimension._role == "OWNER") {
+                                    me.$el.find("li.configure").remove();
+                                    me.$el.find("li").first().before("<li class='configure'></option>");
+                                    me.$el.find("li").first().off().on("click", function() {
+                                        var dimensionSelect = new squid_api.view.ColumnsManagementWidget({
+                                            buttonLabel : "<i class='fa fa-arrows-h'></i>",
+                                            type : "Dimension",
+                                            collection :new squid_api.model.DimensionCollection(),
+                                            model : new squid_api.model.DimensionModel(),
+                                            autoOpen : true,
+                                            successHandler : function() {
+                                                var message = me.type + " with name " + this.get("name") + " has been successfully modified";
+                                                squid_api.model.status.set({'message' : message});
+                                            }
+                                        });
+                                    })
+                                }
+                            }
+                        }
                     }
                 });
             } else {

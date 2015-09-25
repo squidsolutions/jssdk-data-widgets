@@ -263,6 +263,27 @@ Pagination
 	text-decoration: line-through;
 }
 
+.squid-api-data-widgets-dimension-selector li.configure {
+	font: normal normal normal 19px/1 FontAwesome;
+	position: absolute;
+	top: -29px;
+	border-top-right-radius: 10px;
+	border-top-left-radius: 10px;
+	left: -1px;
+	border: 1px solid #ccc;
+	height: 29px;
+	padding-left: 10px;
+	padding-top: 6px;
+	width: 40px;
+	border-bottom: 0px;
+	min-width: 0px !important;
+	background-color: #fff;
+}
+
+.squid-api-data-widgets-dimension-selector li.configure:before {
+	content: "\f013";
+}
+
 .squid-api-data-widgets-dimension-widget .sortable {
 	list-style-type: none;
 	margin: 0px;
