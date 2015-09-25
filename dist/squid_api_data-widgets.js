@@ -1863,7 +1863,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 onDropdownShown: function() {
                                     if (project.get("_role") == "WRITE" || project.get("_role") == "OWNER") {
                                         me.$el.find("li.configure").remove();
-                                        me.$el.find("li").first().before("<li class='configure'></option>");
+                                        me.$el.find("li").first().before("<li class='configure'> configure</option>");
                                         me.$el.find("li").first().off().on("click", function() {
                                             var dimensionSelect = new squid_api.view.ColumnsManagementWidget({
                                                 buttonLabel : "<i class='fa fa-arrows-h'></i>",
@@ -3314,7 +3314,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                     onDropdownShown: function(event) {
                                         if (project.get("_role") == "WRITE" || project.get("_role") == "OWNER") {
                                             me.$el.find("li.configure").remove();
-                                            me.$el.find("li").first().before("<li class='configure'></option>");
+                                            me.$el.find("li").first().before("<li class='configure'> configure</option>");
                                             me.$el.find("li").first().off().on("click", function() {
                                                 var metricSelect = new squid_api.view.ColumnsManagementWidget({
                                                     buttonLabel : "<i class='fa fa-arrows-h'></i>",
