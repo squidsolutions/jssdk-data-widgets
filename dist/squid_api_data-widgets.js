@@ -53,7 +53,7 @@ function program2(depth0,data) {
 function program4(depth0,data) {
   
   
-  return "\r\n            <option disabled=\"true\">No metrics available</option>\r\n        ";
+  return "\r\n            <option disabled=\"true\">No dimensions available</option>\r\n        ";
   }
 
 function program6(depth0,data) {

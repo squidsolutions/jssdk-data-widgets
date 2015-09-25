@@ -1,7 +1,7 @@
 {{#if selAvailable}}
     <select class="sq-select form-control" {{#if multiple}}multiple{{/if}}>
         {{#if empty}}
-            <option disabled="true">No metrics available</option>
+            <option disabled="true">No dimensions available</option>
         {{/if}}
         {{#each options}}
             <option value="{{value}}" {{#if selected}}selected{{/if}} {{#if error}} disabled {{/if}}>
