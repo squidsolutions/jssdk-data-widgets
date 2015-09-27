@@ -43,7 +43,6 @@
 
             // listen for global status change
             squid_api.model.status.on('change:status', this.enable, this);
-
         },
 
         enable: function() {
@@ -74,129 +73,159 @@
         },
 
         render: function() {
-            var isMultiple = true;
             var me = this;
+                squid_api.utils.fetchModel("project").then(function(project) {
+                    squid_api.utils.fetchModel("domain").then(function(domain) {
+                        var isMultiple = true;
 
-            if (this.dimensionIndex !== null) {
-                isMultiple = false;
-            }
-
-            var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
-
-            // iterate through all filter facets
-            var selection = this.filters.get("selection");
-            if (selection) {
-                var facets = selection.facets;
-                if (facets) {
-                    var dimensions = [];
-                    var dims = facets;
-                    for (var i=0; i<facets.length; i++){
-                        var facet = facets[i];
-                        var isBoolean = false;
-                        if ((facet.dimension.type == "SEGMENTS") || (facet.items.length == 1) && (facet.items[0].value == "true")) {
-                            isBoolean = true;
+                        if (me.dimensionIndex !== null) {
+                            isMultiple = false;
                         }
-                        // do not display boolean dimensions
-                        if (!isBoolean) {
-                            if (this.dimensionIdList) {
-                                // insert and sort
-                                var idx = this.dimensionIdList.indexOf(facet.dimension.oid);
-                                if (idx >= 0) {
-                                    dimensions[idx] = facet;
+
+                        var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
+
+                        // iterate through all filter facets
+                        var selection = me.filters.get("selection");
+                        if (selection) {
+                            var facets = selection.facets;
+                            if (facets) {
+                                me.dimensions = [];
+                                var dims = facets;
+                                for (var i=0; i<facets.length; i++){
+                                    var facet = facets[i];
+                                    if (facet.dimension.dynamic === false || domain.get("dynamic") === true) {
+                                        var isBoolean = false;
+                                        if ((facet.dimension.type == "SEGMENTS") || (facet.items.length == 1) && (facet.items[0].value == "true")) {
+                                            isBoolean = true;
+                                        }
+                                        // do not display boolean dimensions
+                                        if (!isBoolean) {
+                                            if (me.dimensionIdList) {
+                                                // insert and sort
+                                                var idx = me.dimensionIdList.indexOf(facet.dimension.oid);
+                                                if (idx >= 0) {
+                                                    me.dimensions[idx] = facet;
+                                                }
+                                            } else {
+                                                // default unordered behavior
+                                                me.dimensions.push(facet);
+                                            }
+                                        }
+                                        // avoid holes
+                                        if (!me.dimensions[i]) {
+                                            me.dimensions[i] = null;
+                                        }
+                                    }
                                 }
-                            } else {
-                                // default unordered behavior
-                                dimensions.push(facet);
+                                var noneSelected = true;
+                                for (var dimIdx=0; dimIdx<me.dimensions.length; dimIdx++) {
+                                    var facet1 = me.dimensions[dimIdx];
+                                    if (facet1) {
+                                        // check if selected
+                                        var selected = me.isChosen(facet1);
+                                        if (selected === true) {
+                                            noneSelected = false;
+                                        }
+                                        // add to the list
+                                        var name;
+                                        if (facet1.name) {
+                                            name = facet1.name;
+                                        } else {
+                                            name = facet1.dimension.name;
+                                        }
+                                        var option = {"label" : name, "value" : facet1.id, "selected" : selected, "error" : me.dimensions[dimIdx].error};
+                                        jsonData.options.push(option);
+                                    }
+                                }
+                                if (noneSelected === true) {
+                                    me.model.set("chosenDimensions", []);
+                                }
                             }
                         }
-                        // avoid holes
-                        if (!dimensions[i]) {
-                            dimensions[i] = null;
+
+                        // Alphabetical Sorting
+                        jsonData.options.sort(function(a, b) {
+                            var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
+                            if (labelA < labelB)
+                                return -1;
+                            if (labelA > labelB)
+                                return 1;
+                            return 0; // no sorting
+                        });
+
+                        // check if empty
+                        if (jsonData.options.length === 0) {
+                            jsonData.empty = true;
                         }
-                    }
-                    var noneSelected = true;
-                    for (var dimIdx=0; dimIdx<dimensions.length; dimIdx++) {
-                        var facet1 = dimensions[dimIdx];
-                        if (facet1) {
-                            // check if selected
-                            var selected = this.isChosen(facet1);
-                            if (selected === true) {
-                                noneSelected = false;
-                            }
-                            // add to the list
-                            var name;
-                            if (facet1.name) {
-                                name = facet1.name;
-                            } else {
-                                name = facet1.dimension.name;
-                            }
-                            var option = {"label" : name, "value" : facet1.id, "selected" : selected, "error" : dimensions[dimIdx].error};
-                            jsonData.options.push(option);
-                        }
-                    }
-                    if (noneSelected === true) {
-                        me.model.set("chosenDimensions", []);
-                    }
-                }
-            }
 
-            // Alphabetical Sorting
-            jsonData.options.sort(function(a, b) {
-                var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
-                if (labelA < labelB)
-                    return -1;
-                if (labelA > labelB)
-                    return 1;
-                return 0; // no sorting
-            });
+                        var html = me.template(jsonData);
+                        me.$el.html(html);
+                        me.$el.show();
 
-            var html = this.template(jsonData);
-            this.$el.html(html);
-            this.$el.show();
+                        // Initialize plugin
+                        var selector = me.$el.find("select");
+                        if (isMultiple) {
+                             selector.multiselect({
+                                buttonContainer: '<div class="squid-api-data-widgets-dimension-selector" />',
+                                buttonText: function(options, select) {
+                                    return 'Dimensions';
+                                },
+                                onChange: function(option, selected, index) {
+                                    var chosenModel = _.clone(me.model.get("chosenDimensions"));
+                                    if (!chosenModel) {
+                                        chosenModel = [];
+                                    }
+                                    var currentItem = option.attr("value");
 
-            // Initialize plugin
-            var selector = this.$el.find("select");
-            if (isMultiple) {
-                 selector.multiselect({
-                    buttonContainer: '<div class="squid-api-data-widgets-dimension-selector" />',
-                    buttonText: function(options, select) {
-                        return 'Dimensions';
-                    },
-                    onChange: function(option, selected, index) {
-                        var chosenModel = _.clone(me.model.get("chosenDimensions"));
-                        if (!chosenModel) {
-                            chosenModel = [];
-                        }
-                        var currentItem = option.attr("value");
-
-                        if (selected) {
-                            chosenModel.push(option.attr("value"));
+                                    if (selected) {
+                                        chosenModel.push(option.attr("value"));
+                                    } else {
+                                        // If deselected remove item from array
+                                        for (var i = chosenModel.length; i--;) {
+                                            if (chosenModel[i] === currentItem) {
+                                                chosenModel.splice(i, 1);
+                                            }
+                                        }
+                                    }
+                                    me.model.set("chosenDimensions", chosenModel);
+                                },
+                                onDropdownShown: function() {
+                                    if (project.get("_role") == "WRITE" || project.get("_role") == "OWNER") {
+                                        me.$el.find("li.configure").remove();
+                                        me.$el.find("li").first().before("<li class='configure'> configure</option>");
+                                        me.$el.find("li").first().off().on("click", function() {
+                                            var dimensionSelect = new squid_api.view.ColumnsManagementWidget({
+                                                buttonLabel : "<i class='fa fa-arrows-h'></i>",
+                                                type : "Dimension",
+                                                collection :new squid_api.model.DimensionCollection(),
+                                                model : new squid_api.model.DimensionModel(),
+                                                autoOpen : true,
+                                                successHandler : function() {
+                                                    var message = me.type + " with name " + this.get("name") + " has been successfully modified";
+                                                    squid_api.model.status.set({'message' : message});
+                                                }
+                                            });
+                                        })
+                                    }
+                                }
+                            });
                         } else {
-                            // If deselected remove item from array
-                            for (var i = chosenModel.length; i--;) {
-                                if (chosenModel[i] === currentItem) {
-                                    chosenModel.splice(i, 1);
-                                }
+                            var selectedDimension = me.model.get("selectedDimension");
+
+                            me.$el.find("select").on("change", function() {
+                                var dimension = $(me).val();
+                                me.model.set("chosenDimensions", [dimension]);
+                            });
+
+                            if (selectedDimension) {
+                                me.$el.find("select").val(selectedDimension);
                             }
                         }
-                        me.model.set("chosenDimensions", chosenModel);
-                    }
+
+                        // Remove Button Title Tag
+                        me.$el.find("button").removeAttr('title');
+                    });
                 });
-            } else {
-                var selectedDimension = this.model.get("selectedDimension");
-
-                this.$el.find("select").on("change", function() {
-                    var dimension = $(this).val();
-                    me.model.set("chosenDimensions", [dimension]);
-                });
-
-                if (selectedDimension) {
-                    this.$el.find("select").val(selectedDimension);
-                }
-            }
-
-            // Remove Button Title Tag
-            this.$el.find("button").removeAttr('title');
 
             return this;
         },

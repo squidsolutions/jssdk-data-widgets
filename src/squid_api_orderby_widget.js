@@ -24,7 +24,7 @@
             if (options.metricList) {
                 this.metricList = options.metricList;
             }
-            
+
             // To populate metrics
             squid_api.model.project.on("change:domains", this.render, this);
 
@@ -72,19 +72,10 @@
             }
         },
 
-        getDomainMetrics : function() {
-            var metrics = [];
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"), "Domain");
-            if (domain) {
-                metrics = domain.metrics;
-            }
-            return metrics;
-        },
-
         render : function() {
             var direction = "";
             var me = this;
-            
+
             var orderByList = this.model.get("orderBy");
             if (orderByList) {
                 var orderBy = this.model.get("orderBy")[0];
@@ -95,54 +86,56 @@
 
             var limit = this.model.get("limit");
 
-            var metrics = this.getDomainMetrics();
-            var chosenMetrics = this.model.get("chosenMetrics");
-            var metricList = [];
+            squid_api.utils.getDomainMetrics().then(function(metrics) {
+                metrics = metrics.models;
+                var chosenMetrics = squid_api.model.config.get("chosenMetrics");
+                var metricList = [];
 
-            if (this.metricList) {
-                var appMetrics = this.metricList;
-                for (var idx=0; idx<metrics.length; idx++) {
-                    for (ix=0; ix<appMetrics.length; ix++) {
-                        var metric1 = metrics[idx];
-                        if (appMetrics[ix] === metric1.oid) {
-                            var option1 = {"label" : metric1.name, "value" : metric1.oid};
-                            metricList.push(option1);
+                if (me.metricList) {
+                    var appMetrics = me.metricList;
+                    for (var idx=0; idx<metrics.length; idx++) {
+                        for (ix=0; ix<appMetrics.length; ix++) {
+                            var metric1 = metrics[idx];
+                            if (appMetrics[ix] === metric1.oid) {
+                                var option1 = {"label" : metric1.name, "value" : metric1.oid};
+                                metricList.push(option1);
+                            }
+                        }
+                    }
+                } else if (metrics && chosenMetrics) {
+                    for (var id=0; id<metrics.length; id++) {
+                        var metric = metrics[id];
+                        // Match with chosen
+                        for (var match=0; match<chosenMetrics.length; match++) {
+                            if (metric.get("oid") === chosenMetrics[match]) {
+                                var option = {"label" : metric.get("name"), "value" : metric.get("oid")};
+                                metricList.push(option);
+                            }
                         }
                     }
                 }
-            } else if (metrics && chosenMetrics) {
-                for (var id=0; id<metrics.length; id++) {
-                    var metric = metrics[id];
-                    // Match with chosen
-                    for (var match=0; match<chosenMetrics.length; match++) {
-                        if (metric.oid === chosenMetrics[match]) {
-                            var option = {"label" : metric.name, "value" : metric.oid};
-                            metricList.push(option);
-                        }
+
+                var jsonData = {"direction" : direction, "limit" : limit, "chosenMetrics" : metricList, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
+
+                var html = me.template(jsonData);
+                me.$el.html(html);
+
+                me.$el.find("select").multiselect({
+                    onChange: function(option, selected, index) {
+                        var metric = option.attr("value");
+                        me.model.set({"selectedMetric": metric});
                     }
+                });
+
+                if (me.model.get("selectedMetric")) {
+                    me.$el.find("select").multiselect('select', me.model.get("selectedMetric"));
                 }
-            }
 
-            var jsonData = {"direction" : direction, "limit" : limit, "chosenMetrics" : metricList, "orderByDirectionDisplay" : this.orderByDirectionDisplay, "removeOrderDirection" : this.removeOrderDirection};
+                me.$el.find("select").multiselect("refresh");
 
-            var html = this.template(jsonData);
-            this.$el.html(html);
-
-            this.$el.find("select").multiselect({
-                onChange: function(option, selected, index) {
-                    var metric = option.attr("value");
-                    me.model.set({"selectedMetric": metric});
-                }
+                // Set Limit Value
+                me.$el.find(".sq-select").val(jsonData.limit);
             });
-
-            if (this.model.get("selectedMetric")) {
-                this.$el.find("select").multiselect('select', this.model.get("selectedMetric"));
-            }
-
-            this.$el.find("select").multiselect("refresh");
-
-            // Set Limit Value
-            this.$el.find(".sq-select").val(jsonData.limit);  
 
             return this;
         }
