@@ -1301,168 +1301,202 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         displayTableHeader : function(selector) {
             var me = this;
-            var columns;
-            var originalColumns;//unaltered by rollup splice
-            var invalidSelection = false;
-            var status = this.model.get("status");
 
-            var analysis = this.model;
-            // in case of a multi-analysis model
-            if (analysis.get("analyses")) {
-              analysis = analysis.get("analyses")[0];
-            }
-            var results = analysis.get("results");
-            var rollups;
-            if (results) {
-                // use results columns
-                columns = results.cols;
-
-                // init rollups
-                rollups = analysis.get("rollups");
-                if (rollups && (rollups.length ===0)) {
-                    rollups = this.rollups = null;
-                }
-                originalColumns = columns;
-            } else {
-                // use analysis columns
-                columns = [];
-                var i;
-                var obj;
-                var facets = this.model.get("facets");
-                if (facets) {
-                    for (i=0; i<facets.length; i++) {
-                        obj = squid_api.utils.find(this.filters.get("selection").facets, "id", facets[i].value);
-                        if (obj) {
-                            obj.dataType = "STRING";
-                            columns.push(obj);
-                        } else {
-                            // impossible to get column data from selection
-                            invalidSelection = true;
-                        }
-
+            if (! me.headerInformation) {
+                squid_api.utils.getProjectDomains().then(function(domains) {
+                    var arr = [];
+                    for(i=0; i<domains.models.length; i++) {
+                        arr.push(domains.models[i].toJSON());
                     }
+                    me.projectDomains = arr;
+                }).then(squid_api.utils.getDomainMetrics().then(function(metrics) {
+                    var arr = [];
+                    for(i=0; i<metrics.models.length; i++) {
+                        arr.push(metrics.models[i].toJSON());
+                    }
+                    me.domainMetrics = arr;
+                    me.headerInformation = true;
+                    me.displayTableHeader();
+                }));
+            } else  {
+                var columns;
+                var originalColumns;//unaltered by rollup splice
+                var invalidSelection = false;
+                var status = this.model.get("status");
+
+                var analysis = this.model;
+                // in case of a multi-analysis model
+                if (analysis.get("analyses")) {
+                  analysis = analysis.get("analyses")[0];
                 }
-                var metrics = this.model.get("metricList");
-                if (metrics) {
-                    var metric;
-                    for (i=0; i<metrics.length; i++) {
-                        metric = metrics[i];
-                        if (metrics[i].id) {
-                            obj = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", metrics[i].id.metricId, "Metric");
+                var results = analysis.get("results");
+                var rollups;
+                if (results) {
+                    // use results columns
+                    columns = results.cols;
+
+                    // init rollups
+                    rollups = analysis.get("rollups");
+                    if (rollups && (rollups.length ===0)) {
+                        rollups = this.rollups = null;
+                    }
+                    originalColumns = columns;
+                } else {
+                    // use analysis columns
+                    columns = [];
+                    var i;
+                    var obj;
+                    var facets = this.model.get("facets");
+                    if (facets) {
+                        for (i=0; i<facets.length; i++) {
+                            obj = squid_api.utils.find(this.filters.get("selection").facets, "id", facets[i].value);
                             if (obj) {
-                                obj.dataType = "NUMBER";
+                                obj.dataType = "STRING";
+                                columns.push(obj);
                             } else {
                                 // impossible to get column data from selection
                                 invalidSelection = true;
                             }
-                        } else {
-                            obj = {
-                                    "id" : null,
-                                    "name" : metrics[i].name,
-                                    "dataType" : "NUMBER"
-                            };
-                        }
-                        columns.push(obj);
-                    }
-                }
-                if (this.config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
-                    originalColumns = columns.slice();
-                    columns.splice(this.config.get("rollups")[0].col, 1);
-                } else {
-                    originalColumns = columns;
-                }
-            }
 
-
-            // Add OrderBy Attribute
-            var orderBy = this.model.get("orderBy");
-            if (orderBy) {
-                for (col=0; col<columns.length; col++) {
-                    columns[col].orderDirection = null;
-                }
-                // add orderBy direction
-                for (ix=0; ix<orderBy.length; ix++) {
-                    for (col=0; col<columns.length; col++) {
-                        if (this.ordering && this.config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
-                            originalColumns[col].orderDirection = orderBy[ix].direction;
-                            break;
-                        }
-                        else if (this.ordering && col == orderBy[ix].col) {
-                        	originalColumns[col].orderDirection = orderBy[ix].direction;
-                            break;
                         }
                     }
-                }
-            }
-
-            var rollupColIndex = null;
-            var rollupSummaryIndex = null;
-            if (rollups) {
-                if ((rollups.length>0)) {
-                    if (rollups.length>1) {
-                        rollupColIndex = rollups[1].col + 1;
-                    } else {
-                        rollupColIndex = rollups[0].col + 1;
+                    var metrics = this.model.get("metricList");
+                    if (metrics) {
+                        if (metrics.length === 0) {
+                            metrics = squid_api.model.config.get("chosenMetrics");
+                        }
                     }
-                }
-                if (this.config.get("rollups") && this.rollupSummaryColumn >= 0) {
-                    rollupSummaryIndex = this.rollupSummaryColumn + 1;
-                }
-            }
-            me = this;
-            // header
-            d3.select(selector).select("thead tr").selectAll("th").remove();
-
-            if (!invalidSelection) {
-                d3.select(selector).select("thead tr").selectAll("th")
-                    .data(columns)
-                    .enter().append("th")
-                    .attr("class", function(d, i) {
-                        var str = "";
-                        if (rollups) {
-                            if (i === 0) {
-                                // hide grouping column
-                                str = str + "hide " + d.dataType;
-                            } else if (( rollupSummaryIndex !== null) && (i === rollupColIndex)) {
-                                // hide rollup column
-                                str = str + "hide " + d.dataType;
+                    if (metrics) {
+                        var metric;
+                        for (i=0; i<metrics.length; i++) {
+                            metric = metrics[i];
+                            if (metrics[i].id) {
+                                for (ix=0; ix<me.domainMetrics.length; ix++) {
+                                    if (metrics[i].id.metricId == me.domainMetrics[ix].oid) {
+                                        metrics[i].name = me.domainMetrics[ix].name;
+                                    }
+                                }
+                                obj = squid_api.utils.find(me.domainMetrics, "oid", metrics[i].id.metricId);
+                                if (obj) {
+                                    obj.dataType = "NUMBER";
+                                } else {
+                                    // impossible to get column data from selection
+                                    invalidSelection = true;
+                                }
                             } else {
-                                str = str + d.dataType;
+                                obj = {
+                                        "id" : null,
+                                        "name" : metrics[i].name,
+                                        "dataType" : "NUMBER"
+                                };
+                            }
+                            columns.push(obj);
+                        }
+                    }
+                    if (this.config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
+                        originalColumns = columns.slice();
+                        columns.splice(this.config.get("rollups")[0].col, 1);
+                    } else {
+                        originalColumns = columns;
+                    }
+                }
+
+
+                // Add OrderBy Attribute
+                var orderBy = this.model.get("orderBy");
+                if (orderBy) {
+                    for (col=0; col<columns.length; col++) {
+                        if (columns[col]) {
+                            columns[col].orderDirection = null;
+                        }
+                    }
+                    // add orderBy direction
+                    for (ix=0; ix<orderBy.length; ix++) {
+                        for (col=0; col<columns.length; col++) {
+                            if (this.ordering && this.config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
+                                if (originalColumns[col]) {
+                                    originalColumns[col].orderDirection = orderBy[ix].direction;
+                                }
+                                break;
+                            }
+                            else if (this.ordering && col == orderBy[ix].col) {
+                                if (originalColumns[col]) {
+                                    originalColumns[col].orderDirection = orderBy[ix].direction;
+                                }
+                                break;
                             }
                         }
-                        if (d.orderDirection) {
-                            str = str + " " + d.orderDirection;
-                        }
-                        return str;
-                    })
-                    .html(function(d) {
-                        var str = d.name;
-                        if (d.orderDirection === "ASC") {
-                            str = str + " " + "<span class='sort-direction'>&#xffea;</span>";
-                        } else if (d.orderDirection === "DESC") {
-                            str = str + " " + "<span class='sort-direction'>&#xffec;</span>";
-                        }
-                        return str;
-                    })
-                    .attr("data-content", function(d) {
-                        if (d.oid) {
-                            return d.oid;
-                        } else {
-                            return d.id;
-                        }
-                    })
-                    .attr("data-id", function(d, i) {
-                        return i;
-                    });
+                    }
+                }
 
-                // add class if more than 10 columns
-                if (this.$el.find("thead th").length > 10) {
-                    this.$el.find("table").addClass("many-columns");
-                } else {
-                    this.$el.find("table").removeClass("many-columns");
+                var rollupColIndex = null;
+                var rollupSummaryIndex = null;
+                if (rollups) {
+                    if ((rollups.length>0)) {
+                        if (rollups.length>1) {
+                            rollupColIndex = rollups[1].col + 1;
+                        } else {
+                            rollupColIndex = rollups[0].col + 1;
+                        }
+                    }
+                    if (this.config.get("rollups") && this.rollupSummaryColumn >= 0) {
+                        rollupSummaryIndex = this.rollupSummaryColumn + 1;
+                    }
+                }
+                me = this;
+                // header
+                d3.select(selector).select("thead tr").selectAll("th").remove();
+
+                if (!invalidSelection) {
+                    d3.select(selector).select("thead tr").selectAll("th")
+                        .data(columns)
+                        .enter().append("th")
+                        .attr("class", function(d, i) {
+                            var str = "";
+                            if (rollups) {
+                                if (i === 0) {
+                                    // hide grouping column
+                                    str = str + "hide " + d.dataType;
+                                } else if (( rollupSummaryIndex !== null) && (i === rollupColIndex)) {
+                                    // hide rollup column
+                                    str = str + "hide " + d.dataType;
+                                } else {
+                                    str = str + d.dataType;
+                                }
+                            }
+                            if (d.orderDirection) {
+                                str = str + " " + d.orderDirection;
+                            }
+                            return str;
+                        })
+                        .html(function(d) {
+                            var str = d.name;
+                            if (d.orderDirection === "ASC") {
+                                str = str + " " + "<span class='sort-direction'>&#xffea;</span>";
+                            } else if (d.orderDirection === "DESC") {
+                                str = str + " " + "<span class='sort-direction'>&#xffec;</span>";
+                            }
+                            return str;
+                        })
+                        .attr("data-content", function(d) {
+                            if (d.oid) {
+                                return d.oid;
+                            } else {
+                                return d.id;
+                            }
+                        })
+                        .attr("data-id", function(d, i) {
+                            return i;
+                        });
+
+                    // add class if more than 10 columns
+                    if (this.$el.find("thead th").length > 10) {
+                        this.$el.find("table").addClass("many-columns");
+                    } else {
+                        this.$el.find("table").removeClass("many-columns");
+                    }
                 }
             }
-
         },
 
         displayTableContent : function(selector) {
