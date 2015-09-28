@@ -36,6 +36,7 @@
 
             // listen for global status change
             this.listenTo(squid_api.model.status,"change:status", this.handleStatus);
+
         },
 
         handleStatus: function() {
@@ -108,26 +109,23 @@
                 var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
 
                 // iterate through all domains metrics
-                squid_api.utils.getDomainMetrics().then(function(metrics) {
-                    squid_api.utils.fetchModel("domain").then(function(domain) {
-                        squid_api.utils.fetchModel("project").then(function(project) {
+                squid_api.utils.fetchModel("project").then(function(project) {
+                    squid_api.utils.getDomainMetrics().then(function(metrics) {
                             me.metrics = metrics;
                             if (metrics.models.length > 0) {
                                 var noneSelected = true;
                                 for (var idx=0; idx<metrics.models.length; idx++) {
                                     var metric = metrics.models[idx];
 
-                                    if (metric.get("dynamic") === false || domain.get("dynamic") === true) {
-                                        // check if selected
-                                        var selected = me.isChosen(metrics.models[idx]);
-                                        if (selected === true) {
-                                            noneSelected = false;
-                                        }
-
-                                        // add to the list
-                                        var option = {"label" : metric.get("name"), "value" : metric.get("oid"), "selected" : selected};
-                                        jsonData.options.push(option);
+                                    // check if selected
+                                    var selected = me.isChosen(metrics.models[idx]);
+                                    if (selected === true) {
+                                        noneSelected = false;
                                     }
+
+                                    // add to the list
+                                    var option = {"label" : metric.get("name"), "value" : metric.get("oid"), "selected" : selected};
+                                    jsonData.options.push(option);
                                 }
 
                                 if (noneSelected === true) {
@@ -186,7 +184,7 @@
 
                             // Remove Button Title Tag
                             me.$el.find("button").removeAttr('title');
-                        });
+
                     });
                 });
             }
