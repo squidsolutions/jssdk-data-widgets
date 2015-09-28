@@ -2993,18 +2993,20 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // check for domain change performed
             this.listenTo(this.config, 'change:domain', function(config) {
-                var id = filters.get("id");
-                if (id) {
-                    filters.set("id" , {
-                        "projectId" : id.projectId,
-                        "facetjobId" : null
-                        });
-                    filters.setDomainIds([{
-                        "projectId" : id.projectId,
-                        "domainId" : config.get("domain")
-                    }]);
+                if (config.get("domain")) {
+                    var id = filters.get("id");
+                    if (id) {
+                        filters.set("id" , {
+                            "projectId" : id.projectId,
+                            "facetjobId" : null
+                            });
+                        filters.setDomainIds([{
+                            "projectId" : id.projectId,
+                            "domainId" : config.get("domain")
+                        }]);
+                    }
+                    me.initFilters(config);
                 }
-                me.initFilters(config);
             });
 
             // check for project change performed
