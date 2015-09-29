@@ -234,7 +234,7 @@
                             columns.push(obj);
                         }
                     }
-                    if (this.config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
+                    if (this.config.get("rollups") && Array.isArray(this.config.get("rollups")) && this.config.get("rollups").length>0 && this.rollupSummaryColumn >= 0 && status !== "DONE") {
                         originalColumns = columns.slice();
                         columns.splice(this.config.get("rollups")[0].col, 1);
                     } else {
