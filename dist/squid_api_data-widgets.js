@@ -53,7 +53,7 @@ function program2(depth0,data) {
 function program4(depth0,data) {
   
   
-  return "\r\n            <option disabled=\"true\">No dimensions available</option>\r\n        ";
+  return "\r\n            <option>No dimensions available</option>\r\n        ";
   }
 
 function program6(depth0,data) {
@@ -1393,7 +1393,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             columns.push(obj);
                         }
                     }
-                    if (this.config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
+                    if (this.config.get("rollups") && Array.isArray(this.config.get("rollups")) && this.config.get("rollups").length>0 && this.rollupSummaryColumn >= 0 && status !== "DONE") {
                         originalColumns = columns.slice();
                         columns.splice(this.config.get("rollups")[0].col, 1);
                     } else {
