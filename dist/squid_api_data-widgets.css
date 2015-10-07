@@ -263,10 +263,6 @@ Pagination
 	text-decoration: line-through;
 }
 
-.squid-api-data-widgets-dimension-selector ul li.empty {
-	opacity: 0.6;
-}
-
 .squid-api-data-widgets-dimension-selector li.configure {
 	cursor: pointer;
     position: absolute;
