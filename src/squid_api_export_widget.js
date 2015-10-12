@@ -17,7 +17,7 @@
         templateData : null,
         displayScripting : true,
         displayCompression : true,
-        
+
         initialize : function(options) {
             if (this.model.get("analysis")) {
                 this.listenTo(this.model.get("analysis"), 'change', this.render);
@@ -55,7 +55,7 @@
             this.model = model;
             this.initialize();
         },
-        
+
         clickedFormat : function (event) {
             var t = event.target;
             this.selectedFormatIndex = null;
@@ -66,7 +66,7 @@
             }
             this.refreshDownloadUrl();
         },
-        
+
         clickedCompression : function (event) {
             var t = event.target;
             this.compression = (t.checked);
@@ -89,7 +89,16 @@
                     analysisJobResults.setParameter("type", selectedFormat.type);
                     analysisJobResults.setParameter("timeout", null);
                     // build the template
-                    var velocityTemplate = selectedFormat.template(me.model.get("templateData"));
+                    if(selectedFormat.format === "xml"){
+                      if(me.model.get("templateData").options.xmlType){
+                        var template  = selectedFormat.template[me.model.get("templateData").options.xmlType];
+                        var velocityTemplate = selectedFormat.template[me.model.get("templateData").options.xmlType](me.model.get("templateData"));
+                      }else{
+                        var velocityTemplate = selectedFormat.template(me.model.get("templateData"));
+                      }
+                    }else{
+                      var velocityTemplate = selectedFormat.template(me.model.get("templateData"));
+                    }
                     analysisJobResults.setParameter("template", base64.encode(velocityTemplate));
                 }
                 if (me.compression) {
@@ -104,14 +113,14 @@
                 downloadBtn.removeClass("disabled");
             }
         },
-        
+
         render : function() {
             var me = this;
             var analysis = this.model.get("analysis");
             if (!analysis) {
                 analysis = this.model;
             }
-            
+
             var selectedFormat = this.formats[this.selectedFormatIndex];
             var formatsDisplay = [];
             for (var i=0; i<this.formats.length;i++) {
@@ -120,7 +129,7 @@
                     formatsDisplay[i].selected = true;
                 }
             }
-            
+
             if (this.displayInAccordion) {
                 this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-download-alt'></span></button>");
                 var facets = analysis.get("facets");
@@ -147,7 +156,7 @@
                         "projectId": analysis.get("id").projectId,
                         "analysisJobId": null
                     });
-    
+
                 // escape all spaces in the json injected into cURL
                 data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
                 curlFileName = "analysis";
@@ -159,7 +168,7 @@
                 }
                 curl = exportAnalysis.url().replace(/\[access_token\]/g, '<b>[access_token]</b>');
             }
-            
+
             $(this.viewPort).html(this.template({
                 "displayInAccordion" : this.displayInAccordion,
                 "data-target" : this.renderTo,
@@ -176,7 +185,7 @@
                 "apiURL":squid_api.apiURL
                 })
             );
-            
+
             // prepare download link
             this.downloadStatus = 1;
             var downloadBtn = $(me.viewPort).find("#download");
@@ -201,25 +210,25 @@
                     console.error("createAnalysisJob failed");
                 });
             }
-            
+
             // apply cURL panel state
             if (me.curlCollapsed) {
                 $(this.viewPort).find('#curl').hide();
             } else {
                 $(this.viewPort).find('#curl').show();
             }
-            
+
             // Click Handlers
             $(this.viewPort).find("#curlbtn").click(function() {
                 me.curlCollapsed = !me.curlCollapsed;
                 if (me.curlCollapsed) {
-                    $(me.viewPort).find('#curl').fadeOut();      
+                    $(me.viewPort).find('#curl').fadeOut();
                 } else {
                     $(me.viewPort).find('#curl').fadeIn();
                 }
             });
 
-            // register click handlers    
+            // register click handlers
             $(this.viewPort).find('[name="format"]').click(
                     function(event) {
                         me.clickedFormat(event);
