@@ -406,7 +406,7 @@ function program10(depth0,data) {
   buffer += "\r\n";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n</div>\r\n\r\n";
+  buffer += "\r\n\r\n<form id=\"download-form\" method=\"POST\"></form>\r\n</div>\r\n\r\n";
   return buffer;
   });
 
@@ -2715,7 +2715,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         compression : true,
         downloadStatus : 0,
         curlCollapsed : true,
-        currentJobId : null,
         displayInAccordion : false,
         viewPort : null,
         formats : [{"format" : "csv", "mime-type" : "text/csv", "template" : null}],
@@ -2727,7 +2726,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         initialize : function(options) {
             if (this.model.get("analysis")) {
                 this.listenTo(this.model.get("analysis"), 'change', this.render);
-                this.listenTo(this.model, 'change:templateData', this.refreshDownloadUrl);
             } else {
                 this.listenTo(this.model, 'change', this.render);
             }
@@ -2779,44 +2777,89 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.refreshDownloadUrl();
         },
 
-        refreshDownloadUrl : function() {
+        downloadAnalysisResults : function(currentJobId) {
             var me = this;
-            if (me.currentJobId) {
-                // create download link
-                var analysisJobResults;
-                var selectedFormat = this.formats[this.selectedFormatIndex];
-                if (!selectedFormat.template) {
-                    // use getResults method
-                    analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                    analysisJobResults.addParameter("format",selectedFormat.format);
-                } else {
-                    // use render method
-                    analysisJobResults = new squid_api.model.ProjectAnalysisJobRender({"format" : selectedFormat.format});
-                    analysisJobResults.setParameter("type", selectedFormat.type);
-                    analysisJobResults.setParameter("timeout", null);
-                    // build the template
-                    if(selectedFormat.format === "xml"){
-                      if(me.model.get("templateData").options.xmlType){
-                        var template  = selectedFormat.template[me.model.get("templateData").options.xmlType];
+            // create download link
+            var analysisJobResults;
+            var selectedFormat = this.formats[this.selectedFormatIndex];
+            if (!selectedFormat.template) {
+                // use getResults method
+                analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
+                analysisJobResults.addParameter("format",selectedFormat.format);
+            } else {
+                // use render method
+                analysisJobResults = new squid_api.model.ProjectAnalysisJobRender({"format" : selectedFormat.format});
+                analysisJobResults.setParameter("type", selectedFormat.type);
+                analysisJobResults.setParameter("timeout", null);
+                // build the template
+                if (selectedFormat.format === "xml") {
+                    if (me.model.get("templateData").options.xmlType) {
+                        var template = selectedFormat.template[me.model.get("templateData").options.xmlType];
                         var velocityTemplate = selectedFormat.template[me.model.get("templateData").options.xmlType](me.model.get("templateData"));
-                      }else{
+                    } else {
                         var velocityTemplate = selectedFormat.template(me.model.get("templateData"));
-                      }
-                    }else{
-                      var velocityTemplate = selectedFormat.template(me.model.get("templateData"));
                     }
-                    analysisJobResults.setParameter("template", base64.encode(velocityTemplate));
+                } else {
+                    var velocityTemplate = selectedFormat.template(me.model.get("templateData"));
                 }
-                if (me.compression) {
-                    analysisJobResults.addParameter("compression","gzip");
-                }
-                analysisJobResults.set({
-                    "id": me.currentJobId,
-                    "oid": me.currentJobId.oid
+            }
+            if (me.compression) {
+                analysisJobResults.addParameter("compression","gzip");
+            }
+            analysisJobResults.set({
+                "id": currentJobId,
+                "oid": currentJobId.oid
+            });
+            var downloadBtn = $(me.viewPort).find("#download");
+            downloadBtn.removeClass("disabled");
+            
+            var downloadForm = $(me.viewPort).find("#download-form");
+            downloadForm.attr("action",analysisJobResults.url());
+            downloadForm.empty();
+            downloadForm.append("<input type='hidden' name='access_token' value='"+analysisJobResults.getParameter("access_token")+"'/>");
+            downloadForm.append("<input type='hidden' name='compression' value='"+analysisJobResults.getParameter("compression")+"'/>");
+            downloadForm.append("<input type='hidden' name='template' value='"+base64.encode(velocityTemplate)+"'/>");
+            if (analysisJobResults.getParameter("type")) {
+                downloadForm.append("<input type='hidden' name='type' value='"+analysisJobResults.getParameter("type")+"'/>");
+            }
+            if (analysisJobResults.getParameter("format")) {
+                downloadForm.append("<input type='hidden' name='format' value='"+analysisJobResults.getParameter("format")+"'/>");
+            }
+            if (analysisJobResults.getParameter("timeout")) {
+                downloadForm.append("<input type='hidden' name='timeout' value='"+analysisJobResults.getParameter("timeout")+"'/>");
+            }
+            downloadForm.submit();
+        },
+        
+        download : function() {
+            var me = this;
+            
+            // run the analysis
+            var analysis = this.model.get("analysis");
+            if (!analysis) {
+                analysis = this.model;
+            }
+            this.downloadStatus = 1;
+            var downloadBtn = $(this.viewPort).find("#download");
+            downloadBtn.addClass("disabled");
+
+            if (analysis.get("id").projectId) {
+                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                downloadAnalysis.set(analysis.attributes);
+                downloadAnalysis.set({
+                    "id": {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": null
+                    },
+                    "autoRun": false});
+                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
+                .done(function(model, response) {
+                    me.downloadStatus = 2;
+                    me.downloadAnalysisResults(downloadAnalysis.get("id"));
+                })
+                .fail(function(model, response) {
+                    console.error("createAnalysisJob failed");
                 });
-                var downloadBtn = $(me.viewPort).find("#download");
-                downloadBtn.attr("href",analysisJobResults.url());
-                downloadBtn.removeClass("disabled");
             }
         },
 
@@ -2892,30 +2935,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 })
             );
 
-            // prepare download link
-            this.downloadStatus = 1;
-            var downloadBtn = $(me.viewPort).find("#download");
-            downloadBtn.addClass("disabled");
-
-            if (analysis.get("id").projectId) {
-                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
-                downloadAnalysis.set(analysis.attributes);
-                downloadAnalysis.set({
-                    "id": {
-                        "projectId": analysis.get("id").projectId,
-                        "analysisJobId": null
-                    },
-                    "autoRun": false});
-                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                .done(function(model, response) {
-                    me.downloadStatus = 2;
-                    me.currentJobId = downloadAnalysis.get("id");
-                    me.refreshDownloadUrl();
-                })
-                .fail(function(model, response) {
-                    console.error("createAnalysisJob failed");
-                });
-            }
+            
 
             // apply cURL panel state
             if (me.curlCollapsed) {
@@ -2934,7 +2954,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             });
 
-            // register click handlers
             $(this.viewPort).find('[name="format"]').click(
                     function(event) {
                         me.clickedFormat(event);
@@ -2942,6 +2961,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             $(this.viewPort).find('[name="compression"]')
             .click(function(event) {
                 me.clickedCompression(event);
+            });
+            
+            $(this.viewPort).find("#download").click(function() {
+                me.download();
             });
 
             return this;
