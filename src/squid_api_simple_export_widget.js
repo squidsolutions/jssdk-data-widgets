@@ -61,7 +61,7 @@
                      },
                      "autoRun": false});
                  squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                 .done(function(model, response) {
+                 .done(function() {
                      me.downloadStatus = 2;
                      me.currentJobId = downloadAnalysis.get("id");
                      // create download link
@@ -87,7 +87,7 @@
                      me.setDownloadBtnState();
 
                  })
-                 .fail(function(model, response) {
+                 .fail(function() {
                      console.error("createAnalysisJob failed");
                      me.setDownloadBtnState();
                  });

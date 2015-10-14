@@ -213,7 +213,7 @@
                             metric = metrics[i];
                             if (metrics[i].id) {
                                 for (ix=0; ix<me.domainMetrics.length; ix++) {
-                                    if (metrics[i].id.metricId == me.domainMetrics[ix].oid) {
+                                    if (metrics[i].id.metricId === me.domainMetrics[ix].oid) {
                                         metrics[i].name = me.domainMetrics[ix].name;
                                     }
                                 }
@@ -254,13 +254,13 @@
                     // add orderBy direction
                     for (ix=0; ix<orderBy.length; ix++) {
                         for (col=0; col<columns.length; col++) {
-                            if (this.ordering && this.config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
+                            if (this.ordering && this.config.get("rollups") && this.rollupSummaryColumn >= 0 && col === orderBy[ix].col) {
                                 if (originalColumns[col]) {
                                     originalColumns[col].orderDirection = orderBy[ix].direction;
                                 }
                                 break;
                             }
-                            else if (this.ordering && col == orderBy[ix].col) {
+                            else if (this.ordering && col === orderBy[ix].col) {
                                 if (originalColumns[col]) {
                                     originalColumns[col].orderDirection = orderBy[ix].direction;
                                 }
@@ -422,7 +422,7 @@
                                 // this is a total line
                                 this.parentNode.className = "group";
                                 return "new-category";
-                            } else if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode == this.parentNode.parentNode.childNodes[0])) {
+                            } else if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode === this.parentNode.parentNode.childNodes[0])) {
                                 // detect total column
                                 this.parentNode.className = "total-column";
                             }
@@ -447,7 +447,7 @@
                                 }
                             }
                             if (i === 2) {
-                                if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode == this.parentNode.parentNode.childNodes[0])) {
+                                if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode === this.parentNode.parentNode.childNodes[0])) {
                                     text = "Total";
                                 }
                             }

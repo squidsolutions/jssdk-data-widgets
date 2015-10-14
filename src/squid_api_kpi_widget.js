@@ -44,9 +44,9 @@
                 jsonData.done = true;
                 results = this.model.get("results");
                 if (results) {
-                    if (results.rows.length == 1) {
+                    if (results.rows.length === 1) {
                         values = results.rows[0].v;
-                        if (values.length == 2) {
+                        if (values.length === 2) {
                             jsonData.value = this.format((values[1] / values[0]) * 100);
                             jsonData.unit = "%";
                             jsonData.name = results.cols[1].lname;

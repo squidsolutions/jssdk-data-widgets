@@ -1,7 +1,7 @@
 (function (root, factory) {
     root.squid_api.controller.FiltersContoller = factory(root.Backbone, root.squid_api);
 
-}(this, function (Backbone, squid_api, template) {
+}(this, function (Backbone, squid_api) {
 
     var View = Backbone.View.extend({
         filters : null,
@@ -106,7 +106,7 @@
                        var facets = sel.facets;
                        for (var i = 0; i < facets.length; i++) {
                            var facet = facets[i];
-                           if (facet.dimension.type == "CONTINUOUS") {
+                           if (facet.dimension.type === "CONTINUOUS") {
                                timeFacet = facet;
                            }
                        }

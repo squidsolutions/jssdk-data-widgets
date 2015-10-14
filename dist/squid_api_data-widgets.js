@@ -803,7 +803,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 (function (root, factory) {
     root.squid_api.controller.AnalysisContoller = factory(root.Backbone, root.squid_api);
 
-}(this, function (Backbone, squid_api, template) {
+}(this, function (Backbone, squid_api) {
 
     var View = Backbone.View.extend({
         analysis : null,
@@ -1056,7 +1056,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     .domain([0, maxValue])
                     .range([0, width - 205]);
 
-                xAxis = d3.svg.axis()
+                var xAxis = d3.svg.axis()
                     .scale(xScale)
                     .orient('top');
 
@@ -1086,14 +1086,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
 
                 // Bar Rectangles with Tooltips / Transition on load
-                var barItem = bar.append("rect")
+                bar.append("rect")
                     .attr("y", function(d, i) {
                         return i*15;
                     })
                     .attr("x", function(d, i) {
                         return i + 200;
                     })
-                    .attr("width", function(d) {
+                    .attr("width", function() {
                         return 0;
                     })
                     .attr('fill', '#026E87')
@@ -1109,7 +1109,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             .style('opacity', 1)
                             .style('fill', '#1aadcf');
                         })
-                    .on('mouseout', function(d) {
+                    .on('mouseout', function() {
                         tooltip.html("");
                         d3.select(this)
                             .style('opacity', 1)
@@ -1126,7 +1126,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         .ease('bounce');
 
                     // xAxis (Starting 200px from left)
-                    var xAxis = d3.select("#bar_chart svg")
+                    xAxis = d3.select("#bar_chart svg")
                         .append("g")
                         .attr('class', 'axis')
                         .attr('width', width)
@@ -1144,7 +1144,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         .selectAll(".tick");
 
                     // Y aXis label spacing
-                    var texts = yAxisAppend.attr("transform", function(d, i) {
+                    yAxisAppend.attr("transform", function(d, i) {
                         return "translate(0," + (15 + (i * ySpacing)) + ")";
                     });
                 }
@@ -1372,7 +1372,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             metric = metrics[i];
                             if (metrics[i].id) {
                                 for (ix=0; ix<me.domainMetrics.length; ix++) {
-                                    if (metrics[i].id.metricId == me.domainMetrics[ix].oid) {
+                                    if (metrics[i].id.metricId === me.domainMetrics[ix].oid) {
                                         metrics[i].name = me.domainMetrics[ix].name;
                                     }
                                 }
@@ -1413,13 +1413,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     // add orderBy direction
                     for (ix=0; ix<orderBy.length; ix++) {
                         for (col=0; col<columns.length; col++) {
-                            if (this.ordering && this.config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
+                            if (this.ordering && this.config.get("rollups") && this.rollupSummaryColumn >= 0 && col === orderBy[ix].col) {
                                 if (originalColumns[col]) {
                                     originalColumns[col].orderDirection = orderBy[ix].direction;
                                 }
                                 break;
                             }
-                            else if (this.ordering && col == orderBy[ix].col) {
+                            else if (this.ordering && col === orderBy[ix].col) {
                                 if (originalColumns[col]) {
                                     originalColumns[col].orderDirection = orderBy[ix].direction;
                                 }
@@ -1581,7 +1581,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 // this is a total line
                                 this.parentNode.className = "group";
                                 return "new-category";
-                            } else if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode == this.parentNode.parentNode.childNodes[0])) {
+                            } else if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode === this.parentNode.parentNode.childNodes[0])) {
                                 // detect total column
                                 this.parentNode.className = "total-column";
                             }
@@ -1606,7 +1606,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 }
                             }
                             if (i === 2) {
-                                if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode == this.parentNode.parentNode.childNodes[0])) {
+                                if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode === this.parentNode.parentNode.childNodes[0])) {
                                     text = "Total";
                                 }
                             }
@@ -1758,7 +1758,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (this.dimensionIndex !== null) {
                     isMultiple = false;
                 }
-                var running = (squid_api.model.status.get("status") != squid_api.model.status.STATUS_DONE);
+                var running = (squid_api.model.status.get("status") !== squid_api.model.status.STATUS_DONE);
                 if (running) {
                     // computation is running : disable input
                     select.attr("disabled","disabled");
@@ -1795,12 +1795,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             var facets = selection.facets;
                             if (facets) {
                                 me.dimensions = [];
-                                var dims = facets;
                                 for (var i=0; i<facets.length; i++){
                                     var facet = facets[i];
                                     if (facet.dimension.dynamic === false || domain.get("dynamic") === true) {
                                         var isBoolean = false;
-                                        if ((facet.dimension.type == "SEGMENTS") || (facet.items.length == 1) && (facet.items[0].value == "true")) {
+                                        if ((facet.dimension.type === "SEGMENTS") || (facet.items.length === 1) && (facet.items[0].value === "true")) {
                                             isBoolean = true;
                                         }
                                         // do not display boolean dimensions
@@ -1851,10 +1850,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         // Alphabetical Sorting
                         jsonData.options.sort(function(a, b) {
                             var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
-                            if (labelA < labelB)
+                            if (labelA < labelB) {
                                 return -1;
-                            if (labelA > labelB)
+                            }
+                            if (labelA > labelB) {
                                 return 1;
+                            }
                             return 0; // no sorting
                         });
 
@@ -1872,10 +1873,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         if (isMultiple) {
                              selector.multiselect({
                                 buttonContainer: '<div class="squid-api-data-widgets-dimension-selector" />',
-                                buttonText: function(options, select) {
+                                buttonText: function() {
                                     return 'Dimensions';
                                 },
-                                onChange: function(option, selected, index) {
+                                onChange: function(option, selected) {
                                     var chosenModel = _.clone(me.model.get("chosenDimensions"));
                                     if (!chosenModel) {
                                         chosenModel = [];
@@ -1895,11 +1896,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                     me.model.set("chosenDimensions", chosenModel);
                                 },
                                 onDropdownShown: function() {
-                                    if (project.get("_role") == "WRITE" || project.get("_role") == "OWNER") {
+                                    if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
                                         me.$el.find("li.configure").remove();
                                         me.$el.find("li").first().before("<li class='configure'> configure</option>");
                                         me.$el.find("li").first().off().on("click", function() {
-                                            var dimensionSelect = new squid_api.view.ColumnsManagementWidget({
+                                            new squid_api.view.ColumnsManagementWidget({
                                                 buttonLabel : "<i class='fa fa-arrows-h'></i>",
                                                 type : "Dimension",
                                                 collection :new squid_api.model.DimensionCollection(),
@@ -1910,7 +1911,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                                     squid_api.model.status.set({'message' : message});
                                                 }
                                             });
-                                        })
+                                        });
                                     }
                                 }
                             });
@@ -1942,12 +1943,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             if (dimensions) {
                 if (this.dimensionIndex !== null) {
-                    if (facet.id == dimensions[this.dimensionIndex]) {
+                    if (facet.id === dimensions[this.dimensionIndex]) {
                         selected = true;
                     }
                 } else {
                     for (var j=0; j<dimensions.length; j++) {
-                        if (facet.id == dimensions[j]) {
+                        if (facet.id === dimensions[j]) {
                             selected = true;
                         }
                     }
@@ -2014,7 +2015,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         events: {
             // Dimension Sorting
-            "change": function(event) {
+            "change": function() {
                 var dimensions = this.$el.find(".sortable li");
                 var selected = [];
 
@@ -2058,7 +2059,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     for (var dc=0; dc<chosenDimensions.length; dc++) {
                         for (var d=0; d<facets.length; d++){
                             var facet = facets[d];
-                            if (chosenDimensions[dc] == facet.id) {
+                            if (chosenDimensions[dc] === facet.id) {
                                 var item = {};
                                 item.id = facet.id;
                                 if (facet.name) {
@@ -2134,8 +2135,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         initialize: function(options) {
 
-            var me = this;
-
             if (options) {
                 // setup options
                 if (options.config) {
@@ -2179,11 +2178,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var analysis;
             
             // create the new view
-            if (viewName == "tableView") {
+            if (viewName === "tableView") {
                 analysis = tableView.model;
-            } else if (viewName == "timeView") {
+            } else if (viewName === "timeView") {
                 analysis = timeView.model;
-            } else if (viewName == "barView") {
+            } else if (viewName === "barView") {
                 analysis = barView.model;
             }
             this.model.set("currentAnalysis", analysis);
@@ -2197,7 +2196,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render: function() {
-            var me = this;
 
             // compute the view types compatible with the model
             var selectedDimension = this.model.get("selectedDimension");
@@ -2217,17 +2215,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var currentViewName;
 
             if (this.tableView) {
-                if (analysis == this.tableView.model) {
+                if (analysis === this.tableView.model) {
                     currentViewName = "tableView";
                 }
             }
             if (this.barView) {
-                if (analysis == this.barView.model) {
+                if (analysis === this.barView.model) {
                     currentViewName = "barView";
                 }
             }
             if (this.timeView) {
-                if (analysis == this.timeView.model) {
+                if (analysis === this.timeView.model) {
                     currentViewName = "timeView";
                 }
             }
@@ -2237,15 +2235,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             for (idx2 = 0; idx2<compatibleViews.length; idx2++) {
                 var view2 = compatibleViews[idx2];
                 var icon;
-                if (view2 == "tableView") {
+                if (view2 === "tableView") {
                     icon = "fa-table";
-                } else if (view2 == "timeView") {
+                } else if (view2 === "timeView") {
                     icon = "fa-line-chart";
-                } else if (view2 == "barView") {
+                } else if (view2 === "barView") {
                     icon = "fa-bar-chart";
                 }
                 var isActive = false;
-                if (view2 == currentViewName) {
+                if (view2 === currentViewName) {
                     isActive = true;
                 }
                 data.options.push({"view" : view2, "icon" : icon, "isActive" : isActive});
@@ -2272,8 +2270,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         onChangeHandler: null,
 
         initialize: function(options) {
-            var me = this;
-
             // setup options
             if (options) {
                 if (options.template) {
@@ -2334,7 +2330,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 for (var i=0; i<domains.length; i++) {
                     domain = domains[i];
                     var selected = false;
-                    if (domain.oid == selectedDomain) {
+                    if (domain.oid === selectedDomain) {
                         selected = true;
                         hasSelection = true;
                     }
@@ -2782,6 +2778,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // create download link
             var analysisJobResults;
             var selectedFormat = this.formats[this.selectedFormatIndex];
+            var velocityTemplate;
             if (!selectedFormat.template) {
                 // use getResults method
                 analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
@@ -2792,15 +2789,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 analysisJobResults.setParameter("type", selectedFormat.type);
                 analysisJobResults.setParameter("timeout", null);
                 // build the template
+                
                 if (selectedFormat.format === "xml") {
                     if (me.model.get("templateData").options.xmlType) {
-                        var template = selectedFormat.template[me.model.get("templateData").options.xmlType];
-                        var velocityTemplate = selectedFormat.template[me.model.get("templateData").options.xmlType](me.model.get("templateData"));
+                        velocityTemplate = selectedFormat.template[me.model.get("templateData").options.xmlType](me.model.get("templateData"));
                     } else {
-                        var velocityTemplate = selectedFormat.template(me.model.get("templateData"));
+                        velocityTemplate = selectedFormat.template(me.model.get("templateData"));
                     }
                 } else {
-                    var velocityTemplate = selectedFormat.template(me.model.get("templateData"));
+                    velocityTemplate = selectedFormat.template(me.model.get("templateData"));
                 }
             }
             if (me.compression) {
@@ -2818,7 +2815,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             downloadForm.empty();
             downloadForm.append("<input type='hidden' name='access_token' value='"+analysisJobResults.getParameter("access_token")+"'/>");
             downloadForm.append("<input type='hidden' name='compression' value='"+analysisJobResults.getParameter("compression")+"'/>");
-            downloadForm.append("<input type='hidden' name='template' value='"+base64.encode(velocityTemplate)+"'/>");
+            if (velocityTemplate) {
+                downloadForm.append("<input type='hidden' name='template' value='"+base64.encode(velocityTemplate)+"'/>");
+            }
             if (analysisJobResults.getParameter("type")) {
                 downloadForm.append("<input type='hidden' name='type' value='"+analysisJobResults.getParameter("type")+"'/>");
             }
@@ -2853,11 +2852,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     },
                     "autoRun": false});
                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                .done(function(model, response) {
+                .done(function() {
                     me.downloadStatus = 2;
                     me.downloadAnalysisResults(downloadAnalysis.get("id"));
                 })
-                .fail(function(model, response) {
+                .fail(function() {
                     console.error("createAnalysisJob failed");
                 });
             }
@@ -2977,7 +2976,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 (function (root, factory) {
     root.squid_api.controller.FiltersContoller = factory(root.Backbone, root.squid_api);
 
-}(this, function (Backbone, squid_api, template) {
+}(this, function (Backbone, squid_api) {
 
     var View = Backbone.View.extend({
         filters : null,
@@ -3082,7 +3081,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                        var facets = sel.facets;
                        for (var i = 0; i < facets.length; i++) {
                            var facet = facets[i];
-                           if (facet.dimension.type == "CONTINUOUS") {
+                           if (facet.dimension.type === "CONTINUOUS") {
                                timeFacet = facet;
                            }
                        }
@@ -3195,9 +3194,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 jsonData.done = true;
                 results = this.model.get("results");
                 if (results) {
-                    if (results.rows.length == 1) {
+                    if (results.rows.length === 1) {
                         values = results.rows[0].v;
-                        if (values.length == 2) {
+                        if (values.length === 2) {
                             jsonData.value = this.format((values[1] / values[0]) * 100);
                             jsonData.unit = "%";
                             jsonData.name = results.cols[1].lname;
@@ -3226,7 +3225,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         metricIndex: null,
 
         initialize: function(options) {
-            var me = this;
 
             // setup options
             if (options) {
@@ -3264,7 +3262,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (this.metricIndex !== null) {
                     isMultiple = false;
                 }
-                var running = (squid_api.model.status.get("status") != squid_api.model.status.STATUS_DONE);
+                var running = (squid_api.model.status.get("status") !== squid_api.model.status.STATUS_DONE);
                 if (running) {
                     // computation is running : disable input
                     select.attr("disabled","disabled");
@@ -3289,7 +3287,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         events: {
-            "change": function(event) {
+            "change": function() {
                 var oid = this.$el.find("select option:selected");
                 // Remove Button Title Tag
                 this.$el.find("button").removeAttr('title');
@@ -3304,7 +3302,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
 
                 // check for additions
-                var selectedMetricsNew = [];
                 chosenMetricsNew = _.intersection(_.union(chosenMetrics, selectedMetrics), selectedMetrics);
 
                 // Update
@@ -3352,10 +3349,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 // Alphabetical Sorting
                                 jsonData.options.sort(function(a, b) {
                                     var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
-                                    if (labelA < labelB)
+                                    if (labelA < labelB) {
                                         return -1;
-                                    if (labelA > labelB)
+                                    }
+                                    if (labelA > labelB) {
                                         return 1;
+                                    }
                                     return 0; // no sorting
                                 });
                             }
@@ -3374,15 +3373,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             if (isMultiple) {
                                 selector.multiselect({
                                     buttonContainer: '<div class="squid-api-data-widgets-metric-selector-open" />',
-                                    buttonText: function(options, select) {
+                                    buttonText: function() {
                                         return 'Metrics';
                                     },
-                                    onDropdownShown: function(event) {
-                                        if (project.get("_role") == "WRITE" || project.get("_role") == "OWNER") {
+                                    onDropdownShown: function() {
+                                        if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
                                             me.$el.find("li.configure").remove();
                                             me.$el.find("li").first().before("<li class='configure'> configure</option>");
                                             me.$el.find("li").first().off().on("click", function() {
-                                                var metricSelect = new squid_api.view.ColumnsManagementWidget({
+                                                new squid_api.view.ColumnsManagementWidget({
                                                     buttonLabel : "<i class='fa fa-arrows-h'></i>",
                                                     type : "Metric",
                                                     collection : me.metrics,
@@ -3393,7 +3392,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                                         squid_api.model.status.set({'message' : message});
                                                     }
                                                 });
-                                            })
+                                            });
                                         }
                                     }
                                 });
@@ -3415,7 +3414,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             if (metrics) {
                 for (var j=0; j<metrics.length; j++) {
-                    if (item.get("oid") == metrics[j]) {
+                    if (item.get("oid") === metrics[j]) {
                         selected = true;
                     }
                 }
@@ -3518,7 +3517,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 if (metrics) {
                     for (var j=0; j<metrics.length; j++) {
-                        if (id == metrics[j].metricId) {
+                        if (id === metrics[j].metricId) {
                             selected = true;
                         }
                     }
@@ -3637,7 +3636,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 $.when.apply($, metricPromises).then(function() {
                     // extract the metricModels from the arguments
                     var metricModels = [];
-                    if (chosenMetrics.length == 1) {
+                    if (chosenMetrics.length === 1) {
                         metricModels.push(arguments[0]);
                     } else {
                         for (var i=0; i<chosenMetrics.length; i++) {
@@ -3778,7 +3777,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 me.$el.html(html);
 
                 me.$el.find("select").multiselect({
-                    onChange: function(option, selected, index) {
+                    onChange: function(option) {
                         var metric = option.attr("value");
                         me.model.set({"selectedMetric": metric});
                     }
@@ -3850,10 +3849,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (model.get("login")) {
                     // fetch projects
                     me.projects.fetch({
-                        success : function(model, response) {
+                        success : function(model) {
                             console.log(model);
                         },
-                        error : function(model, response) {
+                        error : function(model) {
                             console.log(model);
                         }
                     });
@@ -3930,7 +3929,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     project = this.projects.at(i);
                     if (project) {
                         var selected = false;
-                        if (project.get("oid") == this.model.get("project")) {
+                        if (project.get("oid") === this.model.get("project")) {
                             selected = true;
                         }
     
@@ -4029,7 +4028,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                      },
                      "autoRun": false});
                  squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                 .done(function(model, response) {
+                 .done(function() {
                      me.downloadStatus = 2;
                      me.currentJobId = downloadAnalysis.get("id");
                      // create download link
@@ -4055,7 +4054,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                      me.setDownloadBtnState();
 
                  })
-                 .fail(function(model, response) {
+                 .fail(function() {
                      console.error("createAnalysisJob failed");
                      me.setDownloadBtnState();
                  });
@@ -4208,7 +4207,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (dateIndex>0) {
                     serieName = value[dateIndex-1];
                 }
-                if ((currentSerieName === null) || (serieName != currentSerieName) || yearChange === true) {
+                if ((currentSerieName === null) || (serieName !== currentSerieName) || yearChange === true) {
                     currentSerieName = serieName;
                     // create a new serie
                     serie = {};
@@ -4248,7 +4247,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // Store new Series Values
             var newSerie = {};
-            var updatedData = [];
 
             // Calculate the difference in days between the start / end date
             var dateDifference;
@@ -4292,8 +4290,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                     // Update the array with the new data
                     var updatedArray = [];
-                    for (var key in newSerie) {
+                    for (var i2=0; i2<newSerie.length; i2++) {
                         var obj = {};
+                        var key = newSerie[i2];
                         obj.x = moment.utc(key).unix();
                         obj.y = newSerie[key].y;
                         updatedArray.push(obj);
@@ -4352,7 +4351,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render : function() {
-            var me = this;
+
             var status = this.model.get("status");
             this.YearOverYear = squid_api.model.config.get("YearOverYear");
 
@@ -4391,7 +4390,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                     var dateColumnIndex=0;
 
-                    while (data.results.cols[dateColumnIndex].dataType != "DATE") {
+                    while (data.results.cols[dateColumnIndex].dataType !== "DATE") {
                         dateColumnIndex++;
                     }
 
@@ -4416,7 +4415,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                         graph.render();
 
-                        var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+                        new Rickshaw.Graph.HoverDetail( {
                             graph: graph,
                             formatter: function(series, x, y) {
                                 var formatter = d3.format(",.f");
@@ -4433,7 +4432,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             }
                         });
 
-                        var legend = new Rickshaw.Graph.Legend( {
+                        new Rickshaw.Graph.Legend( {
                             graph: graph,
                             element: document.getElementById('legend')
                         });
@@ -4446,12 +4445,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             graph: graph
                         });
 
-                        var slider = new Rickshaw.Graph.RangeSlider({
+                        new Rickshaw.Graph.RangeSlider({
                             graph: graph,
                             element: document.querySelector('#slider')
                         });
-
-                        var offsetForm = document.getElementById('offset_form');
 
                         yAxis.render();
                         xAxis.render();

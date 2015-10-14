@@ -138,7 +138,7 @@
                 if (dateIndex>0) {
                     serieName = value[dateIndex-1];
                 }
-                if ((currentSerieName === null) || (serieName != currentSerieName) || yearChange === true) {
+                if ((currentSerieName === null) || (serieName !== currentSerieName) || yearChange === true) {
                     currentSerieName = serieName;
                     // create a new serie
                     serie = {};
@@ -178,7 +178,6 @@
 
             // Store new Series Values
             var newSerie = {};
-            var updatedData = [];
 
             // Calculate the difference in days between the start / end date
             var dateDifference;
@@ -222,8 +221,9 @@
 
                     // Update the array with the new data
                     var updatedArray = [];
-                    for (var key in newSerie) {
+                    for (var i2=0; i2<newSerie.length; i2++) {
                         var obj = {};
+                        var key = newSerie[i2];
                         obj.x = moment.utc(key).unix();
                         obj.y = newSerie[key].y;
                         updatedArray.push(obj);
@@ -282,7 +282,7 @@
         },
 
         render : function() {
-            var me = this;
+
             var status = this.model.get("status");
             this.YearOverYear = squid_api.model.config.get("YearOverYear");
 
@@ -321,7 +321,7 @@
 
                     var dateColumnIndex=0;
 
-                    while (data.results.cols[dateColumnIndex].dataType != "DATE") {
+                    while (data.results.cols[dateColumnIndex].dataType !== "DATE") {
                         dateColumnIndex++;
                     }
 
@@ -346,7 +346,7 @@
 
                         graph.render();
 
-                        var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+                        new Rickshaw.Graph.HoverDetail( {
                             graph: graph,
                             formatter: function(series, x, y) {
                                 var formatter = d3.format(",.f");
@@ -363,7 +363,7 @@
                             }
                         });
 
-                        var legend = new Rickshaw.Graph.Legend( {
+                        new Rickshaw.Graph.Legend( {
                             graph: graph,
                             element: document.getElementById('legend')
                         });
@@ -376,12 +376,10 @@
                             graph: graph
                         });
 
-                        var slider = new Rickshaw.Graph.RangeSlider({
+                        new Rickshaw.Graph.RangeSlider({
                             graph: graph,
                             element: document.querySelector('#slider')
                         });
-
-                        var offsetForm = document.getElementById('offset_form');
 
                         yAxis.render();
                         xAxis.render();

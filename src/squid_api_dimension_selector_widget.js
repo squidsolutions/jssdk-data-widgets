@@ -53,7 +53,7 @@
                 if (this.dimensionIndex !== null) {
                     isMultiple = false;
                 }
-                var running = (squid_api.model.status.get("status") != squid_api.model.status.STATUS_DONE);
+                var running = (squid_api.model.status.get("status") !== squid_api.model.status.STATUS_DONE);
                 if (running) {
                     // computation is running : disable input
                     select.attr("disabled","disabled");
@@ -90,12 +90,11 @@
                             var facets = selection.facets;
                             if (facets) {
                                 me.dimensions = [];
-                                var dims = facets;
                                 for (var i=0; i<facets.length; i++){
                                     var facet = facets[i];
                                     if (facet.dimension.dynamic === false || domain.get("dynamic") === true) {
                                         var isBoolean = false;
-                                        if ((facet.dimension.type == "SEGMENTS") || (facet.items.length == 1) && (facet.items[0].value == "true")) {
+                                        if ((facet.dimension.type === "SEGMENTS") || (facet.items.length === 1) && (facet.items[0].value === "true")) {
                                             isBoolean = true;
                                         }
                                         // do not display boolean dimensions
@@ -146,10 +145,12 @@
                         // Alphabetical Sorting
                         jsonData.options.sort(function(a, b) {
                             var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
-                            if (labelA < labelB)
+                            if (labelA < labelB) {
                                 return -1;
-                            if (labelA > labelB)
+                            }
+                            if (labelA > labelB) {
                                 return 1;
+                            }
                             return 0; // no sorting
                         });
 
@@ -167,10 +168,10 @@
                         if (isMultiple) {
                              selector.multiselect({
                                 buttonContainer: '<div class="squid-api-data-widgets-dimension-selector" />',
-                                buttonText: function(options, select) {
+                                buttonText: function() {
                                     return 'Dimensions';
                                 },
-                                onChange: function(option, selected, index) {
+                                onChange: function(option, selected) {
                                     var chosenModel = _.clone(me.model.get("chosenDimensions"));
                                     if (!chosenModel) {
                                         chosenModel = [];
@@ -190,11 +191,11 @@
                                     me.model.set("chosenDimensions", chosenModel);
                                 },
                                 onDropdownShown: function() {
-                                    if (project.get("_role") == "WRITE" || project.get("_role") == "OWNER") {
+                                    if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
                                         me.$el.find("li.configure").remove();
                                         me.$el.find("li").first().before("<li class='configure'> configure</option>");
                                         me.$el.find("li").first().off().on("click", function() {
-                                            var dimensionSelect = new squid_api.view.ColumnsManagementWidget({
+                                            new squid_api.view.ColumnsManagementWidget({
                                                 buttonLabel : "<i class='fa fa-arrows-h'></i>",
                                                 type : "Dimension",
                                                 collection :new squid_api.model.DimensionCollection(),
@@ -205,7 +206,7 @@
                                                     squid_api.model.status.set({'message' : message});
                                                 }
                                             });
-                                        })
+                                        });
                                     }
                                 }
                             });
@@ -237,12 +238,12 @@
 
             if (dimensions) {
                 if (this.dimensionIndex !== null) {
-                    if (facet.id == dimensions[this.dimensionIndex]) {
+                    if (facet.id === dimensions[this.dimensionIndex]) {
                         selected = true;
                     }
                 } else {
                     for (var j=0; j<dimensions.length; j++) {
-                        if (facet.id == dimensions[j]) {
+                        if (facet.id === dimensions[j]) {
                             selected = true;
                         }
                     }

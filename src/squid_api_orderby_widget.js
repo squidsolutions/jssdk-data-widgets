@@ -121,7 +121,7 @@
                 me.$el.html(html);
 
                 me.$el.find("select").multiselect({
-                    onChange: function(option, selected, index) {
+                    onChange: function(option) {
                         var metric = option.attr("value");
                         me.model.set({"selectedMetric": metric});
                     }

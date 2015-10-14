@@ -9,7 +9,6 @@
         metricIndex: null,
 
         initialize: function(options) {
-            var me = this;
 
             // setup options
             if (options) {
@@ -47,7 +46,7 @@
                 if (this.metricIndex !== null) {
                     isMultiple = false;
                 }
-                var running = (squid_api.model.status.get("status") != squid_api.model.status.STATUS_DONE);
+                var running = (squid_api.model.status.get("status") !== squid_api.model.status.STATUS_DONE);
                 if (running) {
                     // computation is running : disable input
                     select.attr("disabled","disabled");
@@ -72,7 +71,7 @@
         },
 
         events: {
-            "change": function(event) {
+            "change": function() {
                 var oid = this.$el.find("select option:selected");
                 // Remove Button Title Tag
                 this.$el.find("button").removeAttr('title');
@@ -87,7 +86,6 @@
                 }
 
                 // check for additions
-                var selectedMetricsNew = [];
                 chosenMetricsNew = _.intersection(_.union(chosenMetrics, selectedMetrics), selectedMetrics);
 
                 // Update
@@ -135,10 +133,12 @@
                                 // Alphabetical Sorting
                                 jsonData.options.sort(function(a, b) {
                                     var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
-                                    if (labelA < labelB)
+                                    if (labelA < labelB) {
                                         return -1;
-                                    if (labelA > labelB)
+                                    }
+                                    if (labelA > labelB) {
                                         return 1;
+                                    }
                                     return 0; // no sorting
                                 });
                             }
@@ -157,15 +157,15 @@
                             if (isMultiple) {
                                 selector.multiselect({
                                     buttonContainer: '<div class="squid-api-data-widgets-metric-selector-open" />',
-                                    buttonText: function(options, select) {
+                                    buttonText: function() {
                                         return 'Metrics';
                                     },
-                                    onDropdownShown: function(event) {
-                                        if (project.get("_role") == "WRITE" || project.get("_role") == "OWNER") {
+                                    onDropdownShown: function() {
+                                        if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
                                             me.$el.find("li.configure").remove();
                                             me.$el.find("li").first().before("<li class='configure'> configure</option>");
                                             me.$el.find("li").first().off().on("click", function() {
-                                                var metricSelect = new squid_api.view.ColumnsManagementWidget({
+                                                new squid_api.view.ColumnsManagementWidget({
                                                     buttonLabel : "<i class='fa fa-arrows-h'></i>",
                                                     type : "Metric",
                                                     collection : me.metrics,
@@ -176,7 +176,7 @@
                                                         squid_api.model.status.set({'message' : message});
                                                     }
                                                 });
-                                            })
+                                            });
                                         }
                                     }
                                 });
@@ -198,7 +198,7 @@
 
             if (metrics) {
                 for (var j=0; j<metrics.length; j++) {
-                    if (item.get("oid") == metrics[j]) {
+                    if (item.get("oid") === metrics[j]) {
                         selected = true;
                     }
                 }
