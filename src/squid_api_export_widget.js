@@ -7,7 +7,6 @@
         template : null,
         renderTo: null,
         compression : true,
-        downloadStatus : 0,
         curlCollapsed : true,
         displayInAccordion : false,
         viewPort : null,
@@ -129,31 +128,38 @@
         download : function() {
             var me = this;
             
-            // run the analysis
             var analysis = this.model.get("analysis");
             if (!analysis) {
                 analysis = this.model;
             }
-            this.downloadStatus = 1;
             var downloadBtn = $(this.viewPort).find("#download");
             downloadBtn.addClass("disabled");
 
             if (analysis.get("id").projectId) {
                 var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
                 downloadAnalysis.set(analysis.attributes);
+                downloadAnalysis.setParameter("timeout", 3600*1000);
+                downloadAnalysis.setParameter("maxResults", 1);
                 downloadAnalysis.set({
                     "id": {
                         "projectId": analysis.get("id").projectId,
                         "analysisJobId": null
-                    },
-                    "autoRun": false});
+                    }});
+                // trigger the analysis computation and wait until it's done (or times out)
                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                .done(function() {
-                    me.downloadStatus = 2;
-                    me.downloadAnalysisResults(downloadAnalysis.get("id"));
+                .done(function(analysis) {
+                    if (analysis.get("status") === "DONE") {
+                        // get the results
+                        me.downloadAnalysisResults(analysis.get("id"));
+                    } else {
+                        // analysis timed out
+                        downloadBtn.removeClass("disabled");
+                        squid_api.model.status.set("error" , {"message" : "Analysis computation timed out, please retry later."});
+                    }
                 })
                 .fail(function() {
                     console.error("createAnalysisJob failed");
+                    downloadBtn.removeClass("disabled");
                 });
             }
         },
