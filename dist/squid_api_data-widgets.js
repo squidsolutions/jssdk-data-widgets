@@ -2764,13 +2764,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.selectedFormatIndex = i;
                 }
             }
-            this.refreshDownloadUrl();
         },
 
         clickedCompression : function (event) {
             var t = event.target;
             this.compression = (t.checked);
-            this.refreshDownloadUrl();
         },
 
         downloadAnalysisResults : function(currentJobId) {
