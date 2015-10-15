@@ -2840,7 +2840,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (analysis.get("id").projectId) {
                 var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
                 downloadAnalysis.set(analysis.attributes);
-                downloadAnalysis.setParameter("timeout", 3600*1000);
+                downloadAnalysis.setParameter("timeout", 10000);
                 downloadAnalysis.setParameter("maxResults", 1);
                 downloadAnalysis.set({
                     "id": {
@@ -2854,9 +2854,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         // get the results
                         me.downloadAnalysisResults(analysis.get("id"));
                     } else {
-                        // analysis timed out
-                        downloadBtn.removeClass("disabled");
-                        squid_api.model.status.set("error" , {"message" : "Analysis computation timed out, please retry later."});
+                        // analysis timed out, retry (in a loop)
+                        squid_api.controller.analysisjob.getAnalysisJobResults(null, analysis).done(function(results) {
+                            // get the results
+                            me.downloadAnalysisResults(results.get("id"));
+                        })
+                        .fail(function() {
+                            console.error("createAnalysisJob failed");
+                            downloadBtn.removeClass("disabled");
+                        });
                     }
                 })
                 .fail(function() {
