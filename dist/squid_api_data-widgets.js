@@ -2179,11 +2179,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             
             // create the new view
             if (viewName === "tableView") {
-                analysis = tableView.model;
+                analysis = this.tableView.model;
             } else if (viewName === "timeView") {
-                analysis = timeView.model;
+                analysis = this.timeView.model;
             } else if (viewName === "barView") {
-                analysis = barView.model;
+                analysis = this.barView.model;
             }
             this.model.set("currentAnalysis", analysis);
         },
