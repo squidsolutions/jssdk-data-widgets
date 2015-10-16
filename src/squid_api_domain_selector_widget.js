@@ -9,8 +9,6 @@
         onChangeHandler: null,
 
         initialize: function(options) {
-            var me = this;
-
             // setup options
             if (options) {
                 if (options.template) {
@@ -71,7 +69,7 @@
                 for (var i=0; i<domains.length; i++) {
                     domain = domains[i];
                     var selected = false;
-                    if (domain.oid == selectedDomain) {
+                    if (domain.oid === selectedDomain) {
                         selected = true;
                         hasSelection = true;
                     }

@@ -36,7 +36,10 @@ function program1(depth0,data) {
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.multiple), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\r\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.empty), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n        ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n    </select>\r\n";
   return buffer;
@@ -49,16 +52,22 @@ function program2(depth0,data) {
 
 function program4(depth0,data) {
   
+  
+  return "\r\n            <option>No dimensions available</option>\r\n        ";
+  }
+
+function program6(depth0,data) {
+  
   var buffer = "", stack1, helper;
   buffer += "\r\n            <option value=\"";
   if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
     + "\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += " ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.error), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.error), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\r\n                ";
   if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
@@ -67,19 +76,19 @@ function program4(depth0,data) {
     + "\r\n            </option>\r\n        ";
   return buffer;
   }
-function program5(depth0,data) {
+function program7(depth0,data) {
   
   
   return "selected";
   }
 
-function program7(depth0,data) {
+function program9(depth0,data) {
   
   
   return " disabled ";
   }
 
-function program9(depth0,data) {
+function program11(depth0,data) {
   
   var buffer = "", stack1, helper;
   buffer += "\r\n    <!-- just display filter name -->\r\n    <label class=\"squid-api-data-widgets-dimension-selector\">";
@@ -90,7 +99,7 @@ function program9(depth0,data) {
   return buffer;
   }
 
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(9, program9, data),fn:self.program(1, program1, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(11, program11, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n";
   return buffer;
@@ -397,7 +406,7 @@ function program10(depth0,data) {
   buffer += "\r\n";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n</div>\r\n\r\n";
+  buffer += "\r\n\r\n<form id=\"download-form\" style=\"visibility: hidden;\"></form>\r\n</div>\r\n\r\n";
   return buffer;
   });
 
@@ -463,7 +472,10 @@ function program1(depth0,data) {
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.multiple), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\r\n        ";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.empty), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n        ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.options), {hash:{},inverse:self.program(9, program9, data),fn:self.program(6, program6, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n</select>\r\n";
   return buffer;
@@ -476,28 +488,40 @@ function program2(depth0,data) {
 
 function program4(depth0,data) {
   
+  
+  return "\r\n            <option disabled=\"true\">No metrics available</option>\r\n        ";
+  }
+
+function program6(depth0,data) {
+  
   var buffer = "", stack1, helper;
   buffer += "\r\n            <option value=\"";
   if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
     + "\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selected), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\r\n                ";
   if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\r\n        </option>\r\n    ";
+    + "\r\n            </option>\r\n        ";
   return buffer;
   }
-function program5(depth0,data) {
+function program7(depth0,data) {
   
   
   return "selected";
   }
 
-function program7(depth0,data) {
+function program9(depth0,data) {
+  
+  
+  return "\r\n    ";
+  }
+
+function program11(depth0,data) {
   
   var buffer = "", stack1, helper;
   buffer += "\r\n    <!-- just display filter name -->\r\n    <label>";
@@ -508,7 +532,7 @@ function program7(depth0,data) {
   return buffer;
   }
 
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(7, program7, data),fn:self.program(1, program1, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.selAvailable), {hash:{},inverse:self.program(11, program11, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n";
   return buffer;
@@ -779,7 +803,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 (function (root, factory) {
     root.squid_api.controller.AnalysisContoller = factory(root.Backbone, root.squid_api);
 
-}(this, function (Backbone, squid_api, template) {
+}(this, function (Backbone, squid_api) {
 
     var View = Backbone.View.extend({
         analysis : null,
@@ -1032,7 +1056,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     .domain([0, maxValue])
                     .range([0, width - 205]);
 
-                xAxis = d3.svg.axis()
+                var xAxis = d3.svg.axis()
                     .scale(xScale)
                     .orient('top');
 
@@ -1062,14 +1086,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
 
                 // Bar Rectangles with Tooltips / Transition on load
-                var barItem = bar.append("rect")
+                bar.append("rect")
                     .attr("y", function(d, i) {
                         return i*15;
                     })
                     .attr("x", function(d, i) {
                         return i + 200;
                     })
-                    .attr("width", function(d) {
+                    .attr("width", function() {
                         return 0;
                     })
                     .attr('fill', '#026E87')
@@ -1085,7 +1109,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             .style('opacity', 1)
                             .style('fill', '#1aadcf');
                         })
-                    .on('mouseout', function(d) {
+                    .on('mouseout', function() {
                         tooltip.html("");
                         d3.select(this)
                             .style('opacity', 1)
@@ -1102,7 +1126,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         .ease('bounce');
 
                     // xAxis (Starting 200px from left)
-                    var xAxis = d3.select("#bar_chart svg")
+                    xAxis = d3.select("#bar_chart svg")
                         .append("g")
                         .attr('class', 'axis')
                         .attr('width', width)
@@ -1120,7 +1144,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         .selectAll(".tick");
 
                     // Y aXis label spacing
-                    var texts = yAxisAppend.attr("transform", function(d, i) {
+                    yAxisAppend.attr("transform", function(d, i) {
                         return "translate(0," + (15 + (i * ySpacing)) + ")";
                     });
                 }
@@ -1247,7 +1271,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (this.ordering) {
                     var orderId = parseInt($(item.currentTarget).attr("data-id"));
                     var orderByDirection;
-                    if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
+                    if (this.config.get("rollups") && this.rollupSummaryColumn >= 0) {
                         orderId = orderId - 1;
                     }
                     if ($(item.currentTarget).hasClass("ASC")) {
@@ -1277,168 +1301,202 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         displayTableHeader : function(selector) {
             var me = this;
-            var columns;
-            var originalColumns;//unaltered by rollup splice
-            var invalidSelection = false;
-            var status = this.model.get("status");
 
-            var analysis = this.model;
-            // in case of a multi-analysis model
-            if (analysis.get("analyses")) {
-              analysis = analysis.get("analyses")[0];
-            }
-            var results = analysis.get("results");
-            var rollups;
-            if (results) {
-                // use results columns
-                columns = results.cols;
-
-                // init rollups
-                rollups = analysis.get("rollups");
-                if (rollups && (rollups.length ===0)) {
-                    rollups = this.rollups = null;
-                }
-                originalColumns = columns;
-            } else {
-                // use analysis columns
-                columns = [];
-                var i;
-                var obj;
-                var facets = this.model.get("facets");
-                if (facets) {
-                    for (i=0; i<facets.length; i++) {
-                        obj = squid_api.utils.find(this.filters.get("selection").facets, "id", facets[i].value);
-                        if (obj) {
-                            obj.dataType = "STRING";
-                            columns.push(obj);
-                        } else {
-                            // impossible to get column data from selection
-                            invalidSelection = true;
-                        }
-
+            if (! me.headerInformation) {
+                squid_api.utils.getProjectDomains().then(function(domains) {
+                    var arr = [];
+                    for(i=0; i<domains.models.length; i++) {
+                        arr.push(domains.models[i].toJSON());
                     }
+                    me.projectDomains = arr;
+                }).then(squid_api.utils.getDomainMetrics().then(function(metrics) {
+                    var arr = [];
+                    for(i=0; i<metrics.models.length; i++) {
+                        arr.push(metrics.models[i].toJSON());
+                    }
+                    me.domainMetrics = arr;
+                    me.headerInformation = true;
+                    me.displayTableHeader();
+                }));
+            } else  {
+                var columns;
+                var originalColumns;//unaltered by rollup splice
+                var invalidSelection = false;
+                var status = this.model.get("status");
+
+                var analysis = this.model;
+                // in case of a multi-analysis model
+                if (analysis.get("analyses")) {
+                  analysis = analysis.get("analyses")[0];
                 }
-                var metrics = this.model.get("metricList");
-                if (metrics) {
-                    var metric;
-                    for (i=0; i<metrics.length; i++) {
-                        metric = metrics[i];
-                        if (metrics[i].id) {
-                            obj = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", metrics[i].id.metricId, "Metric");
+                var results = analysis.get("results");
+                var rollups;
+                if (results) {
+                    // use results columns
+                    columns = results.cols;
+
+                    // init rollups
+                    rollups = analysis.get("rollups");
+                    if (rollups && (rollups.length ===0)) {
+                        rollups = this.rollups = null;
+                    }
+                    originalColumns = columns;
+                } else {
+                    // use analysis columns
+                    columns = [];
+                    var i;
+                    var obj;
+                    var facets = this.model.get("facets");
+                    if (facets) {
+                        for (i=0; i<facets.length; i++) {
+                            obj = squid_api.utils.find(this.filters.get("selection").facets, "id", facets[i].value);
                             if (obj) {
-                                obj.dataType = "NUMBER";
+                                obj.dataType = "STRING";
+                                columns.push(obj);
                             } else {
                                 // impossible to get column data from selection
                                 invalidSelection = true;
                             }
-                        } else {
-                            obj = {
-                                    "id" : null,
-                                    "name" : metrics[i].name,
-                                    "dataType" : "NUMBER"
-                            };
-                        }
-                        columns.push(obj);
-                    }
-                }
-                if (config.get("rollups") && this.rollupSummaryColumn >= 0 && status !== "DONE") {
-                    originalColumns = columns.slice();
-                    columns.splice(config.get("rollups")[0].col, 1);
-                } else {
-                    originalColumns = columns;
-                }
-            }
 
-
-            // Add OrderBy Attribute
-            var orderBy = this.model.get("orderBy");
-            if (orderBy) {
-                for (col=0; col<columns.length; col++) {
-                    columns[col].orderDirection = null;
-                }
-                // add orderBy direction
-                for (ix=0; ix<orderBy.length; ix++) {
-                    for (col=0; col<columns.length; col++) {
-                        if (this.ordering && config.get("rollups") && this.rollupSummaryColumn >= 0 && col == orderBy[ix].col) {
-                            originalColumns[col].orderDirection = orderBy[ix].direction;
-                            break;
-                        }
-                        else if (this.ordering && col == orderBy[ix].col) {
-                        	originalColumns[col].orderDirection = orderBy[ix].direction;
-                            break;
                         }
                     }
-                }
-            }
-
-            var rollupColIndex = null;
-            var rollupSummaryIndex = null;
-            if (rollups) {
-                if ((rollups.length>0)) {
-                    if (rollups.length>1) {
-                        rollupColIndex = rollups[1].col + 1;
-                    } else {
-                        rollupColIndex = rollups[0].col + 1;
+                    var metrics = this.model.get("metricList");
+                    if (metrics) {
+                        if (metrics.length === 0) {
+                            metrics = squid_api.model.config.get("chosenMetrics");
+                        }
                     }
-                }
-                if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
-                    rollupSummaryIndex = this.rollupSummaryColumn + 1;
-                }
-            }
-            me = this;
-            // header
-            d3.select(selector).select("thead tr").selectAll("th").remove();
-
-            if (!invalidSelection) {
-                d3.select(selector).select("thead tr").selectAll("th")
-                    .data(columns)
-                    .enter().append("th")
-                    .attr("class", function(d, i) {
-                        var str = "";
-                        if (rollups) {
-                            if (i === 0) {
-                                // hide grouping column
-                                str = str + "hide " + d.dataType;
-                            } else if (( rollupSummaryIndex !== null) && (i === rollupColIndex)) {
-                                // hide rollup column
-                                str = str + "hide " + d.dataType;
+                    if (metrics) {
+                        var metric;
+                        for (i=0; i<metrics.length; i++) {
+                            metric = metrics[i];
+                            if (metrics[i].id) {
+                                for (ix=0; ix<me.domainMetrics.length; ix++) {
+                                    if (metrics[i].id.metricId === me.domainMetrics[ix].oid) {
+                                        metrics[i].name = me.domainMetrics[ix].name;
+                                    }
+                                }
+                                obj = squid_api.utils.find(me.domainMetrics, "oid", metrics[i].id.metricId);
+                                if (obj) {
+                                    obj.dataType = "NUMBER";
+                                } else {
+                                    // impossible to get column data from selection
+                                    invalidSelection = true;
+                                }
                             } else {
-                                str = str + d.dataType;
+                                obj = {
+                                        "id" : null,
+                                        "name" : metrics[i].name,
+                                        "dataType" : "NUMBER"
+                                };
+                            }
+                            columns.push(obj);
+                        }
+                    }
+                    if (this.config.get("rollups") && Array.isArray(this.config.get("rollups")) && this.config.get("rollups").length>0 && this.rollupSummaryColumn >= 0 && status !== "DONE") {
+                        originalColumns = columns.slice();
+                        columns.splice(this.config.get("rollups")[0].col, 1);
+                    } else {
+                        originalColumns = columns;
+                    }
+                }
+
+
+                // Add OrderBy Attribute
+                var orderBy = this.model.get("orderBy");
+                if (orderBy) {
+                    for (col=0; col<columns.length; col++) {
+                        if (columns[col]) {
+                            columns[col].orderDirection = null;
+                        }
+                    }
+                    // add orderBy direction
+                    for (ix=0; ix<orderBy.length; ix++) {
+                        for (col=0; col<columns.length; col++) {
+                            if (this.ordering && this.config.get("rollups") && this.rollupSummaryColumn >= 0 && col === orderBy[ix].col) {
+                                if (originalColumns[col]) {
+                                    originalColumns[col].orderDirection = orderBy[ix].direction;
+                                }
+                                break;
+                            }
+                            else if (this.ordering && col === orderBy[ix].col) {
+                                if (originalColumns[col]) {
+                                    originalColumns[col].orderDirection = orderBy[ix].direction;
+                                }
+                                break;
                             }
                         }
-                        if (d.orderDirection) {
-                            str = str + " " + d.orderDirection;
-                        }
-                        return str;
-                    })
-                    .html(function(d) {
-                        var str = d.name;
-                        if (d.orderDirection === "ASC") {
-                            str = str + " " + "<span class='sort-direction'>&#xffea;</span>";
-                        } else if (d.orderDirection === "DESC") {
-                            str = str + " " + "<span class='sort-direction'>&#xffec;</span>";
-                        }
-                        return str;
-                    })
-                    .attr("data-content", function(d) {
-                        if (d.oid) {
-                            return d.oid;
-                        } else {
-                            return d.id;
-                        }
-                    })
-                    .attr("data-id", function(d, i) {
-                        return i;
-                    });
+                    }
+                }
 
-                // add class if more than 10 columns
-                if (this.$el.find("thead th").length > 10) {
-                    this.$el.find("table").addClass("many-columns");
-                } else {
-                    this.$el.find("table").removeClass("many-columns");
+                var rollupColIndex = null;
+                var rollupSummaryIndex = null;
+                if (rollups) {
+                    if ((rollups.length>0)) {
+                        if (rollups.length>1) {
+                            rollupColIndex = rollups[1].col + 1;
+                        } else {
+                            rollupColIndex = rollups[0].col + 1;
+                        }
+                    }
+                    if (this.config.get("rollups") && this.rollupSummaryColumn >= 0) {
+                        rollupSummaryIndex = this.rollupSummaryColumn + 1;
+                    }
+                }
+                me = this;
+                // header
+                d3.select(selector).select("thead tr").selectAll("th").remove();
+
+                if (!invalidSelection) {
+                    d3.select(selector).select("thead tr").selectAll("th")
+                        .data(columns)
+                        .enter().append("th")
+                        .attr("class", function(d, i) {
+                            var str = "";
+                            if (rollups) {
+                                if (i === 0) {
+                                    // hide grouping column
+                                    str = str + "hide " + d.dataType;
+                                } else if (( rollupSummaryIndex !== null) && (i === rollupColIndex)) {
+                                    // hide rollup column
+                                    str = str + "hide " + d.dataType;
+                                } else {
+                                    str = str + d.dataType;
+                                }
+                            }
+                            if (d.orderDirection) {
+                                str = str + " " + d.orderDirection;
+                            }
+                            return str;
+                        })
+                        .html(function(d) {
+                            var str = d.name;
+                            if (d.orderDirection === "ASC") {
+                                str = str + " " + "<span class='sort-direction'>&#xffea;</span>";
+                            } else if (d.orderDirection === "DESC") {
+                                str = str + " " + "<span class='sort-direction'>&#xffec;</span>";
+                            }
+                            return str;
+                        })
+                        .attr("data-content", function(d) {
+                            if (d.oid) {
+                                return d.oid;
+                            } else {
+                                return d.id;
+                            }
+                        })
+                        .attr("data-id", function(d, i) {
+                            return i;
+                        });
+
+                    // add class if more than 10 columns
+                    if (this.$el.find("thead th").length > 10) {
+                        this.$el.find("table").addClass("many-columns");
+                    } else {
+                        this.$el.find("table").removeClass("many-columns");
+                    }
                 }
             }
-
         },
 
         displayTableContent : function(selector) {
@@ -1468,7 +1526,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             rollupColIndex = rollups[0].col + 1;
                         }
                     }
-                    if (config.get("rollups") && this.rollupSummaryColumn >= 0) {
+                    if (this.config.get("rollups") && this.rollupSummaryColumn >= 0) {
                         rollupSummaryIndex = this.rollupSummaryColumn + 1;
                     }
                 }
@@ -1523,7 +1581,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 // this is a total line
                                 this.parentNode.className = "group";
                                 return "new-category";
-                            } else if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode == this.parentNode.parentNode.childNodes[0])) {
+                            } else if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode === this.parentNode.parentNode.childNodes[0])) {
                                 // detect total column
                                 this.parentNode.className = "total-column";
                             }
@@ -1548,7 +1606,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 }
                             }
                             if (i === 2) {
-                                if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode == this.parentNode.parentNode.childNodes[0])) {
+                                if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode === this.parentNode.parentNode.childNodes[0])) {
                                     text = "Total";
                                 }
                             }
@@ -1690,7 +1748,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // listen for global status change
             squid_api.model.status.on('change:status', this.enable, this);
-
         },
 
         enable: function() {
@@ -1701,7 +1758,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (this.dimensionIndex !== null) {
                     isMultiple = false;
                 }
-                var running = (squid_api.model.status.get("status") != squid_api.model.status.STATUS_DONE);
+                var running = (squid_api.model.status.get("status") !== squid_api.model.status.STATUS_DONE);
                 if (running) {
                     // computation is running : disable input
                     select.attr("disabled","disabled");
@@ -1721,129 +1778,160 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render: function() {
-            var isMultiple = true;
             var me = this;
+                squid_api.utils.fetchModel("project").then(function(project) {
+                    squid_api.utils.fetchModel("domain").then(function(domain) {
+                        var isMultiple = true;
 
-            if (this.dimensionIndex !== null) {
-                isMultiple = false;
-            }
-
-            var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
-
-            // iterate through all filter facets
-            var selection = this.filters.get("selection");
-            if (selection) {
-                var facets = selection.facets;
-                if (facets) {
-                    var dimensions = [];
-                    var dims = facets;
-                    for (var i=0; i<facets.length; i++){
-                        var facet = facets[i];
-                        var isBoolean = false;
-                        if ((facet.dimension.type == "SEGMENTS") || (facet.items.length == 1) && (facet.items[0].value == "true")) {
-                            isBoolean = true;
+                        if (me.dimensionIndex !== null) {
+                            isMultiple = false;
                         }
-                        // do not display boolean dimensions
-                        if (!isBoolean) {
-                            if (this.dimensionIdList) {
-                                // insert and sort
-                                var idx = this.dimensionIdList.indexOf(facet.dimension.oid);
-                                if (idx >= 0) {
-                                    dimensions[idx] = facet;
+
+                        var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
+
+                        // iterate through all filter facets
+                        var selection = me.filters.get("selection");
+                        if (selection) {
+                            var facets = selection.facets;
+                            if (facets) {
+                                me.dimensions = [];
+                                for (var i=0; i<facets.length; i++){
+                                    var facet = facets[i];
+                                    if (facet.dimension.dynamic === false || domain.get("dynamic") === true) {
+                                        var isBoolean = false;
+                                        if ((facet.dimension.type === "SEGMENTS") || (facet.items.length === 1) && (facet.items[0].value === "true")) {
+                                            isBoolean = true;
+                                        }
+                                        // do not display boolean dimensions
+                                        if (!isBoolean) {
+                                            if (me.dimensionIdList) {
+                                                // insert and sort
+                                                var idx = me.dimensionIdList.indexOf(facet.dimension.oid);
+                                                if (idx >= 0) {
+                                                    me.dimensions[idx] = facet;
+                                                }
+                                            } else {
+                                                // default unordered behavior
+                                                me.dimensions.push(facet);
+                                            }
+                                        }
+                                        // avoid holes
+                                        if (!me.dimensions[i]) {
+                                            me.dimensions[i] = null;
+                                        }
+                                    }
                                 }
-                            } else {
-                                // default unordered behavior
-                                dimensions.push(facet);
+                                var noneSelected = true;
+                                for (var dimIdx=0; dimIdx<me.dimensions.length; dimIdx++) {
+                                    var facet1 = me.dimensions[dimIdx];
+                                    if (facet1) {
+                                        // check if selected
+                                        var selected = me.isChosen(facet1);
+                                        if (selected === true) {
+                                            noneSelected = false;
+                                        }
+                                        // add to the list
+                                        var name;
+                                        if (facet1.name) {
+                                            name = facet1.name;
+                                        } else {
+                                            name = facet1.dimension.name;
+                                        }
+                                        var option = {"label" : name, "value" : facet1.id, "selected" : selected, "error" : me.dimensions[dimIdx].error};
+                                        jsonData.options.push(option);
+                                    }
+                                }
+                                if (noneSelected === true) {
+                                    me.model.set("chosenDimensions", []);
+                                }
                             }
                         }
-                        // avoid holes
-                        if (!dimensions[i]) {
-                            dimensions[i] = null;
-                        }
-                    }
-                    var noneSelected = true;
-                    for (var dimIdx=0; dimIdx<dimensions.length; dimIdx++) {
-                        var facet1 = dimensions[dimIdx];
-                        if (facet1) {
-                            // check if selected
-                            var selected = this.isChosen(facet1);
-                            if (selected === true) {
-                                noneSelected = false;
+
+                        // Alphabetical Sorting
+                        jsonData.options.sort(function(a, b) {
+                            var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
+                            if (labelA < labelB) {
+                                return -1;
                             }
-                            // add to the list
-                            var name;
-                            if (facet1.name) {
-                                name = facet1.name;
-                            } else {
-                                name = facet1.dimension.name;
+                            if (labelA > labelB) {
+                                return 1;
                             }
-                            var option = {"label" : name, "value" : facet1.id, "selected" : selected, "error" : dimensions[dimIdx].error};
-                            jsonData.options.push(option);
+                            return 0; // no sorting
+                        });
+
+                        // check if empty
+                        if (jsonData.options.length === 0) {
+                            jsonData.empty = true;
                         }
-                    }
-                    if (noneSelected === true) {
-                        me.model.set("chosenDimensions", []);
-                    }
-                }
-            }
 
-            // Alphabetical Sorting
-            jsonData.options.sort(function(a, b) {
-                var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
-                if (labelA < labelB)
-                    return -1;
-                if (labelA > labelB)
-                    return 1;
-                return 0; // no sorting
-            });
+                        var html = me.template(jsonData);
+                        me.$el.html(html);
+                        me.$el.show();
 
-            var html = this.template(jsonData);
-            this.$el.html(html);
-            this.$el.show();
+                        // Initialize plugin
+                        var selector = me.$el.find("select");
+                        if (isMultiple) {
+                             selector.multiselect({
+                                buttonContainer: '<div class="squid-api-data-widgets-dimension-selector" />',
+                                buttonText: function() {
+                                    return 'Dimensions';
+                                },
+                                onChange: function(option, selected) {
+                                    var chosenModel = _.clone(me.model.get("chosenDimensions"));
+                                    if (!chosenModel) {
+                                        chosenModel = [];
+                                    }
+                                    var currentItem = option.attr("value");
 
-            // Initialize plugin
-            var selector = this.$el.find("select");
-            if (isMultiple) {
-                 selector.multiselect({
-                    buttonContainer: '<div class="squid-api-data-widgets-dimension-selector" />',
-                    buttonText: function(options, select) {
-                        return 'Dimensions';
-                    },
-                    onChange: function(option, selected, index) {
-                        var chosenModel = _.clone(me.model.get("chosenDimensions"));
-                        if (!chosenModel) {
-                            chosenModel = [];
-                        }
-                        var currentItem = option.attr("value");
-
-                        if (selected) {
-                            chosenModel.push(option.attr("value"));
+                                    if (selected) {
+                                        chosenModel.push(option.attr("value"));
+                                    } else {
+                                        // If deselected remove item from array
+                                        for (var i = chosenModel.length; i--;) {
+                                            if (chosenModel[i] === currentItem) {
+                                                chosenModel.splice(i, 1);
+                                            }
+                                        }
+                                    }
+                                    me.model.set("chosenDimensions", chosenModel);
+                                },
+                                onDropdownShown: function() {
+                                    if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
+                                        me.$el.find("li.configure").remove();
+                                        me.$el.find("li").first().before("<li class='configure'> configure</option>");
+                                        me.$el.find("li").first().off().on("click", function() {
+                                            new squid_api.view.ColumnsManagementWidget({
+                                                buttonLabel : "<i class='fa fa-arrows-h'></i>",
+                                                type : "Dimension",
+                                                collection :new squid_api.model.DimensionCollection(),
+                                                model : new squid_api.model.DimensionModel(),
+                                                autoOpen : true,
+                                                successHandler : function() {
+                                                    var message = me.type + " with name " + this.get("name") + " has been successfully modified";
+                                                    squid_api.model.status.set({'message' : message});
+                                                }
+                                            });
+                                        });
+                                    }
+                                }
+                            });
                         } else {
-                            // If deselected remove item from array
-                            for (var i = chosenModel.length; i--;) {
-                                if (chosenModel[i] === currentItem) {
-                                    chosenModel.splice(i, 1);
-                                }
+                            var selectedDimension = me.model.get("selectedDimension");
+
+                            me.$el.find("select").on("change", function() {
+                                var dimension = $(me).val();
+                                me.model.set("chosenDimensions", [dimension]);
+                            });
+
+                            if (selectedDimension) {
+                                me.$el.find("select").val(selectedDimension);
                             }
                         }
-                        me.model.set("chosenDimensions", chosenModel);
-                    }
+
+                        // Remove Button Title Tag
+                        me.$el.find("button").removeAttr('title');
+                    });
                 });
-            } else {
-                var selectedDimension = this.model.get("selectedDimension");
-
-                this.$el.find("select").on("change", function() {
-                    var dimension = $(this).val();
-                    me.model.set("chosenDimensions", [dimension]);
-                });
-
-                if (selectedDimension) {
-                    this.$el.find("select").val(selectedDimension);
-                }
-            }
-
-            // Remove Button Title Tag
-            this.$el.find("button").removeAttr('title');
 
             return this;
         },
@@ -1855,12 +1943,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             if (dimensions) {
                 if (this.dimensionIndex !== null) {
-                    if (facet.id == dimensions[this.dimensionIndex]) {
+                    if (facet.id === dimensions[this.dimensionIndex]) {
                         selected = true;
                     }
                 } else {
                     for (var j=0; j<dimensions.length; j++) {
-                        if (facet.id == dimensions[j]) {
+                        if (facet.id === dimensions[j]) {
                             selected = true;
                         }
                     }
@@ -1927,7 +2015,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         events: {
             // Dimension Sorting
-            "change": function(event) {
+            "change": function() {
                 var dimensions = this.$el.find(".sortable li");
                 var selected = [];
 
@@ -1971,7 +2059,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     for (var dc=0; dc<chosenDimensions.length; dc++) {
                         for (var d=0; d<facets.length; d++){
                             var facet = facets[d];
-                            if (chosenDimensions[dc] == facet.id) {
+                            if (chosenDimensions[dc] === facet.id) {
                                 var item = {};
                                 item.id = facet.id;
                                 if (facet.name) {
@@ -2047,8 +2135,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         initialize: function(options) {
 
-            var me = this;
-
             if (options) {
                 // setup options
                 if (options.config) {
@@ -2092,12 +2178,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var analysis;
             
             // create the new view
-            if (viewName == "tableView") {
-                analysis = tableView.model;
-            } else if (viewName == "timeView") {
-                analysis = timeView.model;
-            } else if (viewName == "barView") {
-                analysis = barView.model;
+            if (viewName === "tableView") {
+                analysis = this.tableView.model;
+            } else if (viewName === "timeView") {
+                analysis = this.timeView.model;
+            } else if (viewName === "barView") {
+                analysis = this.barView.model;
             }
             this.model.set("currentAnalysis", analysis);
         },
@@ -2110,7 +2196,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render: function() {
-            var me = this;
 
             // compute the view types compatible with the model
             var selectedDimension = this.model.get("selectedDimension");
@@ -2130,17 +2215,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var currentViewName;
 
             if (this.tableView) {
-                if (analysis == this.tableView.model) {
+                if (analysis === this.tableView.model) {
                     currentViewName = "tableView";
                 }
             }
             if (this.barView) {
-                if (analysis == this.barView.model) {
+                if (analysis === this.barView.model) {
                     currentViewName = "barView";
                 }
             }
             if (this.timeView) {
-                if (analysis == this.timeView.model) {
+                if (analysis === this.timeView.model) {
                     currentViewName = "timeView";
                 }
             }
@@ -2150,15 +2235,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             for (idx2 = 0; idx2<compatibleViews.length; idx2++) {
                 var view2 = compatibleViews[idx2];
                 var icon;
-                if (view2 == "tableView") {
+                if (view2 === "tableView") {
                     icon = "fa-table";
-                } else if (view2 == "timeView") {
+                } else if (view2 === "timeView") {
                     icon = "fa-line-chart";
-                } else if (view2 == "barView") {
+                } else if (view2 === "barView") {
                     icon = "fa-bar-chart";
                 }
                 var isActive = false;
-                if (view2 == currentViewName) {
+                if (view2 === currentViewName) {
                     isActive = true;
                 }
                 data.options.push({"view" : view2, "icon" : icon, "isActive" : isActive});
@@ -2185,8 +2270,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         onChangeHandler: null,
 
         initialize: function(options) {
-            var me = this;
-
             // setup options
             if (options) {
                 if (options.template) {
@@ -2247,7 +2330,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 for (var i=0; i<domains.length; i++) {
                     domain = domains[i];
                     var selected = false;
-                    if (domain.oid == selectedDomain) {
+                    if (domain.oid === selectedDomain) {
                         selected = true;
                         hasSelection = true;
                     }
@@ -2626,9 +2709,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         template : null,
         renderTo: null,
         compression : true,
-        downloadStatus : 0,
         curlCollapsed : true,
-        currentJobId : null,
         displayInAccordion : false,
         viewPort : null,
         formats : [{"format" : "csv", "mime-type" : "text/csv", "template" : null}],
@@ -2636,11 +2717,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         templateData : null,
         displayScripting : true,
         displayCompression : true,
-        
+
         initialize : function(options) {
             if (this.model.get("analysis")) {
                 this.listenTo(this.model.get("analysis"), 'change', this.render);
-                this.listenTo(this.model, 'change:templateData', this.refreshDownloadUrl);
             } else {
                 this.listenTo(this.model, 'change', this.render);
             }
@@ -2674,7 +2754,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.model = model;
             this.initialize();
         },
-        
+
         clickedFormat : function (event) {
             var t = event.target;
             this.selectedFormatIndex = null;
@@ -2683,54 +2763,128 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.selectedFormatIndex = i;
                 }
             }
-            this.refreshDownloadUrl();
         },
-        
+
         clickedCompression : function (event) {
             var t = event.target;
             this.compression = (t.checked);
-            this.refreshDownloadUrl();
         },
 
-        refreshDownloadUrl : function() {
+        downloadAnalysisResults : function(currentJobId) {
             var me = this;
-            if (me.currentJobId) {
-                // create download link
-                var analysisJobResults;
-                var selectedFormat = this.formats[this.selectedFormatIndex];
-                if (!selectedFormat.template) {
-                    // use getResults method
-                    analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                    analysisJobResults.addParameter("format",selectedFormat.format);
+            // create download link
+            var analysisJobResults;
+            var selectedFormat = this.formats[this.selectedFormatIndex];
+            var velocityTemplate;
+            var postMethod;
+            var downloadBtn = $(me.viewPort).find("#download");
+            var downloadForm = $(me.viewPort).find("#download-form");
+            
+            if (!selectedFormat.template) {
+                // use getResults method
+                analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
+                analysisJobResults.addParameter("format",selectedFormat.format);
+                postMethod = "GET";
+            } else {
+                // use render method
+                analysisJobResults = new squid_api.model.ProjectAnalysisJobRender({"format" : selectedFormat.format});
+                analysisJobResults.setParameter("type", selectedFormat.type);
+                analysisJobResults.setParameter("timeout", null);
+                // build the template
+                
+                if (selectedFormat.format === "xml") {
+                    if (me.model.get("templateData").options.xmlType) {
+                        velocityTemplate = selectedFormat.template[me.model.get("templateData").options.xmlType](me.model.get("templateData"));
+                    } else {
+                        velocityTemplate = selectedFormat.template(me.model.get("templateData"));
+                    }
                 } else {
-                    // use render method
-                    analysisJobResults = new squid_api.model.ProjectAnalysisJobRender({"format" : selectedFormat.format});
-                    analysisJobResults.setParameter("type", selectedFormat.type);
-                    analysisJobResults.setParameter("timeout", null);
-                    // build the template
-                    var velocityTemplate = selectedFormat.template(me.model.get("templateData"));
-                    analysisJobResults.setParameter("template", base64.encode(velocityTemplate));
+                    velocityTemplate = selectedFormat.template(me.model.get("templateData"));
                 }
-                if (me.compression) {
-                    analysisJobResults.addParameter("compression","gzip");
-                }
-                analysisJobResults.set({
-                    "id": me.currentJobId,
-                    "oid": me.currentJobId.oid
-                });
-                var downloadBtn = $(me.viewPort).find("#download");
-                downloadBtn.attr("href",analysisJobResults.url());
-                downloadBtn.removeClass("disabled");
+                postMethod = "POST";
             }
+            if (me.compression) {
+                analysisJobResults.addParameter("compression","gzip");
+            }
+            analysisJobResults.set({
+                "id": currentJobId,
+                "oid": currentJobId.oid
+            });
+            
+            downloadBtn.removeClass("disabled");
+            
+            downloadForm.attr("action",analysisJobResults.url());
+            downloadForm.attr("method",postMethod);
+            downloadForm.empty();
+            downloadForm.append("<input type='hidden' name='access_token' value='"+analysisJobResults.getParameter("access_token")+"'/>");
+            downloadForm.append("<input type='hidden' name='compression' value='"+analysisJobResults.getParameter("compression")+"'/>");
+            if (velocityTemplate) {
+                downloadForm.append("<input type='hidden' name='template' value='"+base64.encode(velocityTemplate)+"'/>");
+            }
+            if (analysisJobResults.getParameter("type")) {
+                downloadForm.append("<input type='hidden' name='type' value='"+analysisJobResults.getParameter("type")+"'/>");
+            }
+            if (analysisJobResults.getParameter("format")) {
+                downloadForm.append("<input type='hidden' name='format' value='"+analysisJobResults.getParameter("format")+"'/>");
+            }
+            if (analysisJobResults.getParameter("timeout")) {
+                downloadForm.append("<input type='hidden' name='timeout' value='"+analysisJobResults.getParameter("timeout")+"'/>");
+            }
+            downloadForm.submit();
         },
         
+        download : function() {
+            var me = this;
+            
+            var analysis = this.model.get("analysis");
+            if (!analysis) {
+                analysis = this.model;
+            }
+            var downloadBtn = $(this.viewPort).find("#download");
+            downloadBtn.addClass("disabled");
+
+            if (analysis.get("id").projectId) {
+                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                downloadAnalysis.set(analysis.attributes);
+                downloadAnalysis.setParameter("timeout", 10000);
+                downloadAnalysis.setParameter("maxResults", 1);
+                downloadAnalysis.set({
+                    "id": {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": null
+                    }});
+                // trigger the analysis computation and wait until it's done (or times out)
+                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
+                .done(function(analysis) {
+                    if (analysis.get("status") === "DONE") {
+                        // get the results
+                        me.downloadAnalysisResults(analysis.get("id"));
+                    } else {
+                        // analysis timed out, retry (in a loop)
+                        squid_api.controller.analysisjob.getAnalysisJobResults(null, analysis).done(function(results) {
+                            // get the results
+                            me.downloadAnalysisResults(results.get("id"));
+                        })
+                        .fail(function() {
+                            console.error("createAnalysisJob failed");
+                            downloadBtn.removeClass("disabled");
+                        });
+                    }
+                })
+                .fail(function() {
+                    console.error("createAnalysisJob failed");
+                    downloadBtn.removeClass("disabled");
+                });
+            }
+        },
+
         render : function() {
             var me = this;
             var analysis = this.model.get("analysis");
             if (!analysis) {
                 analysis = this.model;
             }
-            
+
             var selectedFormat = this.formats[this.selectedFormatIndex];
             var formatsDisplay = [];
             for (var i=0; i<this.formats.length;i++) {
@@ -2739,7 +2893,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     formatsDisplay[i].selected = true;
                 }
             }
-            
+
             if (this.displayInAccordion) {
                 this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-download-alt'></span></button>");
                 var facets = analysis.get("facets");
@@ -2766,7 +2920,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         "projectId": analysis.get("id").projectId,
                         "analysisJobId": null
                     });
-    
+
                 // escape all spaces in the json injected into cURL
                 data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
                 curlFileName = "analysis";
@@ -2778,7 +2932,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 curl = exportAnalysis.url().replace(/\[access_token\]/g, '<b>[access_token]</b>');
             }
-            
+
             $(this.viewPort).html(this.template({
                 "displayInAccordion" : this.displayInAccordion,
                 "data-target" : this.renderTo,
@@ -2795,50 +2949,26 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "apiURL":squid_api.apiURL
                 })
             );
-            
-            // prepare download link
-            this.downloadStatus = 1;
-            var downloadBtn = $(me.viewPort).find("#download");
-            downloadBtn.addClass("disabled");
 
-            if (analysis.get("id").projectId) {
-                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
-                downloadAnalysis.set(analysis.attributes);
-                downloadAnalysis.set({
-                    "id": {
-                        "projectId": analysis.get("id").projectId,
-                        "analysisJobId": null
-                    },
-                    "autoRun": false});
-                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                .done(function(model, response) {
-                    me.downloadStatus = 2;
-                    me.currentJobId = downloadAnalysis.get("id");
-                    me.refreshDownloadUrl();
-                })
-                .fail(function(model, response) {
-                    console.error("createAnalysisJob failed");
-                });
-            }
             
+
             // apply cURL panel state
             if (me.curlCollapsed) {
                 $(this.viewPort).find('#curl').hide();
             } else {
                 $(this.viewPort).find('#curl').show();
             }
-            
+
             // Click Handlers
             $(this.viewPort).find("#curlbtn").click(function() {
                 me.curlCollapsed = !me.curlCollapsed;
                 if (me.curlCollapsed) {
-                    $(me.viewPort).find('#curl').fadeOut();      
+                    $(me.viewPort).find('#curl').fadeOut();
                 } else {
                     $(me.viewPort).find('#curl').fadeIn();
                 }
             });
 
-            // register click handlers    
             $(this.viewPort).find('[name="format"]').click(
                     function(event) {
                         me.clickedFormat(event);
@@ -2846,6 +2976,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             $(this.viewPort).find('[name="compression"]')
             .click(function(event) {
                 me.clickedCompression(event);
+            });
+            
+            $(this.viewPort).find("#download").click(function() {
+                me.download();
             });
 
             return this;
@@ -2858,7 +2992,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 (function (root, factory) {
     root.squid_api.controller.FiltersContoller = factory(root.Backbone, root.squid_api);
 
-}(this, function (Backbone, squid_api, template) {
+}(this, function (Backbone, squid_api) {
 
     var View = Backbone.View.extend({
         filters : null,
@@ -2906,18 +3040,20 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // check for domain change performed
             this.listenTo(this.config, 'change:domain', function(config) {
-                var id = filters.get("id");
-                if (id) {
-                    filters.set("id" , {
-                        "projectId" : id.projectId,
-                        "facetjobId" : null
-                        });
-                    filters.setDomainIds([{
-                        "projectId" : id.projectId,
-                        "domainId" : config.get("domain")
-                    }]);
+                if (config.get("domain")) {
+                    var id = filters.get("id");
+                    if (id) {
+                        filters.set("id" , {
+                            "projectId" : id.projectId,
+                            "facetjobId" : null
+                            });
+                        filters.setDomainIds([{
+                            "projectId" : id.projectId,
+                            "domainId" : config.get("domain")
+                        }]);
+                    }
+                    me.initFilters(config);
                 }
-                me.initFilters(config);
             });
 
             // check for project change performed
@@ -2961,7 +3097,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                        var facets = sel.facets;
                        for (var i = 0; i < facets.length; i++) {
                            var facet = facets[i];
-                           if (facet.dimension.type == "CONTINUOUS") {
+                           if (facet.dimension.valueType === "DATE") {
                                timeFacet = facet;
                            }
                        }
@@ -3074,9 +3210,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 jsonData.done = true;
                 results = this.model.get("results");
                 if (results) {
-                    if (results.rows.length == 1) {
+                    if (results.rows.length === 1) {
                         values = results.rows[0].v;
-                        if (values.length == 2) {
+                        if (values.length === 2) {
                             jsonData.value = this.format((values[1] / values[0]) * 100);
                             jsonData.unit = "%";
                             jsonData.name = results.cols[1].lname;
@@ -3105,8 +3241,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         metricIndex: null,
 
         initialize: function(options) {
-            var me = this;
-          
+
             // setup options
             if (options) {
                 if (options.template) {
@@ -3121,7 +3256,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.metricIndex = options.metricIndex;
                 }
             }
-            
+
             // setup the models
             if (!this.model) {
                 this.model = squid_api.model.config;
@@ -3132,6 +3267,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // listen for global status change
             this.listenTo(squid_api.model.status,"change:status", this.handleStatus);
+
         },
 
         handleStatus: function() {
@@ -3142,7 +3278,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (this.metricIndex !== null) {
                     isMultiple = false;
                 }
-                var running = (squid_api.model.status.get("status") != squid_api.model.status.STATUS_DONE);
+                var running = (squid_api.model.status.get("status") !== squid_api.model.status.STATUS_DONE);
                 if (running) {
                     // computation is running : disable input
                     select.attr("disabled","disabled");
@@ -3167,113 +3303,134 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         events: {
-            "change": function(event) {
+            "change": function() {
                 var oid = this.$el.find("select option:selected");
                 // Remove Button Title Tag
                 this.$el.find("button").removeAttr('title');
-                
+
                 var chosenMetrics = this.model.get("chosenMetrics");
                 var selectedMetrics = [];
-                
+
                 // build the selection array
                 for (i = 0; i < oid.length; i++) {
                     var selectedOid = $(oid[i]).val();
                     selectedMetrics.push(selectedOid);
                 }
-                
+
                 // check for additions
-                var selectedMetricsNew = [];
                 chosenMetricsNew = _.intersection(_.union(chosenMetrics, selectedMetrics), selectedMetrics);
 
                 // Update
                 this.model.set({"chosenMetrics" : chosenMetricsNew});
-                
             }
         },
 
         render: function() {
             var projectOid = this.model.get("project");
             var domainOid = this.model.get("domain");
-            
+
             if (projectOid && domainOid) {
                 var me = this, isMultiple = true;
-    
+
                 if (this.metricIndex !== null) {
                     isMultiple = false;
                 }
-    
+
                 var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
-                
+
                 // iterate through all domains metrics
-                this.getMetrics(projectOid, domainOid).then(function(metrics) {
-                    if (metrics.length > 0) {
-                        var noneSelected = true;
-                        for (var idx=0; idx<metrics.length; idx++) {
-                            var metric = metrics[idx];
-                            // check if selected
-                            var selected = me.isChosen(metric);
-                            if (selected === true) {
-                                noneSelected = false;
+                squid_api.utils.fetchModel("project").then(function(project) {
+                    squid_api.utils.getDomainMetrics().then(function(metrics) {
+                            me.metrics = metrics;
+                            if (metrics.models.length > 0) {
+                                var noneSelected = true;
+                                for (var idx=0; idx<metrics.models.length; idx++) {
+                                    var metric = metrics.models[idx];
+
+                                    // check if selected
+                                    var selected = me.isChosen(metrics.models[idx]);
+                                    if (selected === true) {
+                                        noneSelected = false;
+                                    }
+
+                                    // add to the list
+                                    var option = {"label" : metric.get("name"), "value" : metric.get("oid"), "selected" : selected};
+                                    jsonData.options.push(option);
+                                }
+
+                                if (noneSelected === true) {
+                                    me.model.set("chosenMetrics", []);
+                                }
+
+                                // Alphabetical Sorting
+                                jsonData.options.sort(function(a, b) {
+                                    var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
+                                    if (labelA < labelB) {
+                                        return -1;
+                                    }
+                                    if (labelA > labelB) {
+                                        return 1;
+                                    }
+                                    return 0; // no sorting
+                                });
                             }
-                            
-                            // add to the list
-                            var option = {"label" : metric.name, "value" : metric.oid, "selected" : selected};
-                            jsonData.options.push(option);
-                        }
-                        
-                        if (noneSelected === true) {
-                            me.model.set("chosenMetrics", []);
-                        }
-        
-                        // Alphabetical Sorting
-                        jsonData.options.sort(function(a, b) {
-                            var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
-                            if (labelA < labelB)
-                                return -1;
-                            if (labelA > labelB)
-                                return 1;
-                            return 0; // no sorting
-                        });
-                    }
-    
-                    var html = me.template(jsonData);
-                    me.$el.html(html);
-                    me.$el.show();
-        
-                    // Initialize plugin
-                    var selector = me.$el.find("select");
-                    if (isMultiple) {
-                        selector.multiselect({
-                            buttonText: function(options, select) {
-                                return 'Metrics';
-                            },
-                        });
-                    }
-        
-                    // Remove Button Title Tag
-                    me.$el.find("button").removeAttr('title');
+
+                            // check if empty
+                            if (jsonData.options.length === 0) {
+                                jsonData.empty = true;
+                            }
+
+                            var html = me.template(jsonData);
+                            me.$el.html(html);
+                            me.$el.show();
+
+                            // Initialize plugin
+                            var selector = me.$el.find("select");
+                            if (isMultiple) {
+                                selector.multiselect({
+                                    buttonContainer: '<div class="squid-api-data-widgets-metric-selector-open" />',
+                                    buttonText: function() {
+                                        return 'Metrics';
+                                    },
+                                    onDropdownShown: function() {
+                                        if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
+                                            me.$el.find("li.configure").remove();
+                                            me.$el.find("li").first().before("<li class='configure'> configure</option>");
+                                            me.$el.find("li").first().off().on("click", function() {
+                                                new squid_api.view.ColumnsManagementWidget({
+                                                    buttonLabel : "<i class='fa fa-arrows-h'></i>",
+                                                    type : "Metric",
+                                                    collection : me.metrics,
+                                                    model : new squid_api.model.MetricModel(),
+                                                    autoOpen : true,
+                                                    successHandler : function() {
+                                                        var message = me.type + " with name " + this.get("name") + " has been successfully modified";
+                                                        squid_api.model.status.set({'message' : message});
+                                                    }
+                                                });
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+
+                            // Remove Button Title Tag
+                            me.$el.find("button").removeAttr('title');
+
+                    });
                 });
             }
 
             return this;
         },
-        
-        getMetrics : function(projectOid, domainOid) {
-            var metrics = new squid_api.model.MetricCollection();
-            metrics.parentId = {
-                projectId : projectOid,
-                domainId : domainOid
-            };
-            return metrics.fetch();
-        },
-        
+
         isChosen : function(item) {
             var selected = false;
             var metrics = this.model.get("chosenMetrics");
 
             if (metrics) {
                 for (var j=0; j<metrics.length; j++) {
-                    if (item.oid == metrics[j]) {
+                    if (item.get("oid") === metrics[j]) {
                         selected = true;
                     }
                 }
@@ -3376,7 +3533,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 if (metrics) {
                     for (var j=0; j<metrics.length; j++) {
-                        if (id == metrics[j].metricId) {
+                        if (id === metrics[j].metricId) {
                             selected = true;
                         }
                     }
@@ -3495,7 +3652,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 $.when.apply($, metricPromises).then(function() {
                     // extract the metricModels from the arguments
                     var metricModels = [];
-                    if (chosenMetrics.length == 1) {
+                    if (chosenMetrics.length === 1) {
                         metricModels.push(arguments[0]);
                     } else {
                         for (var i=0; i<chosenMetrics.length; i++) {
@@ -3539,7 +3696,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.metricList) {
                 this.metricList = options.metricList;
             }
-            
+
             // To populate metrics
             squid_api.model.project.on("change:domains", this.render, this);
 
@@ -3587,19 +3744,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
         },
 
-        getDomainMetrics : function() {
-            var metrics = [];
-            var domain = squid_api.utils.find(squid_api.model.project.get("domains"), "oid", this.model.get("domain"), "Domain");
-            if (domain) {
-                metrics = domain.metrics;
-            }
-            return metrics;
-        },
-
         render : function() {
             var direction = "";
             var me = this;
-            
+
             var orderByList = this.model.get("orderBy");
             if (orderByList) {
                 var orderBy = this.model.get("orderBy")[0];
@@ -3610,54 +3758,56 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             var limit = this.model.get("limit");
 
-            var metrics = this.getDomainMetrics();
-            var chosenMetrics = this.model.get("chosenMetrics");
-            var metricList = [];
+            squid_api.utils.getDomainMetrics().then(function(metrics) {
+                metrics = metrics.models;
+                var chosenMetrics = squid_api.model.config.get("chosenMetrics");
+                var metricList = [];
 
-            if (this.metricList) {
-                var appMetrics = this.metricList;
-                for (var idx=0; idx<metrics.length; idx++) {
-                    for (ix=0; ix<appMetrics.length; ix++) {
-                        var metric1 = metrics[idx];
-                        if (appMetrics[ix] === metric1.oid) {
-                            var option1 = {"label" : metric1.name, "value" : metric1.oid};
-                            metricList.push(option1);
+                if (me.metricList) {
+                    var appMetrics = me.metricList;
+                    for (var idx=0; idx<metrics.length; idx++) {
+                        for (ix=0; ix<appMetrics.length; ix++) {
+                            var metric1 = metrics[idx];
+                            if (appMetrics[ix] === metric1.oid) {
+                                var option1 = {"label" : metric1.name, "value" : metric1.oid};
+                                metricList.push(option1);
+                            }
+                        }
+                    }
+                } else if (metrics && chosenMetrics) {
+                    for (var id=0; id<metrics.length; id++) {
+                        var metric = metrics[id];
+                        // Match with chosen
+                        for (var match=0; match<chosenMetrics.length; match++) {
+                            if (metric.get("oid") === chosenMetrics[match]) {
+                                var option = {"label" : metric.get("name"), "value" : metric.get("oid")};
+                                metricList.push(option);
+                            }
                         }
                     }
                 }
-            } else if (metrics && chosenMetrics) {
-                for (var id=0; id<metrics.length; id++) {
-                    var metric = metrics[id];
-                    // Match with chosen
-                    for (var match=0; match<chosenMetrics.length; match++) {
-                        if (metric.oid === chosenMetrics[match]) {
-                            var option = {"label" : metric.name, "value" : metric.oid};
-                            metricList.push(option);
-                        }
+
+                var jsonData = {"direction" : direction, "limit" : limit, "chosenMetrics" : metricList, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
+
+                var html = me.template(jsonData);
+                me.$el.html(html);
+
+                me.$el.find("select").multiselect({
+                    onChange: function(option) {
+                        var metric = option.attr("value");
+                        me.model.set({"selectedMetric": metric});
                     }
+                });
+
+                if (me.model.get("selectedMetric")) {
+                    me.$el.find("select").multiselect('select', me.model.get("selectedMetric"));
                 }
-            }
 
-            var jsonData = {"direction" : direction, "limit" : limit, "chosenMetrics" : metricList, "orderByDirectionDisplay" : this.orderByDirectionDisplay, "removeOrderDirection" : this.removeOrderDirection};
+                me.$el.find("select").multiselect("refresh");
 
-            var html = this.template(jsonData);
-            this.$el.html(html);
-
-            this.$el.find("select").multiselect({
-                onChange: function(option, selected, index) {
-                    var metric = option.attr("value");
-                    me.model.set({"selectedMetric": metric});
-                }
+                // Set Limit Value
+                me.$el.find(".sq-select").val(jsonData.limit);
             });
-
-            if (this.model.get("selectedMetric")) {
-                this.$el.find("select").multiselect('select', this.model.get("selectedMetric"));
-            }
-
-            this.$el.find("select").multiselect("refresh");
-
-            // Set Limit Value
-            this.$el.find(".sq-select").val(jsonData.limit);  
 
             return this;
         }
@@ -3715,10 +3865,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (model.get("login")) {
                     // fetch projects
                     me.projects.fetch({
-                        success : function(model, response) {
+                        success : function(model) {
                             console.log(model);
                         },
-                        error : function(model, response) {
+                        error : function(model) {
                             console.log(model);
                         }
                     });
@@ -3773,7 +3923,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         model : project,
                         successHandler: function() {
                             if (me.projectAutomaticLogin) {
-                                config.set({
+                                squid_api.model.config.set({
                                     "project" : this.get("id").projectId,
                                     "domain" : null
                                 });
@@ -3795,7 +3945,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     project = this.projects.at(i);
                     if (project) {
                         var selected = false;
-                        if (project.get("oid") == this.model.get("project")) {
+                        if (project.get("oid") === this.model.get("project")) {
                             selected = true;
                         }
     
@@ -3894,7 +4044,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                      },
                      "autoRun": false});
                  squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                 .done(function(model, response) {
+                 .done(function() {
                      me.downloadStatus = 2;
                      me.currentJobId = downloadAnalysis.get("id");
                      // create download link
@@ -3920,7 +4070,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                      me.setDownloadBtnState();
 
                  })
-                 .fail(function(model, response) {
+                 .fail(function() {
                      console.error("createAnalysisJob failed");
                      me.setDownloadBtnState();
                  });
@@ -4073,7 +4223,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (dateIndex>0) {
                     serieName = value[dateIndex-1];
                 }
-                if ((currentSerieName === null) || (serieName != currentSerieName) || yearChange === true) {
+                if ((currentSerieName === null) || (serieName !== currentSerieName) || yearChange === true) {
                     currentSerieName = serieName;
                     // create a new serie
                     serie = {};
@@ -4113,7 +4263,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // Store new Series Values
             var newSerie = {};
-            var updatedData = [];
 
             // Calculate the difference in days between the start / end date
             var dateDifference;
@@ -4157,8 +4306,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                     // Update the array with the new data
                     var updatedArray = [];
-                    for (var key in newSerie) {
+                    for (var i2=0; i2<newSerie.length; i2++) {
                         var obj = {};
+                        var key = newSerie[i2];
                         obj.x = moment.utc(key).unix();
                         obj.y = newSerie[key].y;
                         updatedArray.push(obj);
@@ -4217,9 +4367,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render : function() {
-            var me = this;
+
             var status = this.model.get("status");
-            this.YearOverYear = config.get("YearOverYear");
+            this.YearOverYear = squid_api.model.config.get("YearOverYear");
 
             if (status === "PENDING") {
                 this.$el.html(this.template({"staleMessage" : this.staleMessage}));
@@ -4256,7 +4406,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                     var dateColumnIndex=0;
 
-                    while (data.results.cols[dateColumnIndex].dataType != "DATE") {
+                    while (data.results.cols[dateColumnIndex].dataType !== "DATE") {
                         dateColumnIndex++;
                     }
 
@@ -4281,12 +4431,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                         graph.render();
 
-                        var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+                        new Rickshaw.Graph.HoverDetail( {
                             graph: graph,
                             formatter: function(series, x, y) {
                                 var formatter = d3.format(",.f");
                                 var date;
-                                if (config.get("YearOverYear")) {
+                                if (squid_api.model.config.get("YearOverYear")) {
                                     date = '<span class="date">' + series.name + "-" + moment(new Date(x * 1000)).format("MM-DD") + '</span>';
                                 } else {
                                     date = '<span class="date">' + moment(new Date(x * 1000)).format("YYYY-MM-DD") + '</span>';
@@ -4298,7 +4448,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             }
                         });
 
-                        var legend = new Rickshaw.Graph.Legend( {
+                        new Rickshaw.Graph.Legend( {
                             graph: graph,
                             element: document.getElementById('legend')
                         });
@@ -4311,12 +4461,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             graph: graph
                         });
 
-                        var slider = new Rickshaw.Graph.RangeSlider({
+                        new Rickshaw.Graph.RangeSlider({
                             graph: graph,
                             element: document.querySelector('#slider')
                         });
-
-                        var offsetForm = document.getElementById('offset_form');
 
                         yAxis.render();
                         xAxis.render();

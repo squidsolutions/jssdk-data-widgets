@@ -11,3 +11,22 @@
 .squid-api-data-widgets-dimension-selector ul li.disabled {
 	text-decoration: line-through;
 }
+
+.squid-api-data-widgets-dimension-selector li.configure {
+	cursor: pointer;
+    position: absolute;
+    background: #f3f3f3;
+    top: -29px;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    left: -1px;
+    border: 1px solid #ccc;
+    height: 29px;
+    padding: 4px 7px 0px 10px;
+    min-width: 0px !important;
+}
+
+.squid-api-data-widgets-dimension-selector li.configure:before {
+	content: "\f040";
+	font-family: FontAwesome;
+}

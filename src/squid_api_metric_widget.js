@@ -103,7 +103,7 @@
                 $.when.apply($, metricPromises).then(function() {
                     // extract the metricModels from the arguments
                     var metricModels = [];
-                    if (chosenMetrics.length == 1) {
+                    if (chosenMetrics.length === 1) {
                         metricModels.push(arguments[0]);
                     } else {
                         for (var i=0; i<chosenMetrics.length; i++) {

@@ -142,7 +142,7 @@
                     .domain([0, maxValue])
                     .range([0, width - 205]);
 
-                xAxis = d3.svg.axis()
+                var xAxis = d3.svg.axis()
                     .scale(xScale)
                     .orient('top');
 
@@ -172,14 +172,14 @@
                     .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
 
                 // Bar Rectangles with Tooltips / Transition on load
-                var barItem = bar.append("rect")
+                bar.append("rect")
                     .attr("y", function(d, i) {
                         return i*15;
                     })
                     .attr("x", function(d, i) {
                         return i + 200;
                     })
-                    .attr("width", function(d) {
+                    .attr("width", function() {
                         return 0;
                     })
                     .attr('fill', '#026E87')
@@ -195,7 +195,7 @@
                             .style('opacity', 1)
                             .style('fill', '#1aadcf');
                         })
-                    .on('mouseout', function(d) {
+                    .on('mouseout', function() {
                         tooltip.html("");
                         d3.select(this)
                             .style('opacity', 1)
@@ -212,7 +212,7 @@
                         .ease('bounce');
 
                     // xAxis (Starting 200px from left)
-                    var xAxis = d3.select("#bar_chart svg")
+                    xAxis = d3.select("#bar_chart svg")
                         .append("g")
                         .attr('class', 'axis')
                         .attr('width', width)
@@ -230,7 +230,7 @@
                         .selectAll(".tick");
 
                     // Y aXis label spacing
-                    var texts = yAxisAppend.attr("transform", function(d, i) {
+                    yAxisAppend.attr("transform", function(d, i) {
                         return "translate(0," + (15 + (i * ySpacing)) + ")";
                     });
                 }

@@ -13,8 +13,6 @@
 
         initialize: function(options) {
 
-            var me = this;
-
             if (options) {
                 // setup options
                 if (options.config) {
@@ -58,12 +56,12 @@
             var analysis;
             
             // create the new view
-            if (viewName == "tableView") {
-                analysis = tableView.model;
-            } else if (viewName == "timeView") {
-                analysis = timeView.model;
-            } else if (viewName == "barView") {
-                analysis = barView.model;
+            if (viewName === "tableView") {
+                analysis = this.tableView.model;
+            } else if (viewName === "timeView") {
+                analysis = this.timeView.model;
+            } else if (viewName === "barView") {
+                analysis = this.barView.model;
             }
             this.model.set("currentAnalysis", analysis);
         },
@@ -76,7 +74,6 @@
         },
 
         render: function() {
-            var me = this;
 
             // compute the view types compatible with the model
             var selectedDimension = this.model.get("selectedDimension");
@@ -96,17 +93,17 @@
             var currentViewName;
 
             if (this.tableView) {
-                if (analysis == this.tableView.model) {
+                if (analysis === this.tableView.model) {
                     currentViewName = "tableView";
                 }
             }
             if (this.barView) {
-                if (analysis == this.barView.model) {
+                if (analysis === this.barView.model) {
                     currentViewName = "barView";
                 }
             }
             if (this.timeView) {
-                if (analysis == this.timeView.model) {
+                if (analysis === this.timeView.model) {
                     currentViewName = "timeView";
                 }
             }
@@ -116,15 +113,15 @@
             for (idx2 = 0; idx2<compatibleViews.length; idx2++) {
                 var view2 = compatibleViews[idx2];
                 var icon;
-                if (view2 == "tableView") {
+                if (view2 === "tableView") {
                     icon = "fa-table";
-                } else if (view2 == "timeView") {
+                } else if (view2 === "timeView") {
                     icon = "fa-line-chart";
-                } else if (view2 == "barView") {
+                } else if (view2 === "barView") {
                     icon = "fa-bar-chart";
                 }
                 var isActive = false;
-                if (view2 == currentViewName) {
+                if (view2 === currentViewName) {
                     isActive = true;
                 }
                 data.options.push({"view" : view2, "icon" : icon, "isActive" : isActive});

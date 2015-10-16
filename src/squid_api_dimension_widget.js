@@ -51,7 +51,7 @@
 
         events: {
             // Dimension Sorting
-            "change": function(event) {
+            "change": function() {
                 var dimensions = this.$el.find(".sortable li");
                 var selected = [];
 
@@ -95,7 +95,7 @@
                     for (var dc=0; dc<chosenDimensions.length; dc++) {
                         for (var d=0; d<facets.length; d++){
                             var facet = facets[d];
-                            if (chosenDimensions[dc] == facet.id) {
+                            if (chosenDimensions[dc] === facet.id) {
                                 var item = {};
                                 item.id = facet.id;
                                 if (facet.name) {

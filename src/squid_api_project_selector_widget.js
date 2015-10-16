@@ -47,10 +47,10 @@
                 if (model.get("login")) {
                     // fetch projects
                     me.projects.fetch({
-                        success : function(model, response) {
+                        success : function(model) {
                             console.log(model);
                         },
-                        error : function(model, response) {
+                        error : function(model) {
                             console.log(model);
                         }
                     });
@@ -105,7 +105,7 @@
                         model : project,
                         successHandler: function() {
                             if (me.projectAutomaticLogin) {
-                                config.set({
+                                squid_api.model.config.set({
                                     "project" : this.get("id").projectId,
                                     "domain" : null
                                 });
@@ -127,7 +127,7 @@
                     project = this.projects.at(i);
                     if (project) {
                         var selected = false;
-                        if (project.get("oid") == this.model.get("project")) {
+                        if (project.get("oid") === this.model.get("project")) {
                             selected = true;
                         }
     

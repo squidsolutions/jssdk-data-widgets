@@ -88,7 +88,7 @@
                 }
                 if (metrics) {
                     for (var j=0; j<metrics.length; j++) {
-                        if (id == metrics[j].metricId) {
+                        if (id === metrics[j].metricId) {
                             selected = true;
                         }
                     }

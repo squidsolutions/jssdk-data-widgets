@@ -6,6 +6,7 @@
 	display: inline-block;
 	padding: 0px 20px 0px 10px;
 	opacity: 0.3;
+	cursor: pointer;
 }
 
 .squid-api-data-widgets-displaytype-selector li.active, .squid-api-data-widgets-displaytype-selector li:hover {

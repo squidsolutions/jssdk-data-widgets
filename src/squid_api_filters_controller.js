@@ -1,7 +1,7 @@
 (function (root, factory) {
     root.squid_api.controller.FiltersContoller = factory(root.Backbone, root.squid_api);
 
-}(this, function (Backbone, squid_api, template) {
+}(this, function (Backbone, squid_api) {
 
     var View = Backbone.View.extend({
         filters : null,
@@ -49,18 +49,20 @@
 
             // check for domain change performed
             this.listenTo(this.config, 'change:domain', function(config) {
-                var id = filters.get("id");
-                if (id) {
-                    filters.set("id" , {
-                        "projectId" : id.projectId,
-                        "facetjobId" : null
-                        });
-                    filters.setDomainIds([{
-                        "projectId" : id.projectId,
-                        "domainId" : config.get("domain")
-                    }]);
+                if (config.get("domain")) {
+                    var id = filters.get("id");
+                    if (id) {
+                        filters.set("id" , {
+                            "projectId" : id.projectId,
+                            "facetjobId" : null
+                            });
+                        filters.setDomainIds([{
+                            "projectId" : id.projectId,
+                            "domainId" : config.get("domain")
+                        }]);
+                    }
+                    me.initFilters(config);
                 }
-                me.initFilters(config);
             });
 
             // check for project change performed
@@ -104,7 +106,7 @@
                        var facets = sel.facets;
                        for (var i = 0; i < facets.length; i++) {
                            var facet = facets[i];
-                           if (facet.dimension.type == "CONTINUOUS") {
+                           if (facet.dimension.valueType === "DATE") {
                                timeFacet = facet;
                            }
                        }

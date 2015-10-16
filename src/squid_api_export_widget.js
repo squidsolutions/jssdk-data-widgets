@@ -7,9 +7,7 @@
         template : null,
         renderTo: null,
         compression : true,
-        downloadStatus : 0,
         curlCollapsed : true,
-        currentJobId : null,
         displayInAccordion : false,
         viewPort : null,
         formats : [{"format" : "csv", "mime-type" : "text/csv", "template" : null}],
@@ -17,11 +15,10 @@
         templateData : null,
         displayScripting : true,
         displayCompression : true,
-        
+
         initialize : function(options) {
             if (this.model.get("analysis")) {
                 this.listenTo(this.model.get("analysis"), 'change', this.render);
-                this.listenTo(this.model, 'change:templateData', this.refreshDownloadUrl);
             } else {
                 this.listenTo(this.model, 'change', this.render);
             }
@@ -55,7 +52,7 @@
             this.model = model;
             this.initialize();
         },
-        
+
         clickedFormat : function (event) {
             var t = event.target;
             this.selectedFormatIndex = null;
@@ -64,54 +61,128 @@
                     this.selectedFormatIndex = i;
                 }
             }
-            this.refreshDownloadUrl();
         },
-        
+
         clickedCompression : function (event) {
             var t = event.target;
             this.compression = (t.checked);
-            this.refreshDownloadUrl();
         },
 
-        refreshDownloadUrl : function() {
+        downloadAnalysisResults : function(currentJobId) {
             var me = this;
-            if (me.currentJobId) {
-                // create download link
-                var analysisJobResults;
-                var selectedFormat = this.formats[this.selectedFormatIndex];
-                if (!selectedFormat.template) {
-                    // use getResults method
-                    analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
-                    analysisJobResults.addParameter("format",selectedFormat.format);
+            // create download link
+            var analysisJobResults;
+            var selectedFormat = this.formats[this.selectedFormatIndex];
+            var velocityTemplate;
+            var postMethod;
+            var downloadBtn = $(me.viewPort).find("#download");
+            var downloadForm = $(me.viewPort).find("#download-form");
+            
+            if (!selectedFormat.template) {
+                // use getResults method
+                analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
+                analysisJobResults.addParameter("format",selectedFormat.format);
+                postMethod = "GET";
+            } else {
+                // use render method
+                analysisJobResults = new squid_api.model.ProjectAnalysisJobRender({"format" : selectedFormat.format});
+                analysisJobResults.setParameter("type", selectedFormat.type);
+                analysisJobResults.setParameter("timeout", null);
+                // build the template
+                
+                if (selectedFormat.format === "xml") {
+                    if (me.model.get("templateData").options.xmlType) {
+                        velocityTemplate = selectedFormat.template[me.model.get("templateData").options.xmlType](me.model.get("templateData"));
+                    } else {
+                        velocityTemplate = selectedFormat.template(me.model.get("templateData"));
+                    }
                 } else {
-                    // use render method
-                    analysisJobResults = new squid_api.model.ProjectAnalysisJobRender({"format" : selectedFormat.format});
-                    analysisJobResults.setParameter("type", selectedFormat.type);
-                    analysisJobResults.setParameter("timeout", null);
-                    // build the template
-                    var velocityTemplate = selectedFormat.template(me.model.get("templateData"));
-                    analysisJobResults.setParameter("template", base64.encode(velocityTemplate));
+                    velocityTemplate = selectedFormat.template(me.model.get("templateData"));
                 }
-                if (me.compression) {
-                    analysisJobResults.addParameter("compression","gzip");
-                }
-                analysisJobResults.set({
-                    "id": me.currentJobId,
-                    "oid": me.currentJobId.oid
-                });
-                var downloadBtn = $(me.viewPort).find("#download");
-                downloadBtn.attr("href",analysisJobResults.url());
-                downloadBtn.removeClass("disabled");
+                postMethod = "POST";
             }
+            if (me.compression) {
+                analysisJobResults.addParameter("compression","gzip");
+            }
+            analysisJobResults.set({
+                "id": currentJobId,
+                "oid": currentJobId.oid
+            });
+            
+            downloadBtn.removeClass("disabled");
+            
+            downloadForm.attr("action",analysisJobResults.url());
+            downloadForm.attr("method",postMethod);
+            downloadForm.empty();
+            downloadForm.append("<input type='hidden' name='access_token' value='"+analysisJobResults.getParameter("access_token")+"'/>");
+            downloadForm.append("<input type='hidden' name='compression' value='"+analysisJobResults.getParameter("compression")+"'/>");
+            if (velocityTemplate) {
+                downloadForm.append("<input type='hidden' name='template' value='"+base64.encode(velocityTemplate)+"'/>");
+            }
+            if (analysisJobResults.getParameter("type")) {
+                downloadForm.append("<input type='hidden' name='type' value='"+analysisJobResults.getParameter("type")+"'/>");
+            }
+            if (analysisJobResults.getParameter("format")) {
+                downloadForm.append("<input type='hidden' name='format' value='"+analysisJobResults.getParameter("format")+"'/>");
+            }
+            if (analysisJobResults.getParameter("timeout")) {
+                downloadForm.append("<input type='hidden' name='timeout' value='"+analysisJobResults.getParameter("timeout")+"'/>");
+            }
+            downloadForm.submit();
         },
         
+        download : function() {
+            var me = this;
+            
+            var analysis = this.model.get("analysis");
+            if (!analysis) {
+                analysis = this.model;
+            }
+            var downloadBtn = $(this.viewPort).find("#download");
+            downloadBtn.addClass("disabled");
+
+            if (analysis.get("id").projectId) {
+                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                downloadAnalysis.set(analysis.attributes);
+                downloadAnalysis.setParameter("timeout", 10000);
+                downloadAnalysis.setParameter("maxResults", 1);
+                downloadAnalysis.set({
+                    "id": {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": null
+                    }});
+                // trigger the analysis computation and wait until it's done (or times out)
+                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
+                .done(function(analysis) {
+                    if (analysis.get("status") === "DONE") {
+                        // get the results
+                        me.downloadAnalysisResults(analysis.get("id"));
+                    } else {
+                        // analysis timed out, retry (in a loop)
+                        squid_api.controller.analysisjob.getAnalysisJobResults(null, analysis).done(function(results) {
+                            // get the results
+                            me.downloadAnalysisResults(results.get("id"));
+                        })
+                        .fail(function() {
+                            console.error("createAnalysisJob failed");
+                            downloadBtn.removeClass("disabled");
+                        });
+                    }
+                })
+                .fail(function() {
+                    console.error("createAnalysisJob failed");
+                    downloadBtn.removeClass("disabled");
+                });
+            }
+        },
+
         render : function() {
             var me = this;
             var analysis = this.model.get("analysis");
             if (!analysis) {
                 analysis = this.model;
             }
-            
+
             var selectedFormat = this.formats[this.selectedFormatIndex];
             var formatsDisplay = [];
             for (var i=0; i<this.formats.length;i++) {
@@ -120,7 +191,7 @@
                     formatsDisplay[i].selected = true;
                 }
             }
-            
+
             if (this.displayInAccordion) {
                 this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-download-alt'></span></button>");
                 var facets = analysis.get("facets");
@@ -147,7 +218,7 @@
                         "projectId": analysis.get("id").projectId,
                         "analysisJobId": null
                     });
-    
+
                 // escape all spaces in the json injected into cURL
                 data = JSON.stringify(exportAnalysis).replace(/\'/g, '\\\'');
                 curlFileName = "analysis";
@@ -159,7 +230,7 @@
                 }
                 curl = exportAnalysis.url().replace(/\[access_token\]/g, '<b>[access_token]</b>');
             }
-            
+
             $(this.viewPort).html(this.template({
                 "displayInAccordion" : this.displayInAccordion,
                 "data-target" : this.renderTo,
@@ -176,50 +247,26 @@
                 "apiURL":squid_api.apiURL
                 })
             );
-            
-            // prepare download link
-            this.downloadStatus = 1;
-            var downloadBtn = $(me.viewPort).find("#download");
-            downloadBtn.addClass("disabled");
 
-            if (analysis.get("id").projectId) {
-                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
-                downloadAnalysis.set(analysis.attributes);
-                downloadAnalysis.set({
-                    "id": {
-                        "projectId": analysis.get("id").projectId,
-                        "analysisJobId": null
-                    },
-                    "autoRun": false});
-                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                .done(function(model, response) {
-                    me.downloadStatus = 2;
-                    me.currentJobId = downloadAnalysis.get("id");
-                    me.refreshDownloadUrl();
-                })
-                .fail(function(model, response) {
-                    console.error("createAnalysisJob failed");
-                });
-            }
             
+
             // apply cURL panel state
             if (me.curlCollapsed) {
                 $(this.viewPort).find('#curl').hide();
             } else {
                 $(this.viewPort).find('#curl').show();
             }
-            
+
             // Click Handlers
             $(this.viewPort).find("#curlbtn").click(function() {
                 me.curlCollapsed = !me.curlCollapsed;
                 if (me.curlCollapsed) {
-                    $(me.viewPort).find('#curl').fadeOut();      
+                    $(me.viewPort).find('#curl').fadeOut();
                 } else {
                     $(me.viewPort).find('#curl').fadeIn();
                 }
             });
 
-            // register click handlers    
             $(this.viewPort).find('[name="format"]').click(
                     function(event) {
                         me.clickedFormat(event);
@@ -227,6 +274,10 @@
             $(this.viewPort).find('[name="compression"]')
             .click(function(event) {
                 me.clickedCompression(event);
+            });
+            
+            $(this.viewPort).find("#download").click(function() {
+                me.download();
             });
 
             return this;

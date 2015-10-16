@@ -263,6 +263,25 @@ Pagination
 	text-decoration: line-through;
 }
 
+.squid-api-data-widgets-dimension-selector li.configure {
+	cursor: pointer;
+    position: absolute;
+    background: #f3f3f3;
+    top: -29px;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    left: -1px;
+    border: 1px solid #ccc;
+    height: 29px;
+    padding: 4px 7px 0px 10px;
+    min-width: 0px !important;
+}
+
+.squid-api-data-widgets-dimension-selector li.configure:before {
+	content: "\f040";
+	font-family: FontAwesome;
+}
+
 .squid-api-data-widgets-dimension-widget .sortable {
 	list-style-type: none;
 	margin: 0px;
@@ -302,6 +321,7 @@ Pagination
 	display: inline-block;
 	padding: 0px 20px 0px 10px;
 	opacity: 0.3;
+	cursor: pointer;
 }
 
 .squid-api-data-widgets-displaytype-selector li.active, .squid-api-data-widgets-displaytype-selector li:hover {
@@ -374,6 +394,10 @@ Pagination
     margin-right: 0px !important;
 }
 
+.squid-api-data-widgets-export-scheduler-widget {
+	padding: 10px 0px 0px 0px;
+}
+
 .squid-api-data-widgets-export-widget {
 	padding: 10px 0px 0px 0px;
 }
@@ -418,6 +442,26 @@ Pagination
 	opacity: 0.5;
 	background: #ffffff;
 }
+
+.squid-api-data-widgets-metric-selector-open li.configure {
+	cursor: pointer;
+    position: absolute;
+    background: #f3f3f3;
+    top: -29px;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    left: -1px;
+    border: 1px solid #ccc;
+    height: 29px;
+    padding: 4px 7px 0px 10px;
+    min-width: 0px !important;
+}
+
+.squid-api-data-widgets-metric-selector-open li.configure:before {
+	content: "\f040";
+	font-family: FontAwesome;
+}
+
 .squid-api-data-widgets-metric-widget {
     position: relative;
     border-radius: 10px;
