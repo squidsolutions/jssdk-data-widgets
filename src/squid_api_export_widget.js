@@ -74,10 +74,15 @@
             var analysisJobResults;
             var selectedFormat = this.formats[this.selectedFormatIndex];
             var velocityTemplate;
+            var postMethod;
+            var downloadBtn = $(me.viewPort).find("#download");
+            var downloadForm = $(me.viewPort).find("#download-form");
+            
             if (!selectedFormat.template) {
                 // use getResults method
                 analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
                 analysisJobResults.addParameter("format",selectedFormat.format);
+                postMethod = "GET";
             } else {
                 // use render method
                 analysisJobResults = new squid_api.model.ProjectAnalysisJobRender({"format" : selectedFormat.format});
@@ -94,6 +99,7 @@
                 } else {
                     velocityTemplate = selectedFormat.template(me.model.get("templateData"));
                 }
+                postMethod = "POST";
             }
             if (me.compression) {
                 analysisJobResults.addParameter("compression","gzip");
@@ -102,11 +108,11 @@
                 "id": currentJobId,
                 "oid": currentJobId.oid
             });
-            var downloadBtn = $(me.viewPort).find("#download");
+            
             downloadBtn.removeClass("disabled");
             
-            var downloadForm = $(me.viewPort).find("#download-form");
             downloadForm.attr("action",analysisJobResults.url());
+            downloadForm.attr("method",postMethod);
             downloadForm.empty();
             downloadForm.append("<input type='hidden' name='access_token' value='"+analysisJobResults.getParameter("access_token")+"'/>");
             downloadForm.append("<input type='hidden' name='compression' value='"+analysisJobResults.getParameter("compression")+"'/>");

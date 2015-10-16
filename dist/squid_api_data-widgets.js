@@ -406,7 +406,7 @@ function program10(depth0,data) {
   buffer += "\r\n";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n\r\n<form id=\"download-form\" method=\"POST\"></form>\r\n</div>\r\n\r\n";
+  buffer += "\r\n\r\n<form id=\"download-form\" style=\"visibility: hidden;\"></form>\r\n</div>\r\n\r\n";
   return buffer;
   });
 
@@ -2776,10 +2776,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var analysisJobResults;
             var selectedFormat = this.formats[this.selectedFormatIndex];
             var velocityTemplate;
+            var postMethod;
+            var downloadBtn = $(me.viewPort).find("#download");
+            var downloadForm = $(me.viewPort).find("#download-form");
+            
             if (!selectedFormat.template) {
                 // use getResults method
                 analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
                 analysisJobResults.addParameter("format",selectedFormat.format);
+                postMethod = "GET";
             } else {
                 // use render method
                 analysisJobResults = new squid_api.model.ProjectAnalysisJobRender({"format" : selectedFormat.format});
@@ -2796,6 +2801,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 } else {
                     velocityTemplate = selectedFormat.template(me.model.get("templateData"));
                 }
+                postMethod = "POST";
             }
             if (me.compression) {
                 analysisJobResults.addParameter("compression","gzip");
@@ -2804,11 +2810,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "id": currentJobId,
                 "oid": currentJobId.oid
             });
-            var downloadBtn = $(me.viewPort).find("#download");
+            
             downloadBtn.removeClass("disabled");
             
-            var downloadForm = $(me.viewPort).find("#download-form");
             downloadForm.attr("action",analysisJobResults.url());
+            downloadForm.attr("method",postMethod);
             downloadForm.empty();
             downloadForm.append("<input type='hidden' name='access_token' value='"+analysisJobResults.getParameter("access_token")+"'/>");
             downloadForm.append("<input type='hidden' name='compression' value='"+analysisJobResults.getParameter("compression")+"'/>");
