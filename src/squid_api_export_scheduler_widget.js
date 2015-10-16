@@ -87,6 +87,11 @@
             });
         },
 
+        closeModal : function(modal) {
+        	modal.close();
+        	modal.remove();
+        },
+
         renderIndex: function () {
             var me = this;
             var IndexView = Backbone.View.extend({
@@ -146,6 +151,7 @@
                     this.$el.find(".table").DataTable({
                         paging: false
                     });
+                     
                     return this;
                 }
             });
@@ -153,6 +159,21 @@
                 content: new IndexView(),
                 title: "Scheduled Usage Reports"
             }).open();
+           
+            /* bootstrap doesn't remove modal from dom when clicking outside of it.
+            Check to make sure it has been removed whenever it isn't displayed.
+             */
+            if (me.indexModal.el) {
+            	$(me.indexModal.el).one('hidden.bs.modal', function () {
+                    me.closeModal(me.indexModal);
+                });
+                $(me.indexModal.el).find(".close").one("click", function() {
+                    $(me.indexModal.el).trigger("hidden.bs.modal");
+                });
+                $(me.indexModal.el).find(".cancel").one("click", function() {
+                    $(me.indexModal.el).trigger("hidden.bs.modal");
+                });
+            }
         },
 
         getSchema: function () {
@@ -162,6 +183,7 @@
         },
 
         renderForm: function (id) {
+        	var me = this;
             this.getSchema().then(function (data) {
                 var modalHeader;
                 if (id) {
@@ -207,9 +229,6 @@
                     }
                 }
 
-
-
-
                 widget.formContent = new Backbone.Form({
                     schema: schema,
                     model: model
@@ -229,8 +248,19 @@
                     content: new FormView(),
                     title: modalHeader
                 }).open();
-
-
+                
+                /* bootstrap doesn't remove modal from dom when clicking outside of it.
+                Check to make sure it has been removed whenever it isn't displayed.
+                 */
+                 $(formModal.el).one('hidden.bs.modal', function () {
+                     me.closeModal(formModal);
+                 });
+                 $(formModal.el).find(".close").one("click", function() {
+                     $(formModal.el).trigger("hidden.bs.modal");
+                 });
+                 $(formModal.el).find(".cancel").one("click", function() {
+                     $(formModal.el).trigger("hidden.bs.modal");
+                 });
 
                 formModal.on('ok', function () {
                     // the form is used in create and edit mode.
@@ -296,6 +326,7 @@
                         newJob.save({}, {
                             success: function (model) {
                                 var msg = "";
+                                
                                 if (model.get("errors")) {
                                     var errors = model.get("errors");
                                     for (var x in errors) {
@@ -305,6 +336,7 @@
                                     }
                                 } else {
                                     exportJobs.add(model);
+                                    me.closeModal(formModal);
                                     msg = msg + "job successfully saved";
                                 }
                                 squid_api.model.status.set("message", msg);
