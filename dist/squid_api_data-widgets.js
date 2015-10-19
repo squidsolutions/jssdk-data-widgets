@@ -3129,7 +3129,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                        var facets = sel.facets;
                        for (var i = 0; i < facets.length; i++) {
                            var facet = facets[i];
-                           if (facet.dimension.valueType === "DATE") {
+                           if (facet.dimension.valueType === "DATE" && ! me.config.get("period")) {
                                timeFacet = facet;
                            }
                        }
