@@ -164,12 +164,9 @@
                 content: new IndexView(),
                 title: "Scheduled Usage Reports"
             }).open();
-<<<<<<< HEAD
-=======
             
             // modal wrapper class
             $(this.indexModal.el).addClass(this.modalElementClassName);
->>>>>>> develop
            
             /* bootstrap doesn't remove modal from dom when clicking outside of it.
             Check to make sure it has been removed whenever it isn't displayed.
