@@ -327,6 +327,10 @@ Pagination
 .squid-api-data-widgets-displaytype-selector li.active, .squid-api-data-widgets-displaytype-selector li:hover {
 	opacity: 1;
 }
+.squid-api-admin-widgets-export-scheduler .modal-footer .ok {
+	display: none;
+}
+
 .squid-api-export-scheduler-index-view button.create-job {
     float: right;
     margin-bottom: 5px;

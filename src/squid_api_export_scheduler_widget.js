@@ -6,6 +6,7 @@
         template: null,
         IndexView: null,
         ExportJobModel: null,
+        modalElementClassName : "squid-api-admin-widgets-export-scheduler",
         ExportJobCollection: null,
         schedulerApiUri: null,
         exportJobs: null,
@@ -30,6 +31,9 @@
                 }
                 if (options.reports) {
                     this.reports = options.reports.get("items");
+                }
+                if (options.modalElementClassName) {
+                	this.modalElementClassName = options.modalElementClassName;
                 }
             }
 
@@ -155,10 +159,14 @@
                     return this;
                 }
             });
+            
             this.indexModal = new Backbone.BootstrapModal({
                 content: new IndexView(),
                 title: "Scheduled Usage Reports"
             }).open();
+            
+            // modal wrapper class
+            $(this.indexModal.el).addClass(this.modalElementClassName);
            
             /* bootstrap doesn't remove modal from dom when clicking outside of it.
             Check to make sure it has been removed whenever it isn't displayed.
