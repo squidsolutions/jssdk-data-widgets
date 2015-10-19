@@ -1,3 +1,7 @@
+.squid-api-admin-widgets-export-scheduler .modal-footer .ok {
+	display: none;
+}
+
 .squid-api-export-scheduler-index-view button.create-job {
     float: right;
     margin-bottom: 5px;
