@@ -2712,7 +2712,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                     }
                                 } else {
                                     exportJobs.add(model);
-                                    me.closeModal(formModal);
+                                    $(formModal.el).trigger("hidden.bs.modal");
                                     msg = msg + "job successfully saved";
                                 }
                                 squid_api.model.status.set("message", msg);
