@@ -4191,7 +4191,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     };
                 }
             }
-
+            if (this.config) {
+            	this.config = options.config;
+            } else {
+            	this.config = squid_api.model.config;
+            }
             if (this.model) {
                 this.listenTo(this.model, 'change:status', this.render);
                 this.listenTo(this.model, 'change:error', this.render);
@@ -4407,9 +4411,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render : function() {
-
+        	var me = this;
+        	
             var status = this.model.get("status");
-            this.YearOverYear = squid_api.model.config.get("YearOverYear");
+            
+            this.YearOverYear = this.config.get("YearOverYear");
 
             if (status === "PENDING") {
                 this.$el.html(this.template({"staleMessage" : this.staleMessage}));
@@ -4476,7 +4482,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             formatter: function(series, x, y) {
                                 var formatter = d3.format(",.f");
                                 var date;
-                                if (squid_api.model.config.get("YearOverYear")) {
+                                if (me.config.get("YearOverYear")) {
                                     date = '<span class="date">' + series.name + "-" + moment(new Date(x * 1000)).format("MM-DD") + '</span>';
                                 } else {
                                     date = '<span class="date">' + moment(new Date(x * 1000)).format("YYYY-MM-DD") + '</span>';
