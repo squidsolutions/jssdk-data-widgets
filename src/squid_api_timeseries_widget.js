@@ -14,6 +14,7 @@
         interpolationRange: null,
         yearSwitcherView: null,
         metricSelectorView: null,
+        multiSeries: null,
         staleMessage : "Click refresh to update",
 
         initialize : function(options) {
@@ -35,6 +36,9 @@
             }
             if (options.metricSelectorView) {
                 this.metricSelectorView = options.metricSelectorView;
+            }
+            if (options.multiSeries) {
+            	this.multiSeries = options.multiSeries;
             }
             if (options.staleMessage) {
                 this.staleMessage = options.staleMessage;
@@ -326,14 +330,24 @@
                     }
 
                     var dateColumnIndex=0;
-
+                    var series;
+                    
+                    // obtain date column                    
                     while (data.results.cols[dateColumnIndex].dataType !== "DATE") {
                         dateColumnIndex++;
                     }
-
-                    // Time Series [Series Data]
-                    var series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows, data.results.cols);
-                    var metricName = data.results.cols[dateColumnIndex+1].name;
+                    
+                    // obtain multi or single series based on column results                    
+                    if (this.multiSeries) {
+                    	series = [];
+                    	for (i=0; i<data.results.cols.length; i++) {
+                    		if (i !== dateColumnIndex) {
+                    			series.push(this.seriesDataValues(dateColumnIndex, i, data.results.rows, data.results.cols)[0]);
+                    		}
+                    	}
+                    } else {
+                    	series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows, data.results.cols);
+                    }
 
                     if (series.length>0 && (series[0].data.length>0)) {
 
@@ -363,7 +377,7 @@
                                     date = '<span class="date">' + moment(new Date(x * 1000)).format("YYYY-MM-DD") + '</span>';
                                 }
                                 var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
-                                var content = swatch + formatter(parseInt(y)) + " " + metricName + '<br>' + date;
+                                var content = swatch + formatter(parseInt(y)) + " " + series.name + '<br>' + date;
 
                                 return content;
                             }
