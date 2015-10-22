@@ -154,7 +154,7 @@
                         serie.name = moment(value[dateIndex]).year();
                     } else {
                         serie.name = modelCols[metricIndex].name;
-                        serie.color = palette.color();
+                        serie.color = palette.scheme[metricIndex];
                     }
                     serie.data = [];
                     series.push(serie);
