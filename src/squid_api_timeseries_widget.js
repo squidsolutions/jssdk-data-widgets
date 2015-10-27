@@ -14,6 +14,7 @@
         interpolationRange: null,
         yearSwitcherView: null,
         metricSelectorView: null,
+        multiSeries: null,
         staleMessage : "Click refresh to update",
 
         initialize : function(options) {
@@ -35,6 +36,9 @@
             }
             if (options.metricSelectorView) {
                 this.metricSelectorView = options.metricSelectorView;
+            }
+            if (options.multiSeries) {
+            	this.multiSeries = options.multiSeries;
             }
             if (options.staleMessage) {
                 this.staleMessage = options.staleMessage;
@@ -66,7 +70,11 @@
                     };
                 }
             }
-
+            if (this.config) {
+            	this.config = options.config;
+            } else {
+            	this.config = squid_api.model.config;
+            }
             if (this.model) {
                 this.listenTo(this.model, 'change:status', this.render);
                 this.listenTo(this.model, 'change:error', this.render);
@@ -146,7 +154,7 @@
                         serie.name = moment(value[dateIndex]).year();
                     } else {
                         serie.name = modelCols[metricIndex].name;
-                        serie.color = palette.color();
+                        serie.color = palette.scheme[metricIndex];
                     }
                     serie.data = [];
                     series.push(serie);
@@ -282,9 +290,11 @@
         },
 
         render : function() {
-
+        	var me = this;
+        	
             var status = this.model.get("status");
-            this.YearOverYear = squid_api.model.config.get("YearOverYear");
+            
+            this.YearOverYear = this.config.get("YearOverYear");
 
             if (status === "PENDING") {
                 this.$el.html(this.template({"staleMessage" : this.staleMessage}));
@@ -320,14 +330,24 @@
                     }
 
                     var dateColumnIndex=0;
-
+                    var series;
+                    
+                    // obtain date column                    
                     while (data.results.cols[dateColumnIndex].dataType !== "DATE") {
                         dateColumnIndex++;
                     }
-
-                    // Time Series [Series Data]
-                    var series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows, data.results.cols);
-                    var metricName = data.results.cols[dateColumnIndex+1].name;
+                    
+                    // obtain multi or single series based on column results                    
+                    if (this.multiSeries) {
+                    	series = [];
+                    	for (i=0; i<data.results.cols.length; i++) {
+                    		if (i !== dateColumnIndex) {
+                    			series.push(this.seriesDataValues(dateColumnIndex, i, data.results.rows, data.results.cols)[0]);
+                    		}
+                    	}
+                    } else {
+                    	series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows, data.results.cols);
+                    }
 
                     if (series.length>0 && (series[0].data.length>0)) {
 
@@ -351,13 +371,13 @@
                             formatter: function(series, x, y) {
                                 var formatter = d3.format(",.f");
                                 var date;
-                                if (squid_api.model.config.get("YearOverYear")) {
+                                if (me.config.get("YearOverYear")) {
                                     date = '<span class="date">' + series.name + "-" + moment(new Date(x * 1000)).format("MM-DD") + '</span>';
                                 } else {
                                     date = '<span class="date">' + moment(new Date(x * 1000)).format("YYYY-MM-DD") + '</span>';
                                 }
                                 var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
-                                var content = swatch + formatter(parseInt(y)) + " " + metricName + '<br>' + date;
+                                var content = swatch + formatter(parseInt(y)) + " " + series.name + '<br>' + date;
 
                                 return content;
                             }

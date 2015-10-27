@@ -28,9 +28,12 @@
 			<div>
 				<a id="download" class="btn btn-default" target="_blank">Download your data</a>
 			</div>
+            <div>
+                <a id="view-sql" class="btn btn-default" target="_blank">View SQL</a>
+            </div>
 			{{#if data}}
-			<hr>
-			<div>
+			<div id="curl-view">
+                <br><hr>
 				Need to automate exports? Use the <a id="curlbtn">shell commands</a>.
 				<div id="curl">
 					<p>Sample code to download the analysis results using curl shell command.</p>

@@ -33,6 +33,14 @@
 	margin-right: 10px;
 }
 
+.squid-api-data-widgets-export-widget a#download, .squid-api-data-widgets-export-widget a#view-sql {
+    float: left;
+}
+
+.squid-api-data-widgets-export-widget #curl-view {
+	clear: both;
+}
+
 .squid-api-data-widgets-export-widget #curl {
 	margin-top: 10px;
 }

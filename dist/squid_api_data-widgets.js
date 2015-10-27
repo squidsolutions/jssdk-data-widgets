@@ -337,7 +337,7 @@ function program6(depth0,data) {
 function program8(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\r\n			<hr>\r\n			<div>\r\n				Need to automate exports? Use the <a id=\"curlbtn\">shell commands</a>.\r\n				<div id=\"curl\">\r\n					<p>Sample code to download the analysis results using curl shell command.</p>\r\n					<b>1 - get an authentication token</b>\r\n					<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n					<pre class=\"curl\">curl '";
+  buffer += "\r\n			<div id=\"curl-view\">\r\n                <br><hr>\r\n				Need to automate exports? Use the <a id=\"curlbtn\">shell commands</a>.\r\n				<div id=\"curl\">\r\n					<p>Sample code to download the analysis results using curl shell command.</p>\r\n					<b>1 - get an authentication token</b>\r\n					<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n					<pre class=\"curl\">curl '";
   if (helper = helpers.apiURL) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.apiURL); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -400,7 +400,7 @@ function program10(depth0,data) {
   buffer += "\r\n				";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayCompression), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n			</div>\r\n			<div>&nbsp;</div>\r\n			<div>\r\n				<a id=\"download\" class=\"btn btn-default\" target=\"_blank\">Download your data</a>\r\n			</div>\r\n			";
+  buffer += "\r\n			</div>\r\n			<div>&nbsp;</div>\r\n			<div>\r\n				<a id=\"download\" class=\"btn btn-default\" target=\"_blank\">Download your data</a>\r\n			</div>\r\n            <div>\r\n                <a id=\"view-sql\" class=\"btn btn-default\" target=\"_blank\">View SQL</a>\r\n            </div>\r\n			";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n";
@@ -2761,6 +2761,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         initialize : function(options) {
             if (this.model.get("analysis")) {
                 this.listenTo(this.model.get("analysis"), 'change', this.render);
+                this.listenTo(this.model, 'change:templateData', this.refreshViewSqlUrl);
             } else {
                 this.listenTo(this.model, 'change', this.render);
             }
@@ -2803,11 +2804,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.selectedFormatIndex = i;
                 }
             }
+            this.refreshViewSqlUrl();
         },
 
         clickedCompression : function (event) {
             var t = event.target;
             this.compression = (t.checked);
+            this.refreshViewSqlUrl();
         },
 
         downloadAnalysisResults : function(currentJobId) {
@@ -2845,6 +2848,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (me.compression) {
                 analysisJobResults.addParameter("compression","gzip");
+            } else {
+                analysisJobResults.addParameter("compression","none");
             }
             analysisJobResults.set({
                 "id": currentJobId,
@@ -2871,6 +2876,25 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 downloadForm.append("<input type='hidden' name='timeout' value='"+analysisJobResults.getParameter("timeout")+"'/>");
             }
             downloadForm.submit();
+        },
+
+        refreshViewSqlUrl : function() {
+            var me = this;
+            if (me.currentJobId) {
+                // create download link
+                var analysisJobResults;
+                var selectedFormat = this.formats[this.selectedFormatIndex];
+                // use getResults method
+                analysisJobResults = new squid_api.model.ProjectAnalysisJobViewSQL();
+                analysisJobResults.addParameter("format",selectedFormat.format);
+                analysisJobResults.set({
+                    "id": me.currentJobId,
+                    "oid": me.currentJobId.oid
+                });
+                var downloadBtn = $(me.viewPort).find("#view-sql");
+                downloadBtn.attr("href",analysisJobResults.url());
+                downloadBtn.removeClass("disabled");
+            }
         },
         
         download : function() {
@@ -2991,6 +3015,30 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             );
 
             
+            // prepare download link
+            this.downloadStatus = 1;
+            var downloadBtn = $(me.viewPort).find("#view-sql");
+            downloadBtn.addClass("disabled");
+
+            if (analysis.get("id").projectId) {
+                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                downloadAnalysis.set(analysis.attributes);
+                downloadAnalysis.set({
+                    "id": {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": null
+                    },
+                    "autoRun": false});
+                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
+                .done(function(model, response) {
+                    me.downloadStatus = 2;
+                    me.currentJobId = downloadAnalysis.get("id");
+                    me.refreshViewSqlUrl();
+                })
+                .fail(function(model, response) {
+                    console.error("createAnalysisJob failed");
+                });
+            }
 
             // apply cURL panel state
             if (me.curlCollapsed) {
@@ -3656,12 +3704,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var jsonData = {"chosenMetrics" : [], "noChosenMetrics" : true};
             for (var i = 0; i < metrics.length; i++) {
                 // add to the list
-                var option = {
-                    "name" : metrics[i].name,
+        		 var option = {
+        			"name" : metrics[i].name,
                     "value" : metrics[i].oid,
                     "selectMetric" : this.selectMetric,
-                };
-                jsonData.chosenMetrics.push(option);
+                 };
+        		 jsonData.chosenMetrics.push(option);
             }
             if (jsonData.chosenMetrics.length > 0) {
                 jsonData.noChosenMetrics = false;
@@ -3696,7 +3744,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         metricModels.push(arguments[0]);
                     } else {
                         for (var i=0; i<chosenMetrics.length; i++) {
-                            metricModels.push(arguments[i][0]);
+                        	if (! arguments[i][0].error) {
+                        		metricModels.push(arguments[i][0]);
+                        	}
                         }
                     }
                     me.renderMetrics(metricModels);
@@ -4139,6 +4189,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         interpolationRange: null,
         yearSwitcherView: null,
         metricSelectorView: null,
+        multiSeries: null,
         staleMessage : "Click refresh to update",
 
         initialize : function(options) {
@@ -4160,6 +4211,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.metricSelectorView) {
                 this.metricSelectorView = options.metricSelectorView;
+            }
+            if (options.multiSeries) {
+            	this.multiSeries = options.multiSeries;
             }
             if (options.staleMessage) {
                 this.staleMessage = options.staleMessage;
@@ -4191,7 +4245,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     };
                 }
             }
-
+            if (this.config) {
+            	this.config = options.config;
+            } else {
+            	this.config = squid_api.model.config;
+            }
             if (this.model) {
                 this.listenTo(this.model, 'change:status', this.render);
                 this.listenTo(this.model, 'change:error', this.render);
@@ -4271,7 +4329,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         serie.name = moment(value[dateIndex]).year();
                     } else {
                         serie.name = modelCols[metricIndex].name;
-                        serie.color = palette.color();
+                        serie.color = palette.scheme[metricIndex];
                     }
                     serie.data = [];
                     series.push(serie);
@@ -4407,9 +4465,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render : function() {
-
+        	var me = this;
+        	
             var status = this.model.get("status");
-            this.YearOverYear = squid_api.model.config.get("YearOverYear");
+            
+            this.YearOverYear = this.config.get("YearOverYear");
 
             if (status === "PENDING") {
                 this.$el.html(this.template({"staleMessage" : this.staleMessage}));
@@ -4445,14 +4505,24 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
 
                     var dateColumnIndex=0;
-
+                    var series;
+                    
+                    // obtain date column                    
                     while (data.results.cols[dateColumnIndex].dataType !== "DATE") {
                         dateColumnIndex++;
                     }
-
-                    // Time Series [Series Data]
-                    var series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows, data.results.cols);
-                    var metricName = data.results.cols[dateColumnIndex+1].name;
+                    
+                    // obtain multi or single series based on column results                    
+                    if (this.multiSeries) {
+                    	series = [];
+                    	for (i=0; i<data.results.cols.length; i++) {
+                    		if (i !== dateColumnIndex) {
+                    			series.push(this.seriesDataValues(dateColumnIndex, i, data.results.rows, data.results.cols)[0]);
+                    		}
+                    	}
+                    } else {
+                    	series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows, data.results.cols);
+                    }
 
                     if (series.length>0 && (series[0].data.length>0)) {
 
@@ -4476,13 +4546,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             formatter: function(series, x, y) {
                                 var formatter = d3.format(",.f");
                                 var date;
-                                if (squid_api.model.config.get("YearOverYear")) {
+                                if (me.config.get("YearOverYear")) {
                                     date = '<span class="date">' + series.name + "-" + moment(new Date(x * 1000)).format("MM-DD") + '</span>';
                                 } else {
                                     date = '<span class="date">' + moment(new Date(x * 1000)).format("YYYY-MM-DD") + '</span>';
                                 }
                                 var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
-                                var content = swatch + formatter(parseInt(y)) + " " + metricName + '<br>' + date;
+                                var content = swatch + formatter(parseInt(y)) + " " + series.name + '<br>' + date;
 
                                 return content;
                             }
