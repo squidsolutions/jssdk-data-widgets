@@ -67,12 +67,12 @@
             var jsonData = {"chosenMetrics" : [], "noChosenMetrics" : true};
             for (var i = 0; i < metrics.length; i++) {
                 // add to the list
-                var option = {
-                    "name" : metrics[i].name,
+        		 var option = {
+        			"name" : metrics[i].name,
                     "value" : metrics[i].oid,
                     "selectMetric" : this.selectMetric,
-                };
-                jsonData.chosenMetrics.push(option);
+                 };
+        		 jsonData.chosenMetrics.push(option);
             }
             if (jsonData.chosenMetrics.length > 0) {
                 jsonData.noChosenMetrics = false;
@@ -107,7 +107,9 @@
                         metricModels.push(arguments[0]);
                     } else {
                         for (var i=0; i<chosenMetrics.length; i++) {
-                            metricModels.push(arguments[i][0]);
+                        	if (! arguments[i][0].error) {
+                        		metricModels.push(arguments[i][0]);
+                        	}
                         }
                     }
                     me.renderMetrics(metricModels);
