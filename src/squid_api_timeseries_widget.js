@@ -352,7 +352,7 @@
                     if (series.length>0 && (series[0].data.length>0)) {
 
                         var tempWidth = this.$el.width();
-
+                        
                         // Time Series Chart
                         var graph = new Rickshaw.Graph({
                             element: document.getElementById("chart"),
@@ -361,7 +361,8 @@
                             renderer: 'line',
                             interpolation: 'linear',
                             strokeWidth: 3,
-                            series: series
+                            series: series,
+                            min: 'auto'
                         });
 
                         graph.render();
