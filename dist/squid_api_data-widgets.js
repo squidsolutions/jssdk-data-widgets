@@ -4527,7 +4527,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     if (series.length>0 && (series[0].data.length>0)) {
 
                         var tempWidth = this.$el.width();
-
+                        
                         // Time Series Chart
                         var graph = new Rickshaw.Graph({
                             element: document.getElementById("chart"),
@@ -4536,7 +4536,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             renderer: 'line',
                             interpolation: 'linear',
                             strokeWidth: 3,
-                            series: series
+                            series: series,
+                            min: 'auto'
                         });
 
                         graph.render();
