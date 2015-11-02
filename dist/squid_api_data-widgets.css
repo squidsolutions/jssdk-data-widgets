@@ -398,14 +398,6 @@ Pagination
     margin-right: 0px !important;
 }
 
-.squid-api-data-widgets-export-scheduler-widget {
-	padding: 10px 0px 0px 0px;
-}
-
-.squid-api-data-widgets-export-widget {
-	padding: 10px 0px 0px 0px;
-}
-
 .squid-api-data-widgets-export-widget .download-formats {
 	padding-top: 20px;
 }
@@ -443,6 +435,43 @@ Pagination
 
 .squid-api-data-widgets-export-widget #curl {
 	margin-top: 10px;
+}
+
+.squid-api-export-panel-popup {
+	background-color: #fff;
+    display: inline-block;
+    border-radius: 8px;
+    position: absolute;
+    border: 1px solid #d1d1d1;
+    box-shadow: 5px 4px 15px -8px;
+    z-index: 1;
+    padding: 15px 15px;
+}
+
+.squid-api-export-panel-popup .ui-dialog-titlebar {
+	display: none;
+}
+
+.squid-api-export-panel-popup:before {
+	position: absolute;
+    top: -6px;
+    left: 9px;
+    z-index: 2;
+    display: inline-block;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid #ccc;
+    border-left: 7px solid transparent;
+    border-bottom-color: #fff;
+    content: '';
+}
+
+.squid-api-export-panel-popup .ui-dialog-titlebar-close {
+	position: absolute;
+	right: 10px;
+	top: 30px;
+	background: none;
+	border: 0px;
+	font-size: 15px;
 }
 
 #metric .dropdownDisabled {
