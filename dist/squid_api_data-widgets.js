@@ -288,16 +288,20 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 this["squid_api"]["template"]["squid_api_export_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression, self=this;
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\r\n	<div class=\"panel panel-default filter-panel\">\r\n		<div class=\"panel-heading\">\r\n			<button type=\"button\" class=\"close\" data-toggle=\"collapse\"\r\n				data-target=\"";
+  buffer += "\r\n			<div class=\"panel panel-default filter-panel\">\r\n				<div class=\"panel-heading\">\r\n					<button type=\"button\" class=\"close\" data-toggle=\"collapse\"\r\n					data-target=\"";
   if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n				<i class=\"glyphicon glyphicon-chevron-up\"></i>\r\n			</button>\r\n			<h4 class=\"panel-title\" id=\"myModalLabel\">Export</h4>\r\n		</div>\r\n		<div class=\"panel-body\">\r\n";
+    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n						<i class=\"glyphicon glyphicon-chevron-up\"></i>\r\n					</button>\r\n					<h4 class=\"panel-title\" id=\"myModalLabel\">Export</h4>\r\n				</div>\r\n			<div class=\"panel-body\">\r\n			<button type=\"button\" class=\"close\" data-toggle=\"collapse\"data-target=\"";
+  if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" data-clavier=\"true\" aria-hidden=\"true\"></button>\r\n		";
   return buffer;
   }
 
@@ -315,7 +319,7 @@ function program3(depth0,data) {
   if (helper = helpers.format) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.format); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + " \r\n				";
+    + " \r\n			";
   return buffer;
   }
 function program4(depth0,data) {
@@ -330,14 +334,20 @@ function program6(depth0,data) {
   buffer += "\r\n				<div style=\"display: inline-block;\">\r\n					<label>Compression: </label> <input type=\"checkbox\" name=\"compression\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "> gzip\r\n				</div>\r\n				";
+  buffer += "> gzip\r\n				</div>\r\n			";
   return buffer;
   }
 
 function program8(depth0,data) {
   
+  
+  return "\r\n			<div>\r\n				<a id=\"view-sql\" class=\"btn btn-default\" target=\"_blank\">View SQL</a>\r\n			</div>\r\n		";
+  }
+
+function program10(depth0,data) {
+  
   var buffer = "", stack1, helper;
-  buffer += "\r\n			<div id=\"curl-view\">\r\n                <br><hr>\r\n				Need to automate exports? Use the <a id=\"curlbtn\">shell commands</a>.\r\n				<div id=\"curl\">\r\n					<p>Sample code to download the analysis results using curl shell command.</p>\r\n					<b>1 - get an authentication token</b>\r\n					<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n					<pre class=\"curl\">curl '";
+  buffer += "\r\n			<div id=\"curl-view\">\r\n	            <br><hr>\r\n				Need to automate exports? Use the <a id=\"curlbtn\">shell commands</a>.\r\n				<div id=\"curl\">\r\n					<p>Sample code to download the analysis results using curl shell command.</p>\r\n					<b>1 - get an authentication token</b>\r\n					<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n					<pre class=\"curl\">curl '";
   if (helper = helpers.apiURL) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.apiURL); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -377,36 +387,44 @@ function program8(depth0,data) {
   if (helper = helpers.curlFileName) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.curlFileName); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</pre>\r\n				</div>\r\n			</div>\r\n			";
+    + "</pre>\r\n				</div>\r\n			</div>\r\n		";
   return buffer;
   }
 
-function program10(depth0,data) {
+function program12(depth0,data) {
   
   
-  return "\r\n		</div>\r\n	</div>\r\n";
+  return "\r\n			</div>\r\n		</div>\r\n		";
   }
 
-  buffer += "<div class=\"squid-api-data-widgets-export-widget\">\r\n";
+function program14(depth0,data) {
+  
+  
+  return "\r\n		<button type=\"button\" class=\"popup-trigger form-control\">Export</button>\r\n	";
+  }
+
+  buffer += "<div class=\"squid-api-data-widgets-export-widget\">\r\n	<div class=\"download-wrapper\">\r\n		";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n			<button type=\"button\" class=\"close\" data-toggle=\"collapse\"\r\n				data-target=\"";
-  if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n			</button>\r\n			<div class=\"download-formats\">\r\n				<label>Format: </label> \r\n				";
+  buffer += "\r\n		<div class=\"download-formats\">\r\n			<label>Format: </label> \r\n			";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.formats), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n				";
+  buffer += "\r\n			";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayCompression), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n			</div>\r\n			<div>&nbsp;</div>\r\n			<div>\r\n				<a id=\"download\" class=\"btn btn-default\" target=\"_blank\">Download your data</a>\r\n			</div>\r\n            <div>\r\n                <a id=\"view-sql\" class=\"btn btn-default\" target=\"_blank\">View SQL</a>\r\n            </div>\r\n			";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
+  buffer += "\r\n		</div>\r\n			<div>&nbsp;</div>\r\n		<div>\r\n			<a id=\"download\" class=\"btn btn-default\" target=\"_blank\">download<i class=\"fa fa-download\"></i></a>\r\n		</div>\r\n		";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.sqlView), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
+  buffer += "\r\n		";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n\r\n<form id=\"download-form\" style=\"visibility: hidden;\"></form>\r\n</div>\r\n\r\n";
+  buffer += "\r\n		";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(12, program12, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n		<form id=\"download-form\" style=\"visibility: hidden;\"></form>\r\n	</div>\r\n	";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInPopup), {hash:{},inverse:self.noop,fn:self.program(14, program14, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n</div>\r\n\r\n";
   return buffer;
   });
 
@@ -2757,6 +2775,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         templateData : null,
         displayScripting : true,
         displayCompression : true,
+        downloadButtonLabel : "Download your data",
 
         initialize : function(options) {
             if (this.model.get("analysis")) {
@@ -2777,11 +2796,20 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.renderTo) {
                 this.renderTo = options.renderTo;
             }
-            if (options.displayInAccordion !== false) {
-                this.displayInAccordion = true;
+            if (options.displayInAccordion) {
+            	this.displayInAccordion = true;
                 this.viewPort = this.renderTo;
             } else {
                 this.viewPort = this.$el;
+            }
+            if (options.displayInPopup) {
+            	this.displayInPopup = true;
+            }
+            if (options.sqlView) {
+            	this.sqlView = true;
+            }
+            if (options.downloadButtonLabel) {
+            	this.downloadButtonLabel = options.downloadButtonLabel;
             }
             if (options.displayScripting === false) {
                 this.displayScripting = false;
@@ -2815,13 +2843,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         downloadAnalysisResults : function(currentJobId) {
             var me = this;
+            var viewPort = $(me.viewPort);
+            if (this.popup) {
+            	viewPort = this.popup;
+            }
+            
             // create download link
             var analysisJobResults;
             var selectedFormat = this.formats[this.selectedFormatIndex];
             var velocityTemplate;
             var postMethod;
-            var downloadBtn = $(me.viewPort).find("#download");
-            var downloadForm = $(me.viewPort).find("#download-form");
+            var downloadBtn = viewPort.find("#download");
+            var downloadForm = viewPort.find("#download-form");
             
             if (!selectedFormat.template) {
                 // use getResults method
@@ -2880,6 +2913,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         refreshViewSqlUrl : function() {
             var me = this;
+            var viewPort = $(me.viewPort);
+            if (this.displayInPopup) {
+            	viewPort = this.popup;
+            }
             if (me.currentJobId) {
                 // create download link
                 var analysisJobResults;
@@ -2891,7 +2928,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "id": me.currentJobId,
                     "oid": me.currentJobId.oid
                 });
-                var downloadBtn = $(me.viewPort).find("#view-sql");
+                var downloadBtn = viewPort.find("#view-sql");
                 downloadBtn.attr("href",analysisJobResults.url());
                 downloadBtn.removeClass("disabled");
             }
@@ -2899,12 +2936,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         
         download : function() {
             var me = this;
-            
+            var viewPort = $(this.viewPort);
+            if (this.displayInPopup) {
+            	viewPort = this.popup;
+            }
             var analysis = this.model.get("analysis");
             if (!analysis) {
                 analysis = this.model;
             }
-            var downloadBtn = $(this.viewPort).find("#download");
+            var downloadBtn = viewPort.find("#download");
             downloadBtn.addClass("disabled");
 
             if (analysis.get("id").projectId) {
@@ -2959,7 +2999,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             if (this.displayInAccordion) {
-                this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-download-alt'></span></button>");
+                this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + "> "+ this.downloadButtonLabel + "<span class='glyphicon glyphicon-download-alt'></span></button>");
                 var facets = analysis.get("facets");
                 var metrics = analysis.get("metrics");
                 if ((!facets || facets.length === 0) && (!metrics || metrics.length === 0)) {
@@ -2999,6 +3039,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             $(this.viewPort).html(this.template({
                 "displayInAccordion" : this.displayInAccordion,
+                "downloadButtonLabel" : this.downloadButtonLabel,
+                "displayInPopup" : this.displayInPopup,
+                "sqlView" : this.sqlView,
                 "data-target" : this.renderTo,
                 "formats": formatsDisplay,
                 "displayCompression" : this.displayCompression,
@@ -3014,7 +3057,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 })
             );
 
-            
             // prepare download link
             this.downloadStatus = 1;
             var downloadBtn = $(me.viewPort).find("#view-sql");
@@ -3049,18 +3091,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             // Click Handlers
             $(this.viewPort).find("#curlbtn").click(function() {
+            	var viewPort = $(me.viewPort);
+            	if (me.displayInPopup) {
+            		viewPort = me.popup;
+            	}
+            		
                 me.curlCollapsed = !me.curlCollapsed;
                 if (me.curlCollapsed) {
-                    $(me.viewPort).find('#curl').fadeOut();
+                	viewPort.find('#curl').fadeOut();
                 } else {
-                    $(me.viewPort).find('#curl').fadeIn();
+                	viewPort.find('#curl').fadeIn();
                 }
             });
 
             $(this.viewPort).find('[name="format"]').click(
-                    function(event) {
-                        me.clickedFormat(event);
-                    });
+                function(event) {
+                    me.clickedFormat(event);
+                });
             $(this.viewPort).find('[name="compression"]')
             .click(function(event) {
                 me.clickedCompression(event);
@@ -3069,6 +3116,26 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             $(this.viewPort).find("#download").click(function() {
                 me.download();
             });
+            
+            if (this.displayInPopup) {
+            	this.popup = this.$el.find(".download-wrapper").dialog({
+                    dialogClass: "squid-api-export-panel-popup",
+                    autoOpen: false,
+                    position: {
+                        my: "left-70 top", at: "left-70 bottom", of: this.$el.find("button.popup-trigger")
+                    },
+                    clickOutside: true, // clicking outside the dialog will close it
+                    clickOutsideTrigger: this.$el.find("button.popup-trigger"), // Element (id or class) that triggers the dialog opening
+                });
+                // Click Event for filter panel button
+                this.$el.find("button.popup-trigger").click(function() {
+                    if (me.popup.dialog("isOpen")) {
+                    	me.popup.dialog( "close" );
+                    } else {
+                    	me.popup.dialog( "open" );
+                    }
+                });
+            }
 
             return this;
         }
