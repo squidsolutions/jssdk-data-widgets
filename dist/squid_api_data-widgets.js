@@ -400,7 +400,7 @@ function program12(depth0,data) {
 function program14(depth0,data) {
   
   
-  return "\r\n		<button type=\"button\" class=\"popup-trigger form-control\">Export</button>\r\n	";
+  return "\r\n		<button type=\"button\" class=\"btn popup-trigger form-control\">Export</button>\r\n	";
   }
 
   buffer += "<div class=\"squid-api-data-widgets-export-widget\">\r\n	<div class=\"download-wrapper\">\r\n		";
