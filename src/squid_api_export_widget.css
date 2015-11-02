@@ -37,6 +37,10 @@
 	margin-top: 10px;
 }
 
+.squid-api-data-widgets-export-widget #curlbtn, .squid-api-export-panel-popup #curlbtn {
+	cursor: pointer;
+}
+
 .squid-api-export-panel-popup {
 	background-color: #fff;
     display: inline-block;
