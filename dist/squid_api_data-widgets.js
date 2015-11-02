@@ -412,7 +412,7 @@ function program14(depth0,data) {
   buffer += "\r\n			";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayCompression), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n		</div>\r\n			<div>&nbsp;</div>\r\n		<div>\r\n			<a id=\"download\" class=\"btn btn-default\" target=\"_blank\">download<i class=\"fa fa-download\"></i></a>\r\n		</div>\r\n		";
+  buffer += "\r\n		</div>\r\n			<div>&nbsp;</div>\r\n		<div>\r\n			<button id=\"download\" class=\"btn btn-default\" target=\"_blank\">download<i class=\"fa fa-download\"></i></button>\r\n		</div>\r\n		";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.sqlView), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n		";
@@ -2781,6 +2781,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.model.get("analysis")) {
                 this.listenTo(this.model.get("analysis"), 'change', this.render);
                 this.listenTo(this.model, 'change:templateData', this.refreshViewSqlUrl);
+                this.listenTo(this.model, 'change:enabled', this.enabled);
             } else {
                 this.listenTo(this.model, 'change', this.render);
             }
@@ -2817,6 +2818,20 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.displayCompression === false) {
                 this.displayCompression = false;
             }
+        },
+        
+        enabled: function() {
+        	var viewPort = this.viewPort;
+        	if (this.popup) {
+        		viewPort = this.popup;
+        	}
+        	if (this.model.get("enabled")) {
+        		this.$el.find("button").prop("disabled", false);
+        		viewPort.find("button#download").prop("disabled", false);
+        	} else {
+        		this.$el.find("button").prop("disabled", true);
+        		viewPort.find("button#download").prop("disabled", true);
+        	}
         },
 
         setModel : function(model) {
@@ -2941,13 +2956,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             	viewPort = this.popup;
             }
             var analysis = this.model.get("analysis");
+            var enabled = this.model.get("enabled");
             if (!analysis) {
                 analysis = this.model;
             }
             var downloadBtn = viewPort.find("#download");
             downloadBtn.addClass("disabled");
 
-            if (analysis.get("id").projectId) {
+            if (analysis.get("id").projectId && enabled !== false) {
                 var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
                 downloadAnalysis.set(analysis.attributes);
                 downloadAnalysis.setParameter("timeout", 10000);

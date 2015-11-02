@@ -21,6 +21,7 @@
             if (this.model.get("analysis")) {
                 this.listenTo(this.model.get("analysis"), 'change', this.render);
                 this.listenTo(this.model, 'change:templateData', this.refreshViewSqlUrl);
+                this.listenTo(this.model, 'change:enabled', this.enabled);
             } else {
                 this.listenTo(this.model, 'change', this.render);
             }
@@ -57,6 +58,20 @@
             if (options.displayCompression === false) {
                 this.displayCompression = false;
             }
+        },
+        
+        enabled: function() {
+        	var viewPort = this.viewPort;
+        	if (this.popup) {
+        		viewPort = this.popup;
+        	}
+        	if (this.model.get("enabled")) {
+        		this.$el.find("button").prop("disabled", false);
+        		viewPort.find("button#download").prop("disabled", false);
+        	} else {
+        		this.$el.find("button").prop("disabled", true);
+        		viewPort.find("button#download").prop("disabled", true);
+        	}
         },
 
         setModel : function(model) {
@@ -181,13 +196,14 @@
             	viewPort = this.popup;
             }
             var analysis = this.model.get("analysis");
+            var enabled = this.model.get("enabled");
             if (!analysis) {
                 analysis = this.model;
             }
             var downloadBtn = viewPort.find("#download");
             downloadBtn.addClass("disabled");
 
-            if (analysis.get("id").projectId) {
+            if (analysis.get("id").projectId && enabled !== false) {
                 var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
                 downloadAnalysis.set(analysis.attributes);
                 downloadAnalysis.setParameter("timeout", 10000);
