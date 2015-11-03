@@ -4617,6 +4617,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             width: tempWidth,
                             height: 400,
                             renderer: 'line',
+                            padding:{right:0.007},
                             interpolation: 'linear',
                             strokeWidth: 3,
                             series: series,
