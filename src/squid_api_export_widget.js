@@ -15,11 +15,13 @@
         templateData : null,
         displayScripting : true,
         displayCompression : true,
+        downloadButtonLabel : "Download your data",
 
         initialize : function(options) {
             if (this.model.get("analysis")) {
                 this.listenTo(this.model.get("analysis"), 'change', this.render);
                 this.listenTo(this.model, 'change:templateData', this.refreshViewSqlUrl);
+                this.listenTo(this.model, 'change:enabled', this.enabled);
             } else {
                 this.listenTo(this.model, 'change', this.render);
             }
@@ -35,11 +37,20 @@
             if (options.renderTo) {
                 this.renderTo = options.renderTo;
             }
-            if (options.displayInAccordion !== false) {
-                this.displayInAccordion = true;
+            if (options.displayInAccordion) {
+            	this.displayInAccordion = true;
                 this.viewPort = this.renderTo;
             } else {
                 this.viewPort = this.$el;
+            }
+            if (options.displayInPopup) {
+            	this.displayInPopup = true;
+            }
+            if (options.sqlView) {
+            	this.sqlView = true;
+            }
+            if (options.downloadButtonLabel) {
+            	this.downloadButtonLabel = options.downloadButtonLabel;
             }
             if (options.displayScripting === false) {
                 this.displayScripting = false;
@@ -47,6 +58,20 @@
             if (options.displayCompression === false) {
                 this.displayCompression = false;
             }
+        },
+        
+        enabled: function() {
+        	var viewPort = this.viewPort;
+        	if (this.popup) {
+        		viewPort = this.popup;
+        	}
+        	if (this.model.get("enabled")) {
+        		this.$el.find("button").prop("disabled", false);
+        		viewPort.find("button#download").prop("disabled", false);
+        	} else {
+        		this.$el.find("button").prop("disabled", true);
+        		viewPort.find("button#download").prop("disabled", true);
+        	}
         },
 
         setModel : function(model) {
@@ -73,13 +98,18 @@
 
         downloadAnalysisResults : function(currentJobId) {
             var me = this;
+            var viewPort = $(me.viewPort);
+            if (this.popup) {
+            	viewPort = this.popup;
+            }
+            
             // create download link
             var analysisJobResults;
             var selectedFormat = this.formats[this.selectedFormatIndex];
             var velocityTemplate;
             var postMethod;
-            var downloadBtn = $(me.viewPort).find("#download");
-            var downloadForm = $(me.viewPort).find("#download-form");
+            var downloadBtn = viewPort.find("#download");
+            var downloadForm = viewPort.find("#download-form");
             
             if (!selectedFormat.template) {
                 // use getResults method
@@ -138,6 +168,10 @@
 
         refreshViewSqlUrl : function() {
             var me = this;
+            var viewPort = $(me.viewPort);
+            if (this.displayInPopup) {
+            	viewPort = this.popup;
+            }
             if (me.currentJobId) {
                 // create download link
                 var analysisJobResults;
@@ -149,7 +183,7 @@
                     "id": me.currentJobId,
                     "oid": me.currentJobId.oid
                 });
-                var downloadBtn = $(me.viewPort).find("#view-sql");
+                var downloadBtn = viewPort.find("#view-sql");
                 downloadBtn.attr("href",analysisJobResults.url());
                 downloadBtn.removeClass("disabled");
             }
@@ -157,15 +191,19 @@
         
         download : function() {
             var me = this;
-            
+            var viewPort = $(this.viewPort);
+            if (this.displayInPopup) {
+            	viewPort = this.popup;
+            }
             var analysis = this.model.get("analysis");
+            var enabled = this.model.get("enabled");
             if (!analysis) {
                 analysis = this.model;
             }
-            var downloadBtn = $(this.viewPort).find("#download");
+            var downloadBtn = viewPort.find("#download");
             downloadBtn.addClass("disabled");
 
-            if (analysis.get("id").projectId) {
+            if (analysis.get("id").projectId && enabled !== false) {
                 var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
                 downloadAnalysis.set(analysis.attributes);
                 downloadAnalysis.setParameter("timeout", 10000);
@@ -217,7 +255,7 @@
             }
 
             if (this.displayInAccordion) {
-                this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + ">Export<span class='glyphicon glyphicon-download-alt'></span></button>");
+                this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + "> "+ this.downloadButtonLabel + "<span class='glyphicon glyphicon-download-alt'></span></button>");
                 var facets = analysis.get("facets");
                 var metrics = analysis.get("metrics");
                 if ((!facets || facets.length === 0) && (!metrics || metrics.length === 0)) {
@@ -257,6 +295,9 @@
 
             $(this.viewPort).html(this.template({
                 "displayInAccordion" : this.displayInAccordion,
+                "downloadButtonLabel" : this.downloadButtonLabel,
+                "displayInPopup" : this.displayInPopup,
+                "sqlView" : this.sqlView,
                 "data-target" : this.renderTo,
                 "formats": formatsDisplay,
                 "displayCompression" : this.displayCompression,
@@ -272,7 +313,6 @@
                 })
             );
 
-            
             // prepare download link
             this.downloadStatus = 1;
             var downloadBtn = $(me.viewPort).find("#view-sql");
@@ -307,18 +347,23 @@
 
             // Click Handlers
             $(this.viewPort).find("#curlbtn").click(function() {
+            	var viewPort = $(me.viewPort);
+            	if (me.displayInPopup) {
+            		viewPort = me.popup;
+            	}
+            		
                 me.curlCollapsed = !me.curlCollapsed;
                 if (me.curlCollapsed) {
-                    $(me.viewPort).find('#curl').fadeOut();
+                	viewPort.find('#curl').fadeOut();
                 } else {
-                    $(me.viewPort).find('#curl').fadeIn();
+                	viewPort.find('#curl').fadeIn();
                 }
             });
 
             $(this.viewPort).find('[name="format"]').click(
-                    function(event) {
-                        me.clickedFormat(event);
-                    });
+                function(event) {
+                    me.clickedFormat(event);
+                });
             $(this.viewPort).find('[name="compression"]')
             .click(function(event) {
                 me.clickedCompression(event);
@@ -327,6 +372,26 @@
             $(this.viewPort).find("#download").click(function() {
                 me.download();
             });
+            
+            if (this.displayInPopup) {
+            	this.popup = this.$el.find(".download-wrapper").dialog({
+                    dialogClass: "squid-api-export-panel-popup",
+                    autoOpen: false,
+                    position: {
+                        my: "left-70 top", at: "left-70 bottom", of: this.$el.find("button.popup-trigger")
+                    },
+                    clickOutside: true, // clicking outside the dialog will close it
+                    clickOutsideTrigger: this.$el.find("button.popup-trigger"), // Element (id or class) that triggers the dialog opening
+                });
+                // Click Event for filter panel button
+                this.$el.find("button.popup-trigger").click(function() {
+                    if (me.popup.dialog("isOpen")) {
+                    	me.popup.dialog( "close" );
+                    } else {
+                    	me.popup.dialog( "open" );
+                    }
+                });
+            }
 
             return this;
         }

@@ -1,39 +1,40 @@
 <div class="squid-api-data-widgets-export-widget">
-{{#if displayInAccordion}}
-	<div class="panel panel-default filter-panel">
-		<div class="panel-heading">
-			<button type="button" class="close" data-toggle="collapse"
-				data-target="{{data-target}}" data-clavier="true" aria-hidden="true">
-				<i class="glyphicon glyphicon-chevron-up"></i>
-			</button>
-			<h4 class="panel-title" id="myModalLabel">Export</h4>
-		</div>
-		<div class="panel-body">
-{{/if}}
-			<button type="button" class="close" data-toggle="collapse"
-				data-target="{{data-target}}" data-clavier="true" aria-hidden="true">
-			</button>
-			<div class="download-formats">
-				<label>Format: </label> 
-				{{#each formats}}
+	<div class="download-wrapper">
+		{{#if displayInAccordion}}
+			<div class="panel panel-default filter-panel">
+				<div class="panel-heading">
+					<button type="button" class="close" data-toggle="collapse"
+					data-target="{{data-target}}" data-clavier="true" aria-hidden="true">
+						<i class="glyphicon glyphicon-chevron-up"></i>
+					</button>
+					<h4 class="panel-title" id="myModalLabel">Export</h4>
+				</div>
+			<div class="panel-body">
+			<button type="button" class="close" data-toggle="collapse"data-target="{{data-target}}" data-clavier="true" aria-hidden="true"></button>
+		{{/if}}
+		<div class="download-formats">
+			<label>Format: </label> 
+			{{#each formats}}
 				<input type="radio" name="format" value="{{format}}" {{#if selected}}checked{{/if}}> {{format}} 
-				{{/each}}
-				{{#if displayCompression}}
+			{{/each}}
+			{{#if displayCompression}}
 				<div style="display: inline-block;">
 					<label>Compression: </label> <input type="checkbox" name="compression" {{#if compression}}checked{{/if}}> gzip
 				</div>
-				{{/if }}
-			</div>
+			{{/if }}
+		</div>
 			<div>&nbsp;</div>
+		<div>
+			<button id="download" class="btn btn-default" target="_blank">download<i class="fa fa-download"></i></button>
+		</div>
+		{{#if sqlView}}
 			<div>
-				<a id="download" class="btn btn-default" target="_blank">Download your data</a>
+				<a id="view-sql" class="btn btn-default" target="_blank">View SQL</a>
 			</div>
-            <div>
-                <a id="view-sql" class="btn btn-default" target="_blank">View SQL</a>
-            </div>
-			{{#if data}}
+		{{/if}}
+		{{#if data}}
 			<div id="curl-view">
-                <br><hr>
+	            <br><hr>
 				Need to automate exports? Use the <a id="curlbtn">shell commands</a>.
 				<div id="curl">
 					<p>Sample code to download the analysis results using curl shell command.</p>
@@ -48,12 +49,15 @@
 					<pre class="curl">ls {{curlFileName}}</pre>
 				</div>
 			</div>
-			{{/if }}
-{{#if displayInAccordion}}
+		{{/if }}
+		{{#if displayInAccordion}}
+			</div>
 		</div>
+		{{/if}}
+		<form id="download-form" style="visibility: hidden;"></form>
 	</div>
-{{/if}}
-
-<form id="download-form" style="visibility: hidden;"></form>
+	{{#if displayInPopup}}
+		<button type="button" class="btn popup-trigger form-control">Export</button>
+	{{/if}}
 </div>
 
