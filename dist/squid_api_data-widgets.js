@@ -3088,12 +3088,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     },
                     "autoRun": false});
                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                .done(function(model, response) {
+                .done(function() {
                     me.downloadStatus = 2;
                     me.currentJobId = downloadAnalysis.get("id");
                     me.refreshViewSqlUrl();
                 })
-                .fail(function(model, response) {
+                .fail(function() {
                     console.error("createAnalysisJob failed");
                 });
             }
