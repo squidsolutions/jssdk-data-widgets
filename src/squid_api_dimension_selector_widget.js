@@ -94,8 +94,13 @@
                                     var facet = facets[i];
                                     if (facet.dimension.dynamic === false || domain.get("dynamic") === true) {
                                         var isBoolean = false;
-                                        if ((facet.dimension.type === "SEGMENTS") || (facet.items.length === 1) && (facet.items[0].value === "true")) {
+                                        if (facet.dimension.type === "SEGMENTS") {
                                             isBoolean = true;
+                                        }
+                                        if (facet.items) {
+                                        	if ((facet.items.length === 1) && (facet.items[0].value === "true")) {
+                                        		isBoolean = true;
+                                        	}
                                         }
                                         // do not display boolean dimensions
                                         if (!isBoolean) {
