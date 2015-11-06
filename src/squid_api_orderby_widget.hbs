@@ -9,10 +9,9 @@
 					<td>
 						{{#if removeOrderDirection}}
 							<span class="orderby-direction" style="top: 3px; position: relative; font-weight: bold; font-size: 14px;">{{orderByDirectionDisplay}}<span>
-						
 						{{else}}
 							<div class="onoffswitch">
-			    				<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" {{direction}}>
+			    				<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" {{#if checked}}checked{{/if}}>
 			    				<label class="onoffswitch-label" for="myonoffswitch">
 			        				<span class="onoffswitch-inner"></span>
 			       				 	<span class="onoffswitch-switch"></span>
@@ -23,9 +22,9 @@
 					<td>
 						&nbsp;
 						<span style="font-size : 14px; font-weight: bold; padding-right: 5px; position: relative; top: 4px;">{{limit}}</span> <label style="position: relative; top: 4px; font-weight: normal;">by</label> <select class="sq-select form-control" style="display: inline-block; position: relative; bottom: 5px; max-width: 100px;">
-						{{#each chosenMetrics}}
-						<option value="{{value}}">{{label}}</option>
-						{{/each}}
+							{{#each Columns}}
+								<option value="{{value}}">{{label}}</option>
+							{{/each}}
 						</select>
 					</td>
 				</tr>
