@@ -2973,19 +2973,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 downloadAnalysis.set(analysis.attributes);
                 downloadAnalysis.setParameter("timeout", 10000);
                 downloadAnalysis.setParameter("maxResults", 1);
+                downloadAnalysis.set("autoRun", false);
                 downloadAnalysis.set({
                     "id": {
                         "projectId": analysis.get("id").projectId,
                         "analysisJobId": null
                     }});
-                // trigger the analysis computation and wait until it's done (or times out)
+                // 
                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
                 .done(function(analysis) {
-                    if (analysis.get("status") === "DONE") {
-                        // get the results
-                        me.downloadAnalysisResults(analysis.get("id"));
-                    } else {
-                        // analysis timed out, retry (in a loop)
+                    if (analysis.get("limit") || (analysis.get("template"))) {
+                        // trigger the analysis computation and wait until it's done (in a loop)
                         squid_api.controller.analysisjob.getAnalysisJobResults(null, analysis).done(function(results) {
                             // get the results
                             me.downloadAnalysisResults(results.get("id"));
@@ -2994,6 +2992,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             console.error("createAnalysisJob failed");
                             downloadBtn.removeClass("disabled");
                         });
+                    } else {
+                        // compute and get the results without retrying (streaming way)
+                        me.downloadAnalysisResults(analysis.get("id"));
                     }
                 })
                 .fail(function() {
@@ -3078,8 +3079,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 })
             );
 
-            // prepare download link
-            this.downloadStatus = 1;
+            // prepare SQL download link
             var downloadBtn = $(me.viewPort).find("#view-sql");
             downloadBtn.addClass("disabled");
 
@@ -3094,7 +3094,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "autoRun": false});
                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
                 .done(function() {
-                    me.downloadStatus = 2;
                     me.currentJobId = downloadAnalysis.get("id");
                     me.refreshViewSqlUrl();
                 })
