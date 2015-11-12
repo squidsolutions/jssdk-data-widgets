@@ -146,6 +146,9 @@
                             // check if empty
                             if (jsonData.options.length === 0) {
                                 jsonData.empty = true;
+                                if (me.model.get("chosenMetrics").length > 0) {
+                                	me.model.set({"chosenMetrics" : []});
+                                }
                             }
 
                             var html = me.template(jsonData);

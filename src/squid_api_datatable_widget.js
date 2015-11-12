@@ -108,19 +108,16 @@
         },
 
         events : ({
-            "click thead th" : function(item) {
+            "click thead th" : function(event) {
                 if (this.ordering) {
-                    var orderId = parseInt($(item.currentTarget).attr("data-id"));
-                    var orderByDirection;
-                    if (this.config.get("rollups") && this.rollupSummaryColumn >= 0) {
-                        orderId = orderId - 1;
-                    }
-                    if ($(item.currentTarget).hasClass("ASC")) {
-                        orderByDirection = "DESC";
+                	var expressionValue = $(event.currentTarget).attr("data-content");
+                	var obj = {"expression" : {"value" : expressionValue}};
+                	if ($(event.currentTarget).hasClass("ASC")) {
+                		obj.direction = "DESC";
                     } else {
-                        orderByDirection = "ASC";
+                        obj.direction = "ASC";
                     }
-                    this.config.set("orderBy", [{"col" : orderId, "direction" : orderByDirection}]);
+                    this.config.set("orderBy", [obj]);
                 }
             }
         }),
@@ -172,7 +169,7 @@
                 }
                 var results = analysis.get("results");
                 var rollups;
-                if (results) {
+                if (results && status !== "PENDING" && status !== "RUNNING") {
                     // use results columns
                     columns = results.cols;
 
@@ -198,7 +195,6 @@
                                 // impossible to get column data from selection
                                 invalidSelection = true;
                             }
-
                         }
                     }
                     var metrics = this.model.get("metricList");
@@ -242,31 +238,30 @@
                     }
                 }
 
-
-                // Add OrderBy Attribute
                 var orderBy = this.model.get("orderBy");
                 if (orderBy) {
-                    for (col=0; col<columns.length; col++) {
-                        if (columns[col]) {
-                            columns[col].orderDirection = null;
-                        }
-                    }
                     // add orderBy direction
-                    for (ix=0; ix<orderBy.length; ix++) {
-                        for (col=0; col<columns.length; col++) {
-                            if (this.ordering && this.config.get("rollups") && this.rollupSummaryColumn >= 0 && col === orderBy[ix].col) {
-                                if (originalColumns[col]) {
-                                    originalColumns[col].orderDirection = orderBy[ix].direction;
-                                }
-                                break;
-                            }
-                            else if (this.ordering && col === orderBy[ix].col) {
-                                if (originalColumns[col]) {
-                                    originalColumns[col].orderDirection = orderBy[ix].direction;
-                                }
-                                break;
-                            }
-                        }
+                	for (col=0; col<columns.length; col++) {
+                		if (columns[col]) {
+                			columns[col].orderDirection = undefined;
+	                		for (ix=0; ix<orderBy.length; ix++) {
+	                			if (this.ordering) {
+	                            	if (columns[col].definition) {
+	                            		if (orderBy[ix].expression) {
+	                            			if (columns[col].definition == orderBy[ix].expression.value) {
+	                                			columns[col].orderDirection = orderBy[ix].direction;
+	                                			break;
+	                                		}
+	                            		}
+	                            	} else if (orderBy[ix].expression) {
+	                            		if (columns[col].id == orderBy[ix].expression.value) {
+	                            			columns[col].orderDirection = orderBy[ix].direction;
+	                                		break;
+	                            		}
+	                            	}
+	                            }
+	                        }
+                		}
                     }
                 }
 
@@ -320,14 +315,11 @@
                             return str;
                         })
                         .attr("data-content", function(d) {
-                            if (d.oid) {
-                                return d.oid;
+                            if (d.definition) {
+                                return d.definition;
                             } else {
-                                return d.id;
+                            	return d.id;
                             }
-                        })
-                        .attr("data-id", function(d, i) {
-                            return i;
                         });
 
                     // add class if more than 10 columns
