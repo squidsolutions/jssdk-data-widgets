@@ -33,6 +33,11 @@
             } else {
             	this.filters = squid_api.model.filters;
             }
+            if (options.status) {
+            	this.status = options.status;
+            } else {
+            	this.status = squid_api.model.status;
+            }
 
             this.config.on('change:chosenDimensions', this.render, this);
             this.config.on('change:chosenMetrics', this.render, this);
@@ -102,7 +107,7 @@
     			this.$el.find("select").multiselect('select', orderBy[0].expression.value);
     		} else {
     			if (columns[0]) {
-    				this.config.set({"orderBy" : [{expression:{value: columns[0].value, direction:"DESC"}}], "selectedMetric" : columns[0].value});
+    				this.config.set({"orderBy" : [{expression:{value: columns[0].value}, direction:"DESC"}], "selectedMetric" : columns[0].value});
     			} else {
     				this.config.unset("orderBy");
     				this.config.unset("selectedMetric");
@@ -180,7 +185,9 @@
                 if (orderBy) {
                 	if (orderBy[0].expression) {
                 		// verify if existing expression exists
-                		me.expressionExists(columns);            		
+                		if (me.status.get("status") !== "RUNNING") {
+                			me.expressionExists(columns); 
+                		}          		
                 	}
                 } else if (me.$el.find("select").val()) {
                 	var obj = {"expression" : {"value" : me.$el.find("select").val()}, "direction" : "DESC"};
