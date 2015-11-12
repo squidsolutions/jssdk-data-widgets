@@ -3549,8 +3549,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             // check if empty
                             if (jsonData.options.length === 0) {
                                 jsonData.empty = true;
-                                if (me.model.get("chosenMetrics").length > 0) {
-                                	me.model.set({"chosenMetrics" : []});
+                                if (me.model.get("chosenMetrics")) {
+                                	if (me.model.get("chosenMetrics").length > 0) {
+                                    	me.model.set({"chosenMetrics" : []});
+                                    }
                                 }
                             }
 
