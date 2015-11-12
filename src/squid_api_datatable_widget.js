@@ -242,24 +242,26 @@
                 if (orderBy) {
                     // add orderBy direction
                 	for (col=0; col<columns.length; col++) {
-                		columns[col].orderDirection = undefined;
-                		for (ix=0; ix<orderBy.length; ix++) {
-                			if (this.ordering) {
-                            	if (columns[col].definition) {
-                            		if (orderBy[ix].expression) {
-                            			if (columns[col].definition == orderBy[ix].expression.value) {
-                                			columns[col].orderDirection = orderBy[ix].direction;
-                                			break;
-                                		}
-                            		}
-                            	} else if (orderBy[ix].expression) {
-                            		if (columns[col].id == orderBy[ix].expression.value) {
-                            			columns[col].orderDirection = orderBy[ix].direction;
-                                		break;
-                            		}
-                            	}
-                            }
-                        }
+                		if (columns[col]) {
+                			columns[col].orderDirection = undefined;
+	                		for (ix=0; ix<orderBy.length; ix++) {
+	                			if (this.ordering) {
+	                            	if (columns[col].definition) {
+	                            		if (orderBy[ix].expression) {
+	                            			if (columns[col].definition == orderBy[ix].expression.value) {
+	                                			columns[col].orderDirection = orderBy[ix].direction;
+	                                			break;
+	                                		}
+	                            		}
+	                            	} else if (orderBy[ix].expression) {
+	                            		if (columns[col].id == orderBy[ix].expression.value) {
+	                            			columns[col].orderDirection = orderBy[ix].direction;
+	                                		break;
+	                            		}
+	                            	}
+	                            }
+	                        }
+                		}
                     }
                 }
 

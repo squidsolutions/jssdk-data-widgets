@@ -1423,24 +1423,26 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (orderBy) {
                     // add orderBy direction
                 	for (col=0; col<columns.length; col++) {
-                		columns[col].orderDirection = undefined;
-                		for (ix=0; ix<orderBy.length; ix++) {
-                			if (this.ordering) {
-                            	if (columns[col].definition) {
-                            		if (orderBy[ix].expression) {
-                            			if (columns[col].definition == orderBy[ix].expression.value) {
-                                			columns[col].orderDirection = orderBy[ix].direction;
-                                			break;
-                                		}
-                            		}
-                            	} else if (orderBy[ix].expression) {
-                            		if (columns[col].id == orderBy[ix].expression.value) {
-                            			columns[col].orderDirection = orderBy[ix].direction;
-                                		break;
-                            		}
-                            	}
-                            }
-                        }
+                		if (columns[col]) {
+                			columns[col].orderDirection = undefined;
+	                		for (ix=0; ix<orderBy.length; ix++) {
+	                			if (this.ordering) {
+	                            	if (columns[col].definition) {
+	                            		if (orderBy[ix].expression) {
+	                            			if (columns[col].definition == orderBy[ix].expression.value) {
+	                                			columns[col].orderDirection = orderBy[ix].direction;
+	                                			break;
+	                                		}
+	                            		}
+	                            	} else if (orderBy[ix].expression) {
+	                            		if (columns[col].id == orderBy[ix].expression.value) {
+	                            			columns[col].orderDirection = orderBy[ix].direction;
+	                                		break;
+	                            		}
+	                            	}
+	                            }
+	                        }
+                		}
                     }
                 }
 
@@ -3548,6 +3550,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             // check if empty
                             if (jsonData.options.length === 0) {
                                 jsonData.empty = true;
+                                if (me.model.get("chosenMetrics").length > 0) {
+                                	me.model.set({"chosenMetrics" : []});
+                                }
                             }
 
                             var html = me.template(jsonData);
@@ -3823,7 +3828,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     // extract the metricModels from the arguments
                     var metricModels = [];
                     if (chosenMetrics.length === 1) {
-                        metricModels.push(arguments[0]);
+                    	if (! arguments[0].error) {
+                    		metricModels.push(arguments[0]);
+                    	}
                     } else {
                         for (var i=0; i<chosenMetrics.length; i++) {
                         	if (! arguments[i][0].error) {
@@ -3878,7 +3885,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             	this.filters = squid_api.model.filters;
             }
 
-            this.config.on('change', this.render, this);
+            this.config.on('change:chosenDimensions', this.render, this);
+            this.config.on('change:chosenMetrics', this.render, this);
+            this.config.on('change:orderBy', this.render, this);
             
             // listen for selection change as we use it to get dimensions
             this.filters.on("change:selection", function() {
@@ -3931,6 +3940,26 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         	}
         	return col;
         },
+        
+        expressionExists: function(columns) {
+        	var orderBy = this.config.get("orderBy");
+        	var count = 0;
+    		for (i=0; i<columns.length; i++) {
+    			if (orderBy[0].expression.value == columns[i].value) {
+    				count++;
+    			}
+    		}
+    		if (count > 0) {
+    			this.$el.find("select").multiselect('select', orderBy[0].expression.value);
+    		} else {
+    			if (columns[0]) {
+    				this.config.set({"orderBy" : [{expression:{value: columns[0].value, direction:"DESC"}}], "selectedMetric" : columns[0].value});
+    			} else {
+    				this.config.unset("orderBy");
+    				this.config.unset("selectedMetric");
+    			}
+    		}
+        },
 
         render : function() {
         	var me = this;
@@ -3950,11 +3979,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             
             if (chosenDimensions) {
             	for (i=0; i<chosenDimensions.length; i++) {
-                	for (ix=0; ix<filters.facets.length; ix++) {
-                    	if (chosenDimensions[i] === filters.facets[ix].id) {
-                    		columns.push({"label" : filters.facets[ix].dimension.name, "value" : filters.facets[ix].id});
-                    	}
-                    }
+            		if (filters) {
+            			for (ix=0; ix<filters.facets.length; ix++) {
+                        	if (chosenDimensions[i] === filters.facets[ix].id) {
+                        		columns.push({"label" : filters.facets[ix].dimension.name, "value" : filters.facets[ix].id});
+                        	}
+                        }
+            		}
                 }
             }
             
@@ -3969,7 +4000,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         // Match with chosen
                         for (var match=0; match<chosenMetrics.length; match++) {
                             if (metric.get("oid") === chosenMetrics[match]) {
-                                var option = {"label" : metric.get("name"), "value" : "@'" + metric.get("id").domainId + "'.@'" +  metric.get("oid") + "'"};
+                                var option = {"label" : metric.get("name"), "value" : metric.get("definition")};
                                 columns.push(option);
                             }
                         }
@@ -3999,7 +4030,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 
                 if (orderBy) {
                 	if (orderBy[0].expression) {
-                		me.$el.find("select").multiselect('select', orderBy[0].expression.value);
+                		// verify if existing expression exists
+                		me.expressionExists(columns);            		
                 	}
                 } else if (me.$el.find("select").val()) {
                 	var obj = {"expression" : {"value" : me.$el.find("select").val()}, "direction" : "DESC"};
