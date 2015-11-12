@@ -169,7 +169,7 @@
                 }
                 var results = analysis.get("results");
                 var rollups;
-                if (results) {
+                if (results && status !== "PENDING" && status !== "RUNNING") {
                     // use results columns
                     columns = results.cols;
 
