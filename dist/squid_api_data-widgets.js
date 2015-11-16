@@ -346,6 +346,12 @@ function program8(depth0,data) {
 
 function program10(depth0,data) {
   
+  
+  return "\r\n            <div id=\"materializedatasets-view\">\r\n                    <br><hr>\r\n                    <ul>\r\n                <li> <label for=\"destSchema\">Schema: </label><input type=\"text\" name=\"destSchema\" id=\"destSchema\"> </li>\r\n                <li> <label for=\"destProject\">Project: </label> <input type=\"text\" name=\"destProject\" id=\"destProject\"> </li>\r\n                <li> <label for=\"destDomain\">Domain: </label> <input type=\"text\" name=\"destDomain\" id=\"destDomain\"> </li>\r\n                </ul>\r\n                <div>\r\n                    <a id=\"view-materializedatasets\" class=\"btn btn-default\" target=\"_blank\">Materialize Datasets</a>\r\n                </div>\r\n            </div>\r\n\r\n        ";
+  }
+
+function program12(depth0,data) {
+  
   var buffer = "", stack1, helper;
   buffer += "\r\n			<div id=\"curl-view\">\r\n	            <br><hr>\r\n				Need to automate exports? Use the <a id=\"curlbtn\">shell commands</a>.\r\n				<div id=\"curl\">\r\n					<p>Sample code to download the analysis results using curl shell command.</p>\r\n					<b>1 - get an authentication token</b>\r\n					<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n					<pre class=\"curl\">curl '";
   if (helper = helpers.apiURL) { stack1 = helper.call(depth0, {hash:{},data:data}); }
@@ -391,13 +397,13 @@ function program10(depth0,data) {
   return buffer;
   }
 
-function program12(depth0,data) {
+function program14(depth0,data) {
   
   
   return "\r\n			</div>\r\n		</div>\r\n		";
   }
 
-function program14(depth0,data) {
+function program16(depth0,data) {
   
   
   return "\r\n		<button type=\"button\" class=\"btn popup-trigger form-control\">Export</button>\r\n	";
@@ -415,14 +421,17 @@ function program14(depth0,data) {
   buffer += "\r\n		</div>\r\n			<div>&nbsp;</div>\r\n		<div>\r\n			<button id=\"download\" class=\"btn btn-default\" target=\"_blank\">download<i class=\"fa fa-download\"></i></button>\r\n		</div>\r\n		";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.sqlView), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n		";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
+  buffer += "\r\n        ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.materializeDatasetsView), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n		";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(12, program12, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(12, program12, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n		";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(14, program14, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n		<form id=\"download-form\" style=\"visibility: hidden;\"></form>\r\n	</div>\r\n	";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInPopup), {hash:{},inverse:self.noop,fn:self.program(14, program14, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInPopup), {hash:{},inverse:self.noop,fn:self.program(16, program16, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n</div>\r\n\r\n";
   return buffer;
@@ -2782,12 +2791,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         templateData : null,
         displayScripting : true,
         displayCompression : true,
+        materializeDatasetsView : true,
         downloadButtonLabel : "Download your data",
 
         initialize : function(options) {
             if (this.model.get("analysis")) {
                 this.listenTo(this.model.get("analysis"), 'change', this.render);
                 this.listenTo(this.model, 'change:templateData', this.refreshViewSqlUrl);
+                this.listenTo(this.model, 'change:templateData', this.refreshViewMaterializeDatasets);
                 this.listenTo(this.model, 'change:enabled', this.enabled);
             } else {
                 this.listenTo(this.model, 'change', this.render);
@@ -2815,6 +2826,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.sqlView) {
             	this.sqlView = true;
+            }
+            if (options.materializeDatasetsView) {
+                this.materializeDatasetsView = true;
             }
             if (options.downloadButtonLabel) {
             	this.downloadButtonLabel = options.downloadButtonLabel;
@@ -2855,12 +2869,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
             this.refreshViewSqlUrl();
+            this.refreshViewMaterializeDatasets();
         },
 
         clickedCompression : function (event) {
             var t = event.target;
             this.compression = (t.checked);
             this.refreshViewSqlUrl();
+            this.refreshViewMaterializeDatasets();
         },
 
         downloadAnalysisResults : function(currentJobId) {
@@ -2955,7 +2971,35 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 downloadBtn.removeClass("disabled");
             }
         },
-        
+
+        refreshViewMaterializeDatasets : function() {
+            var me = this;
+            console.log("Refreshing datasets url");
+            var viewPort = $(me.viewPort);
+            if (this.displayInPopup) {
+                viewPort = this.popup;
+            }
+            if (me.currentJobId) {
+                // create download link
+                var analysisJobResults;
+                // use getResults method
+                var destSchema = $("#destSchema").val();
+                var destProject = $("#destProject").val();
+                var destDomain = $("#destDomain").val();
+                analysisJobResults = new squid_api.model.ProjectAnalysisJobViewMaterializeDatasets();
+                analysisJobResults.set({
+                    "id": me.currentJobId,
+                    "oid": me.currentJobId.oid,
+                    "destDomain": destDomain,
+                    "destProject": destProject,
+                    "destSchema": destSchema
+                });
+                var downloadBtn = viewPort.find("#view-materializedatasets");
+                downloadBtn.attr("href",analysisJobResults.url());
+                downloadBtn.removeClass("disabled");
+            }
+        },
+
         download : function() {
             var me = this;
             var viewPort = $(this.viewPort);
@@ -3066,6 +3110,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "downloadButtonLabel" : this.downloadButtonLabel,
                 "displayInPopup" : this.displayInPopup,
                 "sqlView" : this.sqlView,
+                "materializeDatasetsView" : this.materializeDatasetsView,
                 "data-target" : this.renderTo,
                 "formats": formatsDisplay,
                 "displayCompression" : this.displayCompression,
@@ -3104,6 +3149,30 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 });
             }
 
+            // prepare materialize datasets download link
+            var downloadBtnD = $(me.viewPort).find("#view-materializedatasets");
+            downloadBtnD.addClass("disabled");
+
+            if (analysis.get("id").projectId) {
+                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                downloadAnalysis.set(analysis.attributes);
+                downloadAnalysis.set({
+                    "id": {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": null
+                    },
+                    "autoRun": false});
+                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
+                    .done(function() {
+                        me.currentJobId = downloadAnalysis.get("id");
+                        me.refreshViewMaterializeDatasets();
+                    })
+                    .fail(function() {
+                        console.error("createAnalysisJob failed");
+                    });
+            }
+
+
             // apply cURL panel state
             if (me.curlCollapsed) {
                 $(this.viewPort).find('#curl').hide();
@@ -3138,7 +3207,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             $(this.viewPort).find("#download").click(function() {
                 me.download();
             });
-            
+
+            $(this.viewPort).find("#view-materializedatasets").click(function() {
+                me.refreshViewMaterializeDatasets();
+            });
+
             if (this.displayInPopup) {
             	this.popup = this.$el.find(".download-wrapper").dialog({
                     dialogClass: "squid-api-export-panel-popup",

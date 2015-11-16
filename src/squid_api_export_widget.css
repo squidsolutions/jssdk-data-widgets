@@ -29,6 +29,18 @@
     float: left;
 }
 
+.squid-api-data-widgets-export-widget #view-materializedatasets, .squid-api-export-panel-popup #view-materializedatasets{
+	margin-top: 10px;
+	display: block;
+}
+
+.squid-api-data-widgets-export-widget #materializedatasets-view, .squid-api-export-panel-popup #materializedatasets-view {
+	clear: both;
+	margin-top: 40px;
+}
+
+
+
 .squid-api-data-widgets-export-widget #curl-view {
 	clear: both;
 }

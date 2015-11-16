@@ -15,12 +15,14 @@
         templateData : null,
         displayScripting : true,
         displayCompression : true,
+        materializeDatasetsView : true,
         downloadButtonLabel : "Download your data",
 
         initialize : function(options) {
             if (this.model.get("analysis")) {
                 this.listenTo(this.model.get("analysis"), 'change', this.render);
                 this.listenTo(this.model, 'change:templateData', this.refreshViewSqlUrl);
+                this.listenTo(this.model, 'change:templateData', this.refreshViewMaterializeDatasets);
                 this.listenTo(this.model, 'change:enabled', this.enabled);
             } else {
                 this.listenTo(this.model, 'change', this.render);
@@ -48,6 +50,9 @@
             }
             if (options.sqlView) {
             	this.sqlView = true;
+            }
+            if (options.materializeDatasetsView) {
+                this.materializeDatasetsView = true;
             }
             if (options.downloadButtonLabel) {
             	this.downloadButtonLabel = options.downloadButtonLabel;
@@ -88,12 +93,14 @@
                 }
             }
             this.refreshViewSqlUrl();
+            this.refreshViewMaterializeDatasets();
         },
 
         clickedCompression : function (event) {
             var t = event.target;
             this.compression = (t.checked);
             this.refreshViewSqlUrl();
+            this.refreshViewMaterializeDatasets();
         },
 
         downloadAnalysisResults : function(currentJobId) {
@@ -188,7 +195,35 @@
                 downloadBtn.removeClass("disabled");
             }
         },
-        
+
+        refreshViewMaterializeDatasets : function() {
+            var me = this;
+            console.log("Refreshing datasets url");
+            var viewPort = $(me.viewPort);
+            if (this.displayInPopup) {
+                viewPort = this.popup;
+            }
+            if (me.currentJobId) {
+                // create download link
+                var analysisJobResults;
+                // use getResults method
+                var destSchema = $("#destSchema").val();
+                var destProject = $("#destProject").val();
+                var destDomain = $("#destDomain").val();
+                analysisJobResults = new squid_api.model.ProjectAnalysisJobViewMaterializeDatasets();
+                analysisJobResults.set({
+                    "id": me.currentJobId,
+                    "oid": me.currentJobId.oid,
+                    "destDomain": destDomain,
+                    "destProject": destProject,
+                    "destSchema": destSchema
+                });
+                var downloadBtn = viewPort.find("#view-materializedatasets");
+                downloadBtn.attr("href",analysisJobResults.url());
+                downloadBtn.removeClass("disabled");
+            }
+        },
+
         download : function() {
             var me = this;
             var viewPort = $(this.viewPort);
@@ -299,6 +334,7 @@
                 "downloadButtonLabel" : this.downloadButtonLabel,
                 "displayInPopup" : this.displayInPopup,
                 "sqlView" : this.sqlView,
+                "materializeDatasetsView" : this.materializeDatasetsView,
                 "data-target" : this.renderTo,
                 "formats": formatsDisplay,
                 "displayCompression" : this.displayCompression,
@@ -337,6 +373,30 @@
                 });
             }
 
+            // prepare materialize datasets download link
+            var downloadBtnD = $(me.viewPort).find("#view-materializedatasets");
+            downloadBtnD.addClass("disabled");
+
+            if (analysis.get("id").projectId) {
+                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                downloadAnalysis.set(analysis.attributes);
+                downloadAnalysis.set({
+                    "id": {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": null
+                    },
+                    "autoRun": false});
+                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
+                    .done(function() {
+                        me.currentJobId = downloadAnalysis.get("id");
+                        me.refreshViewMaterializeDatasets();
+                    })
+                    .fail(function() {
+                        console.error("createAnalysisJob failed");
+                    });
+            }
+
+
             // apply cURL panel state
             if (me.curlCollapsed) {
                 $(this.viewPort).find('#curl').hide();
@@ -371,7 +431,11 @@
             $(this.viewPort).find("#download").click(function() {
                 me.download();
             });
-            
+
+            $(this.viewPort).find("#view-materializedatasets").click(function() {
+                me.refreshViewMaterializeDatasets();
+            });
+
             if (this.displayInPopup) {
             	this.popup = this.$el.find(".download-wrapper").dialog({
                     dialogClass: "squid-api-export-panel-popup",

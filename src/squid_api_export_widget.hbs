@@ -32,6 +32,20 @@
 				<a id="view-sql" class="btn btn-default" target="_blank">View SQL</a>
 			</div>
 		{{/if}}
+        {{#if materializeDatasetsView}}
+            <div id="materializedatasets-view">
+                    <br><hr>
+                    <ul>
+                <li> <label for="destSchema">Schema: </label><input type="text" name="destSchema" id="destSchema"> </li>
+                <li> <label for="destProject">Project: </label> <input type="text" name="destProject" id="destProject"> </li>
+                <li> <label for="destDomain">Domain: </label> <input type="text" name="destDomain" id="destDomain"> </li>
+                </ul>
+                <div>
+                    <a id="view-materializedatasets" class="btn btn-default" target="_blank">Materialize Datasets</a>
+                </div>
+            </div>
+
+        {{/if}}
 		{{#if data}}
 			<div id="curl-view">
 	            <br><hr>
