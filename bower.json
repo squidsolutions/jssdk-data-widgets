@@ -18,7 +18,7 @@
     "Gruntfile.js"
   ],
   "dependencies": {
-    "squid_api": "https://github.com/squidsolutions/jssdk2.git",
+    "squid_api": "https://github.com/squidsolutions/jssdk2.git#feature/T483",
     "bootstrap-multiselect":"https://github.com/davidstutz/bootstrap-multiselect.git#0.9.13",
     "handlebars": "~1.3.0",
     "d3" : "3",
