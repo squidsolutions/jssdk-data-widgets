@@ -24,7 +24,7 @@
     "d3" : "3",
     "rickshaw":"https://github.com/shutterstock/rickshaw.git#1.5.1",
     "moment":"~2.9.0",
-    "backbone-forms": "backbone-forms-squid#master",
+    "backbone-forms": "backbone-forms-squid#24f4e18fcd8b84857d007191135d442db1401156",
     "backbone.bootstrap-modal": "https://github.com/squidsolutions/backbone.bootstrap-modal.git#master",
     "backbone-deep-model" : "https://github.com/squidsolutions/backbone-deep-model.git#master"
   }
