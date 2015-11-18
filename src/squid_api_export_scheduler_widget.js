@@ -139,7 +139,7 @@
                     var jsonData = {"jobs": []};
                     for (var i = 0; i < this.model.models.length; i++) {
                         for (ix = 0; ix < me.reports.length; ix++) {
-                            if (me.reports[ix].oid === this.model.models[i].get("shortcutId")) {
+                            if (me.reports[ix].oid === this.model.models[i].get("reportId")) {
                                 this.model.models[i].set("reportName", me.reports[ix].name);
                             }
                         }
@@ -328,6 +328,8 @@
                             }
                         }
                         values.accountID = accountID;
+                        values.projectId = squid_api.model.state.attributes.config.project;
+                        values.bookmarkId = squid_api.model.state.attributes.config.bookmark;
                         values.reportId = squid_api.model.state.attributes.config.report;
 
                         var newJob = new ExportJobModel(values);
