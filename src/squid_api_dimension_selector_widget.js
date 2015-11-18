@@ -32,7 +32,7 @@
                 this.dimensionIndex = options.dimensionIndex;
             }
             if (this.config) {
-                this.config = options.model
+                this.config = options.model;
             } else {
             	this.config = squid_api.model.config;
             }

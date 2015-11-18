@@ -1429,13 +1429,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 	                			if (this.ordering) {
 	                            	if (columns[col].definition) {
 	                            		if (orderBy[ix].expression) {
-	                            			if (columns[col].definition == orderBy[ix].expression.value) {
+	                            			if (columns[col].definition === orderBy[ix].expression.value) {
 	                                			columns[col].orderDirection = orderBy[ix].direction;
 	                                			break;
 	                                		}
 	                            		}
 	                            	} else if (orderBy[ix].expression) {
-	                            		if (columns[col].id == orderBy[ix].expression.value) {
+	                            		if (columns[col].id === orderBy[ix].expression.value) {
 	                            			columns[col].orderDirection = orderBy[ix].direction;
 	                                		break;
 	                            		}
@@ -1751,7 +1751,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.dimensionIndex = options.dimensionIndex;
             }
             if (this.config) {
-                this.config = options.model
+                this.config = options.model;
             } else {
             	this.config = squid_api.model.config;
             }
@@ -3927,12 +3927,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
         
         events: {
-        	"click .onoffswitch": function(event) {
+        	"click .onoffswitch": function() {
         		var orderBy = this.config.get("orderBy");
         		var obj = {};
         		if (orderBy) {
         			obj.expression = {"value" : orderBy[0].expression.value};
-        			if (orderBy[0].direction == "DESC") {
+        			if (orderBy[0].direction === "DESC") {
         				obj.direction = "ASC";
         			} else {
         				obj.direction = "DESC";
@@ -3957,7 +3957,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         	var orderBy = this.config.get("orderBy");
         	var count = 0;
     		for (i=0; i<columns.length; i++) {
-    			if (orderBy[0].expression.value == columns[i].value) {
+    			if (orderBy[0].expression.value === columns[i].value) {
     				count++;
     			}
     		}

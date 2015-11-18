@@ -248,13 +248,13 @@
 	                			if (this.ordering) {
 	                            	if (columns[col].definition) {
 	                            		if (orderBy[ix].expression) {
-	                            			if (columns[col].definition == orderBy[ix].expression.value) {
+	                            			if (columns[col].definition === orderBy[ix].expression.value) {
 	                                			columns[col].orderDirection = orderBy[ix].direction;
 	                                			break;
 	                                		}
 	                            		}
 	                            	} else if (orderBy[ix].expression) {
-	                            		if (columns[col].id == orderBy[ix].expression.value) {
+	                            		if (columns[col].id === orderBy[ix].expression.value) {
 	                            			columns[col].orderDirection = orderBy[ix].direction;
 	                                		break;
 	                            		}
