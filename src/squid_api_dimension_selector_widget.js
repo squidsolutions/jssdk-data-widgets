@@ -31,18 +31,24 @@
             if (options.dimensionIndex !== null) {
                 this.dimensionIndex = options.dimensionIndex;
             }
+            if (this.config) {
+                this.config = options.model;
+            } else {
+            	this.config = squid_api.model.config;
+            }
+            if (this.status) {
+            	this.status = options.status;
+            } else {
+            	this.status = squid_api.model.status;
+            }
 
             // listen for selection change as we use it to get dimensions
             this.filters.on("change:selection", function() {
                 me.render();
             });
-
-            if (!this.model) {
-                this.model = squid_api.model.config;
-            }
-
+            
             // listen for global status change
-            squid_api.model.status.on('change:status', this.enable, this);
+            this.status.on('change:status', this.enable, this);
         },
 
         enable: function() {
@@ -141,8 +147,8 @@
                                         jsonData.options.push(option);
                                     }
                                 }
-                                if (noneSelected === true) {
-                                    me.model.set("chosenDimensions", []);
+                                if (noneSelected === true && me.status.get("status") !== "RUNNING") {
+                                    me.config.set("chosenDimensions", []);
                                 }
                             }
                         }
@@ -177,7 +183,7 @@
                                     return 'Dimensions';
                                 },
                                 onChange: function(option, selected) {
-                                    var chosenModel = _.clone(me.model.get("chosenDimensions"));
+                                    var chosenModel = _.clone(me.config.get("chosenDimensions"));
                                     if (!chosenModel) {
                                         chosenModel = [];
                                     }
@@ -193,7 +199,7 @@
                                             }
                                         }
                                     }
-                                    me.model.set("chosenDimensions", chosenModel);
+                                    me.config.set("chosenDimensions", chosenModel);
                                 },
                                 onDropdownShown: function() {
                                     if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
@@ -216,11 +222,11 @@
                                 }
                             });
                         } else {
-                            var selectedDimension = me.model.get("selectedDimension");
+                            var selectedDimension = me.config.get("selectedDimension");
 
                             me.$el.find("select").on("change", function() {
                                 var dimension = $(me).val();
-                                me.model.set("chosenDimensions", [dimension]);
+                                me.config.set("chosenDimensions", [dimension]);
                             });
 
                             if (selectedDimension) {
@@ -239,7 +245,7 @@
         isChosen : function(facet) {
             var selected = false;
 
-            var dimensions = this.model.get("chosenDimensions");
+            var dimensions = this.config.get("chosenDimensions");
 
             if (dimensions) {
                 if (this.dimensionIndex !== null) {

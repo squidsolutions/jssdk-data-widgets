@@ -701,8 +701,8 @@ function program1(depth0,data) {
   if (helper = helpers.limit) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.limit); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</span> <label style=\"position: relative; top: 4px; font-weight: normal;\">by</label> <select class=\"sq-select form-control\" style=\"display: inline-block; position: relative; bottom: 5px; max-width: 100px;\">\n						";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.chosenMetrics), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
+    + "</span> <label style=\"position: relative; top: 4px; font-weight: normal;\">by</label> <select class=\"sq-select form-control\" style=\"display: inline-block; position: relative; bottom: 5px; max-width: 100px;\">\n							";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.Columns), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n						</select>\n					</td>\n				</tr>\n			</table>\n		</div>\n	";
   return buffer;
@@ -714,25 +714,29 @@ function program2(depth0,data) {
   if (helper = helpers.orderByDirectionDisplay) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.orderByDirectionDisplay); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "<span>\n						\n						";
+    + "<span>\n						";
   return buffer;
   }
 
 function program4(depth0,data) {
   
-  var buffer = "", stack1, helper;
+  var buffer = "", stack1;
   buffer += "\n							<div class=\"onoffswitch\">\n			    				<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
-  if (helper = helpers.direction) { stack1 = helper.call(depth0, {hash:{},data:data}); }
-  else { helper = (depth0 && depth0.direction); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
-  buffer += escapeExpression(stack1)
-    + ">\n			    				<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n			        				<span class=\"onoffswitch-inner\"></span>\n			       				 	<span class=\"onoffswitch-switch\"></span>\n			    				</label>\n							</div>\n						";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.checked), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += ">\n			    				<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n			        				<span class=\"onoffswitch-inner\"></span>\n			       				 	<span class=\"onoffswitch-switch\"></span>\n			    				</label>\n							</div>\n						";
   return buffer;
   }
+function program5(depth0,data) {
+  
+  
+  return "checked";
+  }
 
-function program6(depth0,data) {
+function program7(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\n						<option value=\"";
+  buffer += "\n								<option value=\"";
   if (helper = helpers.value) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.value); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
@@ -740,7 +744,7 @@ function program6(depth0,data) {
   if (helper = helpers.label) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.label); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</option>\n						";
+    + "</option>\n							";
   return buffer;
   }
 
@@ -1285,19 +1289,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         events : ({
-            "click thead th" : function(item) {
+            "click thead th" : function(event) {
                 if (this.ordering) {
-                    var orderId = parseInt($(item.currentTarget).attr("data-id"));
-                    var orderByDirection;
-                    if (this.config.get("rollups") && this.rollupSummaryColumn >= 0) {
-                        orderId = orderId - 1;
-                    }
-                    if ($(item.currentTarget).hasClass("ASC")) {
-                        orderByDirection = "DESC";
+                	var expressionValue = $(event.currentTarget).attr("data-content");
+                	var obj = {"expression" : {"value" : expressionValue}};
+                	if ($(event.currentTarget).hasClass("ASC")) {
+                		obj.direction = "DESC";
                     } else {
-                        orderByDirection = "ASC";
+                        obj.direction = "ASC";
                     }
-                    this.config.set("orderBy", [{"col" : orderId, "direction" : orderByDirection}]);
+                    this.config.set("orderBy", [obj]);
                 }
             }
         }),
@@ -1349,7 +1350,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 var results = analysis.get("results");
                 var rollups;
-                if (results) {
+                if (results && status !== "PENDING" && status !== "RUNNING") {
                     // use results columns
                     columns = results.cols;
 
@@ -1375,7 +1376,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 // impossible to get column data from selection
                                 invalidSelection = true;
                             }
-
                         }
                     }
                     var metrics = this.model.get("metricList");
@@ -1419,31 +1419,30 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
                 }
 
-
-                // Add OrderBy Attribute
                 var orderBy = this.model.get("orderBy");
                 if (orderBy) {
-                    for (col=0; col<columns.length; col++) {
-                        if (columns[col]) {
-                            columns[col].orderDirection = null;
-                        }
-                    }
                     // add orderBy direction
-                    for (ix=0; ix<orderBy.length; ix++) {
-                        for (col=0; col<columns.length; col++) {
-                            if (this.ordering && this.config.get("rollups") && this.rollupSummaryColumn >= 0 && col === orderBy[ix].col) {
-                                if (originalColumns[col]) {
-                                    originalColumns[col].orderDirection = orderBy[ix].direction;
-                                }
-                                break;
-                            }
-                            else if (this.ordering && col === orderBy[ix].col) {
-                                if (originalColumns[col]) {
-                                    originalColumns[col].orderDirection = orderBy[ix].direction;
-                                }
-                                break;
-                            }
-                        }
+                	for (col=0; col<columns.length; col++) {
+                		if (columns[col]) {
+                			columns[col].orderDirection = undefined;
+	                		for (ix=0; ix<orderBy.length; ix++) {
+	                			if (this.ordering) {
+	                            	if (columns[col].definition) {
+	                            		if (orderBy[ix].expression) {
+	                            			if (columns[col].definition === orderBy[ix].expression.value) {
+	                                			columns[col].orderDirection = orderBy[ix].direction;
+	                                			break;
+	                                		}
+	                            		}
+	                            	} else if (orderBy[ix].expression) {
+	                            		if (columns[col].id === orderBy[ix].expression.value) {
+	                            			columns[col].orderDirection = orderBy[ix].direction;
+	                                		break;
+	                            		}
+	                            	}
+	                            }
+	                        }
+                		}
                     }
                 }
 
@@ -1497,14 +1496,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             return str;
                         })
                         .attr("data-content", function(d) {
-                            if (d.oid) {
-                                return d.oid;
+                            if (d.definition) {
+                                return d.definition;
                             } else {
-                                return d.id;
+                            	return d.id;
                             }
-                        })
-                        .attr("data-id", function(d, i) {
-                            return i;
                         });
 
                     // add class if more than 10 columns
@@ -1754,18 +1750,24 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.dimensionIndex !== null) {
                 this.dimensionIndex = options.dimensionIndex;
             }
+            if (this.config) {
+                this.config = options.model;
+            } else {
+            	this.config = squid_api.model.config;
+            }
+            if (this.status) {
+            	this.status = options.status;
+            } else {
+            	this.status = squid_api.model.status;
+            }
 
             // listen for selection change as we use it to get dimensions
             this.filters.on("change:selection", function() {
                 me.render();
             });
-
-            if (!this.model) {
-                this.model = squid_api.model.config;
-            }
-
+            
             // listen for global status change
-            squid_api.model.status.on('change:status', this.enable, this);
+            this.status.on('change:status', this.enable, this);
         },
 
         enable: function() {
@@ -1864,8 +1866,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                         jsonData.options.push(option);
                                     }
                                 }
-                                if (noneSelected === true) {
-                                    me.model.set("chosenDimensions", []);
+                                if (noneSelected === true && me.status.get("status") !== "RUNNING") {
+                                    me.config.set("chosenDimensions", []);
                                 }
                             }
                         }
@@ -1900,7 +1902,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                     return 'Dimensions';
                                 },
                                 onChange: function(option, selected) {
-                                    var chosenModel = _.clone(me.model.get("chosenDimensions"));
+                                    var chosenModel = _.clone(me.config.get("chosenDimensions"));
                                     if (!chosenModel) {
                                         chosenModel = [];
                                     }
@@ -1916,7 +1918,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                             }
                                         }
                                     }
-                                    me.model.set("chosenDimensions", chosenModel);
+                                    me.config.set("chosenDimensions", chosenModel);
                                 },
                                 onDropdownShown: function() {
                                     if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
@@ -1939,11 +1941,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 }
                             });
                         } else {
-                            var selectedDimension = me.model.get("selectedDimension");
+                            var selectedDimension = me.config.get("selectedDimension");
 
                             me.$el.find("select").on("change", function() {
                                 var dimension = $(me).val();
-                                me.model.set("chosenDimensions", [dimension]);
+                                me.config.set("chosenDimensions", [dimension]);
                             });
 
                             if (selectedDimension) {
@@ -1962,7 +1964,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         isChosen : function(facet) {
             var selected = false;
 
-            var dimensions = this.model.get("chosenDimensions");
+            var dimensions = this.config.get("chosenDimensions");
 
             if (dimensions) {
                 if (this.dimensionIndex !== null) {
@@ -3553,6 +3555,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             // check if empty
                             if (jsonData.options.length === 0) {
                                 jsonData.empty = true;
+                                if (me.model.get("chosenMetrics")) {
+                                	if (me.model.get("chosenMetrics").length > 0) {
+                                    	me.model.set({"chosenMetrics" : []});
+                                    }
+                                }
                             }
 
                             var html = me.template(jsonData);
@@ -3828,7 +3835,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     // extract the metricModels from the arguments
                     var metricModels = [];
                     if (chosenMetrics.length === 1) {
-                        metricModels.push(arguments[0]);
+                    	if (! arguments[0].error) {
+                    		metricModels.push(arguments[0]);
+                    	}
                     } else {
                         for (var i=0; i<chosenMetrics.length; i++) {
                         	if (! arguments[i][0].error) {
@@ -3858,12 +3867,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         removeOrderDirection: false,
         orderByDirectionDisplay: null,
         metricList: null,
+        filters: null,
 
         initialize : function(options) {
-            if (this.model) {
-                this.model.on('change', this.render, this);
+        	var me = this;
+        
+            if (options.config) {
+            	this.config = options.config;
+            } else {
+            	this.config = squid_api.model.config;
             }
-
             if (options.removeOrderDirection) {
                 this.removeOrderDirection = options.removeOrderDirection;
             }
@@ -3873,10 +3886,26 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.metricList) {
                 this.metricList = options.metricList;
             }
+            if (options.filters) {
+            	this.filters = options.filters;
+            } else {
+            	this.filters = squid_api.model.filters;
+            }
+            if (options.status) {
+            	this.status = options.status;
+            } else {
+            	this.status = squid_api.model.status;
+            }
 
-            // To populate metrics
-            squid_api.model.project.on("change:domains", this.render, this);
-
+            this.config.on('change:chosenDimensions', this.render, this);
+            this.config.on('change:chosenMetrics', this.render, this);
+            this.config.on('change:orderBy', this.render, this);
+            
+            // listen for selection change as we use it to get dimensions
+            this.filters.on("change:status", function() {
+                me.render();
+            });
+            
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -3896,95 +3925,137 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
         },
-
-        setModel: function(model) {
-            this.model = model;
-            this.initialize();
-        },
-
+        
         events: {
-            "change": function(event) {
-                if (event.target.checked !== undefined || event.target.type === "checkbox") {
-                    var orderByDirection;
-                    if (event.target.checked) {
-                        orderByDirection = "DESC";
-                    } else {
-                        orderByDirection = "ASC";
-                    }
-                    var orderByList = this.model.get("orderBy");
-                    var orderBy;
-                    if (orderByList) {
-                        orderBy = orderByList[0];
-                        this.model.set("orderBy", [{"col" : orderBy.col, "direction" : orderByDirection}]);
-                    }
-                }
-            }
+        	"click .onoffswitch": function() {
+        		var orderBy = this.config.get("orderBy");
+        		var obj = {};
+        		if (orderBy) {
+        			obj.expression = {"value" : orderBy[0].expression.value};
+        			if (orderBy[0].direction === "DESC") {
+        				obj.direction = "ASC";
+        			} else {
+        				obj.direction = "DESC";
+        			}
+        		}    		
+        		this.config.set({"orderBy" : [obj]});
+        		return false;
+        	}
+        },
+        
+        getColIndex : function(model, columns) {
+        	var col = 0;
+        	for (i=0; i<columns.length; i++) {
+        		if (columns[i].value === model.val()) {
+        			col = i;
+        		}
+        	}
+        	return col;
+        },
+        
+        expressionExists: function(columns) {
+        	var orderBy = this.config.get("orderBy");
+        	var count = 0;
+    		for (i=0; i<columns.length; i++) {
+    			if (orderBy[0].expression.value === columns[i].value) {
+    				count++;
+    			}
+    		}
+    		if (count > 0) {
+    			this.$el.find("select").multiselect('select', orderBy[0].expression.value);
+    		} else {
+    			if (columns[0]) {
+    				this.config.set({"orderBy" : [{expression:{value: columns[0].value}, direction:"DESC"}], "selectedMetric" : columns[0].value});
+    			} else {
+    				this.config.unset("orderBy");
+    				this.config.unset("selectedMetric");
+    			}
+    		}
         },
 
         render : function() {
-            var direction = "";
-            var me = this;
-
-            var orderByList = this.model.get("orderBy");
+        	var me = this;
+        	var filters = this.filters.get("selection");
+            var chosenDimensions = this.config.get("chosenDimensions");
+            var limit = this.config.get("limit");
+            var columns = [];
+                      
+            var orderByList = this.config.get("orderBy");
+            var checked = true;
             if (orderByList) {
-                var orderBy = this.model.get("orderBy")[0];
-                if (orderBy.direction === "DESC") {
-                    direction = "checked";
+                var orderBy = this.config.get("orderBy")[0];
+                if (orderBy.direction === "ASC") {
+                    checked = false;
                 }
             }
-
-            var limit = this.model.get("limit");
-
-            squid_api.utils.getDomainMetrics().then(function(metrics) {
-                metrics = metrics.models;
-                var chosenMetrics = squid_api.model.config.get("chosenMetrics");
-                var metricList = [];
-
-                if (me.metricList) {
-                    var appMetrics = me.metricList;
-                    for (var idx=0; idx<metrics.length; idx++) {
-                        for (ix=0; ix<appMetrics.length; ix++) {
-                            var metric1 = metrics[idx];
-                            if (appMetrics[ix] === metric1.oid) {
-                                var option1 = {"label" : metric1.name, "value" : metric1.oid};
-                                metricList.push(option1);
+            if (this.filters.get("status") === "DONE") {
+            	squid_api.utils.getDomainMetrics().then(function(metrics) {
+                    metrics = metrics.models;
+                    var chosenMetrics = me.config.get("chosenMetrics");
+                    var orderBy = me.config.get("orderBy");
+                    
+                    if (chosenDimensions) {
+                    	for (i=0; i<chosenDimensions.length; i++) {
+                    		if (filters) {
+                    			for (ix=0; ix<filters.facets.length; ix++) {
+                                	if (chosenDimensions[i] === filters.facets[ix].id) {
+                                		columns.push({"label" : filters.facets[ix].dimension.name, "value" : filters.facets[ix].id});
+                                	}
+                                }
+                    		}
+                        }
+                    }
+                    
+                    if (metrics && chosenMetrics) {
+                        for (var id=0; id<metrics.length; id++) {
+                            var metric = metrics[id];
+                            // Match with chosen
+                            for (var match=0; match<chosenMetrics.length; match++) {
+                                if (metric.get("oid") === chosenMetrics[match]) {
+                                    var option = {"label" : metric.get("name"), "value" : metric.get("definition")};
+                                    columns.push(option);
+                                }
                             }
                         }
                     }
-                } else if (metrics && chosenMetrics) {
-                    for (var id=0; id<metrics.length; id++) {
-                        var metric = metrics[id];
-                        // Match with chosen
-                        for (var match=0; match<chosenMetrics.length; match++) {
-                            if (metric.get("oid") === chosenMetrics[match]) {
-                                var option = {"label" : metric.get("name"), "value" : metric.get("oid")};
-                                metricList.push(option);
-                            }
-                        }
+
+                    var jsonData = {"checked" : checked, "limit" : limit, "Columns" : columns, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
+
+                    var html = me.template(jsonData);
+                    me.$el.html(html);
+
+                    me.$el.find("select").multiselect({
+                    	onChange: function(model) {
+                    		var obj = {};
+                    		var orderBy = me.model.get("orderBy");
+                    		if (orderBy) {
+                    			obj.expression = {"value" : model.val()};
+                    			if (orderBy[0].direction) {
+                    				obj.direction = orderBy[0].direction;
+                    			} else {
+                    				obj.direction = "DESC";
+                    			}
+                    		}           		
+                    		me.config.set({"orderBy" : [obj], "selectedMetric" : model.val()});
+                    	}
+                    });
+                    
+                    if (orderBy) {
+                    	if (orderBy[0].expression) {
+                    		// verify if existing expression exists
+                    		me.expressionExists(columns);  		
+                    	}
+                    } else if (me.$el.find("select").val()) {
+                    	var obj = {"expression" : {"value" : me.$el.find("select").val()}, "direction" : "DESC"};
+                    	me.config.set({"orderBy" : [obj], "selectedMetric" : me.$el.find("select").val()});
                     }
-                }
 
-                var jsonData = {"direction" : direction, "limit" : limit, "chosenMetrics" : metricList, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
+                    me.$el.find("select").multiselect("refresh");
 
-                var html = me.template(jsonData);
-                me.$el.html(html);
-
-                me.$el.find("select").multiselect({
-                    onChange: function(option) {
-                        var metric = option.attr("value");
-                        me.model.set({"selectedMetric": metric});
-                    }
+                    // Set Limit Value
+                    me.$el.find(".sq-select").val(jsonData.limit);
                 });
-
-                if (me.model.get("selectedMetric")) {
-                    me.$el.find("select").multiselect('select', me.model.get("selectedMetric"));
-                }
-
-                me.$el.find("select").multiselect("refresh");
-
-                // Set Limit Value
-                me.$el.find(".sq-select").val(jsonData.limit);
-            });
+            }
 
             return this;
         }
