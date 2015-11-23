@@ -35,6 +35,11 @@
                 if (options.modalElementClassName) {
                 	this.modalElementClassName = options.modalElementClassName;
                 }
+                if (options.status) {
+                    this.status = options.status;
+                } else {
+                    this.status = squid_api.model.status;
+                }
             }
 
             this.IndexView = squid_api.template.squid_api_export_scheduler_index_view;
@@ -117,18 +122,16 @@
                         var url = me.schedulerApiUri + "/jobs/" + id + "?run=1&access_token=" + squid_api.model.login.get("accessToken");
                         $.ajax({
                             method: "GET",
-                            url: url,
+                            url: url
                         });
+                        me.status.set("message", "you have manually triggered a job to run");
                     },
                     "click .delete-job": function (event) {
                         var id = $(event.target).parents(".job-item").attr("data-attr");
                         var job = exportJobs.get(id);
                         job.destroy({
                             success: function () {
-                                squid_api.model.status.set("message", "job successfully deleted");
-                            },
-                            error: function () {
-
+                                me.status.set("message", "job successfully deleted");
                             }
                         });
                         exportJobs.remove(job);
@@ -155,19 +158,19 @@
                     this.$el.find(".table").DataTable({
                         paging: false
                     });
-                     
+
                     return this;
                 }
             });
-            
+
             this.indexModal = new Backbone.BootstrapModal({
                 content: new IndexView(),
                 title: "Scheduled Usage Reports"
             }).open();
-            
+
             // modal wrapper class
             $(this.indexModal.el).addClass(this.modalElementClassName);
-           
+
             /* bootstrap doesn't remove modal from dom when clicking outside of it.
             Check to make sure it has been removed whenever it isn't displayed.
              */
@@ -256,7 +259,7 @@
                     content: new FormView(),
                     title: modalHeader
                 }).open();
-                
+
                 /* bootstrap doesn't remove modal from dom when clicking outside of it.
                 Check to make sure it has been removed whenever it isn't displayed.
                  */
@@ -288,25 +291,32 @@
                         if (widget.formContent.getValue().emails.lastIndexOf(widget.formContent.getValue().emails[0]) > 0) {
                             emails = widget.formContent.getValue().emails.slice(widget.formContent.getValue().emails.lastIndexOf(widget.formContent.getValue().emails[0]), widget.formContent.getValue().emails.length);
                         }
-                        // Remove duplicate in emails T264.
-                        /*var emails = values.emails.reduce(function (accum, current) {
-                         if (accum.indexOf(current) < 0) {
-                         accum.push(current);
-                         }
-                         return accum;
-                         }, []);*/
                     }
                     values.emails = emails;
-
-
 
                     if (id) {
                         // EDIT aka PUT /jobs/:id
                         var job = exportJobs.get(id);
                         job.attributes.emails = values.emails;
                         job.set(values);
-                        job.save();
-
+                        job.save({}, {
+                            success: function() {
+                                var msg = "";
+                                if (model.get("errors")) {
+                                    var errors = model.get("errors");
+                                    for (var x in errors) {
+                                        if (errors[x].message) {
+                                            msg = msg + errors[x].message + "";
+                                        }
+                                    }
+                                } else {
+                                    exportJobs.add(model);
+                                    $(formModal.el).trigger("hidden.bs.modal");
+                                    msg = msg + "job successfully modified";
+                                }
+                                me.status.set("message", msg);
+                            }
+                        });
                     } else {
                         // CREATE aka POST /jobs/
 
@@ -334,7 +344,7 @@
                         newJob.save({}, {
                             success: function (model) {
                                 var msg = "";
-                                
+
                                 if (model.get("errors")) {
                                     var errors = model.get("errors");
                                     for (var x in errors) {
@@ -347,7 +357,7 @@
                                     $(formModal.el).trigger("hidden.bs.modal");
                                     msg = msg + "job successfully saved";
                                 }
-                                squid_api.model.status.set("message", msg);
+                                me.status.set("message", msg);
                             }
                         });
                     }
