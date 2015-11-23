@@ -269,7 +269,7 @@
                 var rollupSummaryIndex = null;
                 if (rollups) {
                     if ((rollups.length>0)) {
-                        if (rollups.length>1) {
+                        if (rollups.length>1 && rollups[0].col === -1) {
                             rollupColIndex = rollups[1].col + 1;
                         } else {
                             rollupColIndex = rollups[0].col + 1;
@@ -353,7 +353,7 @@
                 var rollupSummaryIndex = null;
                 if (rollups) {
                     if ((rollups.length>0)) {
-                        if (rollups.length>1) {
+                        if (rollups.length>1 && rollups[0].col === -1) {
                             rollupColIndex = rollups[1].col + 1;
                         } else {
                             rollupColIndex = rollups[0].col + 1;
@@ -408,11 +408,17 @@
                                 if (parseInt(this.parentNode.__data__.v[0]) === 1) {
                                     // this is a total (grouped) line
                                     this.parentNode.className = "group";
-                                    return "new-category";
+                                }
+                                if (parseInt(this.parentNode.__data__.v[0]) >= 1) {
+                                  // this is a rollup sub level line
+                                  return "new-category";
                                 }
                             } else if ((i === 1 && parseInt(this.parentNode.__data__.v[0]) === 1)) {
                                 // this is a total line
                                 this.parentNode.className = "group";
+                                return "new-category";
+                            } else if (parseInt(this.parentNode.__data__.v[0]) > 1) {
+                                // this is a rollup sub level line
                                 return "new-category";
                             } else if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode === this.parentNode.parentNode.childNodes[0])) {
                                 // detect total column
