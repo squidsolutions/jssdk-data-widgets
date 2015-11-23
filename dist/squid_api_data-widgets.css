@@ -67,7 +67,7 @@ rect text {
 	background: -moz-linear-gradient(top,  #f8f8f8,  #f6f6f6);
 }
 
-#squid-api-data-widgets-data-table table tr.group .new-category {
+#squid-api-data-widgets-data-table table tr .new-category {
 	font-weight: bold;
 }
 
