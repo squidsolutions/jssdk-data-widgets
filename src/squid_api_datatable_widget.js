@@ -353,7 +353,7 @@
                 var rollupSummaryIndex = null;
                 if (rollups) {
                     if ((rollups.length>0)) {
-                        if (rollups.length>1) {
+                        if (rollups.length>1 && rollups[0].col === -1) {
                             rollupColIndex = rollups[1].col + 1;
                         } else {
                             rollupColIndex = rollups[0].col + 1;
