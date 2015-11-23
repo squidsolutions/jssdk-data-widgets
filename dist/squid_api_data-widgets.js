@@ -2801,12 +2801,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         downloadButtonLabel : "Download your data",
 
         initialize : function(options) {
+            var me = this;
+
             if (this.model.get("analysis")) {
-                this.listenTo(this.model.get("analysis"), 'change', this.render);
-                this.listenTo(this.model, 'change:templateData', this.refreshViewSqlUrl);
+                this.listenTo(this.model.get("analysis"), 'change', function() {
+                    me.render();
+                    me.enabled();
+                });
+                this.listenTo(this.model, 'change:templateData', function() {
+                    me.refreshViewSqlUrl;
+                    me.enabled();
+                });
                 this.listenTo(this.model, 'change:enabled', this.enabled);
             } else {
-                this.listenTo(this.model, 'change', this.render);
+                this.listenTo(this.model, 'change', function() {
+                    me.render();
+                    me.enabled();
+                });
             }
             // setup options
             if (options.template) {
@@ -2842,7 +2853,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.displayCompression = false;
             }
         },
-        
+
         enabled: function() {
         	var viewPort = this.viewPort;
         	if (this.popup) {
@@ -2885,7 +2896,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.popup) {
             	viewPort = this.popup;
             }
-            
+
             // create download link
             var analysisJobResults;
             var selectedFormat = this.formats[this.selectedFormatIndex];
@@ -2893,7 +2904,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var postMethod;
             var downloadBtn = viewPort.find("#download");
             var downloadForm = viewPort.find("#download-form");
-            
+
             if (!selectedFormat.template) {
                 // use getResults method
                 analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
@@ -2905,7 +2916,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 analysisJobResults.setParameter("type", selectedFormat.type);
                 analysisJobResults.setParameter("timeout", null);
                 // build the template
-                
+
                 if (selectedFormat.format === "xml") {
                     if (me.model.get("templateData").options.xmlType) {
                         velocityTemplate = selectedFormat.template[me.model.get("templateData").options.xmlType](me.model.get("templateData"));
@@ -2926,9 +2937,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "id": currentJobId,
                 "oid": currentJobId.oid
             });
-            
+
             downloadBtn.removeClass("disabled");
-            
+
             downloadForm.attr("action",analysisJobResults.url());
             downloadForm.attr("method",postMethod);
             downloadForm.empty();
@@ -2971,7 +2982,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 downloadBtn.removeClass("disabled");
             }
         },
-        
+
         download : function() {
             var me = this;
             var viewPort = $(this.viewPort);
@@ -2997,7 +3008,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         "projectId": analysis.get("id").projectId,
                         "analysisJobId": null
                     }});
-                // 
+                //
                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
                 .done(function(analysis) {
                     if (analysis.get("limit") || (analysis.get("template"))) {
@@ -3133,7 +3144,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             	if (me.displayInPopup) {
             		viewPort = me.popup;
             	}
-            		
+
                 me.curlCollapsed = !me.curlCollapsed;
                 if (me.curlCollapsed) {
                 	viewPort.find('#curl').fadeOut();
@@ -3150,11 +3161,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             .click(function(event) {
                 me.clickedCompression(event);
             });
-            
+
             $(this.viewPort).find("#download").click(function() {
                 me.download();
             });
-            
+
             if (this.displayInPopup) {
             	this.popup = this.$el.find(".download-wrapper").dialog({
                     dialogClass: "squid-api-export-panel-popup",
