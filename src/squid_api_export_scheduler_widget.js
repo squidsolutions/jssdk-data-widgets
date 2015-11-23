@@ -142,7 +142,7 @@
                     var jsonData = {"jobs": []};
                     for (var i = 0; i < this.model.models.length; i++) {
                         for (ix = 0; ix < me.reports.length; ix++) {
-                            if (me.reports[ix].oid === this.model.models[i].get("shortcutId")) {
+                            if (me.reports[ix].oid === this.model.models[i].get("reportId")) {
                                 this.model.models[i].set("reportName", me.reports[ix].name);
                             }
                         }
@@ -320,12 +320,12 @@
                     } else {
                         // CREATE aka POST /jobs/
 
-                        // TODO use squid_api.model.config instead
-                        values.state = squid_api.model.state;
-
+                        var config = squid_api.model.config.toJSON();
+                        values.state = config;
+                    
                         // Getting the accountID (shared code with PQ Counter)
                         var accountID = 0;
-                        var facets = squid_api.model.state.attributes.config.selection.facets;
+                        var facets = config.selection.facets;
                         for (var i = 0; i < facets.length; i++) {
                             var check = facets[i].id.indexOf("@'shipto_account_name'", facets[i].id.length - "@'shipto_account_name'".length);
                             if (check !== -1) {
@@ -338,7 +338,9 @@
                             }
                         }
                         values.accountID = accountID;
-                        values.reportId = squid_api.model.state.attributes.config.report;
+                        values.projectId = config.project;
+                        values.bookmarkId = config.bookmark;
+                        values.reportId = config.report;
 
                         var newJob = new ExportJobModel(values);
                         newJob.save({}, {
