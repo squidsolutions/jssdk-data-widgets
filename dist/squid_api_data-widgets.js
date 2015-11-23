@@ -3211,6 +3211,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 console.log("compute (change:userSelection)");
                 squid_api.controller.facetjob.compute(filters, filters.get("userSelection"));
             });
+            
+            // check for new filter selection made by config update
+            this.listenTo(this.config, 'change:selection', function() {
+                console.log("compute (change:selection)");
+                squid_api.controller.facetjob.compute(filters, me.config.get("selection"));
+            });
 
             // update config if filters have changed
             this.listenTo(filters, 'change:selection', function(filters) {
