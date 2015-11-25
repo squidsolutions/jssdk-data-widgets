@@ -57,9 +57,9 @@
                             "projectId" : id.projectId,
                             "domainId" : me.config.get("domain")
                         }]);
+                        squid_api.controller.facetjob.compute(filters, me.config.get("selection"));
                     }
                 }
-                squid_api.controller.facetjob.compute(filters, me.config.get("selection"));
             });
 
             // update config if filters have changed
