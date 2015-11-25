@@ -3242,6 +3242,20 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // check for new filter selection made by config update
             this.listenTo(this.config, 'change:selection', function() {
                 console.log("compute (change:selection)");
+                // make sure the domain of filters is set
+                if (me.config.get("domain")) {
+                    var id = filters.get("id");
+                    if (id) {
+                        filters.set("id" , {
+                            "projectId" : id.projectId,
+                            "facetjobId" : null
+                            });
+                        filters.setDomainIds([{
+                            "projectId" : id.projectId,
+                            "domainId" : me.config.get("domain")
+                        }]);
+                    }
+                }
                 squid_api.controller.facetjob.compute(filters, me.config.get("selection"));
             });
 
