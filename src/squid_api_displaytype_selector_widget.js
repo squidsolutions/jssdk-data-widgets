@@ -18,24 +18,24 @@
                 if (options.config) {
                     this.config = options.config;
                 }
-                
+
                 // Store template
                 if (options.template) {
                     this.template = options.template;
                 } else {
                     this.template = template;
                 }
-                
+
                 this.tableView = options.tableView;
                 this.barView = options.barView;
                 this.timeView = options.timeView;
             }
 
-            
+
             if (this.model) {
                 this.listenTo(this.model,"change", this.render);
             }
-            
+
             if (!this.config) {
                 this.config = squid_api.model.config;
             }
@@ -54,15 +54,21 @@
         changeWidget: function(item){
             var viewName = item.currentTarget.dataset.content;
             var analysis;
-            
+            var currentAnalysis;
+
             // create the new view
             if (viewName === "tableView") {
                 analysis = this.tableView.model;
+                currentAnalysis = "tableAnalysis";
             } else if (viewName === "timeView") {
                 analysis = this.timeView.model;
-            } else if (viewName === "barView") {
+                currentAnalysis = "timeAnalysis";
+            } else if (viewName === "barAnalysis") {
                 analysis = this.barView.model;
+                currentAnalysis = "barAnalysis";
             }
+
+            this.config.set("currentAnalysis", currentAnalysis);
             this.model.set("currentAnalysis", analysis);
         },
 
@@ -79,15 +85,15 @@
             var selectedDimension = this.model.get("selectedDimension");
             var compatibleViews = [];
             this.addCompatibleView(compatibleViews, "tableView");
-            
+
             if (selectedDimension && (selectedDimension.length>0)) {
                 this.addCompatibleView(compatibleViews, "barView");
-                
+
             }
             if (squid_api.controller.facetjob.getTemporalFacet(squid_api.model.config.get("selection"))) {
                 this.addCompatibleView(compatibleViews, "timeView");
             }
-            
+
             // compute the current selected view
             var analysis = this.model.get("currentAnalysis");
             var currentViewName;
