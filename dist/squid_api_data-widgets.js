@@ -1768,10 +1768,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             // listen for selection change as we use it to get dimensions
-            this.filters.on("change:selection", function() {
-                me.render();
-            });
-            
+            this.listenTo(this.filters,"change:selection", this.render);
+            this.listenTo(this.config,"change:chosenDimensions", this.render);
+
             // listen for global status change
             this.status.on('change:status', this.enable, this);
         },
