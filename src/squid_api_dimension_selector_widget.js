@@ -32,7 +32,7 @@
                 this.dimensionIndex = options.dimensionIndex;
             }
             if (this.config) {
-                this.config = options.model
+                this.config = options.model;
             } else {
             	this.config = squid_api.model.config;
             }
@@ -43,10 +43,9 @@
             }
 
             // listen for selection change as we use it to get dimensions
-            this.filters.on("change:selection", function() {
-                me.render();
-            });
-            
+            this.listenTo(this.filters,"change:selection", this.render);
+            this.listenTo(this.config,"change:chosenDimensions", this.render);
+
             // listen for global status change
             this.status.on('change:status', this.enable, this);
         },

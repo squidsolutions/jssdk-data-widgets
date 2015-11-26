@@ -1438,13 +1438,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 	                			if (this.ordering) {
 	                            	if (columns[col].definition) {
 	                            		if (orderBy[ix].expression) {
-	                            			if (columns[col].definition == orderBy[ix].expression.value) {
+	                            			if (columns[col].definition === orderBy[ix].expression.value) {
 	                                			columns[col].orderDirection = orderBy[ix].direction;
 	                                			break;
 	                                		}
 	                            		}
 	                            	} else if (orderBy[ix].expression) {
-	                            		if (columns[col].id == orderBy[ix].expression.value) {
+	                            		if (columns[col].id === orderBy[ix].expression.value) {
 	                            			columns[col].orderDirection = orderBy[ix].direction;
 	                                		break;
 	                            		}
@@ -1459,7 +1459,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var rollupSummaryIndex = null;
                 if (rollups) {
                     if ((rollups.length>0)) {
-                        if (rollups.length>1) {
+                        if (rollups.length>1 && rollups[0].col === -1) {
                             rollupColIndex = rollups[1].col + 1;
                         } else {
                             rollupColIndex = rollups[0].col + 1;
@@ -1543,7 +1543,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var rollupSummaryIndex = null;
                 if (rollups) {
                     if ((rollups.length>0)) {
-                        if (rollups.length>1) {
+                        if (rollups.length>1 && rollups[0].col === -1) {
                             rollupColIndex = rollups[1].col + 1;
                         } else {
                             rollupColIndex = rollups[0].col + 1;
@@ -1598,11 +1598,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 if (parseInt(this.parentNode.__data__.v[0]) === 1) {
                                     // this is a total (grouped) line
                                     this.parentNode.className = "group";
-                                    return "new-category";
+                                }
+                                if (parseInt(this.parentNode.__data__.v[0]) >= 1) {
+                                  // this is a rollup sub level line
+                                  return "new-category";
                                 }
                             } else if ((i === 1 && parseInt(this.parentNode.__data__.v[0]) === 1)) {
                                 // this is a total line
                                 this.parentNode.className = "group";
+                                return "new-category";
+                            } else if (parseInt(this.parentNode.__data__.v[0]) > 1) {
+                                // this is a rollup sub level line
                                 return "new-category";
                             } else if ((parseInt(this.parentNode.__data__.v[0]) === 0) && (this.parentNode === this.parentNode.parentNode.childNodes[0])) {
                                 // detect total column
@@ -1760,7 +1766,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.dimensionIndex = options.dimensionIndex;
             }
             if (this.config) {
-                this.config = options.model
+                this.config = options.model;
             } else {
             	this.config = squid_api.model.config;
             }
@@ -1771,10 +1777,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             // listen for selection change as we use it to get dimensions
-            this.filters.on("change:selection", function() {
-                me.render();
-            });
-            
+            this.listenTo(this.filters,"change:selection", this.render);
+            this.listenTo(this.config,"change:chosenDimensions", this.render);
+
             // listen for global status change
             this.status.on('change:status', this.enable, this);
         },
@@ -2174,24 +2179,24 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (options.config) {
                     this.config = options.config;
                 }
-                
+
                 // Store template
                 if (options.template) {
                     this.template = options.template;
                 } else {
                     this.template = template;
                 }
-                
+
                 this.tableView = options.tableView;
                 this.barView = options.barView;
                 this.timeView = options.timeView;
             }
 
-            
+
             if (this.model) {
                 this.listenTo(this.model,"change", this.render);
             }
-            
+
             if (!this.config) {
                 this.config = squid_api.model.config;
             }
@@ -2210,15 +2215,21 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         changeWidget: function(item){
             var viewName = item.currentTarget.dataset.content;
             var analysis;
-            
+            var currentAnalysis;
+
             // create the new view
             if (viewName === "tableView") {
                 analysis = this.tableView.model;
+                currentAnalysis = "tableAnalysis";
             } else if (viewName === "timeView") {
                 analysis = this.timeView.model;
-            } else if (viewName === "barView") {
+                currentAnalysis = "timeAnalysis";
+            } else if (viewName === "barAnalysis") {
                 analysis = this.barView.model;
+                currentAnalysis = "barAnalysis";
             }
+
+            this.config.set("currentAnalysis", currentAnalysis);
             this.model.set("currentAnalysis", analysis);
         },
 
@@ -2235,15 +2246,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var selectedDimension = this.model.get("selectedDimension");
             var compatibleViews = [];
             this.addCompatibleView(compatibleViews, "tableView");
-            
+
             if (selectedDimension && (selectedDimension.length>0)) {
                 this.addCompatibleView(compatibleViews, "barView");
-                
+
             }
             if (squid_api.controller.facetjob.getTemporalFacet(squid_api.model.config.get("selection"))) {
                 this.addCompatibleView(compatibleViews, "timeView");
             }
-            
+
             // compute the current selected view
             var analysis = this.model.get("currentAnalysis");
             var currentViewName;
@@ -2437,6 +2448,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (options.modalElementClassName) {
                 	this.modalElementClassName = options.modalElementClassName;
                 }
+                if (options.status) {
+                    this.status = options.status;
+                } else {
+                    this.status = squid_api.model.status;
+                }
             }
 
             this.IndexView = squid_api.template.squid_api_export_scheduler_index_view;
@@ -2519,18 +2535,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         var url = me.schedulerApiUri + "/jobs/" + id + "?run=1&access_token=" + squid_api.model.login.get("accessToken");
                         $.ajax({
                             method: "GET",
-                            url: url,
+                            url: url
                         });
+                        me.status.set("message", "you have manually triggered a job to run");
                     },
                     "click .delete-job": function (event) {
                         var id = $(event.target).parents(".job-item").attr("data-attr");
                         var job = exportJobs.get(id);
                         job.destroy({
                             success: function () {
-                                squid_api.model.status.set("message", "job successfully deleted");
-                            },
-                            error: function () {
-
+                                me.status.set("message", "job successfully deleted");
                             }
                         });
                         exportJobs.remove(job);
@@ -2541,7 +2555,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     var jsonData = {"jobs": []};
                     for (var i = 0; i < this.model.models.length; i++) {
                         for (ix = 0; ix < me.reports.length; ix++) {
-                            if (me.reports[ix].oid === this.model.models[i].get("shortcutId")) {
+                            if (me.reports[ix].oid === this.model.models[i].get("reportId")) {
                                 this.model.models[i].set("reportName", me.reports[ix].name);
                             }
                         }
@@ -2557,19 +2571,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.$el.find(".table").DataTable({
                         paging: false
                     });
-                     
+
                     return this;
                 }
             });
-            
+
             this.indexModal = new Backbone.BootstrapModal({
                 content: new IndexView(),
                 title: "Scheduled Usage Reports"
             }).open();
-            
+
             // modal wrapper class
             $(this.indexModal.el).addClass(this.modalElementClassName);
-           
+
             /* bootstrap doesn't remove modal from dom when clicking outside of it.
             Check to make sure it has been removed whenever it isn't displayed.
              */
@@ -2658,7 +2672,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     content: new FormView(),
                     title: modalHeader
                 }).open();
-                
+
                 /* bootstrap doesn't remove modal from dom when clicking outside of it.
                 Check to make sure it has been removed whenever it isn't displayed.
                  */
@@ -2690,34 +2704,41 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         if (widget.formContent.getValue().emails.lastIndexOf(widget.formContent.getValue().emails[0]) > 0) {
                             emails = widget.formContent.getValue().emails.slice(widget.formContent.getValue().emails.lastIndexOf(widget.formContent.getValue().emails[0]), widget.formContent.getValue().emails.length);
                         }
-                        // Remove duplicate in emails T264.
-                        /*var emails = values.emails.reduce(function (accum, current) {
-                         if (accum.indexOf(current) < 0) {
-                         accum.push(current);
-                         }
-                         return accum;
-                         }, []);*/
                     }
                     values.emails = emails;
-
-
 
                     if (id) {
                         // EDIT aka PUT /jobs/:id
                         var job = exportJobs.get(id);
                         job.attributes.emails = values.emails;
                         job.set(values);
-                        job.save();
-
+                        job.save({}, {
+                            success: function() {
+                                var msg = "";
+                                if (model.get("errors")) {
+                                    var errors = model.get("errors");
+                                    for (var x in errors) {
+                                        if (errors[x].message) {
+                                            msg = msg + errors[x].message + "";
+                                        }
+                                    }
+                                } else {
+                                    exportJobs.add(model);
+                                    $(formModal.el).trigger("hidden.bs.modal");
+                                    msg = msg + "job successfully modified";
+                                }
+                                me.status.set("message", msg);
+                            }
+                        });
                     } else {
                         // CREATE aka POST /jobs/
 
-                        // TODO use squid_api.model.config instead
-                        values.state = squid_api.model.state;
-
+                        var config = squid_api.model.config.toJSON();
+                        values.state = config;
+                    
                         // Getting the accountID (shared code with PQ Counter)
                         var accountID = 0;
-                        var facets = squid_api.model.state.attributes.config.selection.facets;
+                        var facets = config.selection.facets;
                         for (var i = 0; i < facets.length; i++) {
                             var check = facets[i].id.indexOf("@'shipto_account_name'", facets[i].id.length - "@'shipto_account_name'".length);
                             if (check !== -1) {
@@ -2730,13 +2751,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             }
                         }
                         values.accountID = accountID;
-                        values.reportId = squid_api.model.state.attributes.config.report;
+                        values.projectId = config.project;
+                        values.bookmarkId = config.bookmark;
+                        values.reportId = config.report;
 
                         var newJob = new ExportJobModel(values);
                         newJob.save({}, {
                             success: function (model) {
                                 var msg = "";
-                                
+
                                 if (model.get("errors")) {
                                     var errors = model.get("errors");
                                     for (var x in errors) {
@@ -2749,7 +2772,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                     $(formModal.el).trigger("hidden.bs.modal");
                                     msg = msg + "job successfully saved";
                                 }
-                                squid_api.model.status.set("message", msg);
+                                me.status.set("message", msg);
                             }
                         });
                     }
@@ -2795,13 +2818,27 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         downloadButtonLabel : "Download your data",
 
         initialize : function(options) {
+            var me = this;
+
             if (this.model.get("analysis")) {
-                this.listenTo(this.model.get("analysis"), 'change', this.render);
-                this.listenTo(this.model, 'change:templateData', this.refreshViewSqlUrl);
-                this.listenTo(this.model, 'change:templateData', this.refreshViewMaterializeDatasets);
+                this.listenTo(this.model.get("analysis"), 'change', function() {
+                    me.render();
+                    me.enabled();
+                });
+                this.listenTo(this.model, 'change:templateData', function() {
+                    me.refreshViewSqlUrl();
+                    me.enabled();
+                });
+                this.listenTo(this.model, 'change:templateData', function() {
+                    me.refreshViewMaterializeDatasets();
+                    me.enabled();
+                });
                 this.listenTo(this.model, 'change:enabled', this.enabled);
             } else {
-                this.listenTo(this.model, 'change', this.render);
+                this.listenTo(this.model, 'change', function() {
+                    me.render();
+                    me.enabled();
+                });
             }
             // setup options
             if (options.template) {
@@ -2840,7 +2877,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.displayCompression = false;
             }
         },
-        
+
         enabled: function() {
         	var viewPort = this.viewPort;
         	if (this.popup) {
@@ -2885,7 +2922,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.popup) {
             	viewPort = this.popup;
             }
-            
+
             // create download link
             var analysisJobResults;
             var selectedFormat = this.formats[this.selectedFormatIndex];
@@ -2893,7 +2930,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var postMethod;
             var downloadBtn = viewPort.find("#download");
             var downloadForm = viewPort.find("#download-form");
-            
+
             if (!selectedFormat.template) {
                 // use getResults method
                 analysisJobResults = new squid_api.model.ProjectAnalysisJobResult();
@@ -2905,7 +2942,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 analysisJobResults.setParameter("type", selectedFormat.type);
                 analysisJobResults.setParameter("timeout", null);
                 // build the template
-                
+
                 if (selectedFormat.format === "xml") {
                     if (me.model.get("templateData").options.xmlType) {
                         velocityTemplate = selectedFormat.template[me.model.get("templateData").options.xmlType](me.model.get("templateData"));
@@ -2926,9 +2963,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "id": currentJobId,
                 "oid": currentJobId.oid
             });
-            
+
             downloadBtn.removeClass("disabled");
-            
+
             downloadForm.attr("action",analysisJobResults.url());
             downloadForm.attr("method",postMethod);
             downloadForm.empty();
@@ -3036,7 +3073,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         "projectId": analysis.get("id").projectId,
                         "analysisJobId": null
                     }});
-                // 
+                //
                 squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
                 .done(function(analysis) {
                     if (analysis.get("limit") || (analysis.get("template"))) {
@@ -3174,7 +3211,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             	if (me.displayInPopup) {
             		viewPort = me.popup;
             	}
-            		
+
                 me.curlCollapsed = !me.curlCollapsed;
                 if (me.curlCollapsed) {
                 	viewPort.find('#curl').fadeOut();
@@ -3191,7 +3228,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             .click(function(event) {
                 me.clickedCompression(event);
             });
-            
+
             $(this.viewPort).find("#download").click(function() {
                 me.download();
             });
@@ -3269,6 +3306,26 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.listenTo(filters, 'change:userSelection', function() {
                 console.log("compute (change:userSelection)");
                 squid_api.controller.facetjob.compute(filters, filters.get("userSelection"));
+            });
+            
+            // check for new filter selection made by config update
+            this.listenTo(this.config, 'change:selection', function() {
+                console.log("compute (change:selection)");
+                // make sure the domain of filters is set
+                if (me.config.get("domain")) {
+                    var id = filters.get("id");
+                    if (id) {
+                        filters.set("id" , {
+                            "projectId" : id.projectId,
+                            "facetjobId" : null
+                            });
+                        filters.setDomainIds([{
+                            "projectId" : id.projectId,
+                            "domainId" : me.config.get("domain")
+                        }]);
+                        squid_api.controller.facetjob.compute(filters, me.config.get("selection"));
+                    }
+                }
             });
 
             // update config if filters have changed
@@ -3496,12 +3553,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             // setup the models
-            if (!this.model) {
-                this.model = squid_api.model.config;
+            if (!this.config) {
+                this.config = squid_api.model.config;
             }
 
             // setup the model listeners
-            this.listenTo(this.model,"change:domain", this.render);
+            this.listenTo(this.config,"change:domain", this.render);
+            this.listenTo(this.config,"change:chosenMetrics", this.render);
 
             // listen for global status change
             this.listenTo(squid_api.model.status,"change:status", this.handleStatus);
@@ -3535,18 +3593,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
         },
 
-        setModel: function(model) {
-            this.model = model;
-            this.initialize();
-        },
-
         events: {
             "change": function() {
                 var oid = this.$el.find("select option:selected");
                 // Remove Button Title Tag
                 this.$el.find("button").removeAttr('title');
 
-                var chosenMetrics = this.model.get("chosenMetrics");
+                var chosenMetrics = this.config.get("chosenMetrics");
                 var selectedMetrics = [];
 
                 // build the selection array
@@ -3559,13 +3612,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 chosenMetricsNew = _.intersection(_.union(chosenMetrics, selectedMetrics), selectedMetrics);
 
                 // Update
-                this.model.set({"chosenMetrics" : chosenMetricsNew});
+                this.config.set({"chosenMetrics" : chosenMetricsNew});
             }
         },
 
         render: function() {
-            var projectOid = this.model.get("project");
-            var domainOid = this.model.get("domain");
+            var projectOid = this.config.get("project");
+            var domainOid = this.config.get("domain");
 
             if (projectOid && domainOid) {
                 var me = this, isMultiple = true;
@@ -3597,7 +3650,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 }
 
                                 if (noneSelected === true) {
-                                    me.model.set("chosenMetrics", []);
+                                    me.config.set("chosenMetrics", []);
                                 }
 
                                 // Alphabetical Sorting
@@ -3616,9 +3669,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             // check if empty
                             if (jsonData.options.length === 0) {
                                 jsonData.empty = true;
-                                if (me.model.get("chosenMetrics")) {
-                                	if (me.model.get("chosenMetrics").length > 0) {
-                                    	me.model.set({"chosenMetrics" : []});
+                                if (me.config.get("chosenMetrics")) {
+                                	if (me.config.get("chosenMetrics").length > 0) {
+                                    	me.config.set({"chosenMetrics" : []});
                                     }
                                 }
                             }
@@ -3669,7 +3722,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         isChosen : function(item) {
             var selected = false;
-            var metrics = this.model.get("chosenMetrics");
+            var metrics = this.config.get("chosenMetrics");
 
             if (metrics) {
                 for (var j=0; j<metrics.length; j++) {
@@ -3988,12 +4041,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
         
         events: {
-        	"click .onoffswitch": function(event) {
+        	"click .onoffswitch": function() {
         		var orderBy = this.config.get("orderBy");
         		var obj = {};
         		if (orderBy) {
         			obj.expression = {"value" : orderBy[0].expression.value};
-        			if (orderBy[0].direction == "DESC") {
+        			if (orderBy[0].direction === "DESC") {
         				obj.direction = "ASC";
         			} else {
         				obj.direction = "DESC";
@@ -4018,7 +4071,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         	var orderBy = this.config.get("orderBy");
         	var count = 0;
     		for (i=0; i<columns.length; i++) {
-    			if (orderBy[0].expression.value == columns[i].value) {
+    			if (orderBy[0].expression.value === columns[i].value) {
     				count++;
     			}
     		}

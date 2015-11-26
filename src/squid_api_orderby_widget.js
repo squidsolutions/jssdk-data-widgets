@@ -69,12 +69,12 @@
         },
         
         events: {
-        	"click .onoffswitch": function(event) {
+        	"click .onoffswitch": function() {
         		var orderBy = this.config.get("orderBy");
         		var obj = {};
         		if (orderBy) {
         			obj.expression = {"value" : orderBy[0].expression.value};
-        			if (orderBy[0].direction == "DESC") {
+        			if (orderBy[0].direction === "DESC") {
         				obj.direction = "ASC";
         			} else {
         				obj.direction = "DESC";
@@ -99,7 +99,7 @@
         	var orderBy = this.config.get("orderBy");
         	var count = 0;
     		for (i=0; i<columns.length; i++) {
-    			if (orderBy[0].expression.value == columns[i].value) {
+    			if (orderBy[0].expression.value === columns[i].value) {
     				count++;
     			}
     		}
