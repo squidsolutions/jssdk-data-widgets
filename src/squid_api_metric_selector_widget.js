@@ -26,12 +26,13 @@
             }
 
             // setup the models
-            if (!this.model) {
-                this.model = squid_api.model.config;
+            if (!this.config) {
+                this.config = squid_api.model.config;
             }
 
             // setup the model listeners
-            this.listenTo(this.model,"change:domain", this.render);
+            this.listenTo(this.config,"change:domain", this.render);
+            this.listenTo(this.config,"change:chosenMetrics", this.render);
 
             // listen for global status change
             this.listenTo(squid_api.model.status,"change:status", this.handleStatus);
@@ -65,18 +66,13 @@
             }
         },
 
-        setModel: function(model) {
-            this.model = model;
-            this.initialize();
-        },
-
         events: {
             "change": function() {
                 var oid = this.$el.find("select option:selected");
                 // Remove Button Title Tag
                 this.$el.find("button").removeAttr('title');
 
-                var chosenMetrics = this.model.get("chosenMetrics");
+                var chosenMetrics = this.config.get("chosenMetrics");
                 var selectedMetrics = [];
 
                 // build the selection array
@@ -89,13 +85,13 @@
                 chosenMetricsNew = _.intersection(_.union(chosenMetrics, selectedMetrics), selectedMetrics);
 
                 // Update
-                this.model.set({"chosenMetrics" : chosenMetricsNew});
+                this.config.set({"chosenMetrics" : chosenMetricsNew});
             }
         },
 
         render: function() {
-            var projectOid = this.model.get("project");
-            var domainOid = this.model.get("domain");
+            var projectOid = this.config.get("project");
+            var domainOid = this.config.get("domain");
 
             if (projectOid && domainOid) {
                 var me = this, isMultiple = true;
@@ -127,7 +123,7 @@
                                 }
 
                                 if (noneSelected === true) {
-                                    me.model.set("chosenMetrics", []);
+                                    me.config.set("chosenMetrics", []);
                                 }
 
                                 // Alphabetical Sorting
@@ -146,9 +142,9 @@
                             // check if empty
                             if (jsonData.options.length === 0) {
                                 jsonData.empty = true;
-                                if (me.model.get("chosenMetrics")) {
-                                	if (me.model.get("chosenMetrics").length > 0) {
-                                    	me.model.set({"chosenMetrics" : []});
+                                if (me.config.get("chosenMetrics")) {
+                                	if (me.config.get("chosenMetrics").length > 0) {
+                                    	me.config.set({"chosenMetrics" : []});
                                     }
                                 }
                             }
@@ -199,7 +195,7 @@
 
         isChosen : function(item) {
             var selected = false;
-            var metrics = this.model.get("chosenMetrics");
+            var metrics = this.config.get("chosenMetrics");
 
             if (metrics) {
                 for (var j=0; j<metrics.length; j++) {
