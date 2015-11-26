@@ -2791,7 +2791,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         templateData : null,
         displayScripting : true,
         displayCompression : true,
-        materializeDatasetsView : true,
+        materializeDatasetsView : false,
         downloadButtonLabel : "Download your data",
 
         initialize : function(options) {
@@ -2974,30 +2974,41 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         refreshViewMaterializeDatasets : function() {
             var me = this;
-            console.log("Refreshing datasets url");
+
+            var analysis = this.model.get("analysis");
+            if (!analysis) {
+                analysis = this.model;
+            }
+
+
+            // prepare materialize datasets download link
+            var downloadBtnD = $(me.viewPort).find("#view-materializedatasets");
+            downloadBtnD.addClass("disabled");
+
+            if (analysis.get("id").projectId) {
+                var downloadAnalysis = new squid_api.model.InternalanalysisjobModel();
+                downloadAnalysis.set(
+                    {
+                        "name": $("#destDomain").val(),
+                        "options": {
+                            "analysisJob": analysis,
+                            "sourceProjectId": analysis.get("id").projectId,
+                            "destProjectId": $("#destProject").val(),
+                            "destSchema": $("#destSchema").val()
+                        }
+                    }
+                );
+                downloadAnalysis.save();
+            }
+
+            
             var viewPort = $(me.viewPort);
             if (this.displayInPopup) {
                 viewPort = this.popup;
             }
-            if (me.currentJobId) {
-                // create download link
-                var analysisJobResults;
-                // use getResults method
-                var destSchema = $("#destSchema").val();
-                var destProject = $("#destProject").val();
-                var destDomain = $("#destDomain").val();
-                analysisJobResults = new squid_api.model.ProjectAnalysisJobViewMaterializeDatasets();
-                analysisJobResults.set({
-                    "id": me.currentJobId,
-                    "oid": me.currentJobId.oid,
-                    "destDomain": destDomain,
-                    "destProject": destProject,
-                    "destSchema": destSchema
-                });
-                var downloadBtn = viewPort.find("#view-materializedatasets");
-                downloadBtn.attr("href",analysisJobResults.url());
-                downloadBtn.removeClass("disabled");
-            }
+            //var downloadBtn = viewPort.find("#view-materializedatasets");
+            //downloadBtn.attr("href", downloadAnalysis.url());
+            //downloadBtn.removeClass("disabled");
         },
 
         download : function() {
@@ -3147,29 +3158,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 .fail(function() {
                     console.error("createAnalysisJob failed");
                 });
-            }
-
-            // prepare materialize datasets download link
-            var downloadBtnD = $(me.viewPort).find("#view-materializedatasets");
-            downloadBtnD.addClass("disabled");
-
-            if (analysis.get("id").projectId) {
-                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
-                downloadAnalysis.set(analysis.attributes);
-                downloadAnalysis.set({
-                    "id": {
-                        "projectId": analysis.get("id").projectId,
-                        "analysisJobId": null
-                    },
-                    "autoRun": false});
-                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
-                    .done(function() {
-                        me.currentJobId = downloadAnalysis.get("id");
-                        me.refreshViewMaterializeDatasets();
-                    })
-                    .fail(function() {
-                        console.error("createAnalysisJob failed");
-                    });
             }
 
 
