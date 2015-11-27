@@ -10,7 +10,6 @@
         filters: null,
 
         initialize: function(options) {
-            var me = this;
 
             // setup options
             if (options.template) {
@@ -44,7 +43,7 @@
 
             // listen for selection change as we use it to get dimensions
             this.listenTo(this.filters,"change:selection", this.render);
-            this.listenTo(this.config,"change:chosenDimensions", this.render);
+            this.listenTo(this.config,"change:chosenDimensions", this.updateDropdown);
 
             // listen for global status change
             this.status.on('change:status', this.enable, this);
@@ -80,6 +79,7 @@
         render: function() {
             var me = this;
                 squid_api.utils.fetchModel("project").then(function(project) {
+                    me.project = project;
                     squid_api.utils.fetchModel("domain").then(function(domain) {
                         var isMultiple = true;
 
@@ -152,17 +152,7 @@
                             }
                         }
 
-                        // Alphabetical Sorting
-                        jsonData.options.sort(function(a, b) {
-                            var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
-                            if (labelA < labelB) {
-                                return -1;
-                            }
-                            if (labelA > labelB) {
-                                return 1;
-                            }
-                            return 0; // no sorting
-                        });
+                        jsonData.options = me.sortDimensions(jsonData.options);
 
                         // check if empty
                         if (jsonData.options.length === 0) {
@@ -174,9 +164,9 @@
                         me.$el.show();
 
                         // Initialize plugin
-                        var selector = me.$el.find("select");
+                        me.selector = me.$el.find("select");
                         if (isMultiple) {
-                             selector.multiselect({
+                             me.selector.multiselect({
                                 buttonContainer: '<div class="squid-api-data-widgets-dimension-selector" />',
                                 buttonText: function() {
                                     return 'Dimensions';
@@ -200,24 +190,8 @@
                                     }
                                     me.config.set("chosenDimensions", chosenModel);
                                 },
-                                onDropdownShown: function() {
-                                    if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
-                                        me.$el.find("li.configure").remove();
-                                        me.$el.find("li").first().before("<li class='configure'> configure</option>");
-                                        me.$el.find("li").first().off().on("click", function() {
-                                            new squid_api.view.ColumnsManagementWidget({
-                                                buttonLabel : "<i class='fa fa-arrows-h'></i>",
-                                                type : "Dimension",
-                                                collection :new squid_api.model.DimensionCollection(),
-                                                model : new squid_api.model.DimensionModel(),
-                                                autoOpen : true,
-                                                successHandler : function() {
-                                                    var message = me.type + " with name " + this.get("name") + " has been successfully modified";
-                                                    squid_api.model.status.set({'message' : message});
-                                                }
-                                            });
-                                        });
-                                    }
+                                onDropdownShown: function(option, selected) {
+                                    me.showConfiguration();
                                 }
                             });
                         } else {
@@ -239,6 +213,63 @@
                 });
 
             return this;
+        },
+
+        showConfiguration: function() {
+            var me = this;
+            if (this.project.get("_role") === "WRITE" || this.project.get("_role") === "OWNER") {
+                me.$el.find("li.configure").remove();
+                me.$el.find("li").first().before("<li class='configure'> configure</option>");
+                me.$el.find("li").first().off().on("click", function() {
+                    new squid_api.view.ColumnsManagementWidget({
+                        buttonLabel : "<i class='fa fa-arrows-h'></i>",
+                        type : "Dimension",
+                        collection :new squid_api.model.DimensionCollection(),
+                        model : new squid_api.model.DimensionModel(),
+                        autoOpen : true,
+                        successHandler : function() {
+                            var message = me.type + " with name " + this.get("name") + " has been successfully modified";
+                            squid_api.model.status.set({'message' : message});
+                        }
+                    });
+                });
+            }
+        },
+
+        sortDimensions: function(dimensions) {
+            // Alphabetical Sorting
+            return dimensions.sort(function(a, b) {
+                var labelA=a.label.toLowerCase(), labelB=b.label.toLowerCase();
+                if (labelA < labelB) {
+                    return -1;
+                }
+                if (labelA > labelB) {
+                    return 1;
+                }
+                return 0; // no sorting
+            });
+        },
+
+        updateDropdown: function() {
+            if (this.selector) {
+                var dimensions = [];
+                for (var idx=0; idx<this.dimensions.length; idx++) {
+                    var name;
+                    if (this.dimensions[idx]) {
+                        if (this.dimensions[idx].name) {
+                            name = this.dimensions[idx].name;
+                        } else {
+                            name = this.dimensions[idx].dimension.name;
+                        }
+
+                        var option = {"label" : name, "value" : this.dimensions[idx].id, "selected" : this.isChosen(this.dimensions[idx])};
+                        dimensions.push(option);
+                    }
+                }
+                this.sortDimensions(dimensions);
+                this.selector.multiselect("dataprovider", dimensions);
+                this.showConfiguration();
+            }
         },
 
         isChosen : function(facet) {
