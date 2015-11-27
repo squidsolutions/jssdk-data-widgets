@@ -15,6 +15,7 @@
         templateData : null,
         displayScripting : true,
         displayCompression : true,
+        materializeDatasetsView : false,
         downloadButtonLabel : "Download your data",
 
         initialize : function(options) {
@@ -26,7 +27,11 @@
                     me.enabled();
                 });
                 this.listenTo(this.model, 'change:templateData', function() {
-                    me.refreshViewSqlUrl;
+                    me.refreshViewSqlUrl();
+                    me.enabled();
+                });
+                this.listenTo(this.model, 'change:templateData', function() {
+                    me.refreshViewMaterializeDatasets();
                     me.enabled();
                 });
                 this.listenTo(this.model, 'change:enabled', this.enabled);
@@ -59,6 +64,9 @@
             }
             if (options.sqlView) {
             	this.sqlView = true;
+            }
+            if (options.materializeDatasetsView) {
+                this.materializeDatasetsView = true;
             }
             if (options.downloadButtonLabel) {
             	this.downloadButtonLabel = options.downloadButtonLabel;
@@ -99,12 +107,14 @@
                 }
             }
             this.refreshViewSqlUrl();
+            this.refreshViewMaterializeDatasets();
         },
 
         clickedCompression : function (event) {
             var t = event.target;
             this.compression = (t.checked);
             this.refreshViewSqlUrl();
+            this.refreshViewMaterializeDatasets();
         },
 
         downloadAnalysisResults : function(currentJobId) {
@@ -198,6 +208,45 @@
                 downloadBtn.attr("href",analysisJobResults.url());
                 downloadBtn.removeClass("disabled");
             }
+        },
+
+        refreshViewMaterializeDatasets : function() {
+            var me = this;
+
+            var analysis = this.model.get("analysis");
+            if (!analysis) {
+                analysis = this.model;
+            }
+
+
+            // prepare materialize datasets download link
+            var downloadBtnD = $(me.viewPort).find("#view-materializedatasets");
+            downloadBtnD.addClass("disabled");
+
+            if (analysis.get("id").projectId) {
+                var downloadAnalysis = new squid_api.model.InternalanalysisjobModel();
+                downloadAnalysis.set(
+                    {
+                        "name": $("#destDomain").val(),
+                        "options": {
+                            "analysisJob": analysis,
+                            "sourceProjectId": analysis.get("id").projectId,
+                            "destProjectId": $("#destProject").val(),
+                            "destSchema": $("#destSchema").val()
+                        }
+                    }
+                );
+                downloadAnalysis.save();
+            }
+
+            
+            var viewPort = $(me.viewPort);
+            if (this.displayInPopup) {
+                viewPort = this.popup;
+            }
+            //var downloadBtn = viewPort.find("#view-materializedatasets");
+            //downloadBtn.attr("href", downloadAnalysis.url());
+            //downloadBtn.removeClass("disabled");
         },
 
         download : function() {
@@ -310,6 +359,7 @@
                 "downloadButtonLabel" : this.downloadButtonLabel,
                 "displayInPopup" : this.displayInPopup,
                 "sqlView" : this.sqlView,
+                "materializeDatasetsView" : this.materializeDatasetsView,
                 "data-target" : this.renderTo,
                 "formats": formatsDisplay,
                 "displayCompression" : this.displayCompression,
@@ -348,6 +398,7 @@
                 });
             }
 
+
             // apply cURL panel state
             if (me.curlCollapsed) {
                 $(this.viewPort).find('#curl').hide();
@@ -381,6 +432,10 @@
 
             $(this.viewPort).find("#download").click(function() {
                 me.download();
+            });
+
+            $(this.viewPort).find("#view-materializedatasets").click(function() {
+                me.refreshViewMaterializeDatasets();
             });
 
             if (this.displayInPopup) {

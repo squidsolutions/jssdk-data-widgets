@@ -346,6 +346,12 @@ function program8(depth0,data) {
 
 function program10(depth0,data) {
   
+  
+  return "\r\n            <div id=\"materializedatasets-view\">\r\n                    <br><hr>\r\n                    <ul>\r\n                <li> <label for=\"destSchema\">Schema: </label><input type=\"text\" name=\"destSchema\" id=\"destSchema\"> </li>\r\n                <li> <label for=\"destProject\">Project: </label> <input type=\"text\" name=\"destProject\" id=\"destProject\"> </li>\r\n                <li> <label for=\"destDomain\">Domain: </label> <input type=\"text\" name=\"destDomain\" id=\"destDomain\"> </li>\r\n                </ul>\r\n                <div>\r\n                    <a id=\"view-materializedatasets\" class=\"btn btn-default\" target=\"_blank\">Materialize Datasets</a>\r\n                </div>\r\n            </div>\r\n\r\n        ";
+  }
+
+function program12(depth0,data) {
+  
   var buffer = "", stack1, helper;
   buffer += "\r\n			<div id=\"curl-view\">\r\n	            <br><hr>\r\n				Need to automate exports? Use the <a id=\"curlbtn\">shell commands</a>.\r\n				<div id=\"curl\">\r\n					<p>Sample code to download the analysis results using curl shell command.</p>\r\n					<b>1 - get an authentication token</b>\r\n					<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n					<pre class=\"curl\">curl '";
   if (helper = helpers.apiURL) { stack1 = helper.call(depth0, {hash:{},data:data}); }
@@ -391,13 +397,13 @@ function program10(depth0,data) {
   return buffer;
   }
 
-function program12(depth0,data) {
+function program14(depth0,data) {
   
   
   return "\r\n			</div>\r\n		</div>\r\n		";
   }
 
-function program14(depth0,data) {
+function program16(depth0,data) {
   
   
   return "\r\n		<button type=\"button\" class=\"btn popup-trigger form-control\">Export</button>\r\n	";
@@ -415,14 +421,17 @@ function program14(depth0,data) {
   buffer += "\r\n		</div>\r\n			<div>&nbsp;</div>\r\n		<div>\r\n			<button id=\"download\" class=\"btn btn-default\" target=\"_blank\">download<i class=\"fa fa-download\"></i></button>\r\n		</div>\r\n		";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.sqlView), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n		";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
+  buffer += "\r\n        ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.materializeDatasetsView), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n		";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(12, program12, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(12, program12, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n		";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(14, program14, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n		<form id=\"download-form\" style=\"visibility: hidden;\"></form>\r\n	</div>\r\n	";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInPopup), {hash:{},inverse:self.noop,fn:self.program(14, program14, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInPopup), {hash:{},inverse:self.noop,fn:self.program(16, program16, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n</div>\r\n\r\n";
   return buffer;
@@ -2836,6 +2845,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         templateData : null,
         displayScripting : true,
         displayCompression : true,
+        materializeDatasetsView : false,
         downloadButtonLabel : "Download your data",
 
         initialize : function(options) {
@@ -2847,7 +2857,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     me.enabled();
                 });
                 this.listenTo(this.model, 'change:templateData', function() {
-                    me.refreshViewSqlUrl;
+                    me.refreshViewSqlUrl();
+                    me.enabled();
+                });
+                this.listenTo(this.model, 'change:templateData', function() {
+                    me.refreshViewMaterializeDatasets();
                     me.enabled();
                 });
                 this.listenTo(this.model, 'change:enabled', this.enabled);
@@ -2880,6 +2894,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (options.sqlView) {
             	this.sqlView = true;
+            }
+            if (options.materializeDatasetsView) {
+                this.materializeDatasetsView = true;
             }
             if (options.downloadButtonLabel) {
             	this.downloadButtonLabel = options.downloadButtonLabel;
@@ -2920,12 +2937,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
             this.refreshViewSqlUrl();
+            this.refreshViewMaterializeDatasets();
         },
 
         clickedCompression : function (event) {
             var t = event.target;
             this.compression = (t.checked);
             this.refreshViewSqlUrl();
+            this.refreshViewMaterializeDatasets();
         },
 
         downloadAnalysisResults : function(currentJobId) {
@@ -3019,6 +3038,45 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 downloadBtn.attr("href",analysisJobResults.url());
                 downloadBtn.removeClass("disabled");
             }
+        },
+
+        refreshViewMaterializeDatasets : function() {
+            var me = this;
+
+            var analysis = this.model.get("analysis");
+            if (!analysis) {
+                analysis = this.model;
+            }
+
+
+            // prepare materialize datasets download link
+            var downloadBtnD = $(me.viewPort).find("#view-materializedatasets");
+            downloadBtnD.addClass("disabled");
+
+            if (analysis.get("id").projectId) {
+                var downloadAnalysis = new squid_api.model.InternalanalysisjobModel();
+                downloadAnalysis.set(
+                    {
+                        "name": $("#destDomain").val(),
+                        "options": {
+                            "analysisJob": analysis,
+                            "sourceProjectId": analysis.get("id").projectId,
+                            "destProjectId": $("#destProject").val(),
+                            "destSchema": $("#destSchema").val()
+                        }
+                    }
+                );
+                downloadAnalysis.save();
+            }
+
+            
+            var viewPort = $(me.viewPort);
+            if (this.displayInPopup) {
+                viewPort = this.popup;
+            }
+            //var downloadBtn = viewPort.find("#view-materializedatasets");
+            //downloadBtn.attr("href", downloadAnalysis.url());
+            //downloadBtn.removeClass("disabled");
         },
 
         download : function() {
@@ -3131,6 +3189,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 "downloadButtonLabel" : this.downloadButtonLabel,
                 "displayInPopup" : this.displayInPopup,
                 "sqlView" : this.sqlView,
+                "materializeDatasetsView" : this.materializeDatasetsView,
                 "data-target" : this.renderTo,
                 "formats": formatsDisplay,
                 "displayCompression" : this.displayCompression,
@@ -3169,6 +3228,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 });
             }
 
+
             // apply cURL panel state
             if (me.curlCollapsed) {
                 $(this.viewPort).find('#curl').hide();
@@ -3202,6 +3262,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             $(this.viewPort).find("#download").click(function() {
                 me.download();
+            });
+
+            $(this.viewPort).find("#view-materializedatasets").click(function() {
+                me.refreshViewMaterializeDatasets();
             });
 
             if (this.displayInPopup) {
