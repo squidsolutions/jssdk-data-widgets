@@ -1960,7 +1960,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         type : "Dimension",
                         collection :new squid_api.model.DimensionCollection(),
                         model : new squid_api.model.DimensionModel(),
-                        autoOpen : true,
                         successHandler : function() {
                             var message = me.type + " with name " + this.get("name") + " has been successfully modified";
                             squid_api.model.status.set({'message' : message});
@@ -3738,7 +3737,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         type : "Metric",
                         collection : me.metrics,
                         model : new squid_api.model.MetricModel(),
-                        autoOpen : true,
                         successHandler : function() {
                             var message = me.type + " with name " + this.get("name") + " has been successfully modified";
                             squid_api.model.status.set({'message' : message});
