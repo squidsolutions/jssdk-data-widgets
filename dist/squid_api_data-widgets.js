@@ -1831,33 +1831,31 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 me.dimensions = [];
                                 for (var i=0; i<facets.length; i++){
                                     var facet = facets[i];
-                                    if (facet.dimension.dynamic === false || domain.get("dynamic") === true) {
-                                        var isBoolean = false;
-                                        if (facet.dimension.type === "SEGMENTS") {
-                                            isBoolean = true;
-                                        }
-                                        if (facet.items) {
-                                        	if ((facet.items.length === 1) && (facet.items[0].value === "true")) {
-                                        		isBoolean = true;
-                                        	}
-                                        }
-                                        // do not display boolean dimensions
-                                        if (!isBoolean) {
-                                            if (me.dimensionIdList) {
-                                                // insert and sort
-                                                var idx = me.dimensionIdList.indexOf(facet.dimension.oid);
-                                                if (idx >= 0) {
-                                                    me.dimensions[idx] = facet;
-                                                }
-                                            } else {
-                                                // default unordered behavior
-                                                me.dimensions.push(facet);
+                                    var isBoolean = false;
+                                    if (facet.dimension.type === "SEGMENTS") {
+                                        isBoolean = true;
+                                    }
+                                    if (facet.items) {
+                                    	if ((facet.items.length === 1) && (facet.items[0].value === "true")) {
+                                    		isBoolean = true;
+                                    	}
+                                    }
+                                    // do not display boolean dimensions
+                                    if (!isBoolean) {
+                                        if (me.dimensionIdList) {
+                                            // insert and sort
+                                            var idx = me.dimensionIdList.indexOf(facet.dimension.oid);
+                                            if (idx >= 0) {
+                                                me.dimensions[idx] = facet;
                                             }
+                                        } else {
+                                            // default unordered behavior
+                                            me.dimensions.push(facet);
                                         }
-                                        // avoid holes
-                                        if (!me.dimensions[i]) {
-                                            me.dimensions[i] = null;
-                                        }
+                                    }
+                                    // avoid holes
+                                    if (!me.dimensions[i]) {
+                                        me.dimensions[i] = null;
                                     }
                                 }
                                 var noneSelected = true;
