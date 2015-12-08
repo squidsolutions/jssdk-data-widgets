@@ -31,12 +31,39 @@
             }
 
             // setup the model listeners
-            this.listenTo(this.config,"change:domain", this.render);
+            this.listenTo(squid_api.model.project,"change:domains", function() {
+                var domains = squid_api.model.project.get("domains");
+                if (domains) {
+                    this.listenDomainChange();
+                }
+            });
+            
+            this.listenTo(this.config,"change:domain", function() {
+                this.listenDomainChange();
+            });
+            
             this.listenTo(this.config,"change:chosenMetrics", this.updateDropdown);
 
             // listen for global status change
             this.listenTo(squid_api.model.status,"change:status", this.handleStatus);
 
+        },
+        
+        listenDomainChange : function() {
+            var domainId = this.config.get("domain");
+            if (domainId) {
+                this.listenTo(squid_api.model.project,"change:domains", function() {
+                    var domains = squid_api.model.project.get("domains");
+                    if (domains) {
+                        var domain = domains.findWhere({"oid" : domainId});
+                        if (domain) {
+                            this.listenTo(domain.get("metrics"),"change", this.render);
+                            this.render();
+                        }
+                    }
+                });
+            }
+            this.render();
         },
 
         handleStatus: function() {
@@ -103,67 +130,66 @@
                 var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
 
                 // iterate through all domains metrics
-                squid_api.utils.fetchModel("project").then(function(project) {
-                    me.project = project;
-                    squid_api.utils.getDomainMetrics().then(function(metrics) {
-                            me.metrics = metrics;
-                            if (metrics.models.length > 0) {
-                                var noneSelected = true;
-                                for (var idx=0; idx<metrics.models.length; idx++) {
-                                    var metric = metrics.models[idx];
-
-                                    // check if selected
-                                    var selected = me.isChosen(metrics.models[idx]);
-                                    if (selected === true) {
-                                        noneSelected = false;
-                                    }
-
-                                    // add to the list
-                                    var option = {"label" : metric.get("name"), "value" : metric.get("oid"), "selected" : selected};
-                                    jsonData.options.push(option);
-                                }
-
-                                if (noneSelected === true) {
-                                    me.config.set("chosenMetrics", []);
-                                }
-
-                                // Alphabetical Sorting
-                                jsonData.options = me.sortMetrics(jsonData.options);
+                var domains = squid_api.model.project.get("domains");
+                if (domains && this.config.get("domain")) {
+                    var metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
+                    me.metrics = metrics
+                    if (metrics.models.length > 0) {
+                        var noneSelected = true;
+                        for (var idx=0; idx<metrics.models.length; idx++) {
+                            var metric = metrics.models[idx];
+    
+                            // check if selected
+                            var selected = me.isChosen(metrics.models[idx]);
+                            if (selected === true) {
+                                noneSelected = false;
                             }
+    
+                            // add to the list
+                            var option = {"label" : metric.get("name"), "value" : metric.get("oid"), "selected" : selected};
+                            jsonData.options.push(option);
+                        }
+    
+                        if (noneSelected === true) {
+                            me.config.set("chosenMetrics", []);
+                        }
+    
+                        // Alphabetical Sorting
+                        jsonData.options = me.sortMetrics(jsonData.options);
+                    }
+                
 
-                            // check if empty
-                            if (jsonData.options.length === 0) {
-                                jsonData.empty = true;
-                                if (me.config.get("chosenMetrics")) {
-                                	if (me.config.get("chosenMetrics").length > 0) {
-                                    	me.config.set({"chosenMetrics" : []});
-                                    }
-                                }
+                    // check if empty
+                    if (jsonData.options.length === 0) {
+                        jsonData.empty = true;
+                        if (me.config.get("chosenMetrics")) {
+                        	if (me.config.get("chosenMetrics").length > 0) {
+                            	me.config.set({"chosenMetrics" : []});
                             }
-
-                            var html = me.template(jsonData);
-                            me.$el.html(html);
-                            me.$el.show();
-
-                            // Initialize plugin
-                            me.selector = me.$el.find("select");
-                            if (isMultiple) {
-                                me.selector.multiselect({
-                                    buttonContainer: '<div class="squid-api-data-widgets-metric-selector-open" />',
-                                    buttonText: function() {
-                                        return 'Metrics';
-                                    },
-                                    onDropdownShown: function() {
-                                        me.showConfiguration();
-                                    }
-                                });
+                        }
+                    }
+    
+                    var html = me.template(jsonData);
+                    me.$el.html(html);
+                    me.$el.show();
+    
+                    // Initialize plugin
+                    me.selector = me.$el.find("select");
+                    if (isMultiple) {
+                        me.selector.multiselect({
+                            buttonContainer: '<div class="squid-api-data-widgets-metric-selector-open" />',
+                            buttonText: function() {
+                                return 'Metrics';
+                            },
+                            onDropdownShown: function() {
+                                me.showConfiguration();
                             }
-
-                            // Remove Button Title Tag
-                            me.$el.find("button").removeAttr('title');
-
-                    });
-                });
+                        });
+                    }
+    
+                    // Remove Button Title Tag
+                    me.$el.find("button").removeAttr('title');
+                }
             }
 
             return this;
@@ -171,21 +197,24 @@
 
         showConfiguration: function() {
             var me = this;
-            if (this.project.get("_role") === "WRITE" || this.project.get("_role") === "OWNER") {
-                me.$el.find("li.configure").remove();
-                me.$el.find("li").first().before("<li class='configure'> configure</option>");
-                me.$el.find("li").first().off().on("click", function() {
-                    new squid_api.view.ColumnsManagementWidget({
-                        buttonLabel : "<i class='fa fa-arrows-h'></i>",
-                        type : "Metric",
-                        collection : me.metrics,
-                        model : new squid_api.model.MetricModel(),
-                        successHandler : function() {
-                            var message = me.type + " with name " + this.get("name") + " has been successfully modified";
-                            squid_api.model.status.set({'message' : message});
-                        }
+            var project = squid_api.model.project;
+            if (project) {
+                if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
+                    me.$el.find("li.configure").remove();
+                    me.$el.find("li").first().before("<li class='configure'> configure</option>");
+                    me.$el.find("li").first().off().on("click", function() {
+                        new squid_api.view.ColumnsManagementWidget({
+                            buttonLabel : "<i class='fa fa-arrows-h'></i>",
+                            type : "Metric",
+                            collection : me.metrics,
+                            model : new squid_api.model.MetricModel(),
+                            successHandler : function() {
+                                var message = me.type + " with name " + this.get("name") + " has been successfully modified";
+                                squid_api.model.status.set({'message' : message});
+                            }
+                        });
                     });
-                });
+                }
             }
         },
 
@@ -203,7 +232,7 @@
         },
 
         updateDropdown: function() {
-            if (this.selector) {
+            if (this.selector && this.metrics) {
                 var data = [];
                 for (var idx=0; idx<this.metrics.models.length; idx++) {
                     var option = {"label" : this.metrics.models[idx].get("name"), "value" : this.metrics.models[idx].get("oid"), "selected" : this.isChosen(this.metrics.models[idx])};
