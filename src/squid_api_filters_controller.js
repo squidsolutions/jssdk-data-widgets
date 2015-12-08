@@ -44,7 +44,6 @@
             
             // check for new filter selection made by config update
             this.listenTo(this.config, 'change:selection', function() {
-                console.log("compute (change:selection)");
                 // make sure the domain of filters is set
                 if (me.config.get("domain")) {
                     var id = filters.get("id");
@@ -57,6 +56,7 @@
                             "projectId" : id.projectId,
                             "domainId" : me.config.get("domain")
                         }]);
+                        console.log("compute (change:selection)");
                         squid_api.controller.facetjob.compute(filters, me.config.get("selection"));
                     }
                 }
@@ -117,6 +117,7 @@
                filters.set("engineVersion", "2");
                filters.setDomainIds([domainPk]);
 
+               console.log("compute (initFilters)");
                $.when(squid_api.controller.facetjob.compute(filters, config.get("selection")))
                .then(function() {
                    // search for a time facet
@@ -183,8 +184,8 @@
            if (this.onChangeHandler) {
                this.onChangeHandler(selection, timeFacet);
            } else {
-               console.log("compute (facetjob changed)");
-               squid_api.controller.facetjob.compute(this.filters, selection);
+               // default behavior
+               this.config.set("selection", selection);
            }
        }
 
