@@ -103,6 +103,20 @@
                     };
                 }
             }
+            
+            this.listenTo(this.config,"change:domain", function() {
+                var domainId = this.config.get("domain");
+                if (domainId) {
+                    var domains = squid_api.model.project.get("domains");
+                    if (domains) {
+                        var domain = domains.findWhere({"oid" : domainId});
+                        if (domain) {
+                            this.listenTo(domain.get("metrics"),"change", this.render);
+                        }
+                    }
+                }
+                this.render();
+            });
 
             this.renderBaseViewPort();
         },
@@ -141,21 +155,22 @@
             var me = this;
 
             if (! me.headerInformation) {
-                squid_api.utils.getProjectDomains().then(function(domains) {
+                var domains = squid_api.model.project.get("domains");
+                if (domains && this.config.get("domain")) {
                     var arr = [];
                     for(i=0; i<domains.models.length; i++) {
                         arr.push(domains.models[i].toJSON());
                     }
                     me.projectDomains = arr;
-                }).then(squid_api.utils.getDomainMetrics().then(function(metrics) {
-                    var arr = [];
+                
+                    var metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
+                    me.domainMetrics = [];
                     for(i=0; i<metrics.models.length; i++) {
                         arr.push(metrics.models[i].toJSON());
                     }
-                    me.domainMetrics = arr;
                     me.headerInformation = true;
                     me.displayTableHeader();
-                }));
+                }
             } else  {
                 var columns;
                 var originalColumns;//unaltered by rollup splice
