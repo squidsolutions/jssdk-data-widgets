@@ -144,7 +144,7 @@
                                         jsonData.options.push(option);
                                     }
                                 }
-                                if (noneSelected === true && me.status.get("status") !== "RUNNING") {
+                                if (noneSelected === true && me.filters.get("status") === "DONE") {
                                     me.config.set("chosenDimensions", []);
                                 }
                             }
