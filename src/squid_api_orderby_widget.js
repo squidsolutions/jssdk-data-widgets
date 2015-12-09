@@ -135,11 +135,12 @@
             var chosenDimensions = this.config.get("chosenDimensions");
             var limit = this.config.get("limit");
             var columns = [];
+            var orderBy;
 
             var orderByList = this.config.get("orderBy");
             var checked = true;
             if (orderByList) {
-                var orderBy = this.config.get("orderBy")[0];
+                orderBy = this.config.get("orderBy")[0];
                 if (orderBy.direction === "ASC") {
                     checked = false;
                 }
@@ -149,7 +150,7 @@
                 if (domains && this.config.get("domain")) {
                     var metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
                     var chosenMetrics = me.config.get("chosenMetrics");
-                    var orderBy = me.config.get("orderBy");
+                    orderBy = me.config.get("orderBy");
     
                     if (chosenDimensions) {
                         for (i=0; i<chosenDimensions.length; i++) {

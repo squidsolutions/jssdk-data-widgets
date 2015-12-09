@@ -1343,7 +1343,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         displayTableHeader : function(selector) {
             var me = this;
-
+            var i;
+            var metrics;
+            
             if (! me.headerInformation) {
                 var domains = squid_api.model.project.get("domains");
                 if (domains && this.config.get("domain")) {
@@ -1353,7 +1355,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     }
                     me.projectDomains = arr;
                 
-                    var metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
+                    metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
                     me.domainMetrics = [];
                     for(i=0; i<metrics.models.length; i++) {
                         arr.push(metrics.models[i].toJSON());
@@ -1387,7 +1389,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 } else {
                     // use analysis columns
                     columns = [];
-                    var i;
+                    
                     var obj;
                     var facets = this.model.get("facets");
                     if (facets) {
@@ -1402,7 +1404,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             }
                         }
                     }
-                    var metrics = this.model.get("metricList");
+                    metrics = this.model.get("metricList");
                     if (metrics) {
                         if (metrics.length === 0) {
                             metrics = squid_api.model.config.get("chosenMetrics");
@@ -3351,7 +3353,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 console.log("compute (change:userSelection)");
                 squid_api.controller.facetjob.compute(filters, filters.get("userSelection"));
             });
-            
+
             // check for new filter selection made by config update
             this.listenTo(this.config, 'change:selection', function() {
                 // make sure the domain of filters is set
@@ -3361,7 +3363,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         filters.set("id" , {
                             "projectId" : id.projectId,
                             "facetjobId" : null
-                            });
+                        });
                         filters.setDomainIds([{
                             "projectId" : id.projectId,
                             "domainId" : me.config.get("domain")
@@ -3385,7 +3387,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         filters.set("id" , {
                             "projectId" : id.projectId,
                             "facetjobId" : null
-                            });
+                        });
                         filters.setDomainIds([{
                             "projectId" : id.projectId,
                             "domainId" : config.get("domain")
@@ -3402,103 +3404,193 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     filters.set("id" , {
                         "projectId" : config.get("project"),
                         "facetjobId" : null
-                        });
+                    });
                     filters.setDomainIds(null);
                 }
             });
         },
 
-       initFilters : function(config) {
-           var me = this;
-           var domainId = config.get("domain");
-           var projectId = config.get("project");
+        initFilters : function(config) {
+            var me = this;
+            var domainId = config.get("domain");
+            var projectId = config.get("project");
 
-           if (projectId && domainId) {
-               var domainPk = {
-                       "projectId" : projectId,
-                       "domainId" : domainId
-               };
+            if (projectId && domainId) {
+                var domainPk = {
+                        "projectId" : projectId,
+                        "domainId" : domainId
+                };
 
-               // launch the default filters computation
-               var filters = new squid_api.model.FiltersJob();
-               filters.set("id", {
-                   "projectId": projectId
-               });
-               filters.set("engineVersion", "2");
-               filters.setDomainIds([domainPk]);
+                // launch the default filters computation
+                var filters = new squid_api.model.FiltersJob();
+                filters.set("id", {
+                    "projectId": projectId
+                });
+                filters.set("engineVersion", "2");
+                filters.setDomainIds([domainPk]);
 
-               console.log("compute (initFilters)");
-               $.when(squid_api.controller.facetjob.compute(filters, config.get("selection")))
-               .then(function() {
-                   // search for a time facet
-                   var timeFacet;
-                   var sel = filters.get("selection");
-                   if (sel && sel.facets) {
-                       var facets = sel.facets;
-                       for (var i = 0; i < facets.length; i++) {
-                           var facet = facets[i];
-                           if (facet.dimension.valueType === "DATE" && ! me.config.get("period")) {
-                               timeFacet = facet;
-                           }
-                       }
-                   }
-                   if (timeFacet) {
-                       if (timeFacet.done === false) {
-                           console.log("retrieving time facet's members");
-                           $.when(squid_api.controller.facetjob.getFacetMembers(filters, timeFacet.id))
-                           .always(function() {
-                                   console.log("time facet dimension = "+timeFacet.dimension.name);
-                                   me.changed(filters.get("selection"), timeFacet);
-                               });
-                       } else {
-                           me.changed(filters.get("selection"), timeFacet);
-                       }
-                   } else {
-                       console.log("WARN: cannot use any time dimension to use for datepicker");
-                       me.changed(filters.get("selection"), null);
-                   }
-               });
-           }
-       },
+                console.log("compute (initFilters)");
+                $.when(squid_api.controller.facetjob.compute(filters, config.get("selection")))
+                .then(function() {
+                    // search for a time facet
+                    var timeFacet;
+                    var sel = filters.get("selection");
+                    if (sel && sel.facets) {
+                        var facets = sel.facets;
+                        for (var i = 0; i < facets.length; i++) {
+                            var facet = facets[i];
+                            if (facet.dimension.valueType === "DATE" && ! me.config.get("period")) {
+                                timeFacet = facet;
+                            }
+                        }
+                    }
+                    if (timeFacet) {
+                        if (timeFacet.done === false) {
+                            console.log("retrieving time facet's members");
+                            $.when(squid_api.controller.facetjob.getFacetMembers(filters, timeFacet.id))
+                            .always(function() {
+                                console.log("time facet dimension = "+timeFacet.dimension.name);
+                                me.changed(filters.get("selection"), timeFacet);
+                            });
+                        } else {
+                            me.changed(filters.get("selection"), timeFacet);
+                        }
+                    } else {
+                        console.log("WARN: cannot use any time dimension to use for datepicker");
+                        me.changed(filters.get("selection"), null);
+                    }
+                });
+            }
+        },
 
-       refreshFilters : function(selection) {
-           var changed = false;
-           var f = this.filters;
+        refreshFilters : function(selection) {
+            var changed = false;
+            var f = this.filters;
 
-           var domainOid = this.config.get("domain");
-           if (domainOid) {
-               f.set({"id": {
-                   "projectId": this.config.get("project")
-               }}, {
-                   "silent" : true
-               });
-               f.setDomainIds([domainOid], true);
-               changed = changed || f.hasChanged();
-           } else {
-               // reset the domains
-               f.setDomainIds(null, true);
-               changed = changed || f.hasChanged();
-           }
+            var domainOid = this.config.get("domain");
+            if (domainOid) {
+                f.set({"id": {
+                    "projectId": this.config.get("project")
+                }}, {
+                    "silent" : true
+                });
+                f.setDomainIds([domainOid], true);
+                changed = changed || f.hasChanged();
+            } else {
+                // reset the domains
+                f.setDomainIds(null, true);
+                changed = changed || f.hasChanged();
+            }
 
-           f.set({"selection": selection}, {
-               "silent" : true
-           });
-           changed = changed || f.hasChanged();
+            f.set({"selection": selection}, {
+                "silent" : true
+            });
+            changed = changed || f.hasChanged();
 
-           if (changed === true) {
-               this.changed(selection);
-           }
-       },
+            if (changed === true) {
+                this.changed(selection);
+            }
+        },
 
-       changed : function(selection, timeFacet) {
-           if (this.onChangeHandler) {
-               this.onChangeHandler(selection, timeFacet);
-           } else {
-               // default behavior
-               this.config.set("selection", selection);
-           }
-       }
+        changed : function(selection, timeFacet) {
+            if (this.onChangeHandler) {
+                this.onChangeHandler(selection, timeFacet);
+            } else {
+                // default behavior
+                this.filters.set("selection", selection);
+            }
+        },
 
+        // TODO method moved from filters selector : needs to be fixed
+        setDates: function(facet) {
+            var filters = $.extend(true, {}, this.filters.get("selection"));
+            var selectedItems = [{"type":"i", "lowerBound": "", "upperBound": ""}];
+            var obj = {};
+
+            // Check filter selection for current start & end Date, if not set it as last month          
+            if (filters) {
+                var lowerBound = "";
+                var upperBound = "";
+
+                // get previous lower + upperbound dates                
+                for (i=0; i<filters.facets.length; i++) {
+                    if (filters.facets[i].dimension.type === "CONTINUOUS" && filters.facets[i].dimension.valueType === "DATE") {
+                        if (filters.facets[i].selectedItems.length > 0) {
+                            lowerBound = filters.facets[i].selectedItems[0].lowerBound;
+                            upperBound = filters.facets[i].selectedItems[0].upperBound;
+                        }
+                    }
+                }
+
+                for (i=0; i<filters.facets.length; i++) {
+                    if (filters.facets[i].dimension.type === "CONTINUOUS" && filters.facets[i].dimension.valueType === "DATE") {
+                        if (filters.facets[i].id === facet.id) {
+                            var currentStartDate;
+                            var currentEndDate;
+
+                            // min & max dates
+                            if (facet.items) {
+                                if (facet.items.length > 0) {
+                                    obj.minStartDate = moment(facet.items[0].lowerBound);
+                                    obj.maxEndDate = moment(facet.items[0].upperBound);
+                                } else {
+                                    if (! facet.done) {
+                                        obj.notReady = true;
+                                        obj.minStartDate = moment().subtract(50, "years");
+                                        obj.maxEndDate = moment();
+                                    } else {
+                                        obj.notReady = true;
+                                    }
+                                }
+                            } else {
+                                obj.minStartDate = moment(facet.selectedItems[0].lowerBound);
+                                obj.maxEndDate = moment(facet.selectedItems[0].upperBound);
+                            }
+
+                            // if no previous dates found, use the last month                   
+                            if (lowerBound.length > 0 && upperBound.length > 0) {
+                                currentStartDate = lowerBound;
+                                currentEndDate = upperBound;
+                            } else if (obj.maxEndDate) {
+                                currentStartDate = moment(obj.maxEndDate.utc()).startOf('month').toISOString();
+                                currentEndDate = obj.maxEndDate.utc().toISOString();
+                            } else {
+                                forceChange = true;
+                            }
+
+                            if (currentStartDate && currentEndDate) {
+                                // current dates
+                                obj.currentStartDate = moment(currentStartDate);
+                                obj.currentEndDate = moment(currentEndDate);
+
+                                // set current selection                                                
+                                selectedItems[0].lowerBound = currentStartDate;
+                                selectedItems[0].upperBound = currentEndDate;
+
+                                // set selected items                                           
+                                filters.facets[i].selectedItems = selectedItems;
+                            } else {
+                                filters.facets[i].selectedItems = [];
+                            }
+                        } else {
+                            // reset old period selected items                                          
+                            if (filters.facets[i].selectedItems.length > 0) {
+                                filters.facets[i].selectedItems = [];
+                            }
+                        }
+                    }
+                }
+
+                // make sure filters are ready for resetting the userSelection
+                /*
+                        if (JSON.stringify(this.filters.get("selection")) != JSON.stringify(filters)) {
+                                this.filters.set({"userSelection" : filters});
+                        }
+                 */
+            }
+
+            return obj;
+        }
     });
 
     return View;
@@ -3705,7 +3797,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var domains = squid_api.model.project.get("domains");
                 if (domains && this.config.get("domain")) {
                     var metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
-                    me.metrics = metrics
+                    me.metrics = metrics;
                     if (metrics.models.length > 0) {
                         var noneSelected = true;
                         for (var idx=0; idx<metrics.models.length; idx++) {
@@ -4203,11 +4295,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var chosenDimensions = this.config.get("chosenDimensions");
             var limit = this.config.get("limit");
             var columns = [];
+            var orderBy;
 
             var orderByList = this.config.get("orderBy");
             var checked = true;
             if (orderByList) {
-                var orderBy = this.config.get("orderBy")[0];
+                orderBy = this.config.get("orderBy")[0];
                 if (orderBy.direction === "ASC") {
                     checked = false;
                 }
@@ -4217,7 +4310,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (domains && this.config.get("domain")) {
                     var metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
                     var chosenMetrics = me.config.get("chosenMetrics");
-                    var orderBy = me.config.get("orderBy");
+                    orderBy = me.config.get("orderBy");
     
                     if (chosenDimensions) {
                         for (i=0; i<chosenDimensions.length; i++) {

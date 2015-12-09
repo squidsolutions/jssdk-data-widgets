@@ -133,7 +133,7 @@
                 var domains = squid_api.model.project.get("domains");
                 if (domains && this.config.get("domain")) {
                     var metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
-                    me.metrics = metrics
+                    me.metrics = metrics;
                     if (metrics.models.length > 0) {
                         var noneSelected = true;
                         for (var idx=0; idx<metrics.models.length; idx++) {

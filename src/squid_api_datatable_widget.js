@@ -153,7 +153,9 @@
 
         displayTableHeader : function(selector) {
             var me = this;
-
+            var i;
+            var metrics;
+            
             if (! me.headerInformation) {
                 var domains = squid_api.model.project.get("domains");
                 if (domains && this.config.get("domain")) {
@@ -163,7 +165,7 @@
                     }
                     me.projectDomains = arr;
                 
-                    var metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
+                    metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
                     me.domainMetrics = [];
                     for(i=0; i<metrics.models.length; i++) {
                         arr.push(metrics.models[i].toJSON());
@@ -197,7 +199,7 @@
                 } else {
                     // use analysis columns
                     columns = [];
-                    var i;
+                    
                     var obj;
                     var facets = this.model.get("facets");
                     if (facets) {
@@ -212,7 +214,7 @@
                             }
                         }
                     }
-                    var metrics = this.model.get("metricList");
+                    metrics = this.model.get("metricList");
                     if (metrics) {
                         if (metrics.length === 0) {
                             metrics = squid_api.model.config.get("chosenMetrics");
