@@ -103,20 +103,6 @@
                     };
                 }
             }
-            
-            this.listenTo(this.config,"change:domain", function() {
-                var domainId = this.config.get("domain");
-                if (domainId) {
-                    var domains = squid_api.model.project.get("domains");
-                    if (domains) {
-                        var domain = domains.findWhere({"oid" : domainId});
-                        if (domain) {
-                            this.listenTo(domain.get("metrics"),"change", this.render);
-                        }
-                    }
-                }
-                this.render();
-            });
 
             this.renderBaseViewPort();
         },
