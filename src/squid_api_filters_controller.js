@@ -9,11 +9,6 @@
         onChangeHandler : null,
 
         initialize: function(options) {
-
-            var me = this;
-
-            // setup options
-
             if (this.model) {
                 this.filters = this.model;
             } else {
@@ -32,69 +27,9 @@
                 this.config = squid_api.model.config;
             }
 
-            // controller
-
-            var filters = this.filters;
-
-            // check for new filter selection made by user
-            this.listenTo(filters, 'change:userSelection', function() {
-                console.log("compute (change:userSelection)");
-                squid_api.controller.facetjob.compute(filters, filters.get("userSelection"));
-            });
-
             // check for new filter selection made by config update
             this.listenTo(this.config, 'change:selection', function() {
-                // make sure the domain of filters is set
-                if (me.config.get("domain")) {
-                    var id = filters.get("id");
-                    if (id) {
-                        filters.set("id" , {
-                            "projectId" : id.projectId,
-                            "facetjobId" : null
-                        });
-                        filters.setDomainIds([{
-                            "projectId" : id.projectId,
-                            "domainId" : me.config.get("domain")
-                        }]);
-                        console.log("compute (change:selection)");
-                        squid_api.controller.facetjob.compute(filters, me.config.get("selection"));
-                    }
-                }
-            });
-
-            // update config if filters have changed
-            this.listenTo(filters, 'change:selection', function(filters) {
-                me.config.set("selection", squid_api.utils.buildCleanSelection(filters.get("selection")));
-            });
-
-            // check for domain change performed
-            this.listenTo(this.config, 'change:domain', function(config) {
-                if (config.get("domain")) {
-                    var id = filters.get("id");
-                    if (id) {
-                        filters.set("id" , {
-                            "projectId" : id.projectId,
-                            "facetjobId" : null
-                        });
-                        filters.setDomainIds([{
-                            "projectId" : id.projectId,
-                            "domainId" : config.get("domain")
-                        }]);
-                    }
-                    me.initFilters(config);
-                }
-            });
-
-            // check for project change performed
-            this.listenTo(this.config, 'change:project', function(config) {
-                var id = filters.get("id");
-                if (id) {
-                    filters.set("id" , {
-                        "projectId" : config.get("project"),
-                        "facetjobId" : null
-                    });
-                    filters.setDomainIds(null);
-                }
+                this.initFilters(this.config);
             });
         },
 
@@ -151,35 +86,6 @@
             }
         },
 
-        refreshFilters : function(selection) {
-            var changed = false;
-            var f = this.filters;
-
-            var domainOid = this.config.get("domain");
-            if (domainOid) {
-                f.set({"id": {
-                    "projectId": this.config.get("project")
-                }}, {
-                    "silent" : true
-                });
-                f.setDomainIds([domainOid], true);
-                changed = changed || f.hasChanged();
-            } else {
-                // reset the domains
-                f.setDomainIds(null, true);
-                changed = changed || f.hasChanged();
-            }
-
-            f.set({"selection": selection}, {
-                "silent" : true
-            });
-            changed = changed || f.hasChanged();
-
-            if (changed === true) {
-                this.changed(selection);
-            }
-        },
-
         changed : function(selection, timeFacet) {
             if (this.onChangeHandler) {
                 this.onChangeHandler(selection, timeFacet);
@@ -187,98 +93,8 @@
                 // default behavior
                 this.filters.set("selection", selection);
             }
-        },
-
-        // TODO method moved from filters selector : needs to be fixed
-        setDates: function(facet) {
-            var filters = $.extend(true, {}, this.filters.get("selection"));
-            var selectedItems = [{"type":"i", "lowerBound": "", "upperBound": ""}];
-            var obj = {};
-
-            // Check filter selection for current start & end Date, if not set it as last month          
-            if (filters) {
-                var lowerBound = "";
-                var upperBound = "";
-
-                // get previous lower + upperbound dates                
-                for (i=0; i<filters.facets.length; i++) {
-                    if (filters.facets[i].dimension.type === "CONTINUOUS" && filters.facets[i].dimension.valueType === "DATE") {
-                        if (filters.facets[i].selectedItems.length > 0) {
-                            lowerBound = filters.facets[i].selectedItems[0].lowerBound;
-                            upperBound = filters.facets[i].selectedItems[0].upperBound;
-                        }
-                    }
-                }
-
-                for (i=0; i<filters.facets.length; i++) {
-                    if (filters.facets[i].dimension.type === "CONTINUOUS" && filters.facets[i].dimension.valueType === "DATE") {
-                        if (filters.facets[i].id === facet.id) {
-                            var currentStartDate;
-                            var currentEndDate;
-
-                            // min & max dates
-                            if (facet.items) {
-                                if (facet.items.length > 0) {
-                                    obj.minStartDate = moment(facet.items[0].lowerBound);
-                                    obj.maxEndDate = moment(facet.items[0].upperBound);
-                                } else {
-                                    if (! facet.done) {
-                                        obj.notReady = true;
-                                        obj.minStartDate = moment().subtract(50, "years");
-                                        obj.maxEndDate = moment();
-                                    } else {
-                                        obj.notReady = true;
-                                    }
-                                }
-                            } else {
-                                obj.minStartDate = moment(facet.selectedItems[0].lowerBound);
-                                obj.maxEndDate = moment(facet.selectedItems[0].upperBound);
-                            }
-
-                            // if no previous dates found, use the last month                   
-                            if (lowerBound.length > 0 && upperBound.length > 0) {
-                                currentStartDate = lowerBound;
-                                currentEndDate = upperBound;
-                            } else if (obj.maxEndDate) {
-                                currentStartDate = moment(obj.maxEndDate.utc()).startOf('month').toISOString();
-                                currentEndDate = obj.maxEndDate.utc().toISOString();
-                            } else {
-                                forceChange = true;
-                            }
-
-                            if (currentStartDate && currentEndDate) {
-                                // current dates
-                                obj.currentStartDate = moment(currentStartDate);
-                                obj.currentEndDate = moment(currentEndDate);
-
-                                // set current selection                                                
-                                selectedItems[0].lowerBound = currentStartDate;
-                                selectedItems[0].upperBound = currentEndDate;
-
-                                // set selected items                                           
-                                filters.facets[i].selectedItems = selectedItems;
-                            } else {
-                                filters.facets[i].selectedItems = [];
-                            }
-                        } else {
-                            // reset old period selected items                                          
-                            if (filters.facets[i].selectedItems.length > 0) {
-                                filters.facets[i].selectedItems = [];
-                            }
-                        }
-                    }
-                }
-
-                // make sure filters are ready for resetting the userSelection
-                /*
-                        if (JSON.stringify(this.filters.get("selection")) != JSON.stringify(filters)) {
-                                this.filters.set({"userSelection" : filters});
-                        }
-                 */
-            }
-
-            return obj;
         }
+
     });
 
     return View;
