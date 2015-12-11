@@ -10,7 +10,8 @@
         filters: null,
 
         initialize: function(options) {
-
+            var me = this;
+            
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -41,7 +42,9 @@
             	this.status = squid_api.model.status;
             }
 
-            this.project = squid_api.model.project;
+            squid_api.getSelectedProject().always( function(project) {
+                me.project = project;
+            });
             
             // listen for selection change as we use it to get dimensions
             this.listenTo(this.filters,"change:selection", this.render);

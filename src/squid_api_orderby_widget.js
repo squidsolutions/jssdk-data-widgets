@@ -132,74 +132,75 @@
                 }
             }
             if (this.filters.get("status") === "DONE") {
-                var domains = squid_api.model.project.get("domains");
-                if (domains && this.config.get("domain")) {
-                    var metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
-                    var chosenMetrics = me.config.get("chosenMetrics");
-                    orderBy = me.config.get("orderBy");
-    
-                    if (chosenDimensions) {
-                        for (i=0; i<chosenDimensions.length; i++) {
-                            if (filters) {
-                                for (ix=0; ix<filters.facets.length; ix++) {
-                                    if (chosenDimensions[i] === filters.facets[ix].id) {
-                                        columns.push({"label" : filters.facets[ix].dimension.name, "value" : filters.facets[ix].id});
+                squid_api.getSelectedDomain().always(function(domain) {
+                    if (domain) {
+                        var metrics = domain.get("metrics");
+                        var chosenMetrics = me.config.get("chosenMetrics");
+                        orderBy = me.config.get("orderBy");
+        
+                        if (chosenDimensions) {
+                            for (i=0; i<chosenDimensions.length; i++) {
+                                if (filters) {
+                                    for (ix=0; ix<filters.facets.length; ix++) {
+                                        if (chosenDimensions[i] === filters.facets[ix].id) {
+                                            columns.push({"label" : filters.facets[ix].dimension.name, "value" : filters.facets[ix].id});
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-    
-                    if (metrics && chosenMetrics) {
-                        for (var id=0; id<metrics.length; id++) {
-                            var metric = metrics.at(id);
-                            // Match with chosen
-                            for (var match=0; match<chosenMetrics.length; match++) {
-                                if (metric.get("oid") === chosenMetrics[match]) {
-                                    var option = {"label" : metric.get("name"), "value" : metric.get("definition")};
-                                    columns.push(option);
+        
+                        if (metrics && chosenMetrics) {
+                            for (var id=0; id<metrics.length; id++) {
+                                var metric = metrics.at(id);
+                                // Match with chosen
+                                for (var match=0; match<chosenMetrics.length; match++) {
+                                    if (metric.get("oid") === chosenMetrics[match]) {
+                                        var option = {"label" : metric.get("name"), "value" : metric.get("definition")};
+                                        columns.push(option);
+                                    }
                                 }
                             }
                         }
-                    }
-                
-
-                    var jsonData = {"checked" : checked, "limit" : limit, "Columns" : columns, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
+                    
     
-                    var html = me.template(jsonData);
-                    me.$el.html(html);
-    
-                    me.$el.find("select").multiselect({
-                        onChange: function(model) {
-                            var obj = {};
-                            var orderBy = me.model.get("orderBy");
-                            if (orderBy) {
-                                obj.expression = {"value" : model.val()};
-                                if (orderBy[0].direction) {
-                                    obj.direction = orderBy[0].direction;
-                                } else {
-                                    obj.direction = "DESC";
-                                }
-                            }           		
-                            me.config.set({"orderBy" : [obj], "selectedMetric" : model.val()});
+                        var jsonData = {"checked" : checked, "limit" : limit, "Columns" : columns, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
+        
+                        var html = me.template(jsonData);
+                        me.$el.html(html);
+        
+                        me.$el.find("select").multiselect({
+                            onChange: function(model) {
+                                var obj = {};
+                                var orderBy = me.model.get("orderBy");
+                                if (orderBy) {
+                                    obj.expression = {"value" : model.val()};
+                                    if (orderBy[0].direction) {
+                                        obj.direction = orderBy[0].direction;
+                                    } else {
+                                        obj.direction = "DESC";
+                                    }
+                                }           		
+                                me.config.set({"orderBy" : [obj], "selectedMetric" : model.val()});
+                            }
+                        });
+        
+                        if (orderBy) {
+                            if (orderBy[0].expression) {
+                                // verify if existing expression exists
+                                me.expressionExists(columns);  		
+                            }
+                        } else if (me.$el.find("select").val()) {
+                            var obj = {"expression" : {"value" : me.$el.find("select").val()}, "direction" : "DESC"};
+                            me.config.set({"orderBy" : [obj], "selectedMetric" : me.$el.find("select").val()});
                         }
-                    });
-    
-                    if (orderBy) {
-                        if (orderBy[0].expression) {
-                            // verify if existing expression exists
-                            me.expressionExists(columns);  		
-                        }
-                    } else if (me.$el.find("select").val()) {
-                        var obj = {"expression" : {"value" : me.$el.find("select").val()}, "direction" : "DESC"};
-                        me.config.set({"orderBy" : [obj], "selectedMetric" : me.$el.find("select").val()});
+        
+                        me.$el.find("select").multiselect("refresh");
+        
+                        // Set Limit Value
+                        me.$el.find(".sq-select").val(jsonData.limit);
                     }
-    
-                    me.$el.find("select").multiselect("refresh");
-    
-                    // Set Limit Value
-                    me.$el.find(".sq-select").val(jsonData.limit);
-                }
+                });
 
             }
 

@@ -143,22 +143,15 @@
             var metrics;
             
             if (! me.headerInformation) {
-                var domains = squid_api.model.project.get("domains");
-                if (domains && this.config.get("domain")) {
-                    var arr = [];
-                    for(i=0; i<domains.models.length; i++) {
-                        arr.push(domains.models[i].toJSON());
-                    }
-                    me.projectDomains = arr;
-                
-                    metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
+                squid_api.getSelectedDomain().always( function(domain) {
+                    metrics = domain.get("metrics");
                     me.domainMetrics = [];
                     for(i=0; i<metrics.models.length; i++) {
                         arr.push(metrics.models[i].toJSON());
                     }
                     me.headerInformation = true;
-                    me.displayTableHeader();
-                }
+                    me.displayTableHeader()     
+                });
             } else  {
                 var columns;
                 var originalColumns;//unaltered by rollup splice

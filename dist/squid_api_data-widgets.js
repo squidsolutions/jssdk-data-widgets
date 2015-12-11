@@ -1333,22 +1333,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var metrics;
             
             if (! me.headerInformation) {
-                var domains = squid_api.model.project.get("domains");
-                if (domains && this.config.get("domain")) {
-                    var arr = [];
-                    for(i=0; i<domains.models.length; i++) {
-                        arr.push(domains.models[i].toJSON());
-                    }
-                    me.projectDomains = arr;
-                
-                    metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
+                squid_api.getSelectedDomain().always( function(domain) {
+                    metrics = domain.get("metrics");
                     me.domainMetrics = [];
                     for(i=0; i<metrics.models.length; i++) {
                         arr.push(metrics.models[i].toJSON());
                     }
                     me.headerInformation = true;
-                    me.displayTableHeader();
-                }
+                    me.displayTableHeader()     
+                });
             } else  {
                 var columns;
                 var originalColumns;//unaltered by rollup splice
@@ -1747,7 +1740,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         filters: null,
 
         initialize: function(options) {
-
+            var me = this;
+            
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -1778,7 +1772,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             	this.status = squid_api.model.status;
             }
 
-            this.project = squid_api.model.project;
+            squid_api.getSelectedProject().always( function(project) {
+                me.project = project;
+            });
             
             // listen for selection change as we use it to get dimensions
             this.listenTo(this.filters,"change:selection", this.render);
@@ -3495,41 +3491,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (!this.config) {
                 this.config = squid_api.model.config;
             }
-
-            // setup the model listeners
-            this.listenTo(squid_api.model.project,"change:domains", function() {
-                var domains = squid_api.model.project.get("domains");
-                if (domains) {
-                    this.listenDomainChange();
-                }
-            });
-            
-            this.listenTo(this.config,"change:domain", function() {
-                this.listenDomainChange();
-            });
             
             this.listenTo(this.config,"change:chosenMetrics", this.updateDropdown);
 
             // listen for global status change
             this.listenTo(squid_api.model.status,"change:status", this.handleStatus);
 
-        },
-        
-        listenDomainChange : function() {
-            var domainId = this.config.get("domain");
-            if (domainId) {
-                this.listenTo(squid_api.model.project,"change:domains", function() {
-                    var domains = squid_api.model.project.get("domains");
-                    if (domains) {
-                        var domain = domains.findWhere({"oid" : domainId});
-                        if (domain) {
-                            this.listenTo(domain.get("metrics"),"change", this.render);
-                            this.render();
-                        }
-                    }
-                });
-            }
-            this.render();
         },
 
         handleStatus: function() {
@@ -3596,66 +3563,67 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
 
                 // iterate through all domains metrics
-                var domains = squid_api.model.project.get("domains");
-                if (domains && this.config.get("domain")) {
-                    var metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
-                    me.metrics = metrics;
-                    if (metrics.models.length > 0) {
-                        var noneSelected = true;
-                        for (var idx=0; idx<metrics.models.length; idx++) {
-                            var metric = metrics.models[idx];
-    
-                            // check if selected
-                            var selected = me.isChosen(metrics.models[idx]);
-                            if (selected === true) {
-                                noneSelected = false;
+                squid_api.getSelectedDomain().always(function(domain) {
+                    if (domain) {
+                        var metrics = domain.get("metrics");
+                        me.metrics = metrics;
+                        if (metrics.models.length > 0) {
+                            var noneSelected = true;
+                            for (var idx=0; idx<metrics.models.length; idx++) {
+                                var metric = metrics.models[idx];
+        
+                                // check if selected
+                                var selected = me.isChosen(metrics.models[idx]);
+                                if (selected === true) {
+                                    noneSelected = false;
+                                }
+        
+                                // add to the list
+                                var option = {"label" : metric.get("name"), "value" : metric.get("oid"), "selected" : selected};
+                                jsonData.options.push(option);
                             }
-    
-                            // add to the list
-                            var option = {"label" : metric.get("name"), "value" : metric.get("oid"), "selected" : selected};
-                            jsonData.options.push(option);
+        
+                            if (noneSelected === true) {
+                                me.config.set("chosenMetrics", []);
+                            }
+        
+                            // Alphabetical Sorting
+                            jsonData.options = me.sortMetrics(jsonData.options);
                         }
+                    
     
-                        if (noneSelected === true) {
-                            me.config.set("chosenMetrics", []);
-                        }
-    
-                        // Alphabetical Sorting
-                        jsonData.options = me.sortMetrics(jsonData.options);
-                    }
-                
-
-                    // check if empty
-                    if (jsonData.options.length === 0) {
-                        jsonData.empty = true;
-                        if (me.config.get("chosenMetrics")) {
-                        	if (me.config.get("chosenMetrics").length > 0) {
-                            	me.config.set({"chosenMetrics" : []});
+                        // check if empty
+                        if (jsonData.options.length === 0) {
+                            jsonData.empty = true;
+                            if (me.config.get("chosenMetrics")) {
+                            	if (me.config.get("chosenMetrics").length > 0) {
+                                	me.config.set({"chosenMetrics" : []});
+                                }
                             }
                         }
+        
+                        var html = me.template(jsonData);
+                        me.$el.html(html);
+                        me.$el.show();
+        
+                        // Initialize plugin
+                        me.selector = me.$el.find("select");
+                        if (isMultiple) {
+                            me.selector.multiselect({
+                                buttonContainer: '<div class="squid-api-data-widgets-metric-selector-open" />',
+                                buttonText: function() {
+                                    return 'Metrics';
+                                },
+                                onDropdownShown: function() {
+                                    me.showConfiguration();
+                                }
+                            });
+                        }
+        
+                        // Remove Button Title Tag
+                        me.$el.find("button").removeAttr('title');
                     }
-    
-                    var html = me.template(jsonData);
-                    me.$el.html(html);
-                    me.$el.show();
-    
-                    // Initialize plugin
-                    me.selector = me.$el.find("select");
-                    if (isMultiple) {
-                        me.selector.multiselect({
-                            buttonContainer: '<div class="squid-api-data-widgets-metric-selector-open" />',
-                            buttonText: function() {
-                                return 'Metrics';
-                            },
-                            onDropdownShown: function() {
-                                me.showConfiguration();
-                            }
-                        });
-                    }
-    
-                    // Remove Button Title Tag
-                    me.$el.find("button").removeAttr('title');
-                }
+                });
             }
 
             return this;
@@ -3663,8 +3631,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         showConfiguration: function() {
             var me = this;
-            var project = squid_api.model.project;
-            if (project) {
+            squid_api.getSelectedProject().always( function(project) {
                 if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
                     me.$el.find("li.configure").remove();
                     me.$el.find("li").first().before("<li class='configure'> configure</option>");
@@ -3681,7 +3648,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         });
                     });
                 }
-            }
+            });
         },
 
         sortMetrics: function(metrics) {
@@ -4094,74 +4061,75 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
             }
             if (this.filters.get("status") === "DONE") {
-                var domains = squid_api.model.project.get("domains");
-                if (domains && this.config.get("domain")) {
-                    var metrics = domains.findWhere({"oid": this.config.get("domain")}).get("metrics");
-                    var chosenMetrics = me.config.get("chosenMetrics");
-                    orderBy = me.config.get("orderBy");
-    
-                    if (chosenDimensions) {
-                        for (i=0; i<chosenDimensions.length; i++) {
-                            if (filters) {
-                                for (ix=0; ix<filters.facets.length; ix++) {
-                                    if (chosenDimensions[i] === filters.facets[ix].id) {
-                                        columns.push({"label" : filters.facets[ix].dimension.name, "value" : filters.facets[ix].id});
+                squid_api.getSelectedDomain().always(function(domain) {
+                    if (domain) {
+                        var metrics = domain.get("metrics");
+                        var chosenMetrics = me.config.get("chosenMetrics");
+                        orderBy = me.config.get("orderBy");
+        
+                        if (chosenDimensions) {
+                            for (i=0; i<chosenDimensions.length; i++) {
+                                if (filters) {
+                                    for (ix=0; ix<filters.facets.length; ix++) {
+                                        if (chosenDimensions[i] === filters.facets[ix].id) {
+                                            columns.push({"label" : filters.facets[ix].dimension.name, "value" : filters.facets[ix].id});
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-    
-                    if (metrics && chosenMetrics) {
-                        for (var id=0; id<metrics.length; id++) {
-                            var metric = metrics.at(id);
-                            // Match with chosen
-                            for (var match=0; match<chosenMetrics.length; match++) {
-                                if (metric.get("oid") === chosenMetrics[match]) {
-                                    var option = {"label" : metric.get("name"), "value" : metric.get("definition")};
-                                    columns.push(option);
+        
+                        if (metrics && chosenMetrics) {
+                            for (var id=0; id<metrics.length; id++) {
+                                var metric = metrics.at(id);
+                                // Match with chosen
+                                for (var match=0; match<chosenMetrics.length; match++) {
+                                    if (metric.get("oid") === chosenMetrics[match]) {
+                                        var option = {"label" : metric.get("name"), "value" : metric.get("definition")};
+                                        columns.push(option);
+                                    }
                                 }
                             }
                         }
-                    }
-                
-
-                    var jsonData = {"checked" : checked, "limit" : limit, "Columns" : columns, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
+                    
     
-                    var html = me.template(jsonData);
-                    me.$el.html(html);
-    
-                    me.$el.find("select").multiselect({
-                        onChange: function(model) {
-                            var obj = {};
-                            var orderBy = me.model.get("orderBy");
-                            if (orderBy) {
-                                obj.expression = {"value" : model.val()};
-                                if (orderBy[0].direction) {
-                                    obj.direction = orderBy[0].direction;
-                                } else {
-                                    obj.direction = "DESC";
-                                }
-                            }           		
-                            me.config.set({"orderBy" : [obj], "selectedMetric" : model.val()});
+                        var jsonData = {"checked" : checked, "limit" : limit, "Columns" : columns, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
+        
+                        var html = me.template(jsonData);
+                        me.$el.html(html);
+        
+                        me.$el.find("select").multiselect({
+                            onChange: function(model) {
+                                var obj = {};
+                                var orderBy = me.model.get("orderBy");
+                                if (orderBy) {
+                                    obj.expression = {"value" : model.val()};
+                                    if (orderBy[0].direction) {
+                                        obj.direction = orderBy[0].direction;
+                                    } else {
+                                        obj.direction = "DESC";
+                                    }
+                                }           		
+                                me.config.set({"orderBy" : [obj], "selectedMetric" : model.val()});
+                            }
+                        });
+        
+                        if (orderBy) {
+                            if (orderBy[0].expression) {
+                                // verify if existing expression exists
+                                me.expressionExists(columns);  		
+                            }
+                        } else if (me.$el.find("select").val()) {
+                            var obj = {"expression" : {"value" : me.$el.find("select").val()}, "direction" : "DESC"};
+                            me.config.set({"orderBy" : [obj], "selectedMetric" : me.$el.find("select").val()});
                         }
-                    });
-    
-                    if (orderBy) {
-                        if (orderBy[0].expression) {
-                            // verify if existing expression exists
-                            me.expressionExists(columns);  		
-                        }
-                    } else if (me.$el.find("select").val()) {
-                        var obj = {"expression" : {"value" : me.$el.find("select").val()}, "direction" : "DESC"};
-                        me.config.set({"orderBy" : [obj], "selectedMetric" : me.$el.find("select").val()});
+        
+                        me.$el.find("select").multiselect("refresh");
+        
+                        // Set Limit Value
+                        me.$el.find(".sq-select").val(jsonData.limit);
                     }
-    
-                    me.$el.find("select").multiselect("refresh");
-    
-                    // Set Limit Value
-                    me.$el.find(".sq-select").val(jsonData.limit);
-                }
+                });
 
             }
 
