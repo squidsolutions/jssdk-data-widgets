@@ -1741,7 +1741,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         initialize: function(options) {
             var me = this;
-            
+
             // setup options
             if (options.template) {
                 this.template = options.template;
@@ -1775,12 +1775,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             squid_api.getSelectedProject().always( function(project) {
                 me.project = project;
             });
-            
+
             // listen for selection change as we use it to get dimensions
             this.listenTo(this.filters,"change:selection", this.render);
             this.listenTo(this.model,"change", this.render);
             this.listenTo(this.config,"change:domain", this.render);
             this.listenTo(this.config,"change:chosenDimensions", this.updateDropdown);
+
+            // initilize dimension collection for management view
+            this.dimensionCollection = new squid_api.view.DimensionCollectionManagementWidget();
 
             // listen for global status change
             this.status.on('change:status', this.enable, this);
@@ -1948,21 +1951,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         showConfiguration: function() {
-            var me = this;
             if (this.project.get("_role") === "WRITE" || this.project.get("_role") === "OWNER") {
-                me.$el.find("li.configure").remove();
-                me.$el.find("li").first().before("<li class='configure'> configure</option>");
-                me.$el.find("li").first().off().on("click", function() {
-                    new squid_api.view.ColumnsManagementWidget({
-                        buttonLabel : "<i class='fa fa-arrows-h'></i>",
-                        type : "Dimension",
-                        collection :new squid_api.model.DimensionCollection(),
-                        model : new squid_api.model.DimensionModel(),
-                        successHandler : function() {
-                            var message = me.type + " with name " + this.get("name") + " has been successfully modified";
-                            squid_api.model.status.set({'message' : message});
-                        }
-                    });
+
+                // place dimension collection in modal view
+                var dimensionModal = new squid_api.view.ModalView({
+                    view : this.dimensionCollection
+                });
+
+                this.$el.find("li").first().before("<li class='configure'> configure</option>");
+                this.$el.find("li").first().on("click", function() {
+                    // trigger dimension management view
+                    dimensionModal.render();
                 });
             }
         },
