@@ -31,8 +31,10 @@
                     me.enabled();
                 });
                 this.listenTo(this.model, 'change:templateData', function() {
-                    me.refreshViewMaterializeDatasets();
-                    me.enabled();
+                    if(this.materializeDatasetsView === true) {
+                        me.refreshViewMaterializeDatasets();
+                        me.enabled();
+                    }
                 });
                 this.listenTo(this.model, 'change:enabled', this.enabled);
             } else {
@@ -107,14 +109,18 @@
                 }
             }
             this.refreshViewSqlUrl();
-            this.refreshViewMaterializeDatasets();
+            if(this.materializeDatasetsView === true) {
+                this.refreshViewMaterializeDatasets();
+            }
         },
 
         clickedCompression : function (event) {
             var t = event.target;
             this.compression = (t.checked);
             this.refreshViewSqlUrl();
-            this.refreshViewMaterializeDatasets();
+            if(this.materializeDatasetsView === true) {
+                this.refreshViewMaterializeDatasets();
+            }
         },
 
         downloadAnalysisResults : function(currentJobId) {
@@ -433,11 +439,11 @@
             $(this.viewPort).find("#download").click(function() {
                 me.download();
             });
-
-            $(this.viewPort).find("#view-materializedatasets").click(function() {
-                me.refreshViewMaterializeDatasets();
-            });
-
+            if(this.materializeDatasetsView === true) {
+                $(this.viewPort).find("#view-materializedatasets").click(function () {
+                    me.refreshViewMaterializeDatasets();
+                });
+            }
             if (this.displayInPopup) {
             	this.popup = this.$el.find(".download-wrapper").dialog({
                     dialogClass: "squid-api-export-panel-popup",
