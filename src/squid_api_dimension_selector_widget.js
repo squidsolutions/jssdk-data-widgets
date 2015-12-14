@@ -42,14 +42,8 @@
             	this.status = squid_api.model.status;
             }
 
-            squid_api.getSelectedProject().always( function(project) {
-                me.project = project;
-            });
-
             // listen for selection change as we use it to get dimensions
             this.listenTo(this.filters,"change:selection", this.render);
-            this.listenTo(this.model,"change", this.render);
-            this.listenTo(this.config,"change:domain", this.render);
             this.listenTo(this.config,"change:chosenDimensions", this.updateDropdown);
 
             // initilize dimension collection for management view
@@ -88,7 +82,8 @@
 
         render: function() {
             var me = this;
-            if ((this.project) && (this.config.get("domain"))) {
+            
+            if ((this.config.get("project")) && (this.config.get("domain"))) {
                 var isMultiple = true;
 
                 if (me.dimensionIndex !== null) {
@@ -221,19 +216,22 @@
         },
 
         showConfiguration: function() {
-            if (this.project.get("_role") === "WRITE" || this.project.get("_role") === "OWNER") {
-
-                // place dimension collection in modal view
-                var dimensionModal = new squid_api.view.ModalView({
-                    view : this.dimensionCollection
-                });
-
-                this.$el.find("li").first().before("<li class='configure'> configure</option>");
-                this.$el.find("li").first().on("click", function() {
-                    // trigger dimension management view
-                    dimensionModal.render();
-                });
-            }
+            var me = this;
+            squid_api.getSelectedProject().done( function(project) {
+                if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
+    
+                    // place dimension collection in modal view
+                    var dimensionModal = new squid_api.view.ModalView({
+                        view : me.dimensionCollection
+                    });
+    
+                    me.$el.find("li").first().before("<li class='configure'> configure</option>");
+                    me.$el.find("li").first().on("click", function() {
+                        // trigger dimension management view
+                        dimensionModal.render();
+                    });
+                }
+            });
         },
 
         sortDimensions: function(dimensions) {

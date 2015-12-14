@@ -144,13 +144,15 @@
             
             if (! me.headerInformation) {
                 squid_api.getSelectedDomain().always( function(domain) {
+                    var arr = [];
                     metrics = domain.get("metrics");
                     me.domainMetrics = [];
                     for(i=0; i<metrics.models.length; i++) {
                         arr.push(metrics.models[i].toJSON());
                     }
+                    me.domainMetrics = arr;
                     me.headerInformation = true;
-                    me.displayTableHeader()     
+                    me.displayTableHeader();
                 });
             } else  {
                 var columns;
