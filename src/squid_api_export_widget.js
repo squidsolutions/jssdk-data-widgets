@@ -218,7 +218,10 @@
 
         refreshViewMaterializeDatasets : function() {
             var me = this;
-
+            var viewPort = $(me.viewPort);
+            if (this.displayInPopup) {
+                viewPort = this.popup;
+            }
             var analysis = this.model.get("analysis");
             if (!analysis) {
                 analysis = this.model;
@@ -233,23 +236,19 @@
                 var downloadAnalysis = new squid_api.model.InternalanalysisjobModel();
                 downloadAnalysis.set(
                     {
-                        "name": $("#destDomain").val(),
+                        "name": viewPort.find("#destDomain").val(),
                         "options": {
                             "analysisJob": analysis,
                             "sourceProjectId": analysis.get("id").projectId,
-                            "destProjectId": $("#destProject").val(),
-                            "destSchema": $("#destSchema").val()
+                            "destProjectId": viewPort.find("#destProject").val(),
+                            "destSchema": viewPort.find("#destSchema").val()
                         }
                     }
                 );
                 downloadAnalysis.save();
             }
 
-            
-            var viewPort = $(me.viewPort);
-            if (this.displayInPopup) {
-                viewPort = this.popup;
-            }
+
             //var downloadBtn = viewPort.find("#view-materializedatasets");
             //downloadBtn.attr("href", downloadAnalysis.url());
             //downloadBtn.removeClass("disabled");
