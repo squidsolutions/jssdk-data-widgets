@@ -123,10 +123,6 @@
                             jsonData.options.push(option);
                         }
 
-                        if (noneSelected === true) {
-                            me.config.set("chosenMetrics", []);
-                        }
-
                         // Alphabetical Sorting
                         jsonData.options = me.sortMetrics(jsonData.options);
                     }
@@ -135,11 +131,6 @@
                     // check if empty
                     if (jsonData.options.length === 0) {
                         jsonData.empty = true;
-                        if (me.config.get("chosenMetrics")) {
-                        	if (me.config.get("chosenMetrics").length > 0) {
-                            	me.config.set({"chosenMetrics" : []});
-                            }
-                        }
                     }
 
                     var html = me.template(jsonData);
