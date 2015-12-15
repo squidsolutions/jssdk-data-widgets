@@ -29,7 +29,10 @@
             if (!this.config) {
                 this.config = squid_api.model.config;
             }
-            
+
+            // initilize dimension collection for management view
+            this.metricCollection = new squid_api.view.MetricCollectionManagementWidget();
+
             this.listenTo(this.config,"change:domain", this.render);
             this.listenTo(this.config,"change:chosenMetrics", this.updateDropdown);
 
@@ -108,26 +111,26 @@
                         var noneSelected = true;
                         for (var idx=0; idx<metrics.models.length; idx++) {
                             var metric = metrics.models[idx];
-    
+
                             // check if selected
                             var selected = me.isChosen(metrics.models[idx]);
                             if (selected === true) {
                                 noneSelected = false;
                             }
-    
+
                             // add to the list
                             var option = {"label" : metric.get("name"), "value" : metric.get("oid"), "selected" : selected};
                             jsonData.options.push(option);
                         }
-    
+
                         if (noneSelected === true) {
                             me.config.set("chosenMetrics", []);
                         }
-    
+
                         // Alphabetical Sorting
                         jsonData.options = me.sortMetrics(jsonData.options);
                     }
-                
+
 
                     // check if empty
                     if (jsonData.options.length === 0) {
@@ -138,11 +141,11 @@
                             }
                         }
                     }
-    
+
                     var html = me.template(jsonData);
                     me.$el.html(html);
                     me.$el.show();
-    
+
                     // Initialize plugin
                     me.selector = me.$el.find("select");
                     if (isMultiple) {
@@ -156,7 +159,7 @@
                             }
                         });
                     }
-    
+
                     // Remove Button Title Tag
                     me.$el.find("button").removeAttr('title');
                 });
@@ -167,21 +170,18 @@
 
         showConfiguration: function() {
             var me = this;
-            squid_api.getSelectedProject().always( function(project) {
+            squid_api.getSelectedProject().done( function(project) {
                 if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
-                    me.$el.find("li.configure").remove();
+
+                    // place dimension collection in modal view
+                    var dimensionModal = new squid_api.view.ModalView({
+                        view : me.metricCollection
+                    });
+
                     me.$el.find("li").first().before("<li class='configure'> configure</option>");
-                    me.$el.find("li").first().off().on("click", function() {
-                        new squid_api.view.ColumnsManagementWidget({
-                            buttonLabel : "<i class='fa fa-arrows-h'></i>",
-                            type : "Metric",
-                            collection : me.metrics,
-                            model : new squid_api.model.MetricModel(),
-                            successHandler : function() {
-                                var message = me.type + " with name " + this.get("name") + " has been successfully modified";
-                                squid_api.model.status.set({'message' : message});
-                            }
-                        });
+                    me.$el.find("li").first().on("click", function() {
+                        // trigger dimension management view
+                        dimensionModal.render();
                     });
                 }
             });
