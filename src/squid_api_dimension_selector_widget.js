@@ -47,7 +47,7 @@
             this.listenTo(this.config,"change:chosenDimensions", this.updateDropdown);
 
             // initilize dimension collection for management view
-            this.dimensionCollection = new squid_api.view.DimensionCollectionManagementWidget();
+            this.dimensionCollection = new squid_api.view.DimensionColumnsManagementWidget();
 
             // listen for global status change
             this.status.on('change:status', this.enable, this);
