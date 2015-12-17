@@ -1329,23 +1329,21 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         displayTableHeader : function(selector) {
             var me = this;
-
+            var i;
+            var metrics;
+            
             if (! me.headerInformation) {
-                squid_api.utils.getProjectDomains().then(function(domains) {
+                squid_api.getSelectedDomain().always( function(domain) {
                     var arr = [];
-                    for(i=0; i<domains.models.length; i++) {
-                        arr.push(domains.models[i].toJSON());
-                    }
-                    me.projectDomains = arr;
-                }).then(squid_api.utils.getDomainMetrics().then(function(metrics) {
-                    var arr = [];
+                    metrics = domain.get("metrics");
+                    me.domainMetrics = [];
                     for(i=0; i<metrics.models.length; i++) {
                         arr.push(metrics.models[i].toJSON());
                     }
                     me.domainMetrics = arr;
                     me.headerInformation = true;
                     me.displayTableHeader();
-                }));
+                });
             } else  {
                 var columns;
                 var originalColumns;//unaltered by rollup splice
@@ -1372,7 +1370,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 } else {
                     // use analysis columns
                     columns = [];
-                    var i;
+                    
                     var obj;
                     var facets = this.model.get("facets");
                     if (facets) {
@@ -1387,7 +1385,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             }
                         }
                     }
-                    var metrics = this.model.get("metricList");
+                    metrics = this.model.get("metricList");
                     if (metrics) {
                         if (metrics.length === 0) {
                             metrics = squid_api.model.config.get("chosenMetrics");
@@ -1744,6 +1742,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         filters: null,
 
         initialize: function(options) {
+            var me = this;
 
             // setup options
             if (options.template) {
@@ -1776,8 +1775,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             // listen for selection change as we use it to get dimensions
-            this.listenTo(this.filters,"change:selection", this.render);
-            this.listenTo(this.config,"change:chosenDimensions", this.updateDropdown);
+            me.listenTo(this.filters,"change:selection", this.render);
+            me.listenTo(this.config,"change:chosenDimensions", this.updateDropdown);
+
+            // initilize dimension collection for management view
+            this.dimensionCollection = new squid_api.view.DimensionColumnsManagementWidget();
 
             // listen for global status change
             this.status.on('change:status', this.enable, this);
@@ -1812,159 +1814,156 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         render: function() {
             var me = this;
-                squid_api.utils.fetchModel("project").then(function(project) {
-                    me.project = project;
-                    squid_api.utils.fetchModel("domain").then(function(domain) {
-                        var isMultiple = true;
 
-                        if (me.dimensionIndex !== null) {
-                            isMultiple = false;
-                        }
+            if ((this.config.get("project")) && (this.config.get("domain"))) {
+                var isMultiple = true;
 
-                        var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
+                if (me.dimensionIndex !== null) {
+                    isMultiple = false;
+                }
 
-                        // iterate through all filter facets
-                        var selection = me.filters.get("selection");
-                        if (selection) {
-                            var facets = selection.facets;
-                            if (facets) {
-                                me.dimensions = [];
-                                for (var i=0; i<facets.length; i++){
-                                    var facet = facets[i];
-                                    var isBoolean = false;
-                                    if (facet.dimension.type === "SEGMENTS") {
-                                        isBoolean = true;
-                                    }
-                                    if (facet.items) {
-                                    	if ((facet.items.length === 1) && (facet.items[0].value === "true")) {
-                                    		isBoolean = true;
-                                    	}
-                                    }
-                                    // do not display boolean dimensions
-                                    if (!isBoolean) {
-                                        if (me.dimensionIdList) {
-                                            // insert and sort
-                                            var idx = me.dimensionIdList.indexOf(facet.dimension.oid);
-                                            if (idx >= 0) {
-                                                me.dimensions[idx] = facet;
-                                            }
-                                        } else {
-                                            // default unordered behavior
-                                            me.dimensions.push(facet);
-                                        }
-                                    }
-                                    // avoid holes
-                                    if (!me.dimensions[i]) {
-                                        me.dimensions[i] = null;
-                                    }
-                                }
-                                var noneSelected = true;
-                                for (var dimIdx=0; dimIdx<me.dimensions.length; dimIdx++) {
-                                    var facet1 = me.dimensions[dimIdx];
-                                    if (facet1) {
-                                        // check if selected
-                                        var selected = me.isChosen(facet1);
-                                        if (selected === true) {
-                                            noneSelected = false;
-                                        }
-                                        // add to the list
-                                        var name;
-                                        if (facet1.name) {
-                                            name = facet1.name;
-                                        } else {
-                                            name = facet1.dimension.name;
-                                        }
-                                        var option = {"label" : name, "value" : facet1.id, "selected" : selected, "error" : me.dimensions[dimIdx].error};
-                                        jsonData.options.push(option);
-                                    }
-                                }
-                                if (noneSelected === true && me.filters.get("status") === "DONE") {
-                                    me.config.set("chosenDimensions", []);
+                var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
+
+                // iterate through all filter facets
+                var selection = me.filters.get("selection");
+                if (selection) {
+                    var facets = selection.facets;
+                    if (facets) {
+                        me.dimensions = [];
+                        for (var i=0; i<facets.length; i++){
+                            var facet = facets[i];
+                            var isBoolean = false;
+                            if (facet.dimension.type === "SEGMENTS") {
+                                isBoolean = true;
+                            }
+                            if (facet.items) {
+                                if ((facet.items.length === 1) && (facet.items[0].value === "true")) {
+                                    isBoolean = true;
                                 }
                             }
-                        }
-
-                        jsonData.options = me.sortDimensions(jsonData.options);
-
-                        // check if empty
-                        if (jsonData.options.length === 0) {
-                            jsonData.empty = true;
-                        }
-
-                        var html = me.template(jsonData);
-                        me.$el.html(html);
-                        me.$el.show();
-
-                        // Initialize plugin
-                        me.selector = me.$el.find("select");
-                        if (isMultiple) {
-                             me.selector.multiselect({
-                                buttonContainer: '<div class="squid-api-data-widgets-dimension-selector" />',
-                                buttonText: function() {
-                                    return 'Dimensions';
-                                },
-                                onChange: function(option, selected) {
-                                    var chosenModel = _.clone(me.config.get("chosenDimensions"));
-                                    if (!chosenModel) {
-                                        chosenModel = [];
+                            // do not display boolean dimensions
+                            if (!isBoolean) {
+                                if (me.dimensionIdList) {
+                                    // insert and sort
+                                    var idx = me.dimensionIdList.indexOf(facet.dimension.oid);
+                                    if (idx >= 0) {
+                                        me.dimensions[idx] = facet;
                                     }
-                                    var currentItem = option.attr("value");
-
-                                    if (selected) {
-                                        chosenModel.push(option.attr("value"));
-                                    } else {
-                                        // If deselected remove item from array
-                                        for (var i = chosenModel.length; i--;) {
-                                            if (chosenModel[i] === currentItem) {
-                                                chosenModel.splice(i, 1);
-                                            }
-                                        }
-                                    }
-                                    me.config.set("chosenDimensions", chosenModel);
-                                },
-                                onDropdownShown: function(option, selected) {
-                                    me.showConfiguration();
+                                } else {
+                                    // default unordered behavior
+                                    me.dimensions.push(facet);
                                 }
-                            });
-                        } else {
-                            var selectedDimension = me.config.get("selectedDimension");
-
-                            me.$el.find("select").on("change", function() {
-                                var dimension = $(me).val();
-                                me.config.set("chosenDimensions", [dimension]);
-                            });
-
-                            if (selectedDimension) {
-                                me.$el.find("select").val(selectedDimension);
+                            }
+                            // avoid holes
+                            if (!me.dimensions[i]) {
+                                me.dimensions[i] = null;
                             }
                         }
+                        var noneSelected = true;
+                        for (var dimIdx=0; dimIdx<me.dimensions.length; dimIdx++) {
+                            var facet1 = me.dimensions[dimIdx];
+                            if (facet1) {
+                                // check if selected
+                                var selected = me.isChosen(facet1);
+                                if (selected === true) {
+                                    noneSelected = false;
+                                }
+                                // add to the list
+                                var name;
+                                if (facet1.name) {
+                                    name = facet1.name;
+                                } else {
+                                    name = facet1.dimension.name;
+                                }
+                                var option = {"label" : name, "value" : facet1.id, "selected" : selected, "error" : me.dimensions[dimIdx].error};
+                                jsonData.options.push(option);
+                            }
+                        }
+                        if (noneSelected === true && me.status.get("status") !== "RUNNING") {
+                            me.config.set("chosenDimensions", []);
+                        }
+                    }
 
-                        // Remove Button Title Tag
-                        me.$el.find("button").removeAttr('title');
-                    });
-                });
 
+                    jsonData.options = me.sortDimensions(jsonData.options);
+
+                    // check if empty
+                    if (jsonData.options.length === 0) {
+                        jsonData.empty = true;
+                    }
+
+                    var html = me.template(jsonData);
+                    me.$el.html(html);
+                    me.$el.show();
+
+                    // Initialize plugin
+                    me.selector = me.$el.find("select");
+                    if (isMultiple) {
+                        me.selector.multiselect({
+                            buttonContainer: '<div class="squid-api-data-widgets-dimension-selector" />',
+                            buttonText: function() {
+                                return 'Dimensions';
+                            },
+                            onChange: function(option, selected) {
+                                var chosenModel = _.clone(me.config.get("chosenDimensions"));
+                                if (!chosenModel) {
+                                    chosenModel = [];
+                                }
+                                var currentItem = option.attr("value");
+
+                                if (selected) {
+                                    chosenModel.push(option.attr("value"));
+                                } else {
+                                    // If deselected remove item from array
+                                    for (var i = chosenModel.length; i--;) {
+                                        if (chosenModel[i] === currentItem) {
+                                            chosenModel.splice(i, 1);
+                                        }
+                                    }
+                                }
+                                me.config.set("chosenDimensions", chosenModel);
+                            },
+                            onDropdownShown: function() {
+                                me.showConfiguration();
+                            }
+                        });
+                    } else {
+                        var selectedDimension = me.config.get("selectedDimension");
+
+                        me.$el.find("select").on("change", function() {
+                            var dimension = $(me).val();
+                            me.config.set("chosenDimensions", [dimension]);
+                        });
+
+                        if (selectedDimension) {
+                            me.$el.find("select").val(selectedDimension);
+                        }
+                    }
+
+                    // Remove Button Title Tag
+                    me.$el.find("button").removeAttr('title');
+                }
+            }
             return this;
         },
 
         showConfiguration: function() {
             var me = this;
-            if (this.project.get("_role") === "WRITE" || this.project.get("_role") === "OWNER") {
-                me.$el.find("li.configure").remove();
-                me.$el.find("li").first().before("<li class='configure'> configure</option>");
-                me.$el.find("li").first().off().on("click", function() {
-                    new squid_api.view.ColumnsManagementWidget({
-                        buttonLabel : "<i class='fa fa-arrows-h'></i>",
-                        type : "Dimension",
-                        collection :new squid_api.model.DimensionCollection(),
-                        model : new squid_api.model.DimensionModel(),
-                        successHandler : function() {
-                            var message = me.type + " with name " + this.get("name") + " has been successfully modified";
-                            squid_api.model.status.set({'message' : message});
-                        }
+            squid_api.getSelectedProject().done( function(project) {
+                if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
+
+                    // place dimension collection in modal view
+                    var dimensionModal = new squid_api.view.ModalView({
+                        view : me.dimensionCollection
                     });
-                });
-            }
+
+                    me.$el.find("li").first().before("<li class='configure'> configure</option>");
+                    me.$el.find("li").first().on("click", function() {
+                        // trigger dimension management view
+                        dimensionModal.render();
+                    });
+                }
+            });
         },
 
         sortDimensions: function(dimensions) {
@@ -3075,7 +3074,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 downloadAnalysis.save();
             }
 
-            
+
             //var downloadBtn = viewPort.find("#view-materializedatasets");
             //downloadBtn.attr("href", downloadAnalysis.url());
             //downloadBtn.removeClass("disabled");
@@ -3308,10 +3307,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         onChangeHandler : null,
 
         initialize: function(options) {
-
-            var me = this;
-
-            // setup options
+            this.config = squid_api.model.config;
 
             if (this.model) {
                 this.filters = this.model;
@@ -3320,172 +3316,152 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
 
             if (options) {
-                // setup options
-                if (options.config) {
-                    this.config = options.config;
-                }
                 this.onChangeHandler = options.onChangeHandler;
             }
 
-            if (!this.config) {
-                this.config = squid_api.model.config;
-            }
-
-            // controller
-
-            var filters = this.filters;
-
-            // check for new filter selection made by user
-            this.listenTo(filters, 'change:userSelection', function() {
-                console.log("compute (change:userSelection)");
-                squid_api.controller.facetjob.compute(filters, filters.get("userSelection"));
-            });
-            
             // check for new filter selection made by config update
-            this.listenTo(this.config, 'change:selection', function() {
-                console.log("compute (change:selection)");
-                // make sure the domain of filters is set
-                if (me.config.get("domain")) {
-                    var id = filters.get("id");
-                    if (id) {
-                        filters.set("id" , {
-                            "projectId" : id.projectId,
-                            "facetjobId" : null
-                            });
-                        filters.setDomainIds([{
-                            "projectId" : id.projectId,
-                            "domainId" : me.config.get("domain")
-                        }]);
-                        squid_api.controller.facetjob.compute(filters, me.config.get("selection"));
-                    }
-                }
-            });
-
-            // update config if filters have changed
-            this.listenTo(filters, 'change:selection', function(filters) {
-                me.config.set("selection", squid_api.utils.buildCleanSelection(filters.get("selection")));
-            });
-
-            // check for domain change performed
-            this.listenTo(this.config, 'change:domain', function(config) {
-                if (config.get("domain")) {
-                    var id = filters.get("id");
-                    if (id) {
-                        filters.set("id" , {
-                            "projectId" : id.projectId,
-                            "facetjobId" : null
-                            });
-                        filters.setDomainIds([{
-                            "projectId" : id.projectId,
-                            "domainId" : config.get("domain")
-                        }]);
-                    }
-                    me.initFilters(config);
-                }
-            });
-
-            // check for project change performed
-            this.listenTo(this.config, 'change:project', function(config) {
-                var id = filters.get("id");
-                if (id) {
-                    filters.set("id" , {
-                        "projectId" : config.get("project"),
-                        "facetjobId" : null
-                        });
-                    filters.setDomainIds(null);
-                }
-            });
+            this.listenTo(this.config, 'change:selection', this.initFilters);
+            // check for updated period made by config
+            this.listenTo(this.config, 'change:period', this.resetPeriodSelection);
         },
 
-       initFilters : function(config) {
-           var me = this;
-           var domainId = config.get("domain");
-           var projectId = config.get("project");
+        resetPeriodSelection: function() {
+            var selection = this.filters.get("selection");
+            var domain = this.config.get("domain");
+            var periodConfig = this.config.get("period");
+            if (selection) {
+                if (selection.facets) {
+                    for (i=0; i<selection.facets.length; i++) {
+                        if (selection.facets[i].dimension.type === "DATE" && selection.facets[i].id !== periodConfig[domain]) {
+                            selection.facets.splice(i, 1);
+                        }
+                    }
+                    this.config.set("selection", selection);
+                }
+            }
+        },
 
-           if (projectId && domainId) {
-               var domainPk = {
-                       "projectId" : projectId,
-                       "domainId" : domainId
-               };
+        initFilters : function() {
+            var me = this;
+            var domainId = this.config.get("domain");
+            var projectId = this.config.get("project");
 
-               // launch the default filters computation
-               var filters = new squid_api.model.FiltersJob();
-               filters.set("id", {
-                   "projectId": projectId
-               });
-               filters.set("engineVersion", "2");
-               filters.setDomainIds([domainPk]);
+            if (projectId && domainId) {
+                var domainPk = {
+                        "projectId" : projectId,
+                        "domainId" : domainId
+                };
 
-               $.when(squid_api.controller.facetjob.compute(filters, config.get("selection")))
-               .then(function() {
-                   // search for a time facet
-                   var timeFacet;
-                   var sel = filters.get("selection");
-                   if (sel && sel.facets) {
-                       var facets = sel.facets;
-                       for (var i = 0; i < facets.length; i++) {
-                           var facet = facets[i];
-                           if (facet.dimension.valueType === "DATE" && ! me.config.get("period")) {
-                               timeFacet = facet;
-                           }
-                       }
-                   }
-                   if (timeFacet) {
-                       if (timeFacet.done === false) {
-                           console.log("retrieving time facet's members");
-                           $.when(squid_api.controller.facetjob.getFacetMembers(filters, timeFacet.id))
-                           .always(function() {
-                                   console.log("time facet dimension = "+timeFacet.dimension.name);
-                                   me.changed(filters.get("selection"), timeFacet);
-                               });
-                       } else {
-                           me.changed(filters.get("selection"), timeFacet);
-                       }
-                   } else {
-                       console.log("WARN: cannot use any time dimension to use for datepicker");
-                       me.changed(filters.get("selection"), null);
-                   }
-               });
-           }
-       },
+                // launch the default filters computation
+                var filters = new squid_api.model.FiltersJob();
+                filters.set("id", {
+                    "projectId": projectId
+                });
+                filters.set("engineVersion", "2");
+                filters.setDomainIds([domainPk]);
 
-       refreshFilters : function(selection) {
-           var changed = false;
-           var f = this.filters;
+                console.log("compute (initFilters)");
+                $.when(squid_api.controller.facetjob.compute(filters, this.config.get("selection")))
+                .then(function() {
+                    // search for time facets and make such they are done
+                    var timeFacets = [];
+                    var timeFacetDef = [];
+                    var sel = filters.get("selection");
+                    if (sel && sel.facets) {
+                        var facets = sel.facets;
+                        for (var i = 0; i < facets.length; i++) {
+                            var facet = facets[i];
+                            if (facet.dimension.valueType === "DATE") {
+                                if (facet.done === false) {
+                                    // schedule a new facet members computation
+                                    var computation = squid_api.controller.facetjob.getFacetMembers(filters, facet.id);
+                                    timeFacetDef.push(computation);
+                                } else {
+                                    timeFacets.push(facet);
+                                }
+                            }
+                        }
+                    }
+                    if (timeFacetDef.length > 0) {
+                            console.log("retrieving time facets members");
+                            $.when.apply($, timeFacetDef).always(function() {
+                                timeFacets.concat(arguments);
+                                me.changed(filters.get("selection"), timeFacets);
+                            });
+                    } else {
+                        me.changed(filters.get("selection"), timeFacets);
+                    }
+                });
+            }
+        },
 
-           var domainOid = this.config.get("domain");
-           if (domainOid) {
-               f.set({"id": {
-                   "projectId": this.config.get("project")
-               }}, {
-                   "silent" : true
-               });
-               f.setDomainIds([domainOid], true);
-               changed = changed || f.hasChanged();
-           } else {
-               // reset the domains
-               f.setDomainIds(null, true);
-               changed = changed || f.hasChanged();
-           }
+        defaultBehaviour: function(selection, timeFacets) {
+            var configPeriod = this.config.get("period");
+            var domain = this.config.get("domain");
+            var timeFacet = false;
+            if (configPeriod) {
+                if (configPeriod[domain]) {
+                    for (i=0; i<timeFacets.length; i++) {
+                        if (configPeriod[domain] === timeFacets[i].oid) {
+                            timeFacet = timeFacets[i];
+                        }
+                        break;
+                    }
+                }
+            }
+            if (!timeFacet) {
+                for (i=0; i<timeFacets.length; i++) {
+                    timeFacet = timeFacets[i];
+                    break;
+                }
+            }
+            if (timeFacet) {
+                // set config period
+                if (! configPeriod) {
+                    var obj = {};
+                    obj[domain] = timeFacet.id;
+                    this.config.set("period", obj);
+                } else {
+                    configPeriod[domain] = timeFacet.id;
+                    this.config.set("period", configPeriod);
+                }
+                // set selectedItems
+                if (timeFacet.selectedItems.length === 0) {
+                    var minDate;
+                    var maxDate;
+                    // detect mix & max
+                    if (timeFacet.items.length > 0) {
+                        minDate = timeFacet.items[0].lowerBound;
+                        maxDate = timeFacet.items[0].upperBound;
+                    } else {
+                        minDate = moment().subtract("50", "years").format(squid_api.DATE_FORMAT);
+                        maxDate = moment().format(squid_api.DATE_FORMAT);
+                    }
+                    // set timeFacet selected Items
+                    timeFacet.selectedItems = [{upperBound : maxDate, lowerBound : moment(maxDate).subtract("1", "month").format(squid_api.DATE_FORMAT), type : "i"}];
+                    // update selection
+                    for (ix=0; ix<selection.facets.length; ix++) {
+                        if (selection.facets[ix].id === timeFacet.id) {
+                            selection.facets[ix] = timeFacet;
+                        }
+                    }
+                    // set selection in config
+                    this.config.set("selection", squid_api.utils.buildCleanSelection(selection));
+                } else {
+                    this.filters.set("selection", selection);
+                }
+            } else {
+                this.filters.set("selection", selection);
+            }
+        },
 
-           f.set({"selection": selection}, {
-               "silent" : true
-           });
-           changed = changed || f.hasChanged();
-
-           if (changed === true) {
-               this.changed(selection);
-           }
-       },
-
-       changed : function(selection, timeFacet) {
-           if (this.onChangeHandler) {
-               this.onChangeHandler(selection, timeFacet);
-           } else {
-               console.log("compute (facetjob changed)");
-               squid_api.controller.facetjob.compute(this.filters, selection);
-           }
-       }
+        changed : function(selection, timeFacets) {
+            if (this.onChangeHandler) {
+                this.onChangeHandler(selection, timeFacets);
+            } else {
+                this.defaultBehaviour(selection, timeFacets);
+            }
+        }
 
     });
 
@@ -3590,7 +3566,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.config = squid_api.model.config;
             }
 
-            // setup the model listeners
+            // initilize dimension collection for management view
+            this.metricCollection = new squid_api.view.MetricCollectionManagementWidget();
+
             this.listenTo(this.config,"change:domain", this.render);
             this.listenTo(this.config,"change:chosenMetrics", this.updateDropdown);
 
@@ -3663,66 +3641,54 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var jsonData = {"selAvailable" : true, "options" : [], "multiple" : isMultiple};
 
                 // iterate through all domains metrics
-                squid_api.utils.fetchModel("project").then(function(project) {
-                    me.project = project;
-                    squid_api.utils.getDomainMetrics().then(function(metrics) {
-                            me.metrics = metrics;
-                            if (metrics.models.length > 0) {
-                                var noneSelected = true;
-                                for (var idx=0; idx<metrics.models.length; idx++) {
-                                    var metric = metrics.models[idx];
+                squid_api.getSelectedDomainCollection("metrics").done(function(metrics) {
+                    me.metrics = metrics;
+                    if (metrics.models.length > 0) {
+                        var noneSelected = true;
+                        for (var idx=0; idx<metrics.models.length; idx++) {
+                            var metric = metrics.models[idx];
 
-                                    // check if selected
-                                    var selected = me.isChosen(metrics.models[idx]);
-                                    if (selected === true) {
-                                        noneSelected = false;
-                                    }
-
-                                    // add to the list
-                                    var option = {"label" : metric.get("name"), "value" : metric.get("oid"), "selected" : selected};
-                                    jsonData.options.push(option);
-                                }
-
-                                if (noneSelected === true) {
-                                    me.config.set("chosenMetrics", []);
-                                }
-
-                                // Alphabetical Sorting
-                                jsonData.options = me.sortMetrics(jsonData.options);
+                            // check if selected
+                            var selected = me.isChosen(metrics.models[idx]);
+                            if (selected === true) {
+                                noneSelected = false;
                             }
 
-                            // check if empty
-                            if (jsonData.options.length === 0) {
-                                jsonData.empty = true;
-                                if (me.config.get("chosenMetrics")) {
-                                	if (me.config.get("chosenMetrics").length > 0) {
-                                    	me.config.set({"chosenMetrics" : []});
-                                    }
-                                }
+                            // add to the list
+                            var option = {"label" : metric.get("name"), "value" : metric.get("oid"), "selected" : selected};
+                            jsonData.options.push(option);
+                        }
+
+                        // Alphabetical Sorting
+                        jsonData.options = me.sortMetrics(jsonData.options);
+                    }
+
+
+                    // check if empty
+                    if (jsonData.options.length === 0) {
+                        jsonData.empty = true;
+                    }
+
+                    var html = me.template(jsonData);
+                    me.$el.html(html);
+                    me.$el.show();
+
+                    // Initialize plugin
+                    me.selector = me.$el.find("select");
+                    if (isMultiple) {
+                        me.selector.multiselect({
+                            buttonContainer: '<div class="squid-api-data-widgets-metric-selector-open" />',
+                            buttonText: function() {
+                                return 'Metrics';
+                            },
+                            onDropdownShown: function() {
+                                me.showConfiguration();
                             }
+                        });
+                    }
 
-                            var html = me.template(jsonData);
-                            me.$el.html(html);
-                            me.$el.show();
-
-                            // Initialize plugin
-                            me.selector = me.$el.find("select");
-                            if (isMultiple) {
-                                me.selector.multiselect({
-                                    buttonContainer: '<div class="squid-api-data-widgets-metric-selector-open" />',
-                                    buttonText: function() {
-                                        return 'Metrics';
-                                    },
-                                    onDropdownShown: function() {
-                                        me.showConfiguration();
-                                    }
-                                });
-                            }
-
-                            // Remove Button Title Tag
-                            me.$el.find("button").removeAttr('title');
-
-                    });
+                    // Remove Button Title Tag
+                    me.$el.find("button").removeAttr('title');
                 });
             }
 
@@ -3731,22 +3697,21 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         showConfiguration: function() {
             var me = this;
-            if (this.project.get("_role") === "WRITE" || this.project.get("_role") === "OWNER") {
-                me.$el.find("li.configure").remove();
-                me.$el.find("li").first().before("<li class='configure'> configure</option>");
-                me.$el.find("li").first().off().on("click", function() {
-                    new squid_api.view.ColumnsManagementWidget({
-                        buttonLabel : "<i class='fa fa-arrows-h'></i>",
-                        type : "Metric",
-                        collection : me.metrics,
-                        model : new squid_api.model.MetricModel(),
-                        successHandler : function() {
-                            var message = me.type + " with name " + this.get("name") + " has been successfully modified";
-                            squid_api.model.status.set({'message' : message});
-                        }
+            squid_api.getSelectedProject().done( function(project) {
+                if (project.get("_role") === "WRITE" || project.get("_role") === "OWNER") {
+
+                    // place dimension collection in modal view
+                    var dimensionModal = new squid_api.view.ModalView({
+                        view : me.metricCollection
                     });
-                });
-            }
+
+                    me.$el.find("li").first().before("<li class='configure'> configure</option>");
+                    me.$el.find("li").first().on("click", function() {
+                        // trigger dimension management view
+                        dimensionModal.render();
+                    });
+                }
+            });
         },
 
         sortMetrics: function(metrics) {
@@ -3763,7 +3728,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         updateDropdown: function() {
-            if (this.selector) {
+            if (this.selector && this.metrics) {
                 var data = [];
                 for (var idx=0; idx<this.metrics.models.length; idx++) {
                     var option = {"label" : this.metrics.models[idx].get("name"), "value" : this.metrics.models[idx].get("oid"), "selected" : this.isChosen(this.metrics.models[idx])};
@@ -4039,7 +4004,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         filters: null,
 
         initialize : function(options) {
-        	var me = this;
+            var me = this;
         
             if (options.config) {
             	this.config = options.config;
@@ -4065,7 +4030,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             } else {
             	this.status = squid_api.model.status;
             }
-
+            
             this.config.on('change:chosenDimensions', this.render, this);
             this.config.on('change:chosenMetrics', this.render, this);
             this.config.on('change:orderBy', this.render, this);
@@ -4143,87 +4108,92 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         render : function() {
-        	var me = this;
-        	var filters = this.filters.get("selection");
+            var me = this;
+            var filters = this.filters.get("selection");
             var chosenDimensions = this.config.get("chosenDimensions");
             var limit = this.config.get("limit");
             var columns = [];
-                      
+            var orderBy;
+
             var orderByList = this.config.get("orderBy");
             var checked = true;
             if (orderByList) {
-                var orderBy = this.config.get("orderBy")[0];
+                orderBy = this.config.get("orderBy")[0];
                 if (orderBy.direction === "ASC") {
                     checked = false;
                 }
             }
             if (this.filters.get("status") === "DONE") {
-            	squid_api.utils.getDomainMetrics().then(function(metrics) {
-                    metrics = metrics.models;
-                    var chosenMetrics = me.config.get("chosenMetrics");
-                    var orderBy = me.config.get("orderBy");
-                    
-                    if (chosenDimensions) {
-                    	for (i=0; i<chosenDimensions.length; i++) {
-                    		if (filters) {
-                    			for (ix=0; ix<filters.facets.length; ix++) {
-                                	if (chosenDimensions[i] === filters.facets[ix].id) {
-                                		columns.push({"label" : filters.facets[ix].dimension.name, "value" : filters.facets[ix].id});
-                                	}
-                                }
-                    		}
-                        }
-                    }
-                    
-                    if (metrics && chosenMetrics) {
-                        for (var id=0; id<metrics.length; id++) {
-                            var metric = metrics[id];
-                            // Match with chosen
-                            for (var match=0; match<chosenMetrics.length; match++) {
-                                if (metric.get("oid") === chosenMetrics[match]) {
-                                    var option = {"label" : metric.get("name"), "value" : metric.get("definition")};
-                                    columns.push(option);
+                squid_api.getSelectedDomain().always(function(domain) {
+                    if (domain) {
+                        var metrics = domain.get("metrics");
+                        var chosenMetrics = me.config.get("chosenMetrics");
+                        orderBy = me.config.get("orderBy");
+        
+                        if (chosenDimensions) {
+                            for (i=0; i<chosenDimensions.length; i++) {
+                                if (filters) {
+                                    for (ix=0; ix<filters.facets.length; ix++) {
+                                        if (chosenDimensions[i] === filters.facets[ix].id) {
+                                            columns.push({"label" : filters.facets[ix].dimension.name, "value" : filters.facets[ix].id});
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-
-                    var jsonData = {"checked" : checked, "limit" : limit, "Columns" : columns, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
-
-                    var html = me.template(jsonData);
-                    me.$el.html(html);
-
-                    me.$el.find("select").multiselect({
-                    	onChange: function(model) {
-                    		var obj = {};
-                    		var orderBy = me.model.get("orderBy");
-                    		if (orderBy) {
-                    			obj.expression = {"value" : model.val()};
-                    			if (orderBy[0].direction) {
-                    				obj.direction = orderBy[0].direction;
-                    			} else {
-                    				obj.direction = "DESC";
-                    			}
-                    		}           		
-                    		me.config.set({"orderBy" : [obj], "selectedMetric" : model.val()});
-                    	}
-                    });
+        
+                        if (metrics && chosenMetrics) {
+                            for (var id=0; id<metrics.length; id++) {
+                                var metric = metrics.at(id);
+                                // Match with chosen
+                                for (var match=0; match<chosenMetrics.length; match++) {
+                                    if (metric.get("oid") === chosenMetrics[match]) {
+                                        var option = {"label" : metric.get("name"), "value" : metric.get("definition")};
+                                        columns.push(option);
+                                    }
+                                }
+                            }
+                        }
                     
-                    if (orderBy) {
-                    	if (orderBy[0].expression) {
-                    		// verify if existing expression exists
-                    		me.expressionExists(columns);  		
-                    	}
-                    } else if (me.$el.find("select").val()) {
-                    	var obj = {"expression" : {"value" : me.$el.find("select").val()}, "direction" : "DESC"};
-                    	me.config.set({"orderBy" : [obj], "selectedMetric" : me.$el.find("select").val()});
+    
+                        var jsonData = {"checked" : checked, "limit" : limit, "Columns" : columns, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
+        
+                        var html = me.template(jsonData);
+                        me.$el.html(html);
+        
+                        me.$el.find("select").multiselect({
+                            onChange: function(model) {
+                                var obj = {};
+                                var orderBy = me.model.get("orderBy");
+                                if (orderBy) {
+                                    obj.expression = {"value" : model.val()};
+                                    if (orderBy[0].direction) {
+                                        obj.direction = orderBy[0].direction;
+                                    } else {
+                                        obj.direction = "DESC";
+                                    }
+                                }           		
+                                me.config.set({"orderBy" : [obj], "selectedMetric" : model.val()});
+                            }
+                        });
+        
+                        if (orderBy) {
+                            if (orderBy[0].expression) {
+                                // verify if existing expression exists
+                                me.expressionExists(columns);  		
+                            }
+                        } else if (me.$el.find("select").val()) {
+                            var obj = {"expression" : {"value" : me.$el.find("select").val()}, "direction" : "DESC"};
+                            me.config.set({"orderBy" : [obj], "selectedMetric" : me.$el.find("select").val()});
+                        }
+        
+                        me.$el.find("select").multiselect("refresh");
+        
+                        // Set Limit Value
+                        me.$el.find(".sq-select").val(jsonData.limit);
                     }
-
-                    me.$el.find("select").multiselect("refresh");
-
-                    // Set Limit Value
-                    me.$el.find(".sq-select").val(jsonData.limit);
                 });
+
             }
 
             return this;
