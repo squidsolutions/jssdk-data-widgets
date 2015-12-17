@@ -24,7 +24,10 @@
             // check for new filter selection made by config update
             this.listenTo(this.config, 'change:selection', this.initFilters);
             // check for updated period made by config
-            this.listenTo(this.config, 'change:period', this.resetPeriodSelection);
+            this.listenTo(this.config, 'change:period', function() {
+                this.resetPeriodSelection();
+                this.initFilters();
+            });
         },
 
         resetPeriodSelection: function() {
@@ -104,10 +107,10 @@
             if (configPeriod) {
                 if (configPeriod[domain]) {
                     for (i=0; i<timeFacets.length; i++) {
-                        if (configPeriod[domain] === timeFacets[i].oid) {
+                        if (configPeriod[domain] === timeFacets[i].id) {
                             timeFacet = timeFacets[i];
+                            break;
                         }
-                        break;
                     }
                 }
             }
