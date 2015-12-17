@@ -55,40 +55,41 @@
                 console.log("compute (initFilters)");
                 $.when(squid_api.controller.facetjob.compute(filters, config.get("selection")))
                 .then(function() {
-                    // search for a time facet
-                    var timeFacet;
+                    // search for time facets and make such they are done
+                    var timeFacets = [];
+                    var timeFacetDef = [];
                     var sel = filters.get("selection");
                     if (sel && sel.facets) {
                         var facets = sel.facets;
                         for (var i = 0; i < facets.length; i++) {
                             var facet = facets[i];
                             if (facet.dimension.valueType === "DATE" && ! me.config.get("period")) {
-                                timeFacet = facet;
+                                if (facet.done === false) {
+                                    // schedule a new facet members computation
+                                    var computation = squid_api.controller.facetjob.getFacetMembers(filters, facet.id);
+                                    timeFacetDef.push(computation);
+                                } else {
+                                    timeFacets.push(facet);
+                                }
                             }
                         }
                     }
-                    if (timeFacet) {
-                        if (timeFacet.done === false) {
-                            console.log("retrieving time facet's members");
-                            $.when(squid_api.controller.facetjob.getFacetMembers(filters, timeFacet.id))
-                            .always(function() {
-                                console.log("time facet dimension = "+timeFacet.dimension.name);
-                                me.changed(filters.get("selection"), timeFacet);
+                    if (timeFacetDef.length > 0) {
+                            console.log("retrieving time facets members");
+                            $.when.apply($, timeFacetDef).always(function() {
+                                timeFacets.concat(arguments);
+                                me.changed(filters.get("selection"), timeFacets);
                             });
-                        } else {
-                            me.changed(filters.get("selection"), timeFacet);
-                        }
                     } else {
-                        console.log("WARN: cannot use any time dimension to use for datepicker");
-                        me.changed(filters.get("selection"), null);
+                        me.changed(filters.get("selection"), timeFacets);
                     }
                 });
             }
         },
 
-        changed : function(selection, timeFacet) {
+        changed : function(selection, timeFacets) {
             if (this.onChangeHandler) {
-                this.onChangeHandler(selection, timeFacet);
+                this.onChangeHandler(selection, timeFacets);
             } else {
                 // default behavior
                 this.filters.set("selection", selection);
