@@ -43,8 +43,8 @@
             }
 
             // listen for selection change as we use it to get dimensions
-            this.listenTo(this.filters,"change:selection", this.render);
-            this.listenTo(this.config,"change:chosenDimensions", this.updateDropdown);
+            me.listenTo(this.filters,"change:selection", this.render);
+            me.listenTo(this.config,"change:chosenDimensions", this.updateDropdown);
 
             // initilize dimension collection for management view
             this.dimensionCollection = new squid_api.view.DimensionColumnsManagementWidget();
