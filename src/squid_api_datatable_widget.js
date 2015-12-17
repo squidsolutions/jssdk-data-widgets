@@ -139,23 +139,21 @@
 
         displayTableHeader : function(selector) {
             var me = this;
-
+            var i;
+            var metrics;
+            
             if (! me.headerInformation) {
-                squid_api.utils.getProjectDomains().then(function(domains) {
+                squid_api.getSelectedDomain().always( function(domain) {
                     var arr = [];
-                    for(i=0; i<domains.models.length; i++) {
-                        arr.push(domains.models[i].toJSON());
-                    }
-                    me.projectDomains = arr;
-                }).then(squid_api.utils.getDomainMetrics().then(function(metrics) {
-                    var arr = [];
+                    metrics = domain.get("metrics");
+                    me.domainMetrics = [];
                     for(i=0; i<metrics.models.length; i++) {
                         arr.push(metrics.models[i].toJSON());
                     }
                     me.domainMetrics = arr;
                     me.headerInformation = true;
                     me.displayTableHeader();
-                }));
+                });
             } else  {
                 var columns;
                 var originalColumns;//unaltered by rollup splice
@@ -182,7 +180,7 @@
                 } else {
                     // use analysis columns
                     columns = [];
-                    var i;
+                    
                     var obj;
                     var facets = this.model.get("facets");
                     if (facets) {
@@ -197,7 +195,7 @@
                             }
                         }
                     }
-                    var metrics = this.model.get("metricList");
+                    metrics = this.model.get("metricList");
                     if (metrics) {
                         if (metrics.length === 0) {
                             metrics = squid_api.model.config.get("chosenMetrics");
