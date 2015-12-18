@@ -333,7 +333,7 @@
                     var series;
                     
                     // obtain date column                    
-                    while (data.results.cols[dateColumnIndex].dataType !== "DATE") {
+                    while (data.results.cols[dateColumnIndex].extendedType.name !== "DATE") {
                         dateColumnIndex++;
                     }
                     

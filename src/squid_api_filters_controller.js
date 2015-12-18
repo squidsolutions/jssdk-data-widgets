@@ -99,7 +99,7 @@
                                     if (configPeriod && configPeriod[domain] && (configPeriod[domain] === facet.id)) {
                                         // schedule a new facet members computation
                                         var computation = squid_api.controller.facetjob.getFacetMembers(filters, facet.id).done(getFacetMembersCallback);
-                                        timeFacetDef.push(computation);
+                                        me.timeFacetDef.push(computation);
                                     }
                                 } else {
                                     timeFacets.push(facet);

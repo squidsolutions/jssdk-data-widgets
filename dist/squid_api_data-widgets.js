@@ -3392,7 +3392,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                     if (configPeriod && configPeriod[domain] && (configPeriod[domain] === facet.id)) {
                                         // schedule a new facet members computation
                                         var computation = squid_api.controller.facetjob.getFacetMembers(filters, facet.id).done(getFacetMembersCallback);
-                                        timeFacetDef.push(computation);
+                                        me.timeFacetDef.push(computation);
                                     }
                                 } else {
                                     timeFacets.push(facet);
@@ -4817,7 +4817,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     var series;
                     
                     // obtain date column                    
-                    while (data.results.cols[dateColumnIndex].dataType !== "DATE") {
+                    while (data.results.cols[dateColumnIndex].extendedType.name !== "DATE") {
                         dateColumnIndex++;
                     }
                     
