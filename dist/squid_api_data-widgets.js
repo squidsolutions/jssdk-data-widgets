@@ -3409,8 +3409,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
             if (!timeFacet) {
                 for (i=0; i<timeFacets.length; i++) {
-                    timeFacet = timeFacets[i];
-                    break;
+                    if (timeFacets[i].dimension.valueType === "DATE" && timeFacets[i].dimension.type === "CONTINUOUS") {
+                        timeFacet = timeFacets[i];
+                        break;
+                    }
                 }
             }
             if (timeFacet) {
