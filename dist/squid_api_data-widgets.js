@@ -3300,6 +3300,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         filters : null,
         config : null,
         onChangeHandler : null,
+        timeFacetDef : [],
 
         initialize: function(options) {
             this.config = squid_api.model.config;
@@ -3319,19 +3320,29 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // check for updated period made by config
             this.listenTo(this.config, 'change:period', function() {
                 this.resetPeriodSelection();
-                this.initFilters();
             });
         },
 
         resetPeriodSelection: function() {
-            var selection = this.filters.get("selection");
+            var me = this;
+            var selection = this.config.get("selection");
             var domain = this.config.get("domain");
             var periodConfig = this.config.get("period");
             if (selection) {
                 if (selection.facets) {
                     for (i=0; i<selection.facets.length; i++) {
-                        if (selection.facets[i].dimension.type === "DATE" && selection.facets[i].id !== periodConfig[domain]) {
-                            selection.facets.splice(i, 1);
+                        var facet = selection.facets[i];
+                        if (facet.dimension.type === "DATE") {
+                            if (facet.id !== periodConfig[domain]) {
+                                selection.facets.splice(i, 1);
+                            } else {
+                                if (facet.done === false) {
+                                    // schedule a new facet members computation
+                                    // TODO avoid duplicates
+                                    var computation = squid_api.controller.facetjob.getFacetMembers(me.filters, facet.id);
+                                    me.timeFacetDef.push(computation);
+                                }
+                            }
                         }
                     }
                     this.config.set("selection", selection);
@@ -3343,6 +3354,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var me = this;
             var domainId = this.config.get("domain");
             var projectId = this.config.get("project");
+            var configPeriod = this.config.get("period");
 
             if (projectId && domainId) {
                 var domainPk = {
@@ -3359,11 +3371,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 filters.setDomainIds([domainPk]);
 
                 console.log("compute (initFilters)");
+                var getFacetMembersCallback = function() {
+                    me.changed(filters.get("selection"), timeFacets);
+                };
                 $.when(squid_api.controller.facetjob.compute(filters, this.config.get("selection")))
                 .then(function() {
                     // search for time facets and make such they are done
                     var timeFacets = [];
-                    var timeFacetDef = [];
                     var sel = filters.get("selection");
                     if (sel && sel.facets) {
                         var facets = sel.facets;
@@ -3371,24 +3385,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             var facet = facets[i];
                             if (facet.dimension.valueType === "DATE") {
                                 if (facet.done === false) {
-                                    // schedule a new facet members computation
-                                    var computation = squid_api.controller.facetjob.getFacetMembers(filters, facet.id);
-                                    timeFacetDef.push(computation);
+                                    if (configPeriod && configPeriod[domain] && (configPeriod[domain] === facet.id)) {
+                                        // schedule a new facet members computation
+                                        var computation = squid_api.controller.facetjob.getFacetMembers(filters, facet.id).done(getFacetMembersCallback);
+                                        timeFacetDef.push(computation);
+                                    }
                                 } else {
                                     timeFacets.push(facet);
                                 }
                             }
                         }
-                    }
-                    if (timeFacetDef.length > 0) {
-                            console.log("retrieving time facets members");
-                            $.when.apply($, timeFacetDef).always(function() {
-                                timeFacets.concat(arguments);
-                                me.changed(filters.get("selection"), timeFacets);
-                            });
-                    } else {
-                        me.changed(filters.get("selection"), timeFacets);
-                    }
+                    }    
+                    me.changed(filters.get("selection"), timeFacets);
                 });
             }
         },
@@ -3416,11 +3424,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (timeFacet) {
                 // set config period
                 if (! configPeriod) {
-                    var obj = {};
-                    obj[domain] = timeFacet.id;
-                    this.config.set("period", obj);
-                } else {
+                    configPeriod = {};
+                }
+                if (configPeriod[domain] !== timeFacet.id) {
                     configPeriod[domain] = timeFacet.id;
+                    // set the default period
                     this.config.set("period", configPeriod);
                 }
                 // set selectedItems
@@ -3447,7 +3455,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.config.set("selection", squid_api.utils.buildCleanSelection(selection));
                 } else {
                     this.filters.set("selection", selection);
-                }
+                }  
             } else {
                 this.filters.set("selection", selection);
             }
