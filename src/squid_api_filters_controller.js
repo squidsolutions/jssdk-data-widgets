@@ -32,16 +32,19 @@
 
         resetPeriodSelection: function() {
             var me = this;
-            var selection = this.config.get("selection");
+            var selection = $.extend(true, {}, this.config.get("selection"));
             var domain = this.config.get("domain");
             var periodConfig = this.config.get("period");
             if (selection) {
-                if (selection.facets) {
-                    for (i=0; i<selection.facets.length; i++) {
-                        var facet = selection.facets[i];
-                        if (facet.dimension.type === "DATE") {
+                var facets = selection.facets;
+                if (facets) {
+                    var changed = false;
+                    for (var i=0; i<facets.length; i++) {
+                        var facet = facets[i];
+                        if (facet.dimension.type === "CONTINUOUS" && facet.dimension.valueType === "DATE") {
                             if (facet.id !== periodConfig[domain]) {
-                                selection.facets.splice(i, 1);
+                                changed = true;
+                                facets.splice(i, 1);
                             } else {
                                 if (facet.done === false) {
                                     // schedule a new facet members computation
@@ -52,6 +55,7 @@
                             }
                         }
                     }
+                    selection.facets = facets;
                     this.config.set("selection", selection);
                 }
             }
