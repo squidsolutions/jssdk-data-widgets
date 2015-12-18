@@ -115,7 +115,7 @@
             if (configPeriod) {
                 if (configPeriod[domain]) {
                     for (i=0; i<timeFacets.length; i++) {
-                        if (configPeriod[domain] === timeFacets[i].id) {
+                        if (configPeriod[domain] === timeFacets[i].id && ! timeFacets[i].error) {
                             timeFacet = timeFacets[i];
                             break;
                         }
@@ -124,7 +124,7 @@
             }
             if (!timeFacet) {
                 for (i=0; i<timeFacets.length; i++) {
-                    if (timeFacets[i].dimension.valueType === "DATE" && timeFacets[i].dimension.type === "CONTINUOUS") {
+                    if (timeFacets[i].dimension.valueType === "DATE" && timeFacets[i].dimension.type === "CONTINUOUS"  && ! timeFacets[i].error) {
                         timeFacet = timeFacets[i];
                         break;
                     }
