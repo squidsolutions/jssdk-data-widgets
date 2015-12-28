@@ -3371,7 +3371,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.config.on('change:orderBy', this.render, this);
             
             // listen for selection change as we use it to get dimensions
-            this.filters.on("change:status", function() {
+            this.filters.on("change:selection", function() {
                 me.render();
             });
             
@@ -3458,13 +3458,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     checked = false;
                 }
             }
-            if (this.filters.get("status") === "DONE") {
+            if (filters) {
                 squid_api.getSelectedDomain().always(function(domain) {
                     if (domain) {
                         var metrics = domain.get("metrics");
                         var chosenMetrics = me.config.get("chosenMetrics");
                         orderBy = me.config.get("orderBy");
-        
+
                         if (chosenDimensions) {
                             for (i=0; i<chosenDimensions.length; i++) {
                                 if (filters) {
@@ -3476,7 +3476,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 }
                             }
                         }
-        
+
                         if (metrics && chosenMetrics) {
                             for (var id=0; id<metrics.length; id++) {
                                 var metric = metrics.at(id);
@@ -3489,13 +3489,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                 }
                             }
                         }
-                    
-    
+
+
                         var jsonData = {"checked" : checked, "limit" : limit, "Columns" : columns, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
-        
+
                         var html = me.template(jsonData);
                         me.$el.html(html);
-        
+
                         me.$el.find("select").multiselect({
                             onChange: function(model) {
                                 var obj = {};
@@ -3507,23 +3507,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                                     } else {
                                         obj.direction = "DESC";
                                     }
-                                }           		
+                                }
                                 me.config.set({"orderBy" : [obj], "selectedMetric" : model.val()});
                             }
                         });
-        
+
                         if (orderBy) {
                             if (orderBy[0].expression) {
                                 // verify if existing expression exists
-                                me.expressionExists(columns);  		
+                                me.expressionExists(columns);
                             }
                         } else if (me.$el.find("select").val()) {
                             var obj = {"expression" : {"value" : me.$el.find("select").val()}, "direction" : "DESC"};
                             me.config.set({"orderBy" : [obj], "selectedMetric" : me.$el.find("select").val()});
                         }
-        
+
                         me.$el.find("select").multiselect("refresh");
-        
+
                         // Set Limit Value
                         me.$el.find(".sq-select").val(jsonData.limit);
                     }
