@@ -4139,11 +4139,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     var dateColumnIndex=0;
                     var series;
                     
-                    // obtain date column                    
-                    while (data.results.cols[dateColumnIndex].extendedType.name !== "DATE") {
-                        dateColumnIndex++;
+                    // obtain date column
+                    while (dateColumnIndex <= data.results.cols) {
+                        if (data.results.cols[dateColumnIndex].extendedType.name !== "DATE") {
+                            dateColumnIndex++;
+                        }
                     }
-                    
+
                     // obtain multi or single series based on column results                    
                     if (this.multiSeries) {
                     	series = [];
