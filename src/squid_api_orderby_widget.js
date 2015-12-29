@@ -73,12 +73,18 @@
         		var orderBy = this.config.get("orderBy");
         		var obj = {};
         		if (orderBy) {
-        			obj.expression = {"value" : orderBy[0].expression.value};
-        			if (orderBy[0].direction === "DESC") {
-        				obj.direction = "ASC";
-        			} else {
-        				obj.direction = "DESC";
-        			}
+                    if (orderBy[0]) {
+                        if (orderBy[0].expression) {
+                            obj.expression = {"value" : orderBy[0].expression.value};
+                        }
+                        if (orderBy[0].direction) {
+                            if (orderBy[0].direction === "DESC") {
+                                obj.direction = "ASC";
+                            } else {
+                                obj.direction = "DESC";
+                            }
+                        }
+                    }
         		}    		
         		this.config.set({"orderBy" : [obj]});
         		return false;
