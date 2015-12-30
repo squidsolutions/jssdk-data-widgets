@@ -86,7 +86,7 @@
                     me.changed(filters.get("selection"), timeFacets);
                 };
                 $.when(squid_api.controller.facetjob.compute(filters, this.config.get("selection")))
-                .then(function() {
+                .always(function() {
                     // search for time facets and make such they are done
                     var timeFacets = [];
                     var sel = filters.get("selection");
