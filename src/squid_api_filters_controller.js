@@ -94,15 +94,15 @@
                         var facets = sel.facets;
                         for (var i = 0; i < facets.length; i++) {
                             var facet = facets[i];
-                            if (facet.dimension.valueType === "DATE") {
+                            if (facet.dimension.type === "CONTINUOUS" && facet.dimension.valueType === "DATE") {
+
+                                timeFacets.push(facet);
+
                                 if (facet.done === false) {
-                                    if (configPeriod && configPeriod[domain] && (configPeriod[domain] === facet.id)) {
-                                        // schedule a new facet members computation
-                                        var computation = squid_api.controller.facetjob.getFacetMembers(filters, facet.id).done(getFacetMembersCallback);
-                                        me.timeFacetDef.push(computation);
-                                    }
-                                } else {
-                                    timeFacets.push(facet);
+                                    // schedule a new facet members computation
+                                    var computation = squid_api.controller.facetjob.getFacetMembers(filters, facet.id).done(getFacetMembersCallback);
+                                    me.timeFacetDef.push(computation);
+
                                 }
                             }
                         }
@@ -136,14 +136,23 @@
             }
             if (timeFacet) {
                 // set config period
-                if (! configPeriod) {
-                    configPeriod = {};
+                if (configPeriod) {
+                    if (configPeriod[domain]) {
+                        if (configPeriod[domain] !== timeFacet.id) {
+                            configPeriod[domain] = timeFacet.id;
+                        }
+                    } else {
+                        configPeriod[domain] = timeFacet.id;
+                    }
+                } else {
+                    var obj = {};
+                    obj[domain] = timeFacet.id;
+                    configPeriod = obj;
                 }
-                if (configPeriod[domain] !== timeFacet.id) {
-                    configPeriod[domain] = timeFacet.id;
-                    // set the default period
-                    this.config.set("period", configPeriod);
-                }
+
+                // set the default period
+                this.config.set("period", configPeriod);
+
                 // set selectedItems
                 if (timeFacet.selectedItems.length === 0) {
                     var minDate;
