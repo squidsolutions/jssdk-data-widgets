@@ -3400,12 +3400,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         		var orderBy = this.config.get("orderBy");
         		var obj = {};
         		if (orderBy) {
-        			obj.expression = {"value" : orderBy[0].expression.value};
-        			if (orderBy[0].direction === "DESC") {
-        				obj.direction = "ASC";
-        			} else {
-        				obj.direction = "DESC";
-        			}
+                    if (orderBy[0]) {
+                        if (orderBy[0].expression) {
+                            obj.expression = {"value" : orderBy[0].expression.value};
+                        }
+                        if (orderBy[0].direction) {
+                            if (orderBy[0].direction === "DESC") {
+                                obj.direction = "ASC";
+                            } else {
+                                obj.direction = "DESC";
+                            }
+                        }
+                    }
         		}    		
         		this.config.set({"orderBy" : [obj]});
         		return false;
@@ -4139,11 +4145,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     var dateColumnIndex=0;
                     var series;
                     
-                    // obtain date column                    
-                    while (data.results.cols[dateColumnIndex].extendedType.name !== "DATE") {
-                        dateColumnIndex++;
+                    // obtain date column
+                    while (dateColumnIndex <= data.results.cols) {
+                        if (data.results.cols[dateColumnIndex].extendedType.name !== "DATE") {
+                            dateColumnIndex++;
+                        }
                     }
-                    
+
                     // obtain multi or single series based on column results                    
                     if (this.multiSeries) {
                     	series = [];
