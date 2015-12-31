@@ -30,6 +30,10 @@
             });
         },
 
+        resetFilterSelection: function() {
+
+        },
+
         resetPeriodSelection: function() {
             var me = this;
             var selection = $.extend(true, {}, this.config.get("selection"));
@@ -95,9 +99,7 @@
                         for (var i = 0; i < facets.length; i++) {
                             var facet = facets[i];
                             if (facet.dimension.type === "CONTINUOUS" && facet.dimension.valueType === "DATE") {
-
                                 timeFacets.push(facet);
-
                                 if (facet.done === false) {
                                     // schedule a new facet members computation
                                     var computation = squid_api.controller.facetjob.getFacetMembers(filters, facet.id).done(getFacetMembersCallback);
@@ -162,8 +164,8 @@
                         minDate = timeFacet.items[0].lowerBound;
                         maxDate = timeFacet.items[0].upperBound;
                     } else {
-                        minDate = moment().subtract("50", "years").format(squid_api.DATE_FORMAT);
-                        maxDate = moment().format(squid_api.DATE_FORMAT);
+                        minDate = moment().subtract("50", "years").startOf("day").format(squid_api.DATE_FORMAT);
+                        maxDate = moment().endOf("day").format(squid_api.DATE_FORMAT);
                     }
                     // set timeFacet selected Items
                     timeFacet.selectedItems = [{upperBound : maxDate, lowerBound : moment(maxDate).subtract("1", "month").format(squid_api.DATE_FORMAT), type : "i"}];
