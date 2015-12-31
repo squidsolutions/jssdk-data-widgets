@@ -3006,7 +3006,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         maxDate = timeFacet.items[0].upperBound;
                     } else {
                         minDate = moment().subtract("50", "years").startOf("day").format(squid_api.DATE_FORMAT);
-                        maxDate = moment().endOf("day")format(squid_api.DATE_FORMAT);
+                        maxDate = moment().endOf("day").format(squid_api.DATE_FORMAT);
                     }
                     // set timeFacet selected Items
                     timeFacet.selectedItems = [{upperBound : maxDate, lowerBound : moment(maxDate).subtract("1", "month").format(squid_api.DATE_FORMAT), type : "i"}];
