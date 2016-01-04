@@ -30,11 +30,10 @@
             });
         },
 
-        resetFilterSelection: function() {
-
-        },
-
         resetPeriodSelection: function() {
+            /*  responsible for removing a previously active date
+                facet from the current selection.
+             */
             var me = this;
             var selection = $.extend(true, {}, this.config.get("selection"));
             var domain = this.config.get("domain");
@@ -115,6 +114,11 @@
         },
 
         defaultBehaviour: function(selection, timeFacets) {
+            /*  responsible providing default behavoir in order to:
+                1. detecting a time facet to set the config
+                2. automatically selecting a currently active facet range
+                3. setting the facet selection
+             */
             var configPeriod = this.config.get("period");
             var domain = this.config.get("domain");
             var timeFacet = false;
