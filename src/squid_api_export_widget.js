@@ -17,6 +17,7 @@
         displayCompression : true,
         materializeDatasetsView : false,
         downloadButtonLabel : "Download your data",
+        popupDialogClass : "squid-api-export-panel-popup",
 
         initialize : function(options) {
             var me = this;
@@ -78,6 +79,9 @@
             }
             if (options.displayCompression === false) {
                 this.displayCompression = false;
+            }
+            if (options.popupDialogClass) {
+                this.popupDialogClass = options.popupDialogClass;
             }
         },
 
@@ -444,8 +448,11 @@
                 });
             }
             if (this.displayInPopup) {
-            	this.popup = this.$el.find(".download-wrapper").dialog({
-                    dialogClass: "squid-api-export-panel-popup",
+                // remove any existing popups
+                $("." + this.popupDialogClass).remove();
+
+                this.popup = this.$el.find(".download-wrapper").dialog({
+                    dialogClass: this.popupDialogClass,
                     autoOpen: false,
                     position: {
                         my: "left-70 top", at: "left-70 bottom", of: this.$el.find("button.popup-trigger")
@@ -453,6 +460,7 @@
                     clickOutside: true, // clicking outside the dialog will close it
                     clickOutsideTrigger: this.$el.find("button.popup-trigger"), // Element (id or class) that triggers the dialog opening
                 });
+
                 // Click Event for filter panel button
                 this.$el.find("button.popup-trigger").click(function() {
                     if (me.popup.dialog("isOpen")) {
