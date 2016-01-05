@@ -86,7 +86,7 @@
 
                 console.log("compute (initFilters)");
                 var getFacetMembersCallback = function() {
-                    me.changed(filters.get("selection"), timeFacets);
+                    me.changed(filters.get("selection"));
                 };
                 $.when(squid_api.controller.facetjob.compute(filters, this.config.get("selection")))
                 .always(function() {
@@ -103,7 +103,6 @@
                                     // schedule a new facet members computation
                                     var computation = squid_api.controller.facetjob.getFacetMembers(filters, facet.id).done(getFacetMembersCallback);
                                     me.timeFacetDef.push(computation);
-
                                 }
                             }
                         }
