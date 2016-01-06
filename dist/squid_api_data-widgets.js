@@ -1174,16 +1174,21 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var metrics;
             
             if (! me.headerInformation) {
-                squid_api.getSelectedDomain().always( function(domain) {
-                    var arr = [];
-                    metrics = domain.get("metrics");
-                    me.domainMetrics = [];
-                    for(i=0; i<metrics.models.length; i++) {
-                        arr.push(metrics.models[i].toJSON());
-                    }
-                    me.domainMetrics = arr;
-                    me.headerInformation = true;
-                    me.displayTableHeader();
+                var parentId = this.config.get("domain");
+                return squid_api.getCustomer().then(function(customer) {
+                    return customer.get("projects").load(me.config.get("project")).then(function(project) {
+                        return project.get("domains").load(parentId).then(function(domain) {
+                            return domain.get("metrics").load().then(function(metrics) {
+                                var arr = [];
+                                for(i=0; i<metrics.size(); i++) {
+                                    arr.push(metrics.models[i].toJSON());
+                                }
+                                me.domainMetrics = arr;
+                                me.headerInformation = true;
+                                me.displayTableHeader();
+                            });
+                        });
+                    });
                 });
             } else  {
                 var columns;
