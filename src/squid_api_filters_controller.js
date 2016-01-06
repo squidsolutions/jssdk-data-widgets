@@ -68,7 +68,6 @@
             var me = this;
             var domainId = this.config.get("domain");
             var projectId = this.config.get("project");
-            var configPeriod = this.config.get("period");
 
             if (projectId && domainId) {
                 var domainPk = {
