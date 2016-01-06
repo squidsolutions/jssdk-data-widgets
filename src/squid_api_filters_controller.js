@@ -84,13 +84,13 @@
                 filters.setDomainIds([domainPk]);
 
                 console.log("compute (initFilters)");
+                var timeFacets = [];
                 var getFacetMembersCallback = function() {
-                    me.changed(filters.get("selection"));
+                    me.changed(filters.get("selection"), timeFacets);
                 };
                 $.when(squid_api.controller.facetjob.compute(filters, this.config.get("selection")))
                 .always(function() {
                     // search for time facets and make such they are done
-                    var timeFacets = [];
                     var sel = filters.get("selection");
                     if (sel && sel.facets) {
                         var facets = sel.facets;
