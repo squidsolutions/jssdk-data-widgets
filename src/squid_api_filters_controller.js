@@ -1,5 +1,5 @@
 (function (root, factory) {
-    root.squid_api.controller.FiltersContoller = factory(root.Backbone, root.squid_api);
+    root.squid_api.controller.FiltersController = factory(root.Backbone, root.squid_api);
 
 }(this, function (Backbone, squid_api) {
 
@@ -90,6 +90,8 @@
                 };
                 $.when(squid_api.controller.facetjob.compute(filters, this.config.get("selection")))
                 .always(function() {
+                    // update global filters
+                    me.filters.set({"domains": filters.get("domains"), "id" : filters.get("id")}, {"silent" : true});
                     // search for time facets and make such they are done
                     var sel = filters.get("selection");
                     if (sel && sel.facets) {
