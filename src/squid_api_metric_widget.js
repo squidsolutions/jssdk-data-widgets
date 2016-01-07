@@ -67,12 +67,12 @@
             var jsonData = {"chosenMetrics" : [], "noChosenMetrics" : true};
             for (var i = 0; i < metrics.length; i++) {
                 // add to the list
-        		 var option = {
-        			"name" : metrics[i].name,
-                    "value" : metrics[i].oid,
-                    "selectMetric" : this.selectMetric,
-                 };
-        		 jsonData.chosenMetrics.push(option);
+                var option = {
+                        "name" : metrics[i].get("name"),
+                        "value" : metrics[i].get("oid"),
+                        "selectMetric" : this.selectMetric,
+                };
+                jsonData.chosenMetrics.push(option);
             }
             if (jsonData.chosenMetrics.length > 0) {
                 jsonData.noChosenMetrics = false;
@@ -86,7 +86,8 @@
             var me = this;
             var domainOid = this.model.get("domain");
             var chosenMetrics = this.model.get("chosenMetrics");
-
+            
+            
             if (domainOid && (chosenMetrics)) {
                 // prepare all promises
                 var metricPromises = [];
@@ -100,22 +101,20 @@
                     metricPromises.push(metric.fetch());
                 }
                 // render when all metrics have been fetched
-                $.when.apply($, metricPromises).then(function() {
-                    // extract the metricModels from the arguments
-                    var metricModels = [];
-                    if (chosenMetrics.length === 1) {
-                    	if (! arguments[0].error) {
-                    		metricModels.push(arguments[0]);
-                    	}
-                    } else {
+                squid_api.getSelectedDomain().then(function(domain) {
+                    domain.get("metrics").load().done( function(metrics) {
+                        var metricModels = [];
                         for (var i=0; i<chosenMetrics.length; i++) {
-                        	if (! arguments[i][0].error) {
-                        		metricModels.push(arguments[i][0]);
-                        	}
+                            var metric = metrics.findWhere({"oid" : chosenMetrics[i]});
+                            if (metric) {
+                                metricModels.push(metric);
+                            }
                         }
-                    }
-                    me.renderMetrics(metricModels);
+                        me.renderMetrics(metricModels);
+                    });
                 });
+            } else {
+                me.renderMetrics([]);
             }
 
             return this;
