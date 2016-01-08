@@ -543,21 +543,27 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 function program1(depth0,data) {
   
+  
+  return " disabled ";
+  }
+
+function program3(depth0,data) {
+  
   var buffer = "", stack1, helper;
   buffer += "\n		<div class=\"pull-left\">\n			<table>\n				<tr>\n					<td>\n						<span class=\"preview\" style=\"font-size : 14px; padding-right: 5px; position: relative; top: 3px;\">Preview</span>\n					</td>\n					<td>\n						";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.removeOrderDirection), {hash:{},inverse:self.program(4, program4, data),fn:self.program(2, program2, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.removeOrderDirection), {hash:{},inverse:self.program(6, program6, data),fn:self.program(4, program4, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n					</td>\n					<td>\n						&nbsp;\n						<span style=\"font-size : 14px; font-weight: bold; padding-right: 5px; position: relative; top: 4px;\">";
   if (helper = helpers.limit) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.limit); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
     + "</span> <label style=\"position: relative; top: 4px; font-weight: normal;\">by</label> <select class=\"sq-select form-control\" style=\"display: inline-block; position: relative; bottom: 5px; max-width: 100px;\">\n							";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.Columns), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.Columns), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n						</select>\n					</td>\n				</tr>\n			</table>\n		</div>\n	";
   return buffer;
   }
-function program2(depth0,data) {
+function program4(depth0,data) {
   
   var buffer = "", stack1, helper;
   buffer += "\n							<span class=\"orderby-direction\" style=\"top: 3px; position: relative; font-weight: bold; font-size: 14px;\">";
@@ -568,22 +574,22 @@ function program2(depth0,data) {
   return buffer;
   }
 
-function program4(depth0,data) {
+function program6(depth0,data) {
   
   var buffer = "", stack1;
   buffer += "\n							<div class=\"onoffswitch\">\n			    				<input type=\"checkbox\" name=\"onoffswitch\" class=\"onoffswitch-checkbox\" id=\"myonoffswitch\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.checked), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.checked), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\n			    				<label class=\"onoffswitch-label\" for=\"myonoffswitch\">\n			        				<span class=\"onoffswitch-inner\"></span>\n			       				 	<span class=\"onoffswitch-switch\"></span>\n			    				</label>\n							</div>\n						";
   return buffer;
   }
-function program5(depth0,data) {
+function program7(depth0,data) {
   
   
   return "checked";
   }
 
-function program7(depth0,data) {
+function program9(depth0,data) {
   
   var buffer = "", stack1, helper;
   buffer += "\n								<option value=\"";
@@ -598,8 +604,11 @@ function program7(depth0,data) {
   return buffer;
   }
 
-  buffer += "<div class=\"orderby-container squid-api-data-widgets-orderby-widget\">\n	";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.limit), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  buffer += "<div class=\"orderby-container squid-api-data-widgets-orderby-widget ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.disabled), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\">\n	";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.limit), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n</div>";
   return buffer;
@@ -3409,23 +3418,25 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         
         events: {
         	"click .onoffswitch": function() {
-        		var orderBy = this.config.get("orderBy");
-        		var obj = {};
-        		if (orderBy) {
-                    if (orderBy[0]) {
-                        if (orderBy[0].expression) {
-                            obj.expression = {"value" : orderBy[0].expression.value};
-                        }
-                        if (orderBy[0].direction) {
-                            if (orderBy[0].direction === "DESC") {
-                                obj.direction = "ASC";
-                            } else {
-                                obj.direction = "DESC";
+                if (! this.disabled) {
+                    var orderBy = this.config.get("orderBy");
+                    var obj = {};
+                    if (orderBy) {
+                        if (orderBy[0]) {
+                            if (orderBy[0].expression) {
+                                obj.expression = {"value" : orderBy[0].expression.value};
+                            }
+                            if (orderBy[0].direction) {
+                                if (orderBy[0].direction === "DESC") {
+                                    obj.direction = "ASC";
+                                } else {
+                                    obj.direction = "DESC";
+                                }
                             }
                         }
                     }
-        		}    		
-        		this.config.set({"orderBy" : [obj]});
+                    this.config.set({"orderBy" : [obj]});
+                }
         		return false;
         	}
         },
@@ -3480,10 +3491,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 squid_api.getSelectedDomain().always(function(domain) {
                     if (domain) {
                         var metrics = domain.get("metrics");
+                        var count = 0;
                         var chosenMetrics = me.config.get("chosenMetrics");
                         orderBy = me.config.get("orderBy");
 
                         if (chosenDimensions) {
+                            count = chosenDimensions.length;
                             for (i=0; i<chosenDimensions.length; i++) {
                                 if (filters) {
                                     for (ix=0; ix<filters.facets.length; ix++) {
@@ -3496,6 +3509,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         }
 
                         if (metrics && chosenMetrics) {
+                            count = count + chosenMetrics.length;
                             for (var id=0; id<metrics.length; id++) {
                                 var metric = metrics.at(id);
                                 // Match with chosen
@@ -3508,8 +3522,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             }
                         }
 
+                        var jsonData = {"disabled" : false, "checked" : checked, "limit" : limit, "Columns" : columns, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
 
-                        var jsonData = {"checked" : checked, "limit" : limit, "Columns" : columns, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
+                        if (count === 0) {
+                            jsonData.disabled = true;
+                            me.disabled = true;
+                        } else {
+                            me.disabled = false;
+                        }
 
                         var html = me.template(jsonData);
                         me.$el.html(html);
@@ -3534,6 +3554,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             if (orderBy[0].expression) {
                                 // verify if existing expression exists
                                 me.expressionExists(columns);
+                                me.$el.find("select").val(orderBy[0].expression.value);
                             }
                         } else if (me.$el.find("select").val()) {
                             var obj = {"expression" : {"value" : me.$el.find("select").val()}, "direction" : "DESC"};

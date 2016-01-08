@@ -490,6 +490,9 @@ Pagination
     top: 5px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
 }
+.squid-api-data-widgets-orderby-widget.disabled {
+    opacity: 0.7;
+}
 .squid-api-data-widgets-orderby-widget .onoffswitch-checkbox {
     display: none;
 }

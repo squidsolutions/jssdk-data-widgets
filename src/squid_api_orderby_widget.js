@@ -70,23 +70,25 @@
         
         events: {
         	"click .onoffswitch": function() {
-        		var orderBy = this.config.get("orderBy");
-        		var obj = {};
-        		if (orderBy) {
-                    if (orderBy[0]) {
-                        if (orderBy[0].expression) {
-                            obj.expression = {"value" : orderBy[0].expression.value};
-                        }
-                        if (orderBy[0].direction) {
-                            if (orderBy[0].direction === "DESC") {
-                                obj.direction = "ASC";
-                            } else {
-                                obj.direction = "DESC";
+                if (! this.disabled) {
+                    var orderBy = this.config.get("orderBy");
+                    var obj = {};
+                    if (orderBy) {
+                        if (orderBy[0]) {
+                            if (orderBy[0].expression) {
+                                obj.expression = {"value" : orderBy[0].expression.value};
+                            }
+                            if (orderBy[0].direction) {
+                                if (orderBy[0].direction === "DESC") {
+                                    obj.direction = "ASC";
+                                } else {
+                                    obj.direction = "DESC";
+                                }
                             }
                         }
                     }
-        		}    		
-        		this.config.set({"orderBy" : [obj]});
+                    this.config.set({"orderBy" : [obj]});
+                }
         		return false;
         	}
         },
@@ -141,10 +143,12 @@
                 squid_api.getSelectedDomain().always(function(domain) {
                     if (domain) {
                         var metrics = domain.get("metrics");
+                        var count = 0;
                         var chosenMetrics = me.config.get("chosenMetrics");
                         orderBy = me.config.get("orderBy");
 
                         if (chosenDimensions) {
+                            count = chosenDimensions.length;
                             for (i=0; i<chosenDimensions.length; i++) {
                                 if (filters) {
                                     for (ix=0; ix<filters.facets.length; ix++) {
@@ -157,6 +161,7 @@
                         }
 
                         if (metrics && chosenMetrics) {
+                            count = count + chosenMetrics.length;
                             for (var id=0; id<metrics.length; id++) {
                                 var metric = metrics.at(id);
                                 // Match with chosen
@@ -169,8 +174,14 @@
                             }
                         }
 
+                        var jsonData = {"disabled" : false, "checked" : checked, "limit" : limit, "Columns" : columns, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
 
-                        var jsonData = {"checked" : checked, "limit" : limit, "Columns" : columns, "orderByDirectionDisplay" : me.orderByDirectionDisplay, "removeOrderDirection" : me.removeOrderDirection};
+                        if (count === 0) {
+                            jsonData.disabled = true;
+                            me.disabled = true;
+                        } else {
+                            me.disabled = false;
+                        }
 
                         var html = me.template(jsonData);
                         me.$el.html(html);
@@ -195,6 +206,7 @@
                             if (orderBy[0].expression) {
                                 // verify if existing expression exists
                                 me.expressionExists(columns);
+                                me.$el.find("select").val(orderBy[0].expression.value);
                             }
                         } else if (me.$el.find("select").val()) {
                             var obj = {"expression" : {"value" : me.$el.find("select").val()}, "direction" : "DESC"};
