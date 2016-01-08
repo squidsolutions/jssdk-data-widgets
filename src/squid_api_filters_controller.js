@@ -48,13 +48,6 @@
                             if (facet.id !== periodConfig[domain]) {
                                 changed = true;
                                 facets.splice(i, 1);
-                            } else {
-                                if (facet.done === false) {
-                                    // schedule a new facet members computation
-                                    // TODO avoid duplicates
-                                    var computation = squid_api.controller.facetjob.getFacetMembers(me.filters, facet.id);
-                                    me.timeFacetDef.push(computation);
-                                }
                             }
                         }
                     }
@@ -85,9 +78,6 @@
 
                 console.log("compute (initFilters)");
                 var timeFacets = [];
-                var getFacetMembersCallback = function() {
-                    me.changed(filters.get("selection"), timeFacets);
-                };
                 $.when(squid_api.controller.facetjob.compute(filters, this.config.get("selection")))
                 .always(function() {
                     // update global filters
@@ -100,11 +90,6 @@
                             var facet = facets[i];
                             if (facet.dimension.type === "CONTINUOUS" && facet.dimension.valueType === "DATE") {
                                 timeFacets.push(facet);
-                                if (facet.done === false) {
-                                    // schedule a new facet members computation
-                                    var computation = squid_api.controller.facetjob.getFacetMembers(filters, facet.id).done(getFacetMembersCallback);
-                                    me.timeFacetDef.push(computation);
-                                }
                             }
                         }
                     }    
