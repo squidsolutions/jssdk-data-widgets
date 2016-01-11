@@ -2897,7 +2897,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             /*  responsible for removing a previously active date
                 facet from the current selection.
              */
-            var me = this;
             var selection = $.extend(true, {}, this.config.get("selection"));
             var domain = this.config.get("domain");
             var periodConfig = this.config.get("period");
