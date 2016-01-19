@@ -2928,6 +2928,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     // delegate further processing
                     me.changed(filters.get("selection"), timeFacets);
                 });
+            } else {
+                console.log("WARN : selection changed but project or domain are null");
             }
         },
 
