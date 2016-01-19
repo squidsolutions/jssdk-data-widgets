@@ -7,6 +7,7 @@
         template : template,
 
         selectMetric : false,
+        noDataMessage: "No Metrics have been chosen",
 
         initialize: function(options) {
             var me = this;
@@ -18,6 +19,9 @@
                 }
                 if (options.selectMetric) {
                     this.selectMetric = options.selectMetric;
+                }
+                if (options.noDataMessage) {
+                    this.noDataMessage = options.noDataMessage;
                 }
             }
 
@@ -64,7 +68,7 @@
 
         renderMetrics: function(metrics) {
             var me = this;
-            var jsonData = {"chosenMetrics" : [], "noChosenMetrics" : true};
+            var jsonData = {"chosenMetrics" : [], "noChosenMetrics" : true, "noDataMessage" : this.noDataMessage};
             for (var i = 0; i < metrics.length; i++) {
                 // add to the list
                 var option = {

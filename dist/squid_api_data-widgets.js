@@ -31,8 +31,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 function program1(depth0,data) {
   
-  
-  return "\n	<div class=\"information\">No Dimensions have been chosen</div>\n";
+  var buffer = "", stack1, helper;
+  buffer += "\n	<div class=\"information\">";
+  if (helper = helpers.noDataMessage) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.noDataMessage); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</div>\n";
+  return buffer;
   }
 
 function program3(depth0,data) {
@@ -469,8 +474,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 function program1(depth0,data) {
   
-  
-  return "\n	<div class=\"information\">No Metrics have been chosen</div>\n";
+  var buffer = "", stack1, helper;
+  buffer += "\n	<div class=\"information\">";
+  if (helper = helpers.noDataMessage) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.noDataMessage); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "</div>\n";
+  return buffer;
   }
 
 function program3(depth0,data) {
@@ -1602,27 +1612,32 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         template : null,
         selectDimension: false,
         filters : null,
+        noDataMessage: "No Dimensions have been chosen",
 
         initialize: function(options) {
             var me = this;
 
             // setup options
-            if (options.template) {
-                this.template = options.template;
-            } else {
-                this.template = template;
-            }
-            
-            if (options.filters) {
-                this.filters = options.filters;
-            } else {
-                this.filters = squid_api.model.filters;
+            if (options) {
+                if (options.template) {
+                    this.template = options.template;
+                } else {
+                    this.template = template;
+                }
+
+                if (options.filters) {
+                    this.filters = options.filters;
+                } else {
+                    this.filters = squid_api.model.filters;
+                }
+                if (options.selectDimension) {
+                    this.selectDimension = options.selectDimension;
+                }
+                if (options.noDataMessage) {
+                    this.noDataMessage = options.noDataMessage;
+                }
             }
 
-            if (options.selectDimension) {
-                this.selectDimension = options.selectDimension;
-            }
-            
             // listen for selection change as we use it
             this.filters.on("change:selection", function() {
                 me.render();
@@ -1705,11 +1720,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     jsonData.chosenDimensions = chosenFacets;
                 }
             } else {
-                html = this.template({"noChosenDimensions" : true});
+                html = this.template({"noChosenDimensions" : true, "noDataMessage" : this.noDataMessage});
             }
                 
             if (jsonData.chosenDimensions.length === 0) {
-                html = this.template({"noChosenDimensions" : true});
+                html = this.template({"noChosenDimensions" : true, "noDataMessage" : this.noDataMessage});
             } else {
                 html = this.template(jsonData);
             }
@@ -3205,6 +3220,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         template : template,
 
         selectMetric : false,
+        noDataMessage: "No Metrics have been chosen",
 
         initialize: function(options) {
             var me = this;
@@ -3216,6 +3232,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 if (options.selectMetric) {
                     this.selectMetric = options.selectMetric;
+                }
+                if (options.noDataMessage) {
+                    this.noDataMessage = options.noDataMessage;
                 }
             }
 
@@ -3262,7 +3281,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         renderMetrics: function(metrics) {
             var me = this;
-            var jsonData = {"chosenMetrics" : [], "noChosenMetrics" : true};
+            var jsonData = {"chosenMetrics" : [], "noChosenMetrics" : true, "noDataMessage" : this.noDataMessage};
             for (var i = 0; i < metrics.length; i++) {
                 // add to the list
                 var option = {
