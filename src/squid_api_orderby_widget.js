@@ -93,10 +93,6 @@
         	}
         },
 
-        updateWidget: function() {
-            //this.$el.find("select").multiselect("refresh");
-        },
-
         render : function() {
             var me = this;
 
@@ -115,8 +111,8 @@
                     }
                 }
                 if (chosenMetrics.length !== 0 && ! orderBy) {
-                    for (var i=0; i<chosenMetrics.length; i++) {
-                        this.config.set("orderBy", [{"expression" : {"value" : chosenMetrics[i]}}]);
+                    for (var ix=0; ix<chosenMetrics.length; ix++) {
+                        this.config.set("orderBy", [{"expression" : {"value" : chosenMetrics[ix]}}]);
                         break;
                     }
                 }
@@ -127,11 +123,11 @@
                 // obtain chosenDimension metadata
                 if (chosenDimensions) {
                     count = chosenDimensions.length;
-                    for (i=0; i<chosenDimensions.length; i++) {
+                    for (var ix0=0; ix0<chosenDimensions.length; ix0++) {
                         if (filters) {
-                            for (ix=0; ix<filters.facets.length; ix++) {
-                                if (chosenDimensions[i] === filters.facets[ix].id) {
-                                    columns.push({"label" : filters.facets[ix].dimension.name, "value" : filters.facets[ix].id});
+                            for (ix1=0; ix1<filters.facets.length; ix1++) {
+                                if (chosenDimensions[ix0] === filters.facets[ix1].id) {
+                                    columns.push({"label" : filters.facets[ix1].dimension.name, "value" : filters.facets[ix1].id});
                                 }
                             }
                         }
@@ -170,7 +166,7 @@
                         if (orderBy.length > 0) {
                             for (var i=0; i<columns.length; i++) {
                                 if (orderBy[0].expression) {
-                                    if (columns[i].value == orderBy[0].expression.value) {
+                                    if (columns[i].value === orderBy[0].expression.value) {
                                         columns[i].selected = true;
                                     }
                                 }
