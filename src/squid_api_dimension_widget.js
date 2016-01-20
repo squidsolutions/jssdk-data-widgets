@@ -7,27 +7,32 @@
         template : null,
         selectDimension: false,
         filters : null,
+        noDataMessage: "No Dimensions have been chosen",
 
         initialize: function(options) {
             var me = this;
 
             // setup options
-            if (options.template) {
-                this.template = options.template;
-            } else {
-                this.template = template;
-            }
-            
-            if (options.filters) {
-                this.filters = options.filters;
-            } else {
-                this.filters = squid_api.model.filters;
+            if (options) {
+                if (options.template) {
+                    this.template = options.template;
+                } else {
+                    this.template = template;
+                }
+
+                if (options.filters) {
+                    this.filters = options.filters;
+                } else {
+                    this.filters = squid_api.model.filters;
+                }
+                if (options.selectDimension) {
+                    this.selectDimension = options.selectDimension;
+                }
+                if (options.noDataMessage) {
+                    this.noDataMessage = options.noDataMessage;
+                }
             }
 
-            if (options.selectDimension) {
-                this.selectDimension = options.selectDimension;
-            }
-            
             // listen for selection change as we use it
             this.filters.on("change:selection", function() {
                 me.render();
@@ -110,11 +115,11 @@
                     jsonData.chosenDimensions = chosenFacets;
                 }
             } else {
-                html = this.template({"noChosenDimensions" : true});
+                html = this.template({"noChosenDimensions" : true, "noDataMessage" : this.noDataMessage});
             }
                 
             if (jsonData.chosenDimensions.length === 0) {
-                html = this.template({"noChosenDimensions" : true});
+                html = this.template({"noChosenDimensions" : true, "noDataMessage" : this.noDataMessage});
             } else {
                 html = this.template(jsonData);
             }

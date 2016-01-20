@@ -1,6 +1,6 @@
 <ul class="squid-api-data-widgets-metric-widget">
 {{#if noChosenMetrics}}
-	<div class="information">No Metrics have been chosen</div>
+	<div class="information">{{noDataMessage}}</div>
 {{else}}
     {{#each chosenMetrics}}
     	{{#if this.selectMetric}}
