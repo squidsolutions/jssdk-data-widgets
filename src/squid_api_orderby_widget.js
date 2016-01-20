@@ -104,16 +104,20 @@
 
             // auto set orderBy if one isn't set
             if (! orderBy) {
-                if (chosenDimensions.length !== 0) {
-                    for (var i=0; i<chosenDimensions.length; i++) {
-                        this.config.set("orderBy", [{"expression" : {"value" : chosenDimensions[i]}, "direction":"DESC"}]);
-                        break;
+                if (chosenDimensions) {
+                    if (chosenDimensions.length !== 0) {
+                        for (var i=0; i<chosenDimensions.length; i++) {
+                            this.config.set("orderBy", [{"expression" : {"value" : chosenDimensions[i]}, "direction":"DESC"}]);
+                            break;
+                        }
                     }
                 }
-                if (chosenMetrics.length !== 0 && ! orderBy) {
-                    for (var ix=0; ix<chosenMetrics.length; ix++) {
-                        this.config.set("orderBy", [{"expression" : {"value" : chosenMetrics[ix]}}]);
-                        break;
+                if (chosenMetrics) {
+                    if (chosenMetrics.length !== 0 && ! orderBy) {
+                        for (var ix=0; ix<chosenMetrics.length; ix++) {
+                            this.config.set("orderBy", [{"expression" : {"value" : chosenMetrics[ix]}}]);
+                            break;
+                        }
                     }
                 }
             }
