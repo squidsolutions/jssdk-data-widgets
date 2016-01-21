@@ -86,8 +86,8 @@
                                 }
                             }
                         }
+                        this.config.set({"orderBy" : [obj]});
                     }
-                    this.config.set({"orderBy" : [obj]});
                 }
         		return false;
         	}
@@ -101,26 +101,6 @@
             var chosenMetrics = this.config.get("chosenMetrics");
             var orderBy = this.config.get("orderBy");
             var limit = this.config.get("limit");
-
-            // auto set orderBy if one isn't set
-            if (! orderBy) {
-                if (chosenDimensions) {
-                    if (chosenDimensions.length !== 0) {
-                        for (var i=0; i<chosenDimensions.length; i++) {
-                            this.config.set("orderBy", [{"expression" : {"value" : chosenDimensions[i]}, "direction":"DESC"}]);
-                            break;
-                        }
-                    }
-                }
-                if (chosenMetrics) {
-                    if (chosenMetrics.length !== 0 && ! orderBy) {
-                        for (var ix=0; ix<chosenMetrics.length; ix++) {
-                            this.config.set("orderBy", [{"expression" : {"value" : chosenMetrics[ix]}}]);
-                            break;
-                        }
-                    }
-                }
-            }
 
             var columns = [];
             if (filters) {
@@ -142,6 +122,30 @@
             squid_api.getSelectedDomain().always(function(domain) {
                 if (domain) {
                     var metrics = domain.get("metrics");
+
+                    // auto set orderBy if one isn't set
+                    if (! orderBy) {
+                        if (chosenDimensions) {
+                            if (chosenDimensions.length !== 0) {
+                                for (var i=0; i<chosenDimensions.length; i++) {
+                                    me.config.set("orderBy", [{"expression" : {"value" : chosenDimensions[i]}, "direction":"DESC"}]);
+                                    break;
+                                }
+                            }
+                        }
+                        if (chosenMetrics) {
+                            if (chosenMetrics.length !== 0 && ! orderBy) {
+                                for (var ix=0; ix<chosenMetrics.length; ix++) {
+                                    var metric = metrics.findWhere({oid: chosenMetrics[ix]});
+                                    if (metric) {
+                                        var definition = metric.get("definition");
+                                        me.config.set("orderBy", [{"expression" : {"value" : definition}}]);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     // obtain chosenMetrics metadata
                     if (metrics && chosenMetrics) {
