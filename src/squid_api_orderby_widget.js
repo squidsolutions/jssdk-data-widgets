@@ -139,7 +139,7 @@
                                     var metric = metrics.findWhere({oid: chosenMetrics[ix]});
                                     if (metric) {
                                         var definition = metric.get("definition");
-                                        me.config.set("orderBy", [{"expression" : {"value" : definition}}]);
+                                        me.config.set("orderBy", [{"expression" : {"value" : definition}, "direction":"DESC"}]);
                                         break;
                                     }
                                 }
