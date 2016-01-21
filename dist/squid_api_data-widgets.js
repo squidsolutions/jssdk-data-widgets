@@ -696,7 +696,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (helper = helpers.staleMessage) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.staleMessage); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</span>\n		</div>\n	</div>\n	<div id=\"chart\"></div>\n	<div id=\"legend_container\">\n		<div id=\"smoother\" title=\"Smoothing\"></div>\n		<div id=\"legend\"></div>\n	</div>\n	<div id=\"slider\"></div>\n</div>\n";
+    + "</span>\n		</div>\n	</div>\n	<div id=\"widget\">\n\n	</div>\n</div>\n";
   return buffer;
   });
 (function (root, factory) {
@@ -3837,7 +3837,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     View = Backbone.View.extend({
 
         template : null,
-        dataToDisplay : 10000,
+        limit : 10000,
         format : null,
         d3Formatter : null,
         startDate: null,
@@ -3848,37 +3848,41 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         metricSelectorView: null,
         multiSeries: null,
         staleMessage : "Click refresh to update",
+        renderTo: ".squid-api-data-widgets-timeseries-widget #widget",
 
         initialize : function(options) {
+            this.config = squid_api.model.config;
 
-            if (options.dataToDisplay) {
-                this.dataToDisplay = options.dataToDisplay;
-            }
-            if (options.colorPalette) {
-                this.colorPalette = options.colorPalette;
-            }
-            if (options.interpolationRange) {
-                this.interpolationRange = options.interpolationRange;
-            }
-            if (options.yearSwitcherView) {
-                this.yearSwitcherView = options.yearSwitcherView;
-            }
-            if (options.yearAnalysis) {
-                this.yearAnalysis = options.yearAnalysis;
-            }
-            if (options.metricSelectorView) {
-                this.metricSelectorView = options.metricSelectorView;
-            }
-            if (options.multiSeries) {
-            	this.multiSeries = options.multiSeries;
-            }
-            if (options.staleMessage) {
-                this.staleMessage = options.staleMessage;
-            }
-            if (options.template) {
-                this.template = options.template;
-            } else {
-                this.template = squid_api.template.squid_api_timeseries_widget;
+            if (options) {
+                if (options.limit) {
+                    this.limit = options.limit;
+                }
+                if (options.colorPalette) {
+                    this.colorPalette = options.colorPalette;
+                }
+                if (options.interpolationRange) {
+                    this.interpolationRange = options.interpolationRange;
+                }
+                if (options.yearSwitcherView) {
+                    this.yearSwitcherView = options.yearSwitcherView;
+                }
+                if (options.yearAnalysis) {
+                    this.yearAnalysis = options.yearAnalysis;
+                }
+                if (options.metricSelectorView) {
+                    this.metricSelectorView = options.metricSelectorView;
+                }
+                if (options.multiSeries) {
+                    this.multiSeries = options.multiSeries;
+                }
+                if (options.staleMessage) {
+                    this.staleMessage = options.staleMessage;
+                }
+                if (options.template) {
+                    this.template = options.template;
+                } else {
+                    this.template = squid_api.template.squid_api_timeseries_widget;
+                }
             }
             if (d3) {
                 this.d3Formatter = d3.format(",.f");
@@ -3901,11 +3905,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         return f;
                     };
                 }
-            }
-            if (this.config) {
-            	this.config = options.config;
-            } else {
-            	this.config = squid_api.model.config;
             }
             if (this.model) {
                 this.listenTo(this.model, 'change:status', this.render);
@@ -3942,163 +3941,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return this;
         },
 
-        seriesDataValues : function(dateIndex, metricIndex, modelRows, modelCols) {
-            var series = [];
-            var value, date;
-            var serie;
-            var currentSerieName = null;
-            var serieName = "";
-
-            var palette = new Rickshaw.Color.Palette();
-
-            if (this.colorPalette) {
-                palette.scheme = this.colorPalette;
-            }
-
-            // Start of Data Manipulation
-            var manipTimeStart = new Date();
-            var currentYear;
-
-            // Store Serie Values from data
-            for (var i=0; (i<modelRows.length); i++) {
-                var yearChange = false;
-
-                value = modelRows[i].v;
-
-                if (this.YearOverYear) {
-                    if (moment(value[dateIndex]).year() !== currentYear) {
-                        yearChange = true;
-                        currentYear = moment(value[dateIndex]).year();
-                    }
-                }
-
-                date = moment.utc(value[dateIndex]);
-
-                // Obtain the correct name based on index
-                if (dateIndex>0) {
-                    serieName = value[dateIndex-1];
-                }
-                if ((currentSerieName === null) || (serieName !== currentSerieName) || yearChange === true) {
-                    currentSerieName = serieName;
-                    // create a new serie
-                    serie = {};
-                    if (yearChange) {
-                        serie.name = moment(value[dateIndex]).year();
-                    } else {
-                        serie.name = modelCols[metricIndex].name;
-                        serie.color = palette.scheme[metricIndex];
-                    }
-                    serie.data = [];
-                    series.push(serie);
-                }
-
-                if (date.isValid()) {
-                    var object = {};
-                    object.x = moment(date).format("YYYY-MM-DD");
-                    if (value[metricIndex] === null) {
-                        object.y = 0;
-                    } else {
-                        object.y = parseFloat(value[metricIndex]);
-                    }
-                    serie.data.push(object);
-                } else {
-                    console.debug("Invalid date : "+value[dateIndex]);
-                }
-            }
-
-            // Inverse Array to obtain Correct Colour
-            if (this.YearOverYear) {
-                series = series.reverse();
-                for (i=0; i<series.length; i++) {
-                    series[i].color = palette.color();
-                }
-            }
-
-            var startDate = moment(this.startDate);
-
-            // Store new Series Values
-            var newSerie = {};
-
-            // Calculate the difference in days between the start / end date
-            var dateDifference;
-            if (this.interpolationRange) {
-                dateDifference = moment(this.endDate).utc().endOf('day').diff(startDate.startOf("day"), this.interpolationRange);
-                // detect date difference with returned data set
-                if (series.length > 0) {
-                    if (series[0].data.length !== dateDifference) {
-                        dateDifference = series[0].data.length;
-                        console.log("interpolation month calculation differs from returned result set");
-                    }
-                }
-            } else {
-                dateDifference = moment(this.endDate).diff(startDate, 'days');
-            }
-
-            /*
-                Hashmaps with date as object key values / include a default y value of 0
-                Add a value for each day
-            */
-
-            while (startDate.diff(this.endDate, 'days') <= 0) {
-                newSerie[startDate.format("YYYY-MM-DD")] = { y : 0 };
-                startDate = startDate.add(1, 'days');
-            }
-
-            for (serieIdx=0; serieIdx<series.length; serieIdx++) {
-                // Get each serie
-                var existingSerie = series[serieIdx].data;
-
-                // Check if there is a difference between numbers of days / serie values
-                if (series[serieIdx].data.length !== dateDifference && this.YearOverYear === false) {
-
-                    // Fill in the values from existing serie
-                    for (i=0; i<existingSerie.length; i++) {
-                        var s = newSerie[existingSerie[i].x];
-                        if (s !== undefined) {
-                            s.y = existingSerie[i].y;
-                        }
-                    }
-
-                    // Update the array with the new data
-                    var updatedArray = [];
-                    for (var i2=0; i2<newSerie.length; i2++) {
-                        var obj = {};
-                        var key = newSerie[i2];
-                        obj.x = moment.utc(key).unix();
-                        obj.y = newSerie[key].y;
-                        updatedArray.push(obj);
-                    }
-
-                    // Update the existing data
-                    series[serieIdx].data = updatedArray;
-                } else {
-                    // Convert API date into UNIX + Sort if no manipulation occurs
-                    for (i=0; i<existingSerie.length; i++) {
-                        if (this.YearOverYear) {
-                            var modifiedSerie = "2014" + existingSerie[i].x.substring(4);
-                            existingSerie[i].x = moment.utc(modifiedSerie).unix();
-                        } else {
-                            existingSerie[i].x = moment.utc(existingSerie[i].x).unix();
-                        }
-                    }
-
-                    series[serieIdx].data = this.sortDateValues(series[serieIdx].data);
-                }
-            }
-
-            // End of Data Manipulation
-            var manipTimeEnd = new Date();
-            var manipTimeDifference = manipTimeEnd - manipTimeStart;
-            console.log("TimeSeries manipulation time: " + manipTimeDifference + " ms");
-
-            return series;
-        },
-
-        sortDateValues : function(dates) {
-            dates.sort(function(a,b){
-                return (a.x - b.x);
+        sortDates : function(rows) {
+            rows.sort(function(a,b){
+                var d1 = new Date(a.v[0]).getTime();
+                var d2 = new Date(b.v[0]).getTime();
+                return d1 > d2 ? 1 : -1;
             });
-            return dates;
+            return rows;
         },
 
         getData: function() {
@@ -4125,7 +3974,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         	var me = this;
         	
             var status = this.model.get("status");
-            
             this.YearOverYear = this.config.get("YearOverYear");
 
             if (status === "PENDING") {
@@ -4142,116 +3990,61 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.$el.find(".sq-loading").hide();
 
                 var data = this.getData();
+                var results = data.results;
 
-                if (data.done && data.results) {
+                if (data.done && results) {
                     this.$el.find(".sq-loading").hide();
 
-                    // Temp Fix for correct resizing
-                    this.$el.css("width", "100%");
+                    // data for timeseries
+                    var legend = [];
+                    var data = [];
 
-                    // Store Start and end Dates
-                    var facets = data.selection.facets;
-                    for (i=0; i<facets.length; i++) {
-                        var items = facets[i].selectedItems;
-                        for (ix=0; ix<items.length; ix++) {
-                            if (items[ix].lowerBound && items[ix].upperBound) {
-                                this.startDate = items[ix].lowerBound;
-                                this.endDate = items[ix].upperBound;
-                            }
+                    // sort dates
+                    results.rows = this.sortDates(results.rows);
+
+                    // get data
+                    for (i=1; i<results.cols.length; i++) {
+                        legend.push(results.cols[i].name);
+                        var arr = [];
+                        for (ix=0; ix<results.rows.length; ix++) {
+                            var obj = {};
+                            obj.date = results.rows[ix].v[0];
+                            obj.value = results.rows[ix].v[i];
+                            arr.push(obj);
                         }
+                        arr = MG.convert.date(arr, 'date');
+                        data.push(arr);
                     }
 
-                    var dateColumnIndex=0;
-                    var series;
-                    
-                    // obtain date column
-                    while (dateColumnIndex <= data.results.cols) {
-                        if (data.results.cols[dateColumnIndex].extendedType.name !== "DATE") {
-                            dateColumnIndex++;
-                        }
-                    }
+                    MG.data_graphic({
+                        description: "This graphic shows a time-series of downloads.",
+                        data: data,
+                        area: false,
+                        interpolate: "basic",
+                        color_range:['green', 'red'],
+                        width: $(this.renderTo).width(),
+                        height: 400,
+                        target: this.renderTo,
+                        x_accessor: 'date',
+                        legend: legend,
+                        y_accessor: 'value',
+                    })
 
-                    // obtain multi or single series based on column results                    
-                    if (this.multiSeries) {
-                    	series = [];
-                    	for (i=0; i<data.results.cols.length; i++) {
-                    		if (i !== dateColumnIndex) {
-                    			series.push(this.seriesDataValues(dateColumnIndex, i, data.results.rows, data.results.cols)[0]);
-                    		}
-                    	}
-                    } else {
-                    	series = this.seriesDataValues(dateColumnIndex, dateColumnIndex+1, data.results.rows, data.results.cols);
-                    }
-
-                    if (series.length>0 && (series[0].data.length>0)) {
-
-                        var tempWidth = this.$el.width();
-                        
-                        // Time Series Chart
-                        var graph = new Rickshaw.Graph({
-                            element: document.getElementById("chart"),
-                            width: tempWidth,
-                            height: 400,
-                            renderer: 'line',
-                            padding:{right:0.007},
-                            interpolation: 'linear',
-                            strokeWidth: 3,
-                            series: series,
-                            min: 'auto'
-                        });
-
-                        graph.render();
-
-                        new Rickshaw.Graph.HoverDetail( {
-                            graph: graph,
-                            formatter: function(series, x, y) {
-                                var formatter = d3.format(",.f");
-                                var date;
-                                if (me.config.get("YearOverYear")) {
-                                    date = '<span class="date">' + series.name + "-" + moment(new Date(x * 1000)).format("MM-DD") + '</span>';
-                                } else {
-                                    date = '<span class="date">' + moment(new Date(x * 1000)).format("YYYY-MM-DD") + '</span>';
-                                }
-                                var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
-                                var content = swatch + formatter(parseInt(y)) + " " + series.name + '<br>' + date;
-
-                                return content;
-                            }
-                        });
-
-                        new Rickshaw.Graph.Legend( {
-                            graph: graph,
-                            element: document.getElementById('legend')
-                        });
-
-                        var xAxis = new Rickshaw.Graph.Axis.Time( {
-                            graph: graph
-                        });
-
-                        var yAxis = new Rickshaw.Graph.Axis.Y( {
-                            graph: graph
-                        });
-
-                        new Rickshaw.Graph.RangeSlider({
-                            graph: graph,
-                            element: document.querySelector('#slider')
-                        });
-
-                        yAxis.render();
-                        xAxis.render();
-                    } else {
-                        this.$el.html("<div class='bad-data'>No Series data to View</span>");
-                    }
                 }
             }
+
+            // additional timeserie analysis views
             if (this.yearSwitcherView){
-                this.yearSwitcherView.setElement(this.$el.find("#yearswitcher"));
-                this.yearSwitcherView.render();
+                this.renderAdditionalView(this.yearSwitcherView, this.$el.find("#yearswitcher"));
             }
-            if (this.metricSelectorView){
-                this.metricSelectorView.setElement(this.$el.find("#metricselector"));
-                this.metricSelectorView.render();
+            if (this.metricSelectorView) {
+                this.renderAdditionalView(this.metricSelectorView, this.$el.find("#metricselector"));
             }
+        },
+
+        renderAdditionalView: function(view, element) {
+            view.setElement(element);
+            view.render();
         }
     });
 

@@ -5,7 +5,10 @@
   "authors": [
     "obalbous <oba@squid>"
   ],
-  "main": ["dist/squid_api_data-widgets.js","dist/squid_api_data-widgets.css"],
+  "main": [
+    "dist/squid_api_data-widgets.js",
+    "dist/squid_api_data-widgets.css"
+  ],
   "license": "MIT",
   "private": true,
   "ignore": [
@@ -19,13 +22,13 @@
   ],
   "dependencies": {
     "squid_api": "https://github.com/squidsolutions/jssdk2.git#develop",
-    "bootstrap-multiselect":"https://github.com/davidstutz/bootstrap-multiselect.git#0.9.13",
+    "bootstrap-multiselect": "https://github.com/davidstutz/bootstrap-multiselect.git#0.9.13",
     "handlebars": "~1.3.0",
-    "d3" : "3",
-    "rickshaw":"https://github.com/shutterstock/rickshaw.git#1.5.1",
-    "moment":"~2.9.0",
+    "d3": "3",
+    "moment": "~2.9.0",
     "backbone-forms": "backbone-forms-squid#24f4e18fcd8b84857d007191135d442db1401156",
     "backbone.bootstrap-modal": "https://github.com/squidsolutions/backbone.bootstrap-modal.git#master",
-    "backbone-deep-model" : "https://github.com/squidsolutions/backbone-deep-model.git#master"
+    "backbone-deep-model": "https://github.com/squidsolutions/backbone-deep-model.git#master",
+    "metrics-graphics": "~2.8.0"
   }
 }
