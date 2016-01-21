@@ -15,6 +15,7 @@
         yearSwitcherView: null,
         metricSelectorView: null,
         multiSeries: null,
+        defaultHeight: 500,
         staleMessage : "Click refresh to update",
         renderTo: ".squid-api-data-widgets-timeseries-widget #widget",
 
@@ -59,7 +60,7 @@
                     description: "This graphic shows a time-series of downloads.",
                     interpolate: "basic",
                     right: 50,
-                    height: 400,
+                    height: this.defaultHeight,
                     target: this.renderTo,
                     x_accessor: 'date',
                     y_accessor: 'value'
@@ -148,7 +149,7 @@
                 if (! configDisplay.visible) {
                     this.configuration.height+=configDisplay.originalHeight;
                 } else {
-                    this.configuration.height-=configDisplay.originalHeight;
+                    this.configuration.height = this.defaultHeight;
                 }
                 MG.data_graphic(this.configuration);
             }
