@@ -3884,22 +3884,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.template = squid_api.template.squid_api_timeseries_widget;
                 }
             }
-            if (d3) {
-                this.d3Formatter = d3.format(",.f");
-            }
             if (options.format) {
                 this.format = options.format;
             } else {
                 // default number formatter
-                if (this.d3Formatter) {
-                    var me = this;
-                    this.format = function(f){
-                        if (isNaN(f)) {
-                            return f;
-                        } else {
-                            return me.d3Formatter(f);
-                        }
-                    };
+                if (d3) {
+                    this.format = d3.format(",.1f");
                 } else {
                     this.format = function(f){
                         return f;
@@ -4009,7 +3999,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         for (ix=0; ix<results.rows.length; ix++) {
                             var obj = {};
                             obj.date = results.rows[ix].v[0];
-                            obj.value = results.rows[ix].v[i];
+                            obj.value = parseFloat(results.rows[ix].v[i]);
                             arr.push(obj);
                         }
                         arr = MG.convert.date(arr, 'date');
@@ -4019,10 +4009,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     MG.data_graphic({
                         description: "This graphic shows a time-series of downloads.",
                         data: data,
-                        area: false,
                         interpolate: "basic",
                         color_range:['green', 'red'],
                         width: $(this.renderTo).width(),
+                        right: 50,
                         height: 400,
                         target: this.renderTo,
                         x_accessor: 'date',
