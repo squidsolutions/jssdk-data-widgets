@@ -3884,6 +3884,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     this.template = squid_api.template.squid_api_timeseries_widget;
                 }
             }
+            if (options.configuration) {
+                this.configuration = options.configuration;
+            } else {
+                this.configuration = {
+                    description: "This graphic shows a time-series of downloads.",
+                    interpolate: "basic",
+                    right: 50,
+                    height: 400,
+                    target: this.renderTo,
+                    x_accessor: 'date',
+                    y_accessor: 'value'
+                }
+            }
             if (options.format) {
                 this.format = options.format;
             } else {
@@ -3899,6 +3912,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.model) {
                 this.listenTo(this.model, 'change:status', this.render);
                 this.listenTo(this.model, 'change:error', this.render);
+                this.listenTo(this.config, 'change:configDisplay', this.updateWidget);
             }
 
             // Resize
@@ -3960,6 +3974,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return data;
         },
 
+        updateWidget: function() {
+            var configDisplay = this.config.get("configDisplay");
+            if (configDisplay) {
+                if (! configDisplay.visible) {
+                    this.configuration.height+=configDisplay.originalHeight;
+                } else {
+                    this.configuration.height-=configDisplay.originalHeight;
+                }
+                MG.data_graphic(this.configuration);
+            }
+        },
+
         render : function() {
         	var me = this;
         	
@@ -3981,6 +4007,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
                 var data = this.getData();
                 var results = data.results;
+                var configDisplay = this.config.get("configDisplay");
 
                 if (data.done && results) {
                     this.$el.find(".sq-loading").hide();
@@ -4006,20 +4033,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         data.push(arr);
                     }
 
-                    MG.data_graphic({
-                        description: "This graphic shows a time-series of downloads.",
-                        data: data,
-                        interpolate: "basic",
-                        color_range:['green', 'red'],
-                        width: $(this.renderTo).width(),
-                        right: 50,
-                        height: 400,
-                        target: this.renderTo,
-                        x_accessor: 'date',
-                        legend: legend,
-                        y_accessor: 'value',
-                    })
+                    // set width
+                    this.configuration.width = $(this.renderTo).width();
 
+                    // set legend & data
+                    this.configuration.legend = legend;
+                    this.configuration.data = data;
+
+                    MG.data_graphic(this.configuration);
                 }
             }
 
