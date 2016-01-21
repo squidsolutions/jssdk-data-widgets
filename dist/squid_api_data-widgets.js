@@ -3860,6 +3860,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }
                 if (options.colorPalette) {
                     this.colorPalette = options.colorPalette;
+                } else {
+                    this.colorPalette = ['blue', 'rgb(255,100,43)', '#CCCCFF'];
                 }
                 if (options.interpolationRange) {
                     this.interpolationRange = options.interpolationRange;
@@ -3889,13 +3891,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 this.configuration = options.configuration;
             } else {
                 this.configuration = {
-                    description: "This graphic shows a time-series of downloads.",
                     interpolate: "basic",
                     right: 50,
                     height: this.defaultHeight,
                     target: this.renderTo,
                     x_accessor: 'date',
-                    y_accessor: 'value'
+                    area: false,
+                    y_accessor: 'value',
+                    aggregate_rollover: true,
+                    animate_on_load: true,
+                    colors: this.colorPalette,
                 }
             }
             if (options.format) {
@@ -3926,7 +3931,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (this.resizing) {
                     window.clearTimeout(resizing);
                 }
-                this.resizing = window.setTimeout(_.bind(this.render,this), 100);
+                this.resizing = window.setTimeout(_.bind(this.updateWidget,this), 100);
             };
         },
 
@@ -3983,8 +3988,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 } else {
                     this.configuration.height = this.defaultHeight;
                 }
-                MG.data_graphic(this.configuration);
             }
+            this.configuration.width = $(this.renderTo).width();
+            MG.data_graphic(this.configuration);
         },
 
         render : function() {
