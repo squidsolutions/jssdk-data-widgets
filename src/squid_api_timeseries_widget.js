@@ -86,7 +86,7 @@
             if (this.model) {
                 this.listenTo(this.model, 'change:status', this.render);
                 this.listenTo(this.model, 'change:error', this.render);
-                this.listenTo(this.config, 'change:configDisplay', this.updateWidget);
+                this.listenTo(this.config, 'change:configDisplay', this.updateHeight);
             }
 
             // Resize
@@ -99,7 +99,7 @@
                 if (this.resizing) {
                     window.clearTimeout(resizing);
                 }
-                this.resizing = window.setTimeout(_.bind(this.updateWidget,this), 100);
+                this.resizing = window.setTimeout(_.bind(this.updateWidth,this), 100);
             };
         },
 
@@ -148,7 +148,7 @@
             return data;
         },
 
-        updateWidget: function() {
+        updateHeight: function() {
             var configDisplay = this.config.get("configDisplay");
             if (configDisplay) {
                 if (! configDisplay.visible) {
@@ -156,7 +156,11 @@
                 } else {
                     this.configuration.height = this.defaultHeight;
                 }
+                MG.data_graphic(this.configuration);
             }
+        },
+
+        updateWidth: function() {
             this.configuration.width = $(this.renderTo).width();
             MG.data_graphic(this.configuration);
         },

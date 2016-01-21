@@ -3918,7 +3918,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.model) {
                 this.listenTo(this.model, 'change:status', this.render);
                 this.listenTo(this.model, 'change:error', this.render);
-                this.listenTo(this.config, 'change:configDisplay', this.updateWidget);
+                this.listenTo(this.config, 'change:configDisplay', this.updateHeight);
             }
 
             // Resize
@@ -3931,7 +3931,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 if (this.resizing) {
                     window.clearTimeout(resizing);
                 }
-                this.resizing = window.setTimeout(_.bind(this.updateWidget,this), 100);
+                this.resizing = window.setTimeout(_.bind(this.updateWidth,this), 100);
             };
         },
 
@@ -3980,7 +3980,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             return data;
         },
 
-        updateWidget: function() {
+        updateHeight: function() {
             var configDisplay = this.config.get("configDisplay");
             if (configDisplay) {
                 if (! configDisplay.visible) {
@@ -3988,7 +3988,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 } else {
                     this.configuration.height = this.defaultHeight;
                 }
+                MG.data_graphic(this.configuration);
             }
+        },
+
+        updateWidth: function() {
             this.configuration.width = $(this.renderTo).width();
             MG.data_graphic(this.configuration);
         },
