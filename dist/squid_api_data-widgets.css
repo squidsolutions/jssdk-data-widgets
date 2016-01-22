@@ -658,3 +658,7 @@ Pagination
 .squid-api-data-widgets-timeseries-widget #chart {
 	min-height: 400px;
 }
+
+.squid-api-data-widgets-timeseries-widget #widget text {
+	font-size: 14px;
+}

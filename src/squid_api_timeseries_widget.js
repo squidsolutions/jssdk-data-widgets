@@ -15,7 +15,7 @@
         yearSwitcherView: null,
         metricSelectorView: null,
         multiSeries: null,
-        defaultHeight: 500,
+        height: 400,
         staleMessage : "Click refresh to update",
         renderTo: ".squid-api-data-widgets-timeseries-widget #widget",
 
@@ -49,6 +49,9 @@
                 if (options.staleMessage) {
                     this.staleMessage = options.staleMessage;
                 }
+                if (options.height) {
+                    this.height = options.height;
+                }
                 if (options.template) {
                     this.template = options.template;
                 } else {
@@ -60,8 +63,8 @@
             } else {
                 this.configuration = {
                     interpolate: "basic",
-                    right: 50,
-                    height: this.defaultHeight,
+                    right: 80,
+                    height: this.height,
                     target: this.renderTo,
                     x_accessor: 'date',
                     area: false,
@@ -154,7 +157,7 @@
                 if (! configDisplay.visible) {
                     this.configuration.height+=configDisplay.originalHeight;
                 } else {
-                    this.configuration.height = this.defaultHeight;
+                    this.configuration.height = this.height;
                 }
                 MG.data_graphic(this.configuration);
             }
