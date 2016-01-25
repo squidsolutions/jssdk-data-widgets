@@ -152,6 +152,34 @@
                                 }
                             }
                         }
+                    } else {
+                        var foundExpression = false;
+                        var expressionValue = orderBy[0].expression.value;
+                        if (chosenDimensions) {
+                            if (chosenDimensions.length !== 0 && autoSet) {
+                                for (var i1=0; i1<chosenDimensions.length; i1++) {
+                                    if (chosenDimensions[i1] == expressionValue) {
+                                        foundExpression = true;
+                                    }
+                                }
+                            }
+                        }
+                        if (chosenMetrics) {
+                            if (chosenMetrics.length !== 0 && ! orderBy) {
+                                for (var i2=0; i2<chosenMetrics.length; i2++) {
+                                    var metric = metrics.findWhere({oid: chosenMetrics[i2]});
+                                    if (metric && autoSet) {
+                                        var definition = metric.get("definition");
+                                        if (definition === expressionValue) {
+                                            foundExpression = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (! foundExpression) {
+                            me.config.unset("orderBy");
+                        }
                     }
 
                     // obtain chosenMetrics metadata
@@ -214,7 +242,7 @@
                                 var obj = {"expression": {"value" : model.val()}, "direction" : "DESC"};
                                 me.config.set({"orderBy" : [obj]});
                             } else {
-                                me.config.unset("orderBy", false);
+                                me.config.unset("orderBy");
                             }
                         }
                     });
