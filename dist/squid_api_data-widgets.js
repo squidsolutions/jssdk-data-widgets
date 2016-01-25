@@ -567,7 +567,7 @@ function program3(depth0,data) {
   if (helper = helpers.limit) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.limit); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</span> <label style=\"position: relative; top: 4px; font-weight: normal;\">by</label> <select class=\"sq-select form-control\" style=\"display: inline-block; position: relative; bottom: 5px; max-width: 100px;\">\n							";
+    + "</span> <label style=\"position: relative; top: 4px; font-weight: normal;\">by</label> <select class=\"sq-select form-control\" style=\"display: inline-block; position: relative; bottom: 5px; max-width: 100px;\">\n							<option>none</option>\n							";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.Columns), {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n						</select>\n					</td>\n				</tr>\n			</table>\n		</div>\n	";
@@ -3438,7 +3438,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         	}
         },
 
-        render : function() {
+        render : function(model, attribute, event) {
             var me = this;
 
             var filters = this.filters.get("selection");
@@ -3446,6 +3446,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var chosenMetrics = this.config.get("chosenMetrics");
             var orderBy = this.config.get("orderBy");
             var limit = this.config.get("limit");
+            var autoSet = true;
+
+            if (event) {
+                if (event.unset) {
+                    autoSet = false;
+                }
+            }
 
             var columns = [];
             if (filters) {
@@ -3471,7 +3478,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     // auto set orderBy if one isn't set
                     if (! orderBy) {
                         if (chosenDimensions) {
-                            if (chosenDimensions.length !== 0) {
+                            if (chosenDimensions.length !== 0 && autoSet) {
                                 for (var i=0; i<chosenDimensions.length; i++) {
                                     me.config.set("orderBy", [{"expression" : {"value" : chosenDimensions[i]}, "direction":"DESC"}]);
                                     break;
@@ -3482,7 +3489,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             if (chosenMetrics.length !== 0 && ! orderBy) {
                                 for (var ix=0; ix<chosenMetrics.length; ix++) {
                                     var metric = metrics.findWhere({oid: chosenMetrics[ix]});
-                                    if (metric) {
+                                    if (metric && autoSet) {
                                         var definition = metric.get("definition");
                                         me.config.set("orderBy", [{"expression" : {"value" : definition}, "direction":"DESC"}]);
                                         break;
@@ -3548,8 +3555,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     // instantiate widget
                     me.$el.find("select").multiselect({
                         onChange: function(model) {
-                            var obj = {"expression": {"value" : model.val()}, "direction" : "DESC"};
-                            me.config.set({"orderBy" : [obj]});
+                            if (model.val() !== "none") {
+                                var obj = {"expression": {"value" : model.val()}, "direction" : "DESC"};
+                                me.config.set({"orderBy" : [obj]});
+                            } else {
+                                me.config.unset("orderBy", false);
+                            }
                         }
                     });
 

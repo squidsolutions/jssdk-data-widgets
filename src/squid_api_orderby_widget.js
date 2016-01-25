@@ -93,7 +93,7 @@
         	}
         },
 
-        render : function() {
+        render : function(model, attribute, event) {
             var me = this;
 
             var filters = this.filters.get("selection");
@@ -101,6 +101,13 @@
             var chosenMetrics = this.config.get("chosenMetrics");
             var orderBy = this.config.get("orderBy");
             var limit = this.config.get("limit");
+            var autoSet = true;
+
+            if (event) {
+                if (event.unset) {
+                    autoSet = false;
+                }
+            }
 
             var columns = [];
             if (filters) {
@@ -126,7 +133,7 @@
                     // auto set orderBy if one isn't set
                     if (! orderBy) {
                         if (chosenDimensions) {
-                            if (chosenDimensions.length !== 0) {
+                            if (chosenDimensions.length !== 0 && autoSet) {
                                 for (var i=0; i<chosenDimensions.length; i++) {
                                     me.config.set("orderBy", [{"expression" : {"value" : chosenDimensions[i]}, "direction":"DESC"}]);
                                     break;
@@ -137,7 +144,7 @@
                             if (chosenMetrics.length !== 0 && ! orderBy) {
                                 for (var ix=0; ix<chosenMetrics.length; ix++) {
                                     var metric = metrics.findWhere({oid: chosenMetrics[ix]});
-                                    if (metric) {
+                                    if (metric && autoSet) {
                                         var definition = metric.get("definition");
                                         me.config.set("orderBy", [{"expression" : {"value" : definition}, "direction":"DESC"}]);
                                         break;
@@ -203,8 +210,12 @@
                     // instantiate widget
                     me.$el.find("select").multiselect({
                         onChange: function(model) {
-                            var obj = {"expression": {"value" : model.val()}, "direction" : "DESC"};
-                            me.config.set({"orderBy" : [obj]});
+                            if (model.val() !== "none") {
+                                var obj = {"expression": {"value" : model.val()}, "direction" : "DESC"};
+                                me.config.set({"orderBy" : [obj]});
+                            } else {
+                                me.config.unset("orderBy", false);
+                            }
                         }
                     });
 
