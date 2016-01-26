@@ -129,6 +129,8 @@
             squid_api.getSelectedDomain().always(function(domain) {
                 if (domain) {
                     var metrics = domain.get("metrics");
+                    var metric;
+                    var definition;
 
                     // auto set orderBy if one isn't set
                     if (! orderBy) {
@@ -143,9 +145,9 @@
                         if (chosenMetrics) {
                             if (chosenMetrics.length !== 0 && ! orderBy) {
                                 for (var ix=0; ix<chosenMetrics.length; ix++) {
-                                    var metric = metrics.findWhere({oid: chosenMetrics[ix]});
+                                    metric = metrics.findWhere({oid: chosenMetrics[ix]});
                                     if (metric && autoSet) {
-                                        var definition = metric.get("definition");
+                                        definition = metric.get("definition");
                                         me.config.set("orderBy", [{"expression" : {"value" : definition}, "direction":"DESC"}]);
                                         break;
                                     }
@@ -158,7 +160,7 @@
                         if (chosenDimensions) {
                             if (chosenDimensions.length !== 0) {
                                 for (var i1=0; i1<chosenDimensions.length; i1++) {
-                                    if (chosenDimensions[i1] == expressionValue) {
+                                    if (chosenDimensions[i1] === expressionValue) {
                                         foundExpression = true;
                                     }
                                 }
@@ -167,9 +169,9 @@
                         if (chosenMetrics) {
                             if (chosenMetrics.length !== 0) {
                                 for (var i2=0; i2<chosenMetrics.length; i2++) {
-                                    var metric = metrics.findWhere({oid: chosenMetrics[i2]});
+                                    metric = metrics.findWhere({oid: chosenMetrics[i2]});
                                     if (metric) {
-                                        var definition = metric.get("definition");
+                                        definition = metric.get("definition");
                                         if (definition === expressionValue) {
                                             foundExpression = true;
                                         }
@@ -177,7 +179,8 @@
                                 }
                             }
                         }
-                        if (! foundExpression) {
+                        if (! foundExpression && orderBy.length < 2) {
+                            // TODO: refactor into supporting multi orderBy
                             me.config.unset("orderBy");
                         }
                     }
@@ -186,11 +189,11 @@
                     if (metrics && chosenMetrics) {
                         count = count + chosenMetrics.length;
                         for (var id=0; id<metrics.length; id++) {
-                            var metric = metrics.at(id);
+                            var metricItem = metrics.at(id);
                             // Match with chosen
                             for (var match=0; match<chosenMetrics.length; match++) {
-                                if (metric.get("oid") === chosenMetrics[match]) {
-                                    var option = {"label" : metric.get("name"), "value" : metric.get("definition")};
+                                if (metricItem.get("oid") === chosenMetrics[match]) {
+                                    var option = {"label" : metricItem.get("name"), "value" : metricItem.get("definition")};
                                     columns.push(option);
                                 }
                             }
@@ -207,10 +210,10 @@
 
                     if (orderBy) {
                         if (orderBy.length > 0) {
-                            for (var i=0; i<columns.length; i++) {
+                            for (var ix1=0; ix1<columns.length; ix1++) {
                                 if (orderBy[0].expression) {
-                                    if (columns[i].value === orderBy[0].expression.value) {
-                                        columns[i].selected = true;
+                                    if (columns[ix1].value === orderBy[0].expression.value) {
+                                        columns[ix1].selected = true;
                                     }
                                 }
                             }
