@@ -72,7 +72,7 @@
                     animate_on_load: true,
                     legend_target: '.fake-div',
                     colors: this.colorPalette,
-                }
+                };
             }
             if (options.format) {
                 this.format = options.format;
@@ -169,8 +169,6 @@
         },
 
         render : function() {
-        	var me = this;
-        	
             var status = this.model.get("status");
             this.YearOverYear = this.config.get("YearOverYear");
 
@@ -189,14 +187,13 @@
 
                 var data = this.getData();
                 var results = data.results;
-                var configDisplay = this.config.get("configDisplay");
 
                 if (data.done && results) {
                     this.$el.find(".sq-loading").hide();
 
                     // data for timeseries
                     var legend = [];
-                    var data = [];
+                    var dataset = [];
 
                     // sort dates
                     results.rows = this.sortDates(results.rows);
@@ -212,7 +209,7 @@
                             arr.push(obj);
                         }
                         arr = MG.convert.date(arr, 'date');
-                        data.push(arr);
+                        dataset.push(arr);
                     }
 
                     // set width
@@ -220,7 +217,7 @@
 
                     // set legend & data
                     this.configuration.legend = legend;
-                    this.configuration.data = data;
+                    this.configuration.data = dataset;
 
                     MG.data_graphic(this.configuration);
                 }
