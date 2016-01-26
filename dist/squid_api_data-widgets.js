@@ -3848,6 +3848,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         metricSelectorView: null,
         multiSeries: null,
         height: 400,
+        legend: null,
         staleMessage : "Click refresh to update",
         renderTo: ".squid-api-data-widgets-timeseries-widget #widget",
 
@@ -3901,8 +3902,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     x_accessor: 'date',
                     area: false,
                     y_accessor: 'value',
-                    aggregate_rollover: true,
                     animate_on_load: true,
+                    legend_target: '.fake-div',
                     colors: this.colorPalette,
                 }
             }

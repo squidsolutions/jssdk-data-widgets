@@ -69,8 +69,8 @@
                     x_accessor: 'date',
                     area: false,
                     y_accessor: 'value',
-                    aggregate_rollover: true,
                     animate_on_load: true,
+                    legend_target: '.fake-div',
                     colors: this.colorPalette,
                 }
             }
