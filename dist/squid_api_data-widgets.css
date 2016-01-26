@@ -566,7 +566,7 @@ Pagination
 	opacity: 1;
 }
 .rickshaw_graph .x_ticks_d3 text {
-	text-anchor: inherit !important; 
+	text-anchor: inherit !important;
 }
 
 .squid-api-data-widgets-timeseries-widget #slider {
@@ -635,26 +635,30 @@ Pagination
 	box-shadow: 4px 12px 18px -14px;
 }
 
-.squid-api-data-widgets-timeseries-widget .rickshaw_graph .detail .x_label { 
-	display: none 
+.squid-api-data-widgets-timeseries-widget .rickshaw_graph .detail .x_label {
+	display: none
 }
 
-.squid-api-data-widgets-timeseries-widget .rickshaw_graph .detail .item { 
-	line-height: 1.4; 
-	padding: 0.5em 
+.squid-api-data-widgets-timeseries-widget .rickshaw_graph .detail .item {
+	line-height: 1.4;
+	padding: 0.5em
 }
-.squid-api-data-widgets-timeseries-widget .detail_swatch { 
-	float: right; 
-	display: inline-block; 
-	width: 10px; 
-	height: 10px; 
+.squid-api-data-widgets-timeseries-widget .detail_swatch {
+	float: right;
+	display: inline-block;
+	width: 10px;
+	height: 10px;
 	margin: 20px 4px 0 0;
 }
 
-.squid-api-data-widgets-timeseries-widget .rickshaw_graph .detail .date { 
-	color: #a0a0a0 
+.squid-api-data-widgets-timeseries-widget .rickshaw_graph .detail .date {
+	color: #a0a0a0
 }
 
 .squid-api-data-widgets-timeseries-widget #chart {
 	min-height: 400px;
+}
+
+.squid-api-data-widgets-timeseries-widget #widget text {
+	font-size: 14px;
 }
