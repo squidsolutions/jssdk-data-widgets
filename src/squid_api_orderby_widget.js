@@ -177,7 +177,8 @@
                                 }
                             }
                         }
-                        if (! foundExpression) {
+                        if (! foundExpression && orderBy.length < 2) {
+                            // TODO: refactor into supporting multi orderBy
                             me.config.unset("orderBy");
                         }
                     }
