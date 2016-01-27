@@ -1,5 +1,5 @@
 (function (root, factory) {
-    root.squid_api.controller.AnalysisContoller = factory(root.Backbone, root.squid_api);
+    root.squid_api.controller.AnalysisController = factory(root.Backbone, root.squid_api);
 
 }(this, function (Backbone, squid_api) {
 
