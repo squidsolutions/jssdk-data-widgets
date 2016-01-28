@@ -3447,6 +3447,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var orderBy = this.config.get("orderBy");
             var limit = this.config.get("limit");
             var autoSet = true;
+            var count = 0;
 
             if (event) {
                 if (event.unset) {
