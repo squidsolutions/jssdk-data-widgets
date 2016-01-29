@@ -111,3 +111,11 @@
 .squid-api-data-widgets-timeseries-widget #widget text {
 	font-size: 14px;
 }
+
+.squid-api-data-widgets-timeseries-widget #legend {
+	margin-left: 50px;
+}
+
+.squid-api-data-widgets-timeseries-widget svg:not(:root) {
+	overflow: visible;
+}

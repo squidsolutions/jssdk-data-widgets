@@ -18,6 +18,7 @@
         height: 400,
         staleMessage : "Click refresh to update",
         renderTo: ".squid-api-data-widgets-timeseries-widget #widget",
+        renderLegend: ".squid-api-data-widgets-timeseries-widget #legend",
 
         initialize : function(options) {
             this.config = squid_api.model.config;
@@ -70,7 +71,7 @@
                     area: false,
                     y_accessor: 'value',
                     animate_on_load: true,
-                    legend_target: '.fake-div',
+                    legend_target: this.renderLegend,
                     colors: this.colorPalette,
                 };
             }
