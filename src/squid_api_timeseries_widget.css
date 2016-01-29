@@ -112,6 +112,10 @@
 	font-size: 14px;
 }
 
+.squid-api-data-widgets-timeseries-widget #widget .mg-active-datapoint-container tspan {
+	stroke-width: 0px;
+}
+
 .squid-api-data-widgets-timeseries-widget #legend {
 	margin-left: 50px;
 }
