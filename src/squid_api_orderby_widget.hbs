@@ -22,6 +22,7 @@
 					<td>
 						&nbsp;
 						<span style="font-size : 14px; font-weight: bold; padding-right: 5px; position: relative; top: 4px;">{{limit}}</span> <label style="position: relative; top: 4px; font-weight: normal;">by</label> <select class="sq-select form-control" style="display: inline-block; position: relative; bottom: 5px; max-width: 100px;">
+							<option>none</option>
 							{{#each Columns}}
 								<option {{#if selected}} selected="selected" {{/if}} value="{{value}}">{{label}}</option>
 							{{/each}}
