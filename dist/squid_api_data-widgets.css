@@ -457,6 +457,98 @@ Pagination
 	font-size: 15px;
 }
 
+.squid-api-data-widgets-materialize-widget .download-formats {
+	padding-top: 20px;
+}
+
+.squid-api-data-widgets-materialize-widget .btn-default {
+	cursor: pointer;
+	color: #777;
+	border-radius: 4px;
+	border: 1px solid #e7e7e7;
+}
+
+.squid-api-data-widgets-materialize-widget .btn-link {
+	padding-left: 0px;
+}
+
+.squid-api-data-widgets-materialize-widget .download-label {
+	margin-left: 5px;
+}
+
+.squid-api-data-widgets-materialize-widget a {
+	cursor: pointer;
+}
+
+.squid-api-data-widgets-materialize-widget .download-formats label {
+	margin-right: 10px;
+}
+
+.squid-api-data-widgets-materialize-widget a#download, .squid-api-data-widgets-materialize-widget a#view-sql {
+    float: left;
+}
+
+.squid-api-data-widgets-materialize-widget #view-materializedatasets, .squid-api-materialize-panel-popup #view-materializedatasets{
+	margin-top: 10px;
+	display: block;
+}
+
+.squid-api-data-widgets-materialize-widget #materializedatasets-view, .squid-api-materialize-panel-popup #materializedatasets-view {
+	clear: both;
+	margin-top: 40px;
+}
+
+
+
+.squid-api-data-widgets-materialize-widget #curl-view {
+	clear: both;
+}
+
+.squid-api-data-widgets-materialize-widget #curl {
+	margin-top: 10px;
+}
+
+.squid-api-data-widgets-materialize-widget #curlbtn, .squid-api-materialize-panel-popup #curlbtn {
+	cursor: pointer;
+}
+
+.squid-api-materialize-panel-popup {
+	background-color: #fff;
+    display: inline-block;
+    border-radius: 8px;
+    position: absolute;
+    border: 1px solid #d1d1d1;
+    box-shadow: 5px 4px 15px -8px;
+    z-index: 1;
+    padding: 15px 15px;
+}
+
+.squid-api-materialize-panel-popup .ui-dialog-titlebar {
+	display: none;
+}
+
+.squid-api-materialize-panel-popup:before {
+	position: absolute;
+    top: -6px;
+    left: 9px;
+    z-index: 2;
+    display: inline-block;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid #ccc;
+    border-left: 7px solid transparent;
+    border-bottom-color: #fff;
+    content: '';
+}
+
+.squid-api-materialize-panel-popup .ui-dialog-titlebar-close {
+	position: absolute;
+	right: 10px;
+	top: 30px;
+	background: none;
+	border: 0px;
+	font-size: 15px;
+}
+
 .squid-api-data-widgets-metric-widget {
     position: relative;
     border-radius: 10px;

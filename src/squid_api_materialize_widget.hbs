@@ -1,0 +1,51 @@
+<div class="squid-api-data-widgets-materialize-widget">
+<div class="download-wrapper">
+		{{#if displayInAccordion}}
+			<div class="panel panel-default filter-panel">
+				<div class="panel-heading">
+					<button type="button" class="close" data-toggle="collapse"
+					data-target="{{data-target}}" data-clavier="true" aria-hidden="true">
+						<i class="glyphicon glyphicon-chevron-up"></i>
+					</button>
+					<h4 class="panel-title" id="myModalLabel">Materialize</h4>
+				</div>
+			<div class="panel-body">
+			<button type="button" class="close" data-toggle="collapse"data-target="{{data-target}}" data-clavier="true" aria-hidden="true"></button>
+		{{/if}}
+
+        {{#if materializeDatasetsView}}
+            <button type="button" class="close" data-toggle="collapse"data-target="{{data-target}}" data-clavier="true" aria-hidden="true"></button>
+            <div style="display: inline-block;">
+                <div><label>Name: </label> <input type="text" name="name" ></div>
+                <div><label>Virtualize: </label> <input type="checkbox" name="virtualize" {{#if compression}}checked{{/if}}></div>
+            </div>
+            <div id="materializedatasets-view">
+                 <div>
+                     <a class="destSchema btn btn-default squid-api-button-view selected" name="destSchema" id="destSchema">Schema</a>
+                 </div>
+                <div>
+                <a class="destProject btn btn-default squid-api-button-view selected" name="destProject" id="destProject">Project</a>
+                </div>
+                <div>
+                <a class="destDomain btn btn-default squid-api-button-view selected" name="destDomain" id="destDomain">Domain</a>
+                 </div>
+
+                <div>
+                    <a id="view-materializedatasets" class="btn btn-default" target="_blank">Materialize</a>
+                </div>
+
+                <div>
+                    <a class="materializebtn btn btn-default" id="materializebtn">MT</a>
+                </div>
+            </div>
+        {{/if}}
+		{{#if displayInAccordion}}
+			</div>
+		</div>
+		{{/if}}
+	</div>
+	{{#if displayInPopup}}
+		<button type="button" class="btn popup-trigger form-control">Materialize</button>
+	{{/if}}
+</div>
+

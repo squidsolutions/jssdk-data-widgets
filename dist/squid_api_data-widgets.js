@@ -270,12 +270,6 @@ function program8(depth0,data) {
 
 function program10(depth0,data) {
   
-  
-  return "\r\n            <div id=\"materializedatasets-view\">\r\n                    <br><hr>\r\n                    <ul>\r\n                <li> <label for=\"destSchema\">Schema: </label><input type=\"text\" name=\"destSchema\" id=\"destSchema\"> </li>\r\n                <li> <label for=\"destProject\">Project: </label> <input type=\"text\" name=\"destProject\" id=\"destProject\"> </li>\r\n                <li> <label for=\"destDomain\">Domain: </label> <input type=\"text\" name=\"destDomain\" id=\"destDomain\"> </li>\r\n                </ul>\r\n                <div>\r\n                    <a id=\"view-materializedatasets\" class=\"btn btn-default\" target=\"_blank\">Materialize Datasets</a>\r\n                </div>\r\n            </div>\r\n\r\n        ";
-  }
-
-function program12(depth0,data) {
-  
   var buffer = "", stack1, helper;
   buffer += "\r\n			<div id=\"curl-view\">\r\n	            <br><hr>\r\n				Need to automate exports? Use the <a id=\"curlbtn\">shell commands</a>.\r\n				<div id=\"curl\">\r\n					<p>Sample code to download the analysis results using curl shell command.</p>\r\n					<b>1 - get an authentication token</b>\r\n					<p>replace the 'login' and 'password' fields in the following snippet</p>\r\n					<pre class=\"curl\">curl '";
   if (helper = helpers.apiURL) { stack1 = helper.call(depth0, {hash:{},data:data}); }
@@ -321,19 +315,19 @@ function program12(depth0,data) {
   return buffer;
   }
 
-function program14(depth0,data) {
+function program12(depth0,data) {
   
   
   return "\r\n			</div>\r\n		</div>\r\n		";
   }
 
-function program16(depth0,data) {
+function program14(depth0,data) {
   
   
   return "\r\n		<button type=\"button\" class=\"btn popup-trigger form-control\">Export</button>\r\n	";
   }
 
-  buffer += "<div class=\"squid-api-data-widgets-export-widget\">\r\n	<div class=\"download-wrapper\">\r\n		";
+  buffer += "<div class=\"squid-api-data-widgets-export-widget\">\r\n<div class=\"download-wrapper\">\r\n		";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n		<div class=\"download-formats\">\r\n			<label>Format: </label> \r\n			";
@@ -345,17 +339,14 @@ function program16(depth0,data) {
   buffer += "\r\n		</div>\r\n			<div>&nbsp;</div>\r\n		<div>\r\n			<button id=\"download\" class=\"btn btn-default\" target=\"_blank\">download<i class=\"fa fa-download\"></i></button>\r\n		</div>\r\n		";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.sqlView), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n        ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.materializeDatasetsView), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
+  buffer += "\r\n		";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(10, program10, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n		";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.data), {hash:{},inverse:self.noop,fn:self.program(12, program12, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n		";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(14, program14, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(12, program12, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n		<form id=\"download-form\" style=\"visibility: hidden;\"></form>\r\n	</div>\r\n	";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInPopup), {hash:{},inverse:self.noop,fn:self.program(16, program16, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInPopup), {hash:{},inverse:self.noop,fn:self.program(14, program14, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n</div>\r\n\r\n";
   return buffer;
@@ -409,6 +400,73 @@ function program6(depth0,data) {
   stack1 = helpers['if'].call(depth0, depth0, {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { return stack1; }
   else { return ''; }
+  });
+
+this["squid_api"]["template"]["squid_api_materialize_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\r\n			<div class=\"panel panel-default filter-panel\">\r\n				<div class=\"panel-heading\">\r\n					<button type=\"button\" class=\"close\" data-toggle=\"collapse\"\r\n					data-target=\"";
+  if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n						<i class=\"glyphicon glyphicon-chevron-up\"></i>\r\n					</button>\r\n					<h4 class=\"panel-title\" id=\"myModalLabel\">Materialize</h4>\r\n				</div>\r\n			<div class=\"panel-body\">\r\n			<button type=\"button\" class=\"close\" data-toggle=\"collapse\"data-target=\"";
+  if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" data-clavier=\"true\" aria-hidden=\"true\"></button>\r\n		";
+  return buffer;
+  }
+
+function program3(depth0,data) {
+  
+  var buffer = "", stack1, helper;
+  buffer += "\r\n            <button type=\"button\" class=\"close\" data-toggle=\"collapse\"data-target=\"";
+  if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\" data-clavier=\"true\" aria-hidden=\"true\"></button>\r\n            <div style=\"display: inline-block;\">\r\n                <div><label>Name: </label> <input type=\"text\" name=\"name\" ></div>\r\n                <div><label>Virtualize: </label> <input type=\"checkbox\" name=\"virtualize\" ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "></div>\r\n            </div>\r\n            <div id=\"materializedatasets-view\">\r\n                 <div>\r\n                     <a class=\"destSchema btn btn-default squid-api-button-view selected\" name=\"destSchema\" id=\"destSchema\">Schema</a>\r\n                 </div>\r\n                <div>\r\n                <a class=\"destProject btn btn-default squid-api-button-view selected\" name=\"destProject\" id=\"destProject\">Project</a>\r\n                </div>\r\n                <div>\r\n                <a class=\"destDomain btn btn-default squid-api-button-view selected\" name=\"destDomain\" id=\"destDomain\">Domain</a>\r\n                 </div>\r\n\r\n                <div>\r\n                    <a id=\"view-materializedatasets\" class=\"btn btn-default\" target=\"_blank\">Materialize</a>\r\n                </div>\r\n\r\n                <div>\r\n                    <a class=\"materializebtn btn btn-default\" id=\"materializebtn\">MT</a>\r\n                </div>\r\n            </div>\r\n        ";
+  return buffer;
+  }
+function program4(depth0,data) {
+  
+  
+  return "checked";
+  }
+
+function program6(depth0,data) {
+  
+  
+  return "\r\n			</div>\r\n		</div>\r\n		";
+  }
+
+function program8(depth0,data) {
+  
+  
+  return "\r\n		<button type=\"button\" class=\"btn popup-trigger form-control\">Materialize</button>\r\n	";
+  }
+
+  buffer += "<div class=\"squid-api-data-widgets-materialize-widget\">\r\n<div class=\"download-wrapper\">\r\n		";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n\r\n        ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.materializeDatasetsView), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n		";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n	</div>\r\n	";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInPopup), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\r\n</div>\r\n\r\n";
+  return buffer;
   });
 
 this["squid_api"]["template"]["squid_api_metric_total_widget"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -3102,6 +3160,367 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             var tableContent = this.$el;
             var tableHTML = this.template(jsonData);
             tableContent.html(tableHTML);
+            return this;
+        }
+    });
+
+    return View;
+}));
+
+(function (root, factory) {
+    root.squid_api.view.Materialize = factory(root.Backbone, root.squid_api);
+}(this, function (Backbone, squid_api) {
+
+    View = Backbone.View.extend( {
+
+        template : null,
+        renderTo: null,
+        compression : true,
+        displayInAccordion : false,
+        viewPort : null,
+        formats : [{"format" : "csv", "mime-type" : "text/csv", "template" : null}],
+        selectedFormatIndex : 0,
+        templateData : null,
+        displayScripting : true,
+        displayCompression : true,
+        materializeDatasetsView : false,
+        downloadButtonLabel : "Create Your DataFrame",
+        popupDialogClass : "squid-api-materialize-panel-popup",
+
+        initialize : function(options) {
+            var me = this;
+
+            if (this.model.get("analysis")) {
+                this.listenTo(this.model.get("analysis"), 'change', function() {
+                    me.render();
+                    me.enabled();
+                });
+                this.listenTo(this.model, 'change:templateData', function() {
+                    me.enabled();
+                });
+                this.listenTo(this.model, 'change:templateData', function() {
+                    if(this.materializeDatasetsView === true) {
+                        me.refreshViewMaterializeDatasets();
+                        me.enabled();
+                    }
+                });
+                this.listenTo(this.model, 'change:enabled', this.enabled);
+            } else {
+                this.listenTo(this.model, 'change', function() {
+                    me.render();
+                    me.enabled();
+                });
+            }
+            // setup options
+            if (options.template) {
+                this.template = options.template;
+            } else {
+                this.template = squid_api.template.squid_api_materialize_widget;
+            }
+            if (options.formats) {
+                this.formats = options.formats;
+            }
+            if (options.renderTo) {
+                this.renderTo = options.renderTo;
+            }
+            if (options.displayInAccordion) {
+            	this.displayInAccordion = true;
+                this.viewPort = this.renderTo;
+            } else {
+                this.viewPort = this.$el;
+            }
+            if (options.displayInPopup) {
+            	this.displayInPopup = true;
+            }
+            if (options.materializeDatasetsView) {
+                this.materializeDatasetsView = true;
+            }
+            if (options.downloadButtonLabel) {
+            	this.downloadButtonLabel = options.downloadButtonLabel;
+            }
+            if (options.displayScripting === false) {
+                this.displayScripting = false;
+            }
+            if (options.displayCompression === false) {
+                this.displayCompression = false;
+            }
+            if (options.popupDialogClass) {
+                this.popupDialogClass = options.popupDialogClass;
+            }
+
+        },
+
+        enabled: function() {
+        	var viewPort = this.viewPort;
+        	if (this.popup) {
+        		viewPort = this.popup;
+        	}
+        	if (this.model.get("enabled")) {
+        		this.$el.find("button").prop("disabled", false);
+        		viewPort.find("button#download").prop("disabled", false);
+        	} else {
+        		this.$el.find("button").prop("disabled", true);
+        		viewPort.find("button#download").prop("disabled", true);
+        	}
+        },
+
+        setModel : function(model) {
+            this.model = model;
+            this.initialize();
+        },
+
+        clickedFormat : function (event) {
+            var t = event.target;
+            this.selectedFormatIndex = null;
+            for (var i=0; i<this.formats.length;i++) {
+                if (this.formats[i].format === t.value) {
+                    this.selectedFormatIndex = i;
+                }
+            }
+            if(this.materializeDatasetsView === true) {
+                this.refreshViewMaterializeDatasets();
+            }
+        },
+
+        clickedVirtualize : function (event) {
+            var t = event.target;
+            this.virtualize = (t.checked);
+            if(this.materializeDatasetsView === true) {
+                this.refreshViewMaterializeDatasets();
+            }
+        },
+
+
+
+        refreshViewMaterializeDatasets : function() {
+            var me = this;
+            var viewPort = $(me.viewPort);
+            if (this.displayInPopup) {
+                viewPort = this.popup;
+            }
+            var analysis = this.model.get("analysis");
+            if (!analysis) {
+                analysis = this.model;
+            }
+
+
+            // prepare materialize datasets download link
+            var downloadBtnD = $(me.viewPort).find("#view-materializedatasets");
+            downloadBtnD.addClass("disabled");
+
+            if (analysis.get("id").projectId) {
+                var downloadAnalysis = new squid_api.model.InternalanalysisjobModel();
+                downloadAnalysis.set(
+                    {
+                        "name": viewPort.find("#destDomain").val(),
+                        "options": {
+                            "analysisJob": analysis,
+                            "sourceProjectId": analysis.get("id").projectId,
+                            "destProjectId": viewPort.find("#destProject").val(),
+                            "destSchema": viewPort.find("#destSchema").val()
+                        }
+                    }
+                );
+                downloadAnalysis.save();
+            }
+
+
+            //var downloadBtn = viewPort.find("#view-materializedatasets");
+            //downloadBtn.attr("href", downloadAnalysis.url());
+            //downloadBtn.removeClass("disabled");
+        },
+
+        download : function() {
+            var me = this;
+            var viewPort = $(this.viewPort);
+            if (this.displayInPopup) {
+            	viewPort = this.popup;
+            }
+            var analysis = this.model.get("analysis");
+            var enabled = this.model.get("enabled");
+            if (!analysis) {
+                analysis = this.model;
+            }
+            var downloadBtn = viewPort.find("#download");
+            downloadBtn.addClass("disabled");
+
+            if (analysis.get("id").projectId && enabled !== false) {
+                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                downloadAnalysis.set(analysis.attributes);
+                downloadAnalysis.setParameter("timeout", 10000);
+                downloadAnalysis.setParameter("maxResults", 1);
+                downloadAnalysis.set("autoRun", false);
+                downloadAnalysis.set({
+                    "id": {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": null
+                    }});
+                //
+                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
+                .done(function(analysis) {
+                    if (analysis.get("limit") || (analysis.get("template"))) {
+                        // trigger the analysis computation and wait until it's done (in a loop)
+                        squid_api.controller.analysisjob.getAnalysisJobResults(null, analysis).done(function(results) {
+                            // get the results
+                            me.downloadAnalysisResults(results.get("id"));
+                        })
+                        .fail(function() {
+                            console.error("createAnalysisJob failed");
+                            downloadBtn.removeClass("disabled");
+                        });
+                    } else {
+                        // compute and get the results without retrying (streaming way)
+                        me.downloadAnalysisResults(analysis.get("id"));
+                    }
+                })
+                .fail(function() {
+                    console.error("createAnalysisJob failed");
+                    downloadBtn.removeClass("disabled");
+                });
+            }
+        },
+
+        render : function() {
+            var me = this;
+            var analysis = this.model.get("analysis");
+            if (!analysis) {
+                analysis = this.model;
+            }
+
+            var selectedFormat = this.formats[this.selectedFormatIndex];
+            var formatsDisplay = [];
+            for (var i=0; i<this.formats.length;i++) {
+                formatsDisplay[i] = this.formats[i];
+                if (i === this.selectedFormatIndex) {
+                    formatsDisplay[i].selected = true;
+                }
+            }
+
+            if (this.displayInAccordion) {
+                this.$el.html("<button type='button' class='btn btn-open-export-panel' data-toggle='collapse' data-target=" + this.renderTo + "> "+ this.downloadButtonLabel + "<span class='glyphicon glyphicon-download-alt'></span></button>");
+                var facets = analysis.get("facets");
+                var metrics = analysis.get("metrics");
+                if ((!facets || facets.length === 0) && (!metrics || metrics.length === 0)) {
+                    $("button.btn-open-materialize-panel").prop('disabled', true);
+                } else {
+                    $("button.btn-open-materialize-panel").prop('disabled', false);
+                }
+            }
+
+            $(this.viewPort).html(this.template({
+                "displayInAccordion" : this.displayInAccordion,
+                "downloadButtonLabel" : this.downloadButtonLabel,
+                "displayInPopup" : this.displayInPopup,
+                "materializeDatasetsView" : this.materializeDatasetsView,
+                "data-target" : this.renderTo,
+                "formats": formatsDisplay,
+                "displayVirtualize" : this.displayVirtualize,
+                "virtualize": (this.virtualize),
+                "origin": "https://api.squidsolutions.com",
+                "customerId" : squid_api.customerId,
+                "clientId" : squid_api.clientId,
+                "redirectURI":"https://api.squidsolutions.com",
+                "apiURL":squid_api.apiURL
+                })
+            );
+            var dfButton = new squid_api.view.DomainSelectorButton({
+                el : '#materializebtn'
+            });
+
+            dfButton.$el.click(function() {
+                dfModal.render();
+            });
+
+            var dfCollection = new squid_api.view.BookmarkCollectionManagementWidget({
+                onSelect: function() {
+                    dfModal.close();
+                }
+            });
+
+            var dfModal = new squid_api.view.ModalView({
+                view : dfCollection
+            });
+
+
+            var projectCollection = new squid_api.view.ProjectCollectionManagementWidget({
+                onSelect: function() {
+                    projectModal.close();
+                }
+            });
+
+            var projectModal = new squid_api.view.ModalView({
+                view : projectCollection
+            });
+
+            var projectButton = new squid_api.view.ProjectSelectorButton({
+                el : '#destProject'
+            });
+
+            projectButton.$el.click(function() {
+                projectModal.render();
+            });
+
+
+            if (analysis.get("id").projectId) {
+                var downloadAnalysis = new squid_api.model.ProjectAnalysisJob();
+                downloadAnalysis.set(analysis.attributes);
+                downloadAnalysis.set({
+                    "id": {
+                        "projectId": analysis.get("id").projectId,
+                        "analysisJobId": null
+                    },
+                    "autoRun": false});
+                squid_api.controller.analysisjob.createAnalysisJob(downloadAnalysis, analysis.get("selection"))
+                .done(function() {
+                    me.currentJobId = downloadAnalysis.get("id");
+                })
+                .fail(function() {
+                    console.error("createAnalysisJob failed");
+                });
+            }
+
+
+            $(this.viewPort).find('[name="format"]').click(
+                function(event) {
+                    me.clickedFormat(event);
+                });
+            $(this.viewPort).find('[name="virtualize"]')
+            .click(function(event) {
+                me.clickedVirtualize(event);
+            });
+
+            $(this.viewPort).find("#download").click(function() {
+                me.download();
+            });
+            if(this.materializeDatasetsView === true) {
+                $(this.viewPort).find("#view-materializedatasets").click(function () {
+                    me.refreshViewMaterializeDatasets();
+                });
+            }
+            if (this.displayInPopup) {
+                // remove any existing popups
+                $("." + this.popupDialogClass).remove();
+
+                this.popup = this.$el.find(".download-wrapper").dialog({
+                    dialogClass: this.popupDialogClass,
+                    autoOpen: false,
+                    position: {
+                        my: "left-70 top", at: "left-70 bottom", of: this.$el.find("button.popup-trigger")
+                    },
+                    clickOutside: true, // clicking outside the dialog will close it
+                    clickOutsideTrigger: this.$el.find("button.popup-trigger"), // Element (id or class) that triggers the dialog opening
+                });
+
+                // Click Event for filter panel button
+                this.$el.find("button.popup-trigger").click(function() {
+                    if (me.popup.dialog("isOpen")) {
+                    	me.popup.dialog( "close" );
+                    } else {
+                    	me.popup.dialog( "open" );
+                    }
+                });
+            }
+
             return this;
         }
     });
