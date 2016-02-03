@@ -429,7 +429,7 @@ function program3(depth0,data) {
   if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\"\r\n                    aria-hidden=\"true\"></button>\r\n            <div style=\"display: inline-block;\">\r\n                <div><label>Name: </label> <input type=\"text\" name=\"name\"></div>\r\n                <div><label>Virtualize: </label> <input type=\"checkbox\" name=\"virtualize\"\r\n                                                        ";
+    + "\" data-clavier=\"true\"\r\n                    aria-hidden=\"true\"></button>\r\n            <div style=\"display: inline-block;\">\r\n                <div><label for=\"name\">Name: </label> <input type=\"text\" name=\"name\"></div>\r\n                <div><label for=\"virtualize\">Virtualize: </label> <input type=\"checkbox\" name=\"virtualize\"\r\n                                                        ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "></div>\r\n            </div>\r\n            <div id=\"materializedatasets-view\">\r\n                    <div id=\"materializedatasets-destination\" style=\"display: inline-block;\">\r\n                        <div id=\"materialize-destination-tooltip\" data-toggle=\"materialize-destination-tooltip\" data-placement=\"left\"\r\n                             title=\"Use it to define the destination of your current dataset. Default will go to Spark environement.\">\r\n                            Destination :\r\n                            <div>\r\n                                <button data-toggle=\"materialize-destination-tooltip\" data-placement=\"left\"\r\n                                        title=\"Use it to define the destination of your current dataset. Default will go to Spark environment.\" class=\"destSchema btn btn-default squid-api-button-view selected\"\r\n                                        name=\"destSchema\"\r\n                                        id=\"destSchema\">Schema\r\n                                </button>\r\n                            </div>\r\n                            <div>\r\n                                <button class=\"destProject btn btn-default squid-api-button-view selected\"\r\n                                        name=\"destProject\"\r\n                                        id=\"destProject\">Project\r\n                                </button>\r\n                            </div>\r\n                            <div>\r\n                                <button class=\"destDomain btn btn-default squid-api-button-view selected\"\r\n                                        name=\"destDomain\"\r\n                                        id=\"destDomain\">Domain\r\n                                </button>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n\r\n                    <div>\r\n                        <a id=\"view-materializedatasets\" class=\"btn btn-default\" target=\"_blank\">Materialize</a>\r\n                    </div>\r\n\r\n            </div>\r\n        ";
@@ -3548,7 +3548,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.displayInPopup) {
                 // remove any existing popups
                 $("." + this.popupDialogClass).remove();
-
+                /*
+                    when the popup is initialized, events will need to be targeted by using 'this.popup' instead of
+                    the 'this.viewPort' as the popup dom elements will be inserted after
+                 */
                 this.popup = this.$el.find(".download-wrapper").dialog({
                     dialogClass: this.popupDialogClass,
                     autoOpen: false,
