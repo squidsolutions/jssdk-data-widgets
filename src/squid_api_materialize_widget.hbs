@@ -19,39 +19,43 @@
                     aria-hidden="true"></button>
             <div style="display: inline-block;">
                 <div><label for="name">Name: </label> <input type="text" name="name"></div>
-                <div><label for="virtualize">Virtualize: </label> <input type="checkbox" name="virtualize"
-                                                        {{#if compression}}checked{{/if}}></div>
+                <div id="virtualize" data-toggle="materialize-virtualize-tooltip" data-placement="left"
+                     title="Use a virtual dataset. The datasets is not actually reinjected but stays as domain without physical existence.">
+                    <label for="virtualize">Virtualize: </label>
+                    <input
+                            type="checkbox" name="virtualize"
+                            {{#if compression}}checked{{/if}}></div>
             </div>
             <div id="materializedatasets-view">
-                    <div id="materializedatasets-destination" style="display: inline-block;">
-                        <div id="materialize-destination-tooltip" data-toggle="materialize-destination-tooltip" data-placement="left"
-                             title="Use it to define the destination of your current dataset. Default will go to Spark environement.">
-                            Destination :
-                            <div>
-                                <button data-toggle="materialize-destination-tooltip" data-placement="left"
-                                        title="Use it to define the destination of your current dataset. Default will go to Spark environment." class="destSchema btn btn-default squid-api-button-view selected"
-                                        name="destSchema"
-                                        id="destSchema">Schema
-                                </button>
-                            </div>
-                            <div>
-                                <button class="destProject btn btn-default squid-api-button-view selected"
-                                        name="destProject"
-                                        id="destProject">Project
-                                </button>
-                            </div>
-                            <div>
-                                <button class="destDomain btn btn-default squid-api-button-view selected"
-                                        name="destDomain"
-                                        id="destDomain">Domain
-                                </button>
+                <div id="materializedatasets-destination" style="display: inline-block;">
+                    <div id="materialize-destination-tooltip" data-toggle="materialize-destination-tooltip"
+                         data-placement="left"
+                         title="Use it to define the destination of your current dataset. By default, it will go to our Spark environement.">
+                        Destination :
+                        <div>
+                            <button class="destSchema btn btn-default squid-api-button-view"
+                                    name="destSchema"
+                                    id="destSchema">Schema
+                            </button>
+                        </div>
+                        <div>
+                            <div class="destProject project"
+                                    name="destProject"
+                                    id="destProject">Project
                             </div>
                         </div>
+                        <div>
+                            <button class="destDomain btn btn-default squid-api-button-view"
+                                    name="destDomain"
+                                    id="destDomain">Domain
+                            </button>
+                        </div>
                     </div>
+                </div>
 
-                    <div>
-                        <a id="view-materializedatasets" class="btn btn-default" target="_blank">Materialize</a>
-                    </div>
+                <div>
+                    <a id="view-materializedatasets" class="btn btn-default" target="_blank">Materialize</a>
+                </div>
 
             </div>
         {{/if}}
