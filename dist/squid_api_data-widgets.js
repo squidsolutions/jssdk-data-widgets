@@ -410,29 +410,29 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\r\n			<div class=\"panel panel-default filter-panel\">\r\n				<div class=\"panel-heading\">\r\n					<button type=\"button\" class=\"close\" data-toggle=\"collapse\"\r\n					data-target=\"";
+  buffer += "\r\n        <div class=\"panel panel-default filter-panel\">\r\n            <div class=\"panel-heading\">\r\n                <button type=\"button\" class=\"close\" data-toggle=\"collapse\"\r\n                        data-target=\"";
   if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n						<i class=\"glyphicon glyphicon-chevron-up\"></i>\r\n					</button>\r\n					<h4 class=\"panel-title\" id=\"myModalLabel\">Materialize</h4>\r\n				</div>\r\n			<div class=\"panel-body\">\r\n			<button type=\"button\" class=\"close\" data-toggle=\"collapse\"data-target=\"";
+    + "\" data-clavier=\"true\" aria-hidden=\"true\">\r\n                    <i class=\"glyphicon glyphicon-chevron-up\"></i>\r\n                </button>\r\n                <h4 class=\"panel-title\" id=\"myModalLabel\">Materialize</h4>\r\n            </div>\r\n        <div class=\"panel-body\">\r\n            <button type=\"button\" class=\"close\" data-toggle=\"collapse\" data-target=\"";
   if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\" aria-hidden=\"true\"></button>\r\n		";
+    + "\" data-clavier=\"true\"\r\n                    aria-hidden=\"true\"></button>\r\n        ";
   return buffer;
   }
 
 function program3(depth0,data) {
   
   var buffer = "", stack1, helper;
-  buffer += "\r\n            <button type=\"button\" class=\"close\" data-toggle=\"collapse\"data-target=\"";
+  buffer += "\r\n            <button type=\"button\" class=\"close\" data-toggle=\"collapse\" data-target=\"";
   if (helper = helpers['data-target']) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0['data-target']); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "\" data-clavier=\"true\" aria-hidden=\"true\"></button>\r\n            <div style=\"display: inline-block;\">\r\n                <div><label>Name: </label> <input type=\"text\" name=\"name\" ></div>\r\n                <div><label>Virtualize: </label> <input type=\"checkbox\" name=\"virtualize\" ";
+    + "\" data-clavier=\"true\"\r\n                    aria-hidden=\"true\"></button>\r\n            <div style=\"display: inline-block;\">\r\n                <div><label>Name: </label> <input type=\"text\" name=\"name\"></div>\r\n                <div><label>Virtualize: </label> <input type=\"checkbox\" name=\"virtualize\"\r\n                                                        ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "></div>\r\n            </div>\r\n            <div id=\"materializedatasets-view\">\r\n                 <div>\r\n                     <a class=\"destSchema btn btn-default squid-api-button-view selected\" name=\"destSchema\" id=\"destSchema\">Schema</a>\r\n                 </div>\r\n                <div>\r\n                <a class=\"destProject btn btn-default squid-api-button-view selected\" name=\"destProject\" id=\"destProject\">Project</a>\r\n                </div>\r\n                <div>\r\n                <a class=\"destDomain btn btn-default squid-api-button-view selected\" name=\"destDomain\" id=\"destDomain\">Domain</a>\r\n                 </div>\r\n\r\n                <div>\r\n                    <a id=\"view-materializedatasets\" class=\"btn btn-default\" target=\"_blank\">Materialize</a>\r\n                </div>\r\n\r\n                <div>\r\n                    <a class=\"materializebtn btn btn-default\" id=\"materializebtn\">MT</a>\r\n                </div>\r\n            </div>\r\n        ";
+  buffer += "></div>\r\n            </div>\r\n            <div id=\"materializedatasets-view\">\r\n                    <div id=\"materializedatasets-destination\" style=\"display: inline-block;\">\r\n                        <div id=\"materialize-destination-tooltip\" data-toggle=\"materialize-destination-tooltip\" data-placement=\"left\"\r\n                             title=\"Use it to define the destination of your current dataset. Default will go to Spark environement.\">\r\n                            Destination :\r\n                            <div>\r\n                                <button data-toggle=\"materialize-destination-tooltip\" data-placement=\"left\"\r\n                                        title=\"Use it to define the destination of your current dataset. Default will go to Spark environment.\" class=\"destSchema btn btn-default squid-api-button-view selected\"\r\n                                        name=\"destSchema\"\r\n                                        id=\"destSchema\">Schema\r\n                                </button>\r\n                            </div>\r\n                            <div>\r\n                                <button class=\"destProject btn btn-default squid-api-button-view selected\"\r\n                                        name=\"destProject\"\r\n                                        id=\"destProject\">Project\r\n                                </button>\r\n                            </div>\r\n                            <div>\r\n                                <button class=\"destDomain btn btn-default squid-api-button-view selected\"\r\n                                        name=\"destDomain\"\r\n                                        id=\"destDomain\">Domain\r\n                                </button>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n\r\n                    <div>\r\n                        <a id=\"view-materializedatasets\" class=\"btn btn-default\" target=\"_blank\">Materialize</a>\r\n                    </div>\r\n\r\n            </div>\r\n        ";
   return buffer;
   }
 function program4(depth0,data) {
@@ -444,25 +444,25 @@ function program4(depth0,data) {
 function program6(depth0,data) {
   
   
-  return "\r\n			</div>\r\n		</div>\r\n		";
+  return "\r\n        </div>\r\n        </div>\r\n        ";
   }
 
 function program8(depth0,data) {
   
   
-  return "\r\n		<button type=\"button\" class=\"btn popup-trigger form-control\">Materialize</button>\r\n	";
+  return "\r\n        <a href=\"#\" data-toggle=\"materialize-tooltip\" data-placement=\"top\"\r\n           title=\"You can use this button to reinject the current dataset. For example, you may want to reinject the new dataset in the same database as an other table to save your current work.\">\r\n            <button type=\"button\" class=\"btn popup-trigger form-control\">Materialize</button>\r\n        </a>\r\n    ";
   }
 
-  buffer += "<div class=\"squid-api-data-widgets-materialize-widget\">\r\n<div class=\"download-wrapper\">\r\n		";
+  buffer += "<div class=\"squid-api-data-widgets-materialize-widget\">\r\n    <div class=\"download-wrapper\">\r\n        ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n\r\n        ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.materializeDatasetsView), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n		";
+  buffer += "\r\n        ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInAccordion), {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\r\n	</div>\r\n	";
+  buffer += "\r\n    </div>\r\n    ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.displayInPopup), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\r\n</div>\r\n\r\n";
@@ -3272,6 +3272,20 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         },
 
+        infomaterialize : function (event) {
+            //if ($(this.viewPort).find('.squid-api-materialize-panel-popup')) {
+                $(this.viewPort).find('[data-toggle="materialize-tooltip"]').tooltip();
+            //}
+        },
+
+        infodestination : function (event) {
+            //if ($(this.viewPort).find('.squid-api-materialize-panel-popup')) {
+            $(this.viewPort).find('[data-toggle="materialize-destination-tooltip"]').tooltip();
+            //}
+        },
+
+
+
         enabled: function() {
         	var viewPort = this.viewPort;
         	if (this.popup) {
@@ -3500,6 +3514,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     console.error("createAnalysisJob failed");
                 });
             }
+
+            $(this.viewPort).find('.squid-api-data-widgets-materialize-widget').mouseover(
+                function(event) {
+                    me.infomaterialize(event);
+                }
+            );
+
+            $(this.viewPort).find('#materializedatasets-destination').mouseover(
+                function(event) {
+                    me.infodestination(event);
+                }
+            );
 
 
             $(this.viewPort).find('[name="format"]').click(

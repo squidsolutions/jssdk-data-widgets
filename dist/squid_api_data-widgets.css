@@ -468,6 +468,10 @@ Pagination
 	border: 1px solid #e7e7e7;
 }
 
+.squid-api-materialize-panel-popup .squid-api-button-view {
+	margin: 5px;
+}
+
 .squid-api-data-widgets-materialize-widget .btn-link {
 	padding-left: 0px;
 }
@@ -495,22 +499,10 @@ Pagination
 
 .squid-api-data-widgets-materialize-widget #materializedatasets-view, .squid-api-materialize-panel-popup #materializedatasets-view {
 	clear: both;
-	margin-top: 40px;
 }
 
 
 
-.squid-api-data-widgets-materialize-widget #curl-view {
-	clear: both;
-}
-
-.squid-api-data-widgets-materialize-widget #curl {
-	margin-top: 10px;
-}
-
-.squid-api-data-widgets-materialize-widget #curlbtn, .squid-api-materialize-panel-popup #curlbtn {
-	cursor: pointer;
-}
 
 .squid-api-materialize-panel-popup {
 	background-color: #fff;

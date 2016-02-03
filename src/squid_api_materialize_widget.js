@@ -81,6 +81,20 @@
 
         },
 
+        infomaterialize : function (event) {
+            //if ($(this.viewPort).find('.squid-api-materialize-panel-popup')) {
+                $(this.viewPort).find('[data-toggle="materialize-tooltip"]').tooltip();
+            //}
+        },
+
+        infodestination : function (event) {
+            //if ($(this.viewPort).find('.squid-api-materialize-panel-popup')) {
+            $(this.viewPort).find('[data-toggle="materialize-destination-tooltip"]').tooltip();
+            //}
+        },
+
+
+
         enabled: function() {
         	var viewPort = this.viewPort;
         	if (this.popup) {
@@ -309,6 +323,18 @@
                     console.error("createAnalysisJob failed");
                 });
             }
+
+            $(this.viewPort).find('.squid-api-data-widgets-materialize-widget').mouseover(
+                function(event) {
+                    me.infomaterialize(event);
+                }
+            );
+
+            $(this.viewPort).find('#materializedatasets-destination').mouseover(
+                function(event) {
+                    me.infodestination(event);
+                }
+            );
 
 
             $(this.viewPort).find('[name="format"]').click(

@@ -1,51 +1,70 @@
 <div class="squid-api-data-widgets-materialize-widget">
-<div class="download-wrapper">
-		{{#if displayInAccordion}}
-			<div class="panel panel-default filter-panel">
-				<div class="panel-heading">
-					<button type="button" class="close" data-toggle="collapse"
-					data-target="{{data-target}}" data-clavier="true" aria-hidden="true">
-						<i class="glyphicon glyphicon-chevron-up"></i>
-					</button>
-					<h4 class="panel-title" id="myModalLabel">Materialize</h4>
-				</div>
-			<div class="panel-body">
-			<button type="button" class="close" data-toggle="collapse"data-target="{{data-target}}" data-clavier="true" aria-hidden="true"></button>
-		{{/if}}
+    <div class="download-wrapper">
+        {{#if displayInAccordion}}
+        <div class="panel panel-default filter-panel">
+            <div class="panel-heading">
+                <button type="button" class="close" data-toggle="collapse"
+                        data-target="{{data-target}}" data-clavier="true" aria-hidden="true">
+                    <i class="glyphicon glyphicon-chevron-up"></i>
+                </button>
+                <h4 class="panel-title" id="myModalLabel">Materialize</h4>
+            </div>
+        <div class="panel-body">
+            <button type="button" class="close" data-toggle="collapse" data-target="{{data-target}}" data-clavier="true"
+                    aria-hidden="true"></button>
+        {{/if}}
 
         {{#if materializeDatasetsView}}
-            <button type="button" class="close" data-toggle="collapse"data-target="{{data-target}}" data-clavier="true" aria-hidden="true"></button>
+            <button type="button" class="close" data-toggle="collapse" data-target="{{data-target}}" data-clavier="true"
+                    aria-hidden="true"></button>
             <div style="display: inline-block;">
-                <div><label>Name: </label> <input type="text" name="name" ></div>
-                <div><label>Virtualize: </label> <input type="checkbox" name="virtualize" {{#if compression}}checked{{/if}}></div>
+                <div><label for="name">Name: </label> <input type="text" name="name"></div>
+                <div><label for="virtualize">Virtualize: </label> <input type="checkbox" name="virtualize"
+                                                        {{#if compression}}checked{{/if}}></div>
             </div>
             <div id="materializedatasets-view">
-                 <div>
-                     <a class="destSchema btn btn-default squid-api-button-view selected" name="destSchema" id="destSchema">Schema</a>
-                 </div>
-                <div>
-                <a class="destProject btn btn-default squid-api-button-view selected" name="destProject" id="destProject">Project</a>
-                </div>
-                <div>
-                <a class="destDomain btn btn-default squid-api-button-view selected" name="destDomain" id="destDomain">Domain</a>
-                 </div>
+                    <div id="materializedatasets-destination" style="display: inline-block;">
+                        <div id="materialize-destination-tooltip" data-toggle="materialize-destination-tooltip" data-placement="left"
+                             title="Use it to define the destination of your current dataset. Default will go to Spark environement.">
+                            Destination :
+                            <div>
+                                <button data-toggle="materialize-destination-tooltip" data-placement="left"
+                                        title="Use it to define the destination of your current dataset. Default will go to Spark environment." class="destSchema btn btn-default squid-api-button-view selected"
+                                        name="destSchema"
+                                        id="destSchema">Schema
+                                </button>
+                            </div>
+                            <div>
+                                <button class="destProject btn btn-default squid-api-button-view selected"
+                                        name="destProject"
+                                        id="destProject">Project
+                                </button>
+                            </div>
+                            <div>
+                                <button class="destDomain btn btn-default squid-api-button-view selected"
+                                        name="destDomain"
+                                        id="destDomain">Domain
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
-                <div>
-                    <a id="view-materializedatasets" class="btn btn-default" target="_blank">Materialize</a>
-                </div>
+                    <div>
+                        <a id="view-materializedatasets" class="btn btn-default" target="_blank">Materialize</a>
+                    </div>
 
-                <div>
-                    <a class="materializebtn btn btn-default" id="materializebtn">MT</a>
-                </div>
             </div>
         {{/if}}
-		{{#if displayInAccordion}}
-			</div>
-		</div>
-		{{/if}}
-	</div>
-	{{#if displayInPopup}}
-		<button type="button" class="btn popup-trigger form-control">Materialize</button>
-	{{/if}}
+        {{#if displayInAccordion}}
+        </div>
+        </div>
+        {{/if}}
+    </div>
+    {{#if displayInPopup}}
+        <a href="#" data-toggle="materialize-tooltip" data-placement="top"
+           title="You can use this button to reinject the current dataset. For example, you may want to reinject the new dataset in the same database as an other table to save your current work.">
+            <button type="button" class="btn popup-trigger form-control">Materialize</button>
+        </a>
+    {{/if}}
 </div>
 
