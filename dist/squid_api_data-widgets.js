@@ -432,7 +432,7 @@ function program3(depth0,data) {
     + "\" data-clavier=\"true\"\r\n                    aria-hidden=\"true\"></button>\r\n            <div style=\"display: inline-block;\">\r\n                <div><label for=\"name\">Name: </label> <input type=\"text\" name=\"name\"></div>\r\n                <div id=\"virtualize\" data-toggle=\"materialize-virtualize-tooltip\" data-placement=\"left\"\r\n                     title=\"Use a virtual dataset. The datasets is not actually reinjected but stays as domain without physical existence.\">\r\n                    <label for=\"virtualize\">Virtualize: </label>\r\n                    <input\r\n                            type=\"checkbox\" name=\"virtualize\"\r\n                            ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.compression), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "></div>\r\n            </div>\r\n            <div id=\"materializedatasets-view\">\r\n                <div id=\"materializedatasets-destination\" style=\"display: inline-block;\">\r\n                    <div id=\"materialize-destination-tooltip\" data-toggle=\"materialize-destination-tooltip\"\r\n                         data-placement=\"left\"\r\n                         title=\"Use it to define the destination of your current dataset. By default, it will go to our Spark environement.\">\r\n                        Destination :\r\n                        <div>\r\n                            <button class=\"destSchema btn btn-default squid-api-button-view\"\r\n                                    name=\"destSchema\"\r\n                                    id=\"destSchema\">Schema\r\n                            </button>\r\n                        </div>\r\n                        <div>\r\n                            <button class=\"destProject project btn btn-default squid-api-button-view\"\r\n                                    name=\"destProject\"\r\n                                    id=\"destProject\">Project\r\n                            </button>\r\n                        </div>\r\n                        <div>\r\n                            <button class=\"destDomain btn btn-default squid-api-button-view\"\r\n                                    name=\"destDomain\"\r\n                                    id=\"destDomain\">Domain\r\n                            </button>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div>\r\n                    <a id=\"view-materializedatasets\" class=\"btn btn-default\" target=\"_blank\">Materialize</a>\r\n                </div>\r\n\r\n            </div>\r\n        ";
+  buffer += "></div>\r\n            </div>\r\n            <div id=\"materializedatasets-view\">\r\n                <div id=\"materializedatasets-destination\" style=\"display: inline-block;\">\r\n                    <div id=\"materialize-destination-tooltip\" data-toggle=\"materialize-destination-tooltip\"\r\n                         data-placement=\"left\"\r\n                         title=\"Use it to define the destination of your current dataset. By default, it will go to our Spark environement.\">\r\n                        Destination :\r\n                        <div>\r\n                            <button class=\"destSchema btn btn-default squid-api-button-view\"\r\n                                    name=\"destSchema\"\r\n                                    id=\"destSchema\">Schema\r\n                            </button>\r\n                        </div>\r\n                        <div>\r\n                            <div class=\"destProject project\"\r\n                                    name=\"destProject\"\r\n                                    id=\"destProject\">Project\r\n                            </div>\r\n                        </div>\r\n                        <div>\r\n                            <button class=\"destDomain btn btn-default squid-api-button-view\"\r\n                                    name=\"destDomain\"\r\n                                    id=\"destDomain\">Domain\r\n                            </button>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n\r\n                <div>\r\n                    <a id=\"view-materializedatasets\" class=\"btn btn-default\" target=\"_blank\">Materialize</a>\r\n                </div>\r\n\r\n            </div>\r\n        ";
   return buffer;
   }
 function program4(depth0,data) {
@@ -3208,6 +3208,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         materializeDatasetsView: false,
         downloadButtonLabel: "Create Your DataFrame",
         popupDialogClass: "squid-api-materialize-panel-popup",
+        mdomainCollection: null,
+        mprojectCollection: null,
+        mdomainModal: null,
+        mdomainButton: null,
+        mprojectModal: null,
+        mprojectButton: null,
 
         initialize: function (options) {
             var me = this;
@@ -3254,6 +3260,27 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (options.displayInPopup) {
                 this.displayInPopup = true;
             }
+
+            if (options.mprojectCollection) {
+                this.mprojectCollection = options.mprojectCollection;
+            }
+            if (options.mprojectModal) {
+                this.mprojectModal = options.mprojectModal;
+            }
+            if (options.mprojectButton) {
+                this.mprojectButton = options.mprojectButton;
+            }
+
+            if (options.mdomainCollection) {
+                this.mdomainCollection = options.mdomainCollection;
+            }
+            if (options.mdomainModal) {
+                this.mdomainModal = options.mdomainModal;
+            }
+            if (options.mdomainButton) {
+                this.mdomainButton = options.mdomainButton;
+            }
+
             if (options.materializeDatasetsView) {
                 this.materializeDatasetsView = true;
             }
@@ -3360,12 +3387,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 var downloadAnalysis = new squid_api.model.InternalanalysisjobModel();
                 downloadAnalysis.set(
                     {
-                        "name": viewPort.find("#destDomain").val(),
+                        "name": this.popup.find("#destDomain").val(),
                         "options": {
                             "analysisJob": analysis,
                             "sourceProjectId": analysis.get("id").projectId,
-                            "destProjectId": viewPort.find("#destProject").val(),
-                            "destSchema": viewPort.find("#destSchema").val()
+                            "destProjectId": this.popup.find("#destProject").val(),
+                            "destSchema": this.popup.find("#destSchema").val()
                         }
                     }
                 );
@@ -3472,41 +3499,15 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     "apiURL": squid_api.apiURL
                 })
             );
-            var dfButton = new squid_api.view.DomainSelectorButton({
-                el: '#materializebtn'
-            });
 
-            dfButton.$el.click(function () {
-                dfModal.render();
-            });
 
-            var dfCollection = new squid_api.view.BookmarkCollectionManagementWidget({
-                onSelect: function () {
-                    dfModal.close();
-                }
-            });
-
-            var dfModal = new squid_api.view.ModalView({
-                view: dfCollection
-            });
-
-            var projectCollection = new squid_api.view.ProjectCollectionManagementWidget({
-                onSelect: function () {
-                    projectModal.close();
-                }
-            });
-
-            var projectModal = new squid_api.view.ModalView({
-                view: projectCollection //squid_api.getSelectedProjectCollection()
-            });
-
-            var projectButton = new squid_api.view.ProjectSelectorButton({
-                el: '#destProject'
-            });
-
-            projectButton.$el.click(function () {
-                projectModal.render();
-            });
+            //var mprojectButton = new squid_api.view.ProjectSelectorButton({
+            //    el: '#destProject'
+            //});
+            //
+            //mprojectButton.$el.click(function () {
+            //    me.mprojectModal.render();
+            //});
 
 
             if (analysis.get("id").projectId) {
@@ -3552,18 +3553,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             );
 
 
-            $(this.viewPort).find('[name="format"]').click(
-                function (event) {
-                    me.clickedFormat(event);
-                });
             $(this.viewPort).find('[name="virtualize"]')
                 .click(function (event) {
                     me.clickedVirtualize(event);
                 });
 
-            $(this.viewPort).find("#download").click(function () {
-                me.download();
-            });
+
             if (this.materializeDatasetsView === true) {
                 $(this.viewPort).find("#view-materializedatasets").click(function () {
                     me.refreshViewMaterializeDatasets();
@@ -3572,7 +3567,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             if (this.displayInPopup) {
                 // remove any existing popups
                 $("." + this.popupDialogClass).remove();
-
+                /*
+                    when the popup is initialized, events will need to be targeted by using 'this.popup' instead of
+                    the 'this.viewPort' as the popup dom elements will be inserted after
+                 */
                 this.popup = this.$el.find(".download-wrapper").dialog({
                     dialogClass: this.popupDialogClass,
                     autoOpen: false,

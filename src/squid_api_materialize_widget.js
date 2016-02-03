@@ -376,7 +376,10 @@
             if (this.displayInPopup) {
                 // remove any existing popups
                 $("." + this.popupDialogClass).remove();
-
+                /*
+                    when the popup is initialized, events will need to be targeted by using 'this.popup' instead of
+                    the 'this.viewPort' as the popup dom elements will be inserted after
+                 */
                 this.popup = this.$el.find(".download-wrapper").dialog({
                     dialogClass: this.popupDialogClass,
                     autoOpen: false,
